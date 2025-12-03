@@ -1,0 +1,290 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+.instagram-page {
+  min-height: 100vh;
+  background: #ffffff;
+  position: relative;
+}
+
+.cart-notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+  color: #ffffff;
+  padding: 15px 25px;
+  border-radius: 25px;
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4);
+  z-index: 1000;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Hero Section */
+.instagram-hero {
+  padding: 120px 20px 80px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 30%, #fcd34d 60%, #fbbf24 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.2) 0%,
+    rgba(236, 72, 153, 0.25) 30%,
+    rgba(219, 39, 119, 0.2) 70%,
+    rgba(245, 158, 11, 0.25) 100%
+  );
+  z-index: 0;
+}
+
+.hero-container {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 900;
+  color: #1e293b;
+  margin: 0 0 1.5rem 0;
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1.2;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  color: #334155;
+  margin: 0 0 1rem 0;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+}
+
+.hero-description {
+  font-size: 1.1rem;
+  color: #475569;
+  margin: 0 0 2.5rem 0;
+  line-height: 1.7;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Instagram Price List Section */
+.instagram-price-section {
+  padding: 80px 20px;
+  background: #ffffff;
+}
+
+.instagram-price-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.instagram-price-section .section-title {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 50px 0;
+  background: linear-gradient(135deg, #f59e0b 0%, #ec4899 50%, #db2777 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+}
+
+.instagram-price-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 40px;
+}
+
+.instagram-category {
+  background: #f8f9fa;
+  padding: 30px;
+  border-radius: 16px;
+  border: 2px solid #e2e8f0;
+}
+
+.instagram-category-title {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 25px 0;
+  background: linear-gradient(135deg, #f59e0b 0%, #ec4899 30%, #db2777 60%, #be185d 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.8px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #ec4899;
+}
+
+.instagram-price-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.instagram-price-item {
+  display: flex;
+  flex-direction: column;
+  padding: 15px 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.instagram-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.instagram-price-item:hover {
+  border-color: #ec4899;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.15);
+}
+
+.instagram-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  font-family: 'Inter', sans-serif;
+}
+
+.instagram-price {
+  font-size: 1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #f59e0b 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.instagram-note {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-style: italic;
+  font-family: 'Inter', sans-serif;
+  margin-top: 5px;
+}
+
+.price-order-btn {
+  padding: 10px 20px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  white-space: nowrap !important;
+  width: 100% !important;
+}
+
+.price-order-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+  .instagram-price-section .section-title {
+    font-size: 2rem;
+  }
+
+  .instagram-category-title {
+    font-size: 2rem;
+  }
+
+  .instagram-price-container {
+    grid-template-columns: 1fr;
+  }
+
+  .instagram-price-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .instagram-hero {
+    padding: 100px 15px 60px;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .instagram-price-section {
+    padding: 60px 15px;
+  }
+
+  .instagram-price-section .section-title {
+    font-size: 1.75rem;
+  }
+
+  .instagram-category-title {
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+  }
+
+  .instagram-price-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .instagram-category {
+    padding: 20px;
+  }
+}
+

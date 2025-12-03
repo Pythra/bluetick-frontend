@@ -1,0 +1,115 @@
+.publication-logos-section {
+  padding: 50px 20px;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.publication-logos-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.publication-logos-title {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 40px;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  letter-spacing: 0.8px;
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 30%, #ec4899 60%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.publication-logos-section.impact-logos-carousel {
+  padding: 0;
+  background: transparent;
+}
+
+.publication-logos-section.impact-logos-carousel .publication-logos-title {
+  margin-bottom: 20px;
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+  background: none;
+  -webkit-text-fill-color: rgba(241, 245, 249, 0.9);
+  color: rgba(241, 245, 249, 0.9);
+  text-transform: uppercase;
+}
+
+.logos-carousel-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.logos-carousel {
+  display: flex;
+  animation: scroll 30s linear infinite;
+  gap: 40px;
+  width: fit-content;
+}
+
+.logo-item {
+  flex-shrink: 0;
+  width: 150px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  transition: transform 0.3s ease;
+}
+
+.logo-item:hover {
+  transform: scale(1.1);
+}
+
+.logo-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: grayscale(20%);
+  transition: filter 0.3s ease;
+}
+
+.logo-item:hover .logo-image {
+  filter: grayscale(0%);
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 768px) {
+  .publication-logos-section {
+    padding: 40px 20px;
+  }
+
+  .publication-logos-title {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+  }
+
+  .logo-item {
+    width: 120px;
+    height: 60px;
+    padding: 10px;
+  }
+
+  .logos-carousel {
+    gap: 30px;
+  }
+}
+
