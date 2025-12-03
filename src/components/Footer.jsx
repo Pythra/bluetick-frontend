@@ -92,9 +92,9 @@ function Footer({ onScrollToSection }) {
           <div className="footer-section">
             <h3 className="footer-title">Follow Us</h3>
             <div className="social-links">
-              <a 
-                href="https://www.instagram.com/bluetickgenq" 
-                target="_blank" 
+              <a
+                href="https://www.instagram.com/bluetickgengs?igsh=OGY2dWU3a3lsZzR5&utm_source=qr"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="social-link"
                 aria-label="Instagram"

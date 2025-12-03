@@ -305,7 +305,7 @@ const packages = [
     image: newsImage,
   },
   {
-    id: 2,
+    id: 3,
     title: 'UK News Network',
     price: 'Contact for pricing',
     description: 'Reach UK audiences with top British publications and business outlets including BBC News, The Guardian, and more.',
@@ -315,7 +315,7 @@ const packages = [
     image: ukNewsImage,
   },
   {
-    id: 3,
+    id: 4,
     title: 'Google News Verified',
     price: 'Contact for pricing',
     description: 'Get featured on Google News approved platforms for maximum visibility and search engine exposure.',
@@ -325,7 +325,7 @@ const packages = [
     image: googleNewsImage,
   },
   {
-    id: 4,
+    id: 2,
     title: 'Tech Cabal & Friends',
     price: 'Contact for pricing',
     description: 'TechCabal, Techpoint, Techeconomy, and more. Launch products, raise funding, or make ecosystem noise.',
@@ -334,7 +334,7 @@ const packages = [
     image: techImage,
   },
   {
-    id: 3,
+    id: 5,
     title: 'Global News',
     price: 'Contact for pricing',
     description: 'Forbes, BBC News, Bloomberg, Reuters. Unlock international credibility and investor-grade trust.',
