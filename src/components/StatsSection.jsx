@@ -7,7 +7,7 @@ import './StatsSection.css';
 
 function StatsSection() {
   const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef(null);
+  const sectionRef = u  seRef(null);
 
   const stats = [
     { value: 500, suffix: '+', label: 'Satisfied Clients', icon: '👥', bg: clientsImage },
