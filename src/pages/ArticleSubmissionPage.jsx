@@ -109,6 +109,13 @@ function ArticleSubmissionPage() {
     setSubmitStatus('');
 
     try {
+      // Check if orderId exists
+      if (!orderDetails.orderId) {
+        setError('Order ID is missing. Please go back to checkout and try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
       const formDataToSend = new FormData();
       formDataToSend.append('postTitle', formData.postTitle.trim());
       formDataToSend.append('postBody', formData.postBody.trim());
@@ -121,6 +128,13 @@ function ArticleSubmissionPage() {
       // Add images
       formData.imageFiles.forEach((file, index) => {
         formDataToSend.append(`image${index + 1}`, file);
+      });
+
+      console.log('[Article Submission] Sending request with:', {
+        orderId: orderDetails.orderId,
+        hasPostTitle: !!formData.postTitle,
+        hasPostBody: !!formData.postBody,
+        imagesCount: formData.imageFiles.length
       });
 
       const response = await fetch(`${apiUrl}/api/orders/article-submission`, {
