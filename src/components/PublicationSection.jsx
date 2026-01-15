@@ -5,14 +5,14 @@ const packages = [
   {
     id: 1,
     title: 'Package 1',
-    price: '$2,500',
+    price: '₦3,750,000',
     description: 'Publications on all major platforms plus over 10 news platforms',
     delivery: '2-7 days'
   },
   {
     id: 2,
     title: 'Package 2',
-    price: '$300 per platform',
+    price: '₦450,000 per platform',
     description: 'Publications on individual platforms',
     delivery: '6 hours'
   },
@@ -27,7 +27,7 @@ const packages = [
   {
     id: 4,
     title: 'Package 4 - USA Newswire',
-    price: '$400',
+    price: '₦600,000',
     description: 'Syndicated on 400+ US sites across all states. Includes FOX News affiliates. Full list of published links provided in Excel format',
     delivery: 'Varies'
   },
@@ -41,15 +41,15 @@ const packages = [
   {
     id: 6,
     title: 'Package 6',
-    price: '$550 each',
+    price: '₦825,000 each',
     description: 'Publication on individual international platforms',
     delivery: 'More information available on request'
   },
   {
     id: 7,
     title: 'Package 7',
-    price: '$2,500',
-    description: 'Multiple platform options: MSN ($1,000), Bloomberg ($700), 5 Google News Sites',
+    price: '₦3,750,000',
+    description: 'Multiple platform options: MSN (₦1,500,000), Bloomberg (₦1,050,000), 5 Google News Sites',
     delivery: 'Varies',
     bonus: 'Bonus: 3 platforms from Package 2'
   },
@@ -63,29 +63,29 @@ const packages = [
   {
     id: 9,
     title: 'Package 9 - Tech and Entertainment Platforms',
-    price: '$2,400',
-    description: 'Individual platform pricing: $200, $1,000, $200, $500, $300, $200, $200 (various platforms)',
+    price: '₦3,600,000',
+    description: 'Individual platform pricing: ₦300,000, ₦1,500,000, ₦300,000, ₦750,000, ₦450,000, ₦300,000, ₦300,000 (various platforms)',
     delivery: 'Varies',
     bonus: 'Bonus: 3 platforms from Package 2'
   },
   {
     id: 10,
     title: 'Package 10',
-    price: '$1,200 / $1,200 / $600 / $300',
+    price: '₦1,800,000 / ₦1,800,000 / ₦900,000 / ₦450,000',
     description: 'Make a selection from available platforms',
     delivery: 'Varies'
   },
   {
     id: 11,
     title: 'Package 11',
-    price: '$3,500',
+    price: '₦5,250,000',
     description: 'Publications on all platforms plus over 10 news platforms',
     delivery: '2-7 days'
   },
   {
     id: 12,
     title: 'Package 12',
-    price: '$4,500',
+    price: '₦6,750,000',
     description: 'Different articles can be published on each news platform',
     delivery: 'Varies',
     bonus: 'Bonus: 3 platforms from Package 2'
@@ -100,7 +100,7 @@ const packages = [
   {
     id: 14,
     title: 'Package 14 - Uganda Platforms',
-    price: '$2,200 per platform',
+    price: '₦3,300,000 per platform',
     description: 'Featured placement on Uganda authority sites',
     delivery: 'More information available on request'
   },

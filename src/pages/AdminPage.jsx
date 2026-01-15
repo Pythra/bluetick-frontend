@@ -329,6 +329,24 @@ function AdminPage() {
                                 <div className="field-value message-text">{order.message}</div>
                               </div>
                             )}
+                            {order.metadata?.postDetails && (
+                              <div className="order-field">
+                                <span className="field-label">Post Details:</span>
+                                <div className="field-value">{order.metadata.postDetails}</div>
+                              </div>
+                            )}
+                            {order.metadata?.comments && (
+                              <div className="order-field">
+                                <span className="field-label">Comments:</span>
+                                <div className="field-value">{order.metadata.comments}</div>
+                              </div>
+                            )}
+                            {order.metadata?.instructions && (
+                              <div className="order-field">
+                                <span className="field-label">Special Instructions:</span>
+                                <div className="field-value">{order.metadata.instructions}</div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}

@@ -7,6 +7,7 @@ import {
   IoLogoInstagram,
   IoLogoTiktok,
   IoLogoFacebook,
+  IoLogoTwitter,
   IoGlobeOutline,
   IoPhonePortraitOutline,
   IoCheckmarkCircleOutline,
@@ -113,7 +114,7 @@ function Footer({ onScrollToSection }) {
                 <span>TikTok</span>
               </a>
               <a 
-                href="https://www.facebook.com/bluetickgeng" 
+                href="https://www.facebook.com/bluetickgeng1" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="social-link"
@@ -121,6 +122,16 @@ function Footer({ onScrollToSection }) {
               >
                 <IoLogoFacebook className="social-icon" />
                 <span>Facebook</span>
+              </a>
+              <a 
+                href="https://x.com/bluetickgeng" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="social-link"
+                aria-label="Twitter"
+              >
+                <IoLogoTwitter className="social-icon" />
+                <span>Twitter</span>
               </a>
             </div>
           </div>

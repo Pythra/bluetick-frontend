@@ -73,10 +73,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Alabareports</span>
-                    <span className="instagram-price">₦100,000</span>
+                    <span className="instagram-price">₦70,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Alabareports', price: '₦100,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Alabareports', price: '₦70,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -84,12 +84,25 @@ function InstagramServicesPage() {
                 </div>
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">Gossipmial</span>
-                    <span className="instagram-price">₦1,000,000 or ₦500,000</span>
-                    <span className="instagram-note">(Gossipmial Have 2 account)</span>
+                    <span className="instagram-name">Gossipmill</span>
+                    <span className="instagram-price">₦750,000</span>
+                    <span className="instagram-note">Account 1</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Gossipmial', price: '₦1,000,000 or ₦500,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Gossipmill - Account 1', price: '₦750,000', category: 'instagram' })} 
+                    className="price-order-btn"
+                  >
+                    Add to Cart
+                  </Button>
+                </div>
+                <div className="instagram-price-item">
+                  <div className="instagram-info">
+                    <span className="instagram-name">Gossipmill</span>
+                    <span className="instagram-price">₦400,000</span>
+                    <span className="instagram-note">Account 2</span>
+                  </div>
+                  <Button 
+                    onClick={() => handleAddToCart({ title: 'Gossipmill - Account 2', price: '₦400,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -98,10 +111,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">WahalaNetwork</span>
-                    <span className="instagram-price">₦400,000</span>
+                    <span className="instagram-price">₦300,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'WahalaNetwork', price: '₦400,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'WahalaNetwork', price: '₦300,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -110,10 +123,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Instablog</span>
-                    <span className="instagram-price">₦1,500,000</span>
+                    <span className="instagram-price">₦900,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Instablog', price: '₦1,500,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Instablog', price: '₦900,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -122,10 +135,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Themixhq</span>
-                    <span className="instagram-price">₦1,000,000</span>
+                    <span className="instagram-price">₦750,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Themixhq', price: '₦1,000,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Themixhq', price: '₦750,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -133,11 +146,23 @@ function InstagramServicesPage() {
                 </div>
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">GossipLoaded</span>
+                    <span className="instagram-name">Gossiploaded</span>
+                    <span className="instagram-price">₦200,000</span>
+                  </div>
+                  <Button 
+                    onClick={() => handleAddToCart({ title: 'Gossiploaded', price: '₦200,000', category: 'instagram' })} 
+                    className="price-order-btn"
+                  >
+                    Add to Cart
+                  </Button>
+                </div>
+                <div className="instagram-price-item">
+                  <div className="instagram-info">
+                    <span className="instagram-name">Thecontentlovers</span>
                     <span className="instagram-price">₦300,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'GossipLoaded', price: '₦300,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Thecontentlovers', price: '₦300,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -145,23 +170,11 @@ function InstagramServicesPage() {
                 </div>
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">thecontentlovers</span>
-                    <span className="instagram-price">₦400,000</span>
+                    <span className="instagram-name">Olofofonija</span>
+                    <span className="instagram-price">₦200,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'thecontentlovers', price: '₦400,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Olofofonaija</span>
-                    <span className="instagram-price">₦300,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Olofofonaija', price: '₦300,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Olofofonija', price: '₦200,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -170,10 +183,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Notjustok</span>
-                    <span className="instagram-price">₦1,000,000</span>
+                    <span className="instagram-price">₦800,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Notjustok', price: '₦1,000,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Notjustok', price: '₦800,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -182,10 +195,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Gistloverblog</span>
-                    <span className="instagram-price">₦900,000</span>
+                    <span className="instagram-price">₦700,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Gistloverblog', price: '₦900,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Gistloverblog', price: '₦700,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -194,10 +207,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Samklef</span>
-                    <span className="instagram-price">₦1,000,000</span>
+                    <span className="instagram-price">₦750,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Samklef', price: '₦1,000,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Samklef', price: '₦750,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -206,10 +219,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">FunnyAfrica</span>
-                    <span className="instagram-price">₦700,000</span>
+                    <span className="instagram-price">₦500,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'FunnyAfrica', price: '₦700,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'FunnyAfrica', price: '₦500,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -218,10 +231,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Tundeednut</span>
-                    <span className="instagram-price">₦5,000,000</span>
+                    <span className="instagram-price">₦1,000,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Tundeednut', price: '₦5,000,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Tundeednut', price: '₦1,000,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -230,10 +243,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">NaijaEverything</span>
-                    <span className="instagram-price">₦450,000</span>
+                    <span className="instagram-price">₦350,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'NaijaEverything', price: '₦450,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'NaijaEverything', price: '₦350,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -242,10 +255,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Yabaleftonline</span>
-                    <span className="instagram-price">₦850,000</span>
+                    <span className="instagram-price">₦650,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Yabaleftonline', price: '₦850,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Yabaleftonline', price: '₦650,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -253,11 +266,11 @@ function InstagramServicesPage() {
                 </div>
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">Goldmynetv</span>
-                    <span className="instagram-price">₦350,000</span>
+                    <span className="instagram-name">GoldmyneTV</span>
+                    <span className="instagram-price">₦250,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Goldmynetv', price: '₦350,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'GoldmyneTV', price: '₦250,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -266,10 +279,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Lindaikejisblog</span>
-                    <span className="instagram-price">₦850,000</span>
+                    <span className="instagram-price">₦650,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Lindaikejisblog', price: '₦850,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Lindaikejisblog', price: '₦650,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -278,10 +291,10 @@ function InstagramServicesPage() {
                 <div className="instagram-price-item">
                   <div className="instagram-info">
                     <span className="instagram-name">Shallipopi News</span>
-                    <span className="instagram-price">₦300,000</span>
+                    <span className="instagram-price">₦200,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Shallipopi News', price: '₦300,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Shallipopi News', price: '₦200,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -289,11 +302,11 @@ function InstagramServicesPage() {
                 </div>
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">Officialbiesloeded</span>
-                    <span className="instagram-price">₦650,000</span>
+                    <span className="instagram-name">Officialbisloded</span>
+                    <span className="instagram-price">₦500,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Officialbiesloeded', price: '₦650,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Officialbisloded', price: '₦500,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -307,11 +320,23 @@ function InstagramServicesPage() {
               <div className="instagram-price-grid">
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">24hour Post</span>
+                    <span className="instagram-name">24 Hours Post</span>
+                    <span className="instagram-price">₦180,000</span>
+                  </div>
+                  <Button 
+                    onClick={() => handleAddToCart({ title: '24 Hours Post', price: '₦180,000', category: 'instagram' })} 
+                    className="price-order-btn"
+                  >
+                    Add to Cart
+                  </Button>
+                </div>
+                <div className="instagram-price-item">
+                  <div className="instagram-info">
+                    <span className="instagram-name">1 Day Post</span>
                     <span className="instagram-price">₦250,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: '24hour Post', price: '₦250,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: '1 Day Post', price: '₦250,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -319,11 +344,11 @@ function InstagramServicesPage() {
                 </div>
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">1Day Post</span>
-                    <span className="instagram-price">₦350,000</span>
+                    <span className="instagram-name">3 Days Post</span>
+                    <span className="instagram-price">₦500,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: '1Day Post', price: '₦350,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: '3 Days Post', price: '₦500,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -331,11 +356,11 @@ function InstagramServicesPage() {
                 </div>
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">3Days Post</span>
-                    <span className="instagram-price">₦650,000</span>
+                    <span className="instagram-name">Collaboration Post (3 Days)</span>
+                    <span className="instagram-price">₦800,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: '3Days Post', price: '₦650,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Collaboration Post (3 Days)', price: '₦800,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart
@@ -343,23 +368,11 @@ function InstagramServicesPage() {
                 </div>
                 <div className="instagram-price-item">
                   <div className="instagram-info">
-                    <span className="instagram-name">Collaboration Post For 3Day</span>
-                    <span className="instagram-price">₦1,000,000</span>
+                    <span className="instagram-name">Collaboration Post (6 Days)</span>
+                    <span className="instagram-price">₦2,300,000</span>
                   </div>
                   <Button 
-                    onClick={() => handleAddToCart({ title: 'Collaboration Post For 3Day', price: '₦1,000,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Collaboration Post For 6Day</span>
-                    <span className="instagram-price">₦3,000,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Collaboration Post For 6Day', price: '₦3,000,000', category: 'instagram' })} 
+                    onClick={() => handleAddToCart({ title: 'Collaboration Post (6 Days)', price: '₦2,300,000', category: 'instagram' })} 
                     className="price-order-btn"
                   >
                     Add to Cart

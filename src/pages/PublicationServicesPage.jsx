@@ -63,7 +63,7 @@ import './PublicationServicesPage.css';
 const africanPlatforms = [
   { name: 'Punch', price: '\u20a680000', logo: punchLogo },
   { name: 'BusinessDay', price: '\u20a680000', logo: businessDayLogo },
-  { name: 'Legit', price: '\u20a610000', logo: legitLogo },
+  { name: 'Legit', price: 'NGN300,000', logo: legitLogo },
   { name: 'The Nation', price: '\u20a630000', logo: theNationLogo },
   { name: 'Independent', price: '\u20a620000', logo: independentLogo },
   { name: 'Vanguard', price: '\u20a620000', logo: vanguardLogo },
@@ -81,7 +81,7 @@ const africanPlatforms = [
   { name: 'Champion', price: '\u20a620000', logo: championLogo },
   { name: "People's Daily", price: '\u20a620000', logo: peoplesDailyLogo },
   { name: 'Blueprint', price: '\u20a620000', logo: blueprintLogo },
-  { name: 'GhanaWeb', price: '\u20a610000', logo: ghanaWebLogo },
+  { name: 'GhanaWeb', price: 'NGN100,000', logo: ghanaWebLogo },
   { name: 'Pulse', price: '\u20a620000', logo: pulseLogo },
   { name: 'OkayAfrican', price: '\u20a62500000', logo: null },
   { name: 'PeaceFm Online', price: '\u20a6800000', logo: null },
@@ -216,7 +216,7 @@ const ukPlatforms = [
 
 // Tech & Startup Platforms
 const techPlatforms = [
-  { name: 'Techpoint', price: '\u20a620000', logo: techpointLogo },
+  { name: 'Techpoint', price: 'NGN250,000', logo: techpointLogo },
   { name: 'TechCabal', price: '\u20a625000', logo: techCabalLogo },
   { name: 'Cybersecurity Insiders', price: '\u20a6700000', logo: null },
   { name: 'TechRound', price: '\u20a61600000', logo: null },
@@ -646,15 +646,15 @@ function PublicationServicesPage() {
             <div className="services-list">
               <div className="service-fee-item">
                 <span className="service-name">Backdating an article</span>
-                <span className="service-price">₦10,000 per article</span>
+                <span className="service-price">NGN50,000 per article</span>
               </div>
               <div className="service-fee-item">
                 <span className="service-name">Including links in an article</span>
-                <span className="service-price">₦30,000 per article</span>
+                <span className="service-price">NGN100,000 per article</span>
               </div>
               <div className="service-fee-item">
-                <span className="service-name">Deleting an article from a platform after publication</span>
-                <span className="service-price">₦60,000 per article</span>
+                <span className="service-name">Deleting already existing article (Reputation management)</span>
+                <span className="service-price">NGN500,000 per article</span>
               </div>
             </div>
           </div>

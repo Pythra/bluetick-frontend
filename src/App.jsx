@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import ScrollToTop from './components/ScrollToTop';
@@ -19,6 +20,7 @@ import PackageDetailPage from './pages/PackageDetailPage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
 import CheckoutPage from './pages/CheckoutPage';
+import ArticleSubmissionPage from './pages/ArticleSubmissionPage';
 import AdminPage from './pages/AdminPage';
 import Footer from './components/Footer';
 import { useAuth } from './contexts/AuthContext';
@@ -52,10 +54,18 @@ function HomePage() {
 }
 
 function App() {
+  // Create a custom history object with the future flags
+  const history = createBrowserHistory({
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true
+    }
+  });
+
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
+        <Router history={history}>
           <ScrollToTop />
           <div className="App">
             <Routes>
@@ -63,12 +73,15 @@ function App() {
               <Route path="/services/apps" element={<AppServicesPage />} />
               <Route path="/services/websites" element={<WebsiteServicesPage />} />
               <Route path="/services/verification" element={<VerificationServicesPage />} />
-            <Route path="/services/publications" element={<PublicationServicesPage />} />
-            <Route path="/services/publications/package/:id" element={<PackageDetailPage />} />
-            <Route path="/services/instagram" element={<InstagramServicesPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/services/publications">
+                <Route index element={<PublicationServicesPage />} />
+                <Route path="package/:id" element={<PackageDetailPage />} />
+              </Route>
+              <Route path="/services/instagram" element={<InstagramServicesPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/article-submission" element={<ArticleSubmissionPage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/terms" element={<TermsAndConditions />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
