@@ -377,13 +377,7 @@ function AdminPage() {
                                 </span>
                               </div>
                             )}
-                            {order.message && (
-                              <div className="order-field message-field">
-                                <span className="field-label">Message:</span>
-                                <div className="field-value message-text">{order.message}</div>
-                              </div>
-                            )}
-                            {order.metadata?.postDetails && (
+                            {order.postDetails && (
                               <div className="order-field">
                                 <span className="field-label">Post Details:</span>
                                 <div className="field-value">{order.metadata.postDetails}</div>
@@ -498,12 +492,6 @@ function AdminPage() {
                           <span className="field-value">
                             {order.currency === 'USD' ? '$' : '₦'}{order.totalAmount.toLocaleString()}
                           </span>
-                        </div>
-                      )}
-                      {order.message && (
-                        <div className="order-field message-field">
-                          <span className="field-label">Message:</span>
-                          <div className="field-value message-text">{order.message}</div>
                         </div>
                       )}
                     </div>
