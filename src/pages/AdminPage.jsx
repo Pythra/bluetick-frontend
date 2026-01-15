@@ -158,6 +158,21 @@ function AdminPage() {
     }));
   };
 
+  // Expand submission details by default for orders that have them
+  useEffect(() => {
+    if (users.length > 0) {
+      const orderIdsWithSubmissions = {};
+      users.forEach(user => {
+        user.orders?.forEach(order => {
+          if (order.postTitle || order.postBody || order.articleContent || order.fileName) {
+            orderIdsWithSubmissions[order.id] = true;
+          }
+        });
+      });
+      setExpandedOrders(orderIdsWithSubmissions);
+    }
+  }, [users]);
+
   // Login Form Component
   if (!isLoggedIn) {
     return (
