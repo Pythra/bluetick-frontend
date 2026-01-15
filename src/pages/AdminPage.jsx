@@ -249,10 +249,7 @@ function AdminPage() {
           <div className="admin-header-top">
             <Button onClick={() => navigate('/')} className="back-button">
               ← Back to Home
-            </Button>
-            <Button onClick={fetchUsers} className="refresh-button">
-              🔄 Refresh
-            </Button>
+            </Button> 
             <Button onClick={handleLogout} className="logout-button">
               Logout
             </Button>
