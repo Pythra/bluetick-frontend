@@ -9,9 +9,9 @@ import Footer from '../components/Footer';
 import './ServicesPage.css';
 
 const websiteServices = [
-  { title: 'Basic Informational Website', price: 350 },
-  { title: 'Standard Website', price: 1000 },
-  { title: 'Custom Web Applications', price: 2500 },
+  { title: 'Basic Informational Website', price: 525000 },
+  { title: 'Standard Website', price: 1500000 },
+  { title: 'Custom Web Applications', price: 3750000 },
 ];
 
 function WebsiteServicesPage() {
@@ -63,7 +63,7 @@ function WebsiteServicesPage() {
             <div key={index} className="service-card-detailed">
               <h3 className="service-card-title">{service.title}</h3>
               <div className="service-card-price">
-                Starting from <span className="price-amount">{formatPrice(service.price, '$')}</span>
+                Starting from <span className="price-amount">{formatPrice(service.price, '₦')}</span>
               </div>
               <Button 
                 onClick={() => handleAddToCart(service)} 
