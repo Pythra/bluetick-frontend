@@ -248,8 +248,7 @@ export const SubmissionManagement = ({ users }) => {
                           padding: '12px',
                           backgroundColor: 'white',
                           borderRadius: '6px',
-                          border: '1px solid #eee',
-                          marginBottom: '16px'
+                          border: '1px solid #eee'
                         }}>
                           <div style={{ fontSize: '12px', fontWeight: '600', color: '#121212', marginBottom: '8px' }}>
                             Uploaded File
@@ -260,62 +259,6 @@ export const SubmissionManagement = ({ users }) => {
                             wordBreak: 'break-all'
                           }}>
                             📎 {submission.fileName}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Display Images */}
-                      {submission.images && submission.images.length > 0 && (
-                        <div style={{
-                          padding: '12px',
-                          backgroundColor: 'white',
-                          borderRadius: '6px',
-                          border: '1px solid #eee'
-                        }}>
-                          <div style={{ fontSize: '12px', fontWeight: '600', color: '#121212', marginBottom: '8px' }}>
-                            Submitted Images ({submission.images.length})
-                          </div>
-                          <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                            gap: '12px'
-                          }}>
-                            {submission.images.map((imagePath, idx) => (
-                              <div
-                                key={idx}
-                                style={{
-                                  position: 'relative',
-                                  borderRadius: '6px',
-                                  overflow: 'hidden',
-                                  backgroundColor: '#f5f5f5',
-                                  border: '1px solid #eee'
-                                }}
-                              >
-                                <img
-                                  src={imagePath}
-                                  alt={`Submission image ${idx + 1}`}
-                                  style={{
-                                    width: '100%',
-                                    height: '120px',
-                                    objectFit: 'cover',
-                                    cursor: 'pointer'
-                                  }}
-                                  onClick={() => window.open(imagePath, '_blank')}
-                                />
-                                <div style={{
-                                  position: 'absolute',
-                                  top: '4px',
-                                  right: '4px',
-                                  backgroundColor: 'rgba(0,0,0,0.6)',
-                                  color: 'white',
-                                  padding: '2px 8px',
-                                  borderRadius: '4px',
-                                  fontSize: '11px'
-                                }}>
-                                  Image {idx + 1}
-                                </div>
-                              </div>
-                            ))}
                           </div>
                         </div>
                       )}
