@@ -89,7 +89,12 @@ function AdminPage() {
       }
 
       if (data.success) {
-        setUsers(data.users || []);
+        // Sort orders by creation date (newest first) for each user
+        const usersWithSortedOrders = (data.users || []).map(user => ({
+          ...user,
+          orders: user.orders?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) || []
+        }));
+        setUsers(usersWithSortedOrders);
       } else {
         throw new Error('Failed to fetch users');
       }
