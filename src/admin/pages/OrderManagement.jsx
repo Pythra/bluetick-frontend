@@ -123,7 +123,7 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {filteredOrders.map((order) => {
+          {filteredOrders.map((order, index) => {
             const statusConfig = getStatusBadge(order.status)
             const isExpanded = expandedOrders[order.id]
             const StatusIcon = statusConfig.icon
@@ -153,61 +153,63 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                     padding: '20px',
                     cursor: 'pointer',
                     display: 'grid',
-                    gridTemplateColumns: 'auto 1fr auto auto',
+                    gridTemplateColumns: 'auto auto 1fr auto auto auto',
                     gap: '16px',
                     alignItems: 'center',
                     backgroundColor: '#f9f9f9',
-                    '@media (max-width: 768px)': {
-                      gridTemplateColumns: '1fr auto'
-                    }
                   }}
                 >
                   <StatusIcon size={24} style={{ color: statusConfig.color }} />
                   
+                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#0066FF', minWidth: '30px' }}>
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
+                  
                   <div style={{ flex: '1', minWidth: 0 }}>
-                    <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#121212' }}>
-                      Order #{order.id.slice(-8)}
-                    </h3>
-                    <p style={{ margin: '4px 0', fontSize: '14px', color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#666' }}>
+                      {order.userName}
+                    </p>
+                    <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#666' }}>
+                      📱 {order.userPhone}
+                    </p>
+                    <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#666' }}>
+                      ✉️ {order.userEmail}
+                    </p>
+                    <p style={{ margin: '0', fontSize: '14px', color: '#0066FF', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {order.cartItems && order.cartItems.length > 0 
                         ? order.cartItems.map(item => item.title).join(', ')
                         : order.productName}
                     </p>
-                    <p style={{ margin: '4px 0', fontSize: '13px', color: '#999' }}>
-                      {order.userName} • {order.userEmail}
-                    </p>
-                    <p style={{ margin: '4px 0', fontSize: '12px', color: '#999' }}>
-                      {formatDate(order.createdAt)}
-                    </p>
                   </div>
 
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    justifyContent: 'flex-end',
-                    minWidth: '150px'
-                  }}>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{
+                      fontSize: '12px',
+                      color: '#999',
+                      marginBottom: '8px',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {formatDate(order.createdAt)}
+                    </div>
                     <div style={{
                       fontSize: '16px',
                       fontWeight: '700',
                       color: '#0066FF',
-                      textAlign: 'right'
                     }}>
-                      {order.currency === 'USD' ? '$' : '₦'}{order.totalAmount?.toLocaleString() || order.productPrice}
+                      ₦{order.totalAmount?.toLocaleString() || order.productPrice}
                     </div>
+                  </div>
 
-                    <div style={{
-                      padding: '6px 12px',
-                      borderRadius: '4px',
-                      backgroundColor: statusConfig.bg,
-                      color: statusConfig.color,
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {statusConfig.label}
-                    </div>
+                  <div style={{
+                    padding: '6px 12px',
+                    borderRadius: '4px',
+                    backgroundColor: statusConfig.bg,
+                    color: statusConfig.color,
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {statusConfig.label}
                   </div>
 
                   <span style={{
@@ -228,21 +230,6 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                   }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' }}>
                       <div>
-                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Customer</div>
-                        <div style={{ fontSize: '14px', color: '#121212', fontWeight: '500' }}>{order.userName}</div>
-                      </div>
-
-                      <div>
-                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Email</div>
-                        <div style={{ fontSize: '14px', color: '#121212', fontWeight: '500' }}>{order.userEmail}</div>
-                      </div>
-
-                      <div>
-                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Phone</div>
-                        <div style={{ fontSize: '14px', color: '#121212', fontWeight: '500' }}>{order.userPhone}</div>
-                      </div>
-
-                      <div>
                         <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Service</div>
                         <div style={{ fontSize: '14px', color: '#121212', fontWeight: '500' }}>
                           {order.cartItems && order.cartItems.length > 0 
@@ -259,18 +246,8 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                       <div>
                         <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Total Amount</div>
                         <div style={{ fontSize: '14px', color: '#0066FF', fontWeight: '700' }}>
-                          {order.currency === 'USD' ? '$' : '₦'}{order.totalAmount?.toLocaleString() || 'N/A'}
+                          ₦{order.totalAmount?.toLocaleString() || 'N/A'}
                         </div>
-                      </div>
-
-                      <div>
-                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Currency</div>
-                        <div style={{ fontSize: '14px', color: '#121212', fontWeight: '500' }}>{order.currency}</div>
-                      </div>
-
-                      <div>
-                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Date</div>
-                        <div style={{ fontSize: '14px', color: '#121212', fontWeight: '500' }}>{formatDate(order.createdAt)}</div>
                       </div>
                     </div>
 
