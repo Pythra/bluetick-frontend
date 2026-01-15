@@ -16,6 +16,8 @@ function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken'));
+  const [showAllOrders, setShowAllOrders] = useState(false);
+  const [allOrders, setAllOrders] = useState([]);
 
   // Check if admin is already logged in
   useEffect(() => {
@@ -95,6 +97,17 @@ function AdminPage() {
           orders: user.orders?.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) || []
         }));
         setUsers(usersWithSortedOrders);
+        
+        // Collect all orders from all users
+        const allOrders = usersWithSortedOrders.flatMap(user => 
+          (user.orders || []).map(order => ({
+            ...order,
+            userName: `${user.firstName} ${user.lastName}`,
+            userEmail: user.email
+          }))
+        ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        setAllOrders(allOrders);
       } else {
         throw new Error('Failed to fetch users');
       }
@@ -225,9 +238,9 @@ function AdminPage() {
               </div>
               <div className="stat-label">Cart Items</div>
             </div>
-            <div className="stat-card">
+            <div className="stat-card clickable" onClick={() => setShowAllOrders(true)}>
               <div className="stat-number">
-                {users.reduce((total, user) => total + (user.orders?.length || 0), 0)}
+                {users.reduce((total, user) => total + (user.orders?.length || 0), 0}
               </div>
               <div className="stat-label">Total Orders</div>
             </div>
@@ -365,7 +378,165 @@ function AdminPage() {
           </div>
         )}
       </div>
+
+      {/* All Orders Modal */}
+      {showAllOrders && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>All Orders ({allOrders.length})</h2>
+              <button className="close-button" onClick={() => setShowAllOrders(false)}>
+                &times;
+              </button>
+            </div>
+            <div className="orders-container">
+              {allOrders.length > 0 ? (
+                allOrders.map((order) => (
+                  <div key={order.id} className="order-card">
+                    <div className="order-header">
+                      <span className="order-id">#{order.id.slice(-8)}</span>
+                      <span className={getOrderStatusBadgeClass(order.status)}>
+                        {getOrderStatusLabel(order.status)}
+                      </span>
+                      <span className="order-date">{formatDate(order.createdAt)}</span>
+                    </div>
+                    <div className="order-customer">
+                      <strong>{order.userName}</strong> ({order.userEmail})
+                    </div>
+                    <div className="order-details">
+                      <div className="order-field">
+                        <span className="field-label">Product:</span>
+                        <span className="field-value">{order.productName}</span>
+                      </div>
+                      <div className="order-field">
+                        <span className="field-label">Price:</span>
+                        <span className="field-value price-value">
+                          {order.currency === 'USD' ? '$' : '₦'}{order.productPrice}
+                        </span>
+                      </div>
+                      {order.totalAmount && (
+                        <div className="order-field">
+                          <span className="field-label">Total:</span>
+                          <span className="field-value">
+                            {order.currency === 'USD' ? '$' : '₦'}{order.totalAmount.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
+                      {order.message && (
+                        <div className="order-field message-field">
+                          <span className="field-label">Message:</span>
+                          <div className="field-value message-text">{order.message}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  <p>No orders found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    
+    <style jsx>{`
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 2rem;
+        z-index: 1000;
+        overflow-y: auto;
+      }
+      
+      .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 1000px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+      }
+      
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .close-button {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+      }
+      
+      .orders-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .order-card {
+        background: #f9f9f9;
+        border-radius: 6px;
+        padding: 1rem;
+        border-left: 4px solid #4CAF50;
+      }
+      
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      
+      .order-customer {
+        margin-bottom: 0.75rem;
+        color: #555;
+      }
+      
+      .order-field {
+        display: flex;
+        margin-bottom: 0.25rem;
+      }
+      
+      .field-label {
+        font-weight: 500;
+        min-width: 80px;
+        color: #666;
+      }
+      
+      .price-value {
+        color: #2e7d32;
+        font-weight: 500;
+      }
+      
+      .clickable {
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      
+      .clickable:hover {
+        transform: translateY(-2px);
+      }
+    `}</style>
   );
 }
 
