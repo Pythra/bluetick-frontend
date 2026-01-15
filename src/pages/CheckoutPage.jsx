@@ -276,10 +276,6 @@ function CheckoutPage() {
               </div>
 
               <div className="dva-section">
-                <p className="dva-instructions">
-                  Transfer the exact total to the account below, then click “I have paid”. Your order will be marked pending and we will verify it.
-                </p>
-
                 <div className="bank-info">
                   <p><strong>Bank Name:</strong> KudaBank</p>
                   <p><strong>Account Name:</strong> BLUETICKGENG DEVELOPMENT</p>
@@ -291,7 +287,7 @@ function CheckoutPage() {
                   disabled={!canCheckout || isClaimingPayment}
                   className="checkout-button"
                 >
-                  {isClaimingPayment ? 'Submitting...' : 'I have paid'}
+                  {isClaimingPayment ? 'Processing...' : 'Complete Payment'}
                 </button>
               </div>
 

@@ -18,12 +18,15 @@ function AdminPage() {
   const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken'));
   const [showAllOrders, setShowAllOrders] = useState(false);
   const [allOrders, setAllOrders] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
+  const [showSubmissions, setShowSubmissions] = useState(false);
 
   // Check if admin is already logged in
   useEffect(() => {
     if (adminToken) {
       setIsLoggedIn(true);
       fetchUsers();
+      fetchSubmissions();
     }
   }, [adminToken]);
 
@@ -116,6 +119,35 @@ function AdminPage() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  }, [apiUrl, adminToken]);
+
+  const fetchSubmissions = useCallback(async () => {
+    if (!adminToken) return;
+
+    try {
+      const response = await fetch(`${apiUrl}/api/admin/article-submissions`, {
+        headers: {
+          'Authorization': `Bearer ${adminToken}`,
+        },
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          handleLogout();
+          return;
+        }
+        throw new Error(data.error || 'Failed to fetch submissions');
+      }
+
+      if (data.success) {
+        setSubmissions(data.submissions || []);
+      } else {
+        throw new Error('Failed to fetch submissions');
+      }
+    } catch (err) {
+      console.error('Error fetching submissions:', err);
     }
   }, [apiUrl, adminToken]);
 
@@ -218,7 +250,7 @@ function AdminPage() {
             <Button onClick={() => navigate('/')} className="back-button">
               ← Back to Home
             </Button>
-            <Button onClick={fetchUsers} className="refresh-button">
+            <Button onClick={() => { fetchUsers(); fetchSubmissions(); }} className="refresh-button">
               🔄 Refresh
             </Button>
             <Button onClick={handleLogout} className="logout-button">
