@@ -240,7 +240,7 @@ function AdminPage() {
             </div>
             <div className="stat-card clickable" onClick={() => setShowAllOrders(true)}>
               <div className="stat-number">
-                {users.reduce((total, user) => total + (user.orders?.length || 0), 0}
+                {users.reduce((total, user) => total + (user.orders?.length || 0), 0)}
               </div>
               <div className="stat-label">Total Orders</div>
             </div>
