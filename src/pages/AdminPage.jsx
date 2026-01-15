@@ -19,6 +19,8 @@ function AdminPage() {
   const [showAllOrders, setShowAllOrders] = useState(false);
   const [allOrders, setAllOrders] = useState([]);
   const [expandedOrders, setExpandedOrders] = useState({});
+  const [showSubmissions, setShowSubmissions] = useState(false);
+  const [submissions, setSubmissions] = useState([]);
 
   // Check if admin is already logged in
   useEffect(() => {
@@ -109,6 +111,22 @@ function AdminPage() {
         ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         
         setAllOrders(allOrders);
+        // Collect article submissions from orders that include post/article data or uploaded files
+        const submissionsList = usersWithSortedOrders.flatMap(user => 
+          (user.orders || []).filter(order => (
+            order.postTitle || order.postBody || order.articleContent || order.fileName || order.reviewNotes
+          )).map(order => ({
+            ...order,
+            submittedAt: order.createdAt,
+            serviceType: order.productName || order.serviceType || '',
+            userName: `${user.firstName} ${user.lastName}`,
+            userEmail: user.email,
+            userPhone: user.phone,
+            cartItems: order.cartItems || []
+          }))
+        ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        setSubmissions(submissionsList);
       } else {
         throw new Error('Failed to fetch users');
       }
@@ -243,7 +261,8 @@ function AdminPage() {
 
   // Main Admin Dashboard
   return (
-    <div className="admin-page">
+    <>
+      <div className="admin-page">
       <div className="admin-container">
         <div className="admin-header">
           <div className="admin-header-top">
@@ -634,9 +653,9 @@ function AdminPage() {
           </div>
         </div>
       )}
-    </div>
-    
-    <style jsx>{`
+      </div>
+
+      <style jsx>{`
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -781,6 +800,7 @@ function AdminPage() {
         transform: translateY(-2px);
       }
     `}</style>
+    </>
   );
 }
 

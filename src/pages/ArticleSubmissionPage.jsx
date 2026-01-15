@@ -18,7 +18,9 @@ function ArticleSubmissionPage() {
     postBody: '',
     articleContent: '',
     file: null,
-    fileName: ''
+    fileName: '',
+    images: [],
+    imageFiles: []
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
@@ -51,6 +53,42 @@ function ArticleSubmissionPage() {
         fileName: file.name
       }));
     }
+  };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    
+    // Limit to 2 images
+    if (files.length + formData.images.length > 2) {
+      setError('Maximum 2 images allowed');
+      return;
+    }
+
+    files.forEach(file => {
+      if (!file.type.startsWith('image/')) {
+        setError('Only image files are allowed');
+        return;
+      }
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, e.target.result],
+          imageFiles: [...prev.imageFiles, file]
+        }));
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+      imageFiles: prev.imageFiles.filter((_, i) => i !== index)
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -215,6 +253,62 @@ function ArticleSubmissionPage() {
                 )}
               </div>
               <small className="form-help">Supported formats: .doc, .docx, .pdf, .txt (Max 10MB)</small>
+            </div>
+
+            <div className="form-group file-upload-container">
+              <label>Upload Images (Optional - Max 2 images)</label>
+              <div className="file-upload-wrapper">
+                <input
+                  type="file"
+                  id="image-upload"
+                  onChange={handleImageChange}
+                  className="file-upload-input"
+                  accept="image/*"
+                  multiple
+                  disabled={formData.images.length >= 2}
+                />
+                <label htmlFor="image-upload" className="file-upload-label">
+                  {formData.images.length >= 2 ? 'Maximum images reached' : `Choose image${formData.images.length > 0 ? 's' : ''}...`}
+                </label>
+              </div>
+              <small className="form-help">Supported formats: JPG, PNG, GIF, WebP (Max 2 images)</small>
+              
+              {formData.images.length > 0 && (
+                <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
+                  {formData.images.map((image, index) => (
+                    <div key={index} style={{ position: 'relative', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
+                      <img 
+                        src={image} 
+                        alt={`Preview ${index + 1}`} 
+                        style={{ width: '100%', height: '100px', objectFit: 'cover' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        style={{
+                          position: 'absolute',
+                          top: '4px',
+                          right: '4px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '50%',
+                          width: '24px',
+                          height: '24px',
+                          cursor: 'pointer',
+                          fontSize: '14px',
+                          lineHeight: '1',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {error && (

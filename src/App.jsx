@@ -22,6 +22,7 @@ import LoginPage from './pages/LoginPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ArticleSubmissionPage from './pages/ArticleSubmissionPage';
 import AdminPage from './pages/AdminPage';
+import AdminApp from './admin/AdminApp';
 import Footer from './components/Footer';
 import { useAuth } from './contexts/AuthContext';
 import TermsAndConditions from './pages/legal/TermsAndConditions';
@@ -82,7 +83,8 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/article-submission" element={<ArticleSubmissionPage />} />
-              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin" element={<AdminApp />} />
+              <Route path="/admin-dashboard" element={<AdminApp />} />
               <Route path="/terms" element={<TermsAndConditions />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/refund-policy" element={<RefundPolicy />} />
