@@ -287,7 +287,7 @@ function CheckoutPage() {
                   disabled={!canCheckout || isClaimingPayment}
                   className="checkout-button"
                 >
-                  {isClaimingPayment ? 'Processing...' : 'Complete Payment'}
+                  {isClaimingPayment ? 'Processing...' : 'I Have Paid'}
                 </button>
               </div>
 
