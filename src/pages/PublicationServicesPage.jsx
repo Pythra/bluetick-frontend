@@ -64,7 +64,7 @@ const africanPlatforms = [
   { name: 'Punch', price: '\u20a680000', logo: punchLogo },
   { name: 'BusinessDay', price: '\u20a680000', logo: businessDayLogo },
   { name: 'Legit', price: 'NGN300,000', logo: legitLogo },
-  { name: 'The Nation', price: '\u20a630000', logo: theNationLogo },
+  { name: 'The Nation', price: '\u20a6300000', logo: theNationLogo },
   { name: 'Independent', price: '\u20a620000', logo: independentLogo },
   { name: 'Vanguard', price: '\u20a620000', logo: vanguardLogo },
   { name: 'ThisDay', price: '\u20a620000', logo: thisDayLogo },
