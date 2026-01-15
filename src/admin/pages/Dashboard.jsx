@@ -131,15 +131,19 @@ export const Dashboard = ({ users, carts, orders, submissions, onNavigateToTab }
                       padding: '20px',
                       cursor: 'pointer',
                       display: 'grid',
-                      gridTemplateColumns: 'auto auto 1fr auto auto auto',
+                      gridTemplateColumns: 'minmax(0, 1fr) auto auto auto',
                       gap: '16px',
                       alignItems: 'center',
                       backgroundColor: '#f9f9f9',
                     }}
                   >
-                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#0066FF', minWidth: '30px' }}>
-                      {String(index + 1).padStart(2, '0')}
-                    </div>
+                    <style>{`
+                      @media (max-width: 768px) {
+                        .order-header-mobile {
+                          grid-template-columns: minmax(0, 1fr) auto auto !important;
+                        }
+                      }
+                    `}</style>
                     
                     <div style={{ flex: '1', minWidth: 0 }}>
                       <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#666' }}>
