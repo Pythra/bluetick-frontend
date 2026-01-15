@@ -109,21 +109,26 @@ function ArticleSubmissionPage() {
     setSubmitStatus('');
 
     try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('postTitle', formData.postTitle.trim());
+      formDataToSend.append('postBody', formData.postBody.trim());
+      formDataToSend.append('articleContent', formData.articleContent.trim());
+      formDataToSend.append('orderId', orderDetails.orderId);
+      formDataToSend.append('serviceType', isPublication ? 'publication' : 'other');
+      formDataToSend.append('cartItems', JSON.stringify(cartItems));
+      formDataToSend.append('fileName', formData.fileName);
+      
+      // Add images
+      formData.imageFiles.forEach((file, index) => {
+        formDataToSend.append(`image${index + 1}`, file);
+      });
+
       const response = await fetch(`${apiUrl}/api/orders/article-submission`, {
         method: 'POST',
         headers: {
           ...getAuthHeaders(),
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          postTitle: formData.postTitle.trim(),
-          postBody: formData.postBody.trim(),
-          articleContent: formData.articleContent.trim(),
-          orderId: orderDetails.orderId,
-          serviceType: isPublication ? 'publication' : 'other',
-          cartItems: cartItems,
-          fileName: formData.fileName
-        }),
+        body: formDataToSend,
       });
 
       const data = await response.json();

@@ -212,14 +212,22 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                     {statusConfig.label}
                   </div>
 
-                  <span style={{
-                    fontSize: '18px',
-                    color: '#666',
-                    transition: 'transform 0.2s ease',
-                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'
-                  }}>
-                    ▼
-                  </span>
+                  <button
+                    onClick={() => toggleOrder(order.id)}
+                    style={{
+                      padding: '6px 12px',
+                      backgroundColor: '#0066FF',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {isExpanded ? 'See Less' : 'See More'}
+                  </button>
                 </div>
 
                 {isExpanded && (
@@ -422,6 +430,55 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                             <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Uploaded File</div>
                             <div style={{ fontSize: '13px', color: '#0066FF', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', wordBreak: 'break-all' }}>
                               📎 {order.fileName}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Display Images */}
+                        {order.images && order.images.length > 0 && (
+                          <div style={{ marginTop: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '8px' }}>Submitted Images ({order.images.length})</div>
+                            <div style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                              gap: '12px'
+                            }}>
+                              {order.images.map((imagePath, idx) => (
+                                <div
+                                  key={idx}
+                                  style={{
+                                    position: 'relative',
+                                    borderRadius: '6px',
+                                    overflow: 'hidden',
+                                    backgroundColor: '#f5f5f5',
+                                    border: '1px solid #eee'
+                                  }}
+                                >
+                                  <img
+                                    src={imagePath}
+                                    alt={`Submission image ${idx + 1}`}
+                                    style={{
+                                      width: '100%',
+                                      height: '120px',
+                                      objectFit: 'cover',
+                                      cursor: 'pointer'
+                                    }}
+                                    onClick={() => window.open(imagePath, '_blank')}
+                                  />
+                                  <div style={{
+                                    position: 'absolute',
+                                    top: '4px',
+                                    right: '4px',
+                                    backgroundColor: 'rgba(0,0,0,0.6)',
+                                    color: 'white',
+                                    padding: '2px 8px',
+                                    borderRadius: '4px',
+                                    fontSize: '11px'
+                                  }}>
+                                    Image {idx + 1}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           </div>
                         )}
