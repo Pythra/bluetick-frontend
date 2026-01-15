@@ -215,6 +215,7 @@
   margin-top: 0.5rem;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .file-upload-input {
@@ -241,12 +242,20 @@
   cursor: pointer;
   transition: all 0.2s ease;
   flex-grow: 1;
-  justify-content: space-between;
+  justify-content: center;
+  min-height: 44px;
 }
 
 .file-upload-label:hover {
   background-color: #f1f5f9;
   border-color: #94a3b8;
+}
+
+.file-upload-input:disabled ~ .file-upload-label {
+  background-color: #f1f5f9;
+  border-color: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
 }
 
 .file-upload-clear {
