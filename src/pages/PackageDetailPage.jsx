@@ -71,7 +71,7 @@ const packageDetails = {
       // News Platforms
       { name: 'Punch', price: '₦80,000', logo: punchLogo },
       { name: 'BusinessDay', price: '₦80,000', logo: businessDayLogo },
-      { name: 'Legit', price: '₦10,000', logo: legitLogo },
+      { name: 'Legit', price: '₦300,000', logo: legitLogo },
       { name: 'The Nation', price: '₦30,000', logo: theNationLogo },
       { name: 'Vanguard', price: '₦20,000', logo: vanguardLogo },
       { name: 'ThisDay', price: '₦20,000', logo: thisDayLogo },
@@ -86,7 +86,7 @@ const packageDetails = {
       { name: 'Champion', price: '₦20,000', logo: championLogo },
       { name: 'Blueprint', price: '₦20,000', logo: blueprintLogo },
       { name: 'Peoples Daily', price: '₦20,000', logo: peoplesDailyLogo },
-      { name: 'GhanaWeb', price: '₦10,000', logo: ghanaWebLogo },
+      { name: 'GhanaWeb', price: '₦100,000', logo: ghanaWebLogo },
       { name: 'Pulse', price: '₦20,000', logo: pulseLogo },
       
       // Tech & Business
@@ -116,7 +116,7 @@ const packageDetails = {
     description: 'Focused tech PR on leading African and international tech platforms.',
     platforms: [
       // African Tech
-      { name: 'Techpoint', price: '₦200,000', logo: techpointLogo },
+      { name: 'Techpoint', price: '₦250,000', logo: techpointLogo },
       { name: 'TechCabal', price: '₦250,000', logo: techCabalLogo },
       
       // Cybersecurity
