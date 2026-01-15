@@ -164,6 +164,15 @@ function AdminPage() {
       const orderIdsWithSubmissions = {};
       users.forEach(user => {
         user.orders?.forEach(order => {
+          console.log('[AdminPage] Order submission check:', {
+            orderId: order.id,
+            hasPostTitle: !!order.postTitle,
+            hasPostBody: !!order.postBody,
+            hasArticleContent: !!order.articleContent,
+            hasFileName: !!order.fileName,
+            postTitle: order.postTitle,
+            postBody: order.postBody
+          });
           if (order.postTitle || order.postBody || order.articleContent || order.fileName) {
             orderIdsWithSubmissions[order.id] = true;
           }
