@@ -63,7 +63,7 @@ function WebsiteServicesPage() {
             <div key={index} className="service-card-detailed">
               <h3 className="service-card-title">{service.title}</h3>
               <div className="service-card-price">
-                Starting from <span className="price-amount">{formatPrice(service.price, '₦')}</span>
+                Starting from <span className="price-amount">20000</span>
               </div>
               <Button 
                 onClick={() => handleAddToCart(service)} 
