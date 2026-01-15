@@ -9,6 +9,7 @@ import WebsiteServicesSummary from './components/WebsiteServicesSummary';
 import VerificationServicesSummary from './components/VerificationServicesSummary';
 import PublicationServicesSummary from './components/PublicationServicesSummary';
 import InstagramServicesSummary from './components/InstagramServicesSummary';
+import WikipediaServicesSummary from './components/WikipediaServicesSummary';
 import CelebritiesSection from './components/CelebritiesSection';
 import CartIcon from './components/CartIcon';
 import AppServicesPage from './pages/AppServicesPage';
@@ -16,6 +17,7 @@ import WebsiteServicesPage from './pages/WebsiteServicesPage';
 import VerificationServicesPage from './pages/VerificationServicesPage';
 import PublicationServicesPage from './pages/PublicationServicesPage';
 import InstagramServicesPage from './pages/InstagramServicesPage';
+import WikipediaServicesPage from './pages/WikipediaServicesPage';
 import PackageDetailPage from './pages/PackageDetailPage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
@@ -47,6 +49,7 @@ function HomePage() {
       <VerificationServicesSummary />
       <PublicationServicesSummary />
       <InstagramServicesSummary />
+      <WikipediaServicesSummary />
       <CelebritiesSection />
       <FAQ />
       <div className="editorial-guidelines-section" style={{ padding: '60px 20px', backgroundColor: '#f9fafb', marginBottom: '40px' }}>
@@ -184,6 +187,7 @@ function App() {
                 <Route path="package/:id" element={<PackageDetailPage />} />
               </Route>
               <Route path="/services/instagram" element={<InstagramServicesPage />} />
+              <Route path="/services/wikipedia" element={<WikipediaServicesPage />} />
               <Route path="/signup" element={<SignUpPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
