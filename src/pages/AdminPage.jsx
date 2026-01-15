@@ -18,15 +18,13 @@ function AdminPage() {
   const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken'));
   const [showAllOrders, setShowAllOrders] = useState(false);
   const [allOrders, setAllOrders] = useState([]);
-  const [submissions, setSubmissions] = useState([]);
-  const [showSubmissions, setShowSubmissions] = useState(false);
+  const [expandedOrders, setExpandedOrders] = useState({});
 
   // Check if admin is already logged in
   useEffect(() => {
     if (adminToken) {
       setIsLoggedIn(true);
       fetchUsers();
-      fetchSubmissions();
     }
   }, [adminToken]);
 
@@ -122,35 +120,6 @@ function AdminPage() {
     }
   }, [apiUrl, adminToken]);
 
-  const fetchSubmissions = useCallback(async () => {
-    if (!adminToken) return;
-
-    try {
-      const response = await fetch(`${apiUrl}/api/admin/article-submissions`, {
-        headers: {
-          'Authorization': `Bearer ${adminToken}`,
-        },
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          handleLogout();
-          return;
-        }
-        throw new Error(data.error || 'Failed to fetch submissions');
-      }
-
-      if (data.success) {
-        setSubmissions(data.submissions || []);
-      } else {
-        throw new Error('Failed to fetch submissions');
-      }
-    } catch (err) {
-      console.error('Error fetching submissions:', err);
-    }
-  }, [apiUrl, adminToken]);
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString('en-US', {
@@ -180,6 +149,13 @@ function AdminPage() {
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  };
+
+  const toggleOrderExpanded = (orderId) => {
+    setExpandedOrders(prev => ({
+      ...prev,
+      [orderId]: !prev[orderId]
+    }));
   };
 
   // Login Form Component
@@ -250,7 +226,7 @@ function AdminPage() {
             <Button onClick={() => navigate('/')} className="back-button">
               ← Back to Home
             </Button>
-            <Button onClick={() => { fetchUsers(); fetchSubmissions(); }} className="refresh-button">
+            <Button onClick={fetchUsers} className="refresh-button">
               🔄 Refresh
             </Button>
             <Button onClick={handleLogout} className="logout-button">
@@ -275,6 +251,10 @@ function AdminPage() {
                 {users.reduce((total, user) => total + (user.orders?.length || 0), 0)}
               </div>
               <div className="stat-label">Total Orders</div>
+            </div>
+            <div className="stat-card clickable" onClick={() => setShowSubmissions(true)}>
+              <div className="stat-number">{submissions.length}</div>
+              <div className="stat-label">Article Submissions</div>
             </div>
           </div>
         </div>
@@ -398,6 +378,48 @@ function AdminPage() {
                               </div>
                             )}
                           </div>
+                          
+                          {/* Collapsible Submission Details */}
+                          {(order.postTitle || order.postBody || order.articleContent || order.fileName) && (
+                            <div className="submission-details-section">
+                              <button
+                                className="submission-toggle"
+                                onClick={() => toggleOrderExpanded(order.id)}
+                              >
+                                <span className="toggle-icon">{expandedOrders[order.id] ? '▼' : '▶'}</span>
+                                <span className="toggle-label">Submission Details</span>
+                              </button>
+                              
+                              {expandedOrders[order.id] && (
+                                <div className="submission-content">
+                                  {order.postTitle && (
+                                    <div className="order-field">
+                                      <span className="field-label">Post Title:</span>
+                                      <div className="field-value message-text">{order.postTitle}</div>
+                                    </div>
+                                  )}
+                                  {order.postBody && (
+                                    <div className="order-field">
+                                      <span className="field-label">Post Body:</span>
+                                      <div className="field-value message-text">{order.postBody}</div>
+                                    </div>
+                                  )}
+                                  {order.articleContent && (
+                                    <div className="order-field">
+                                      <span className="field-label">Content/Notes:</span>
+                                      <div className="field-value message-text">{order.articleContent}</div>
+                                    </div>
+                                  )}
+                                  {order.fileName && (
+                                    <div className="order-field">
+                                      <span className="field-label">Uploaded File:</span>
+                                      <div className="field-value">{order.fileName}</div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -461,11 +483,136 @@ function AdminPage() {
                         </div>
                       )}
                     </div>
+
+                    {/* Collapsible Submission Details */}
+                    {(order.postTitle || order.postBody || order.articleContent || order.fileName) && (
+                      <div className="submission-details-section">
+                        <button
+                          className="submission-toggle"
+                          onClick={() => toggleOrderExpanded(order.id)}
+                        >
+                          <span className="toggle-icon">{expandedOrders[order.id] ? '▼' : '▶'}</span>
+                          <span className="toggle-label">Submission Details</span>
+                        </button>
+
+                        {expandedOrders[order.id] && (
+                          <div className="submission-content">
+                            {order.postTitle && (
+                              <div className="order-field">
+                                <span className="field-label">Post Title:</span>
+                                <div className="field-value message-text">{order.postTitle}</div>
+                              </div>
+                            )}
+                            {order.postBody && (
+                              <div className="order-field">
+                                <span className="field-label">Post Body:</span>
+                                <div className="field-value message-text">{order.postBody}</div>
+                              </div>
+                            )}
+                            {order.articleContent && (
+                              <div className="order-field">
+                                <span className="field-label">Content/Notes:</span>
+                                <div className="field-value message-text">{order.articleContent}</div>
+                              </div>
+                            )}
+                            {order.fileName && (
+                              <div className="order-field">
+                                <span className="field-label">Uploaded File:</span>
+                                <div className="field-value">{order.fileName}</div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (
                 <div className="empty-state">
                   <p>No orders found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Article Submissions Modal */}
+      {showSubmissions && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Article Submissions ({submissions.length})</h2>
+              <button className="close-button" onClick={() => setShowSubmissions(false)}>
+                &times;
+              </button>
+            </div>
+            <div className="orders-container">
+              {submissions.length > 0 ? (
+                submissions.map((submission) => (
+                  <div key={submission.id} className="order-card">
+                    <div className="order-header">
+                      <span className="order-id">#{submission.id.slice(-8)}</span>
+                      <span className={getOrderStatusBadgeClass(submission.status)}>
+                        {getOrderStatusLabel(submission.status)}
+                      </span>
+                      <span className="order-date">{formatDate(submission.submittedAt)}</span>
+                    </div>
+                    <div className="order-customer">
+                      <strong>{submission.userName}</strong> ({submission.userEmail})
+                      {submission.userPhone && <span> • {submission.userPhone}</span>}
+                    </div>
+                    <div className="order-details">
+                      <div className="order-field">
+                        <span className="field-label">Service:</span>
+                        <span className="field-value">{submission.serviceType}</span>
+                      </div>
+                      {submission.postTitle && (
+                        <div className="order-field">
+                          <span className="field-label">Post Title:</span>
+                          <div className="field-value message-text">{submission.postTitle}</div>
+                        </div>
+                      )}
+                      {submission.postBody && (
+                        <div className="order-field">
+                          <span className="field-label">Post Body:</span>
+                          <div className="field-value message-text">{submission.postBody}</div>
+                        </div>
+                      )}
+                      {submission.articleContent && (
+                        <div className="order-field">
+                          <span className="field-label">Content/Notes:</span>
+                          <div className="field-value message-text">{submission.articleContent}</div>
+                        </div>
+                      )}
+                      {submission.fileName && (
+                        <div className="order-field">
+                          <span className="field-label">Uploaded File:</span>
+                          <div className="field-value">{submission.fileName}</div>
+                        </div>
+                      )}
+                      {submission.cartItems && submission.cartItems.length > 0 && (
+                        <div className="order-field">
+                          <span className="field-label">Cart Items:</span>
+                          <div className="field-value">
+                            {submission.cartItems.map((item, idx) => (
+                              <div key={idx} style={{ marginTop: '4px' }}>• {item.title} - {item.price}</div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {submission.reviewNotes && (
+                        <div className="order-field">
+                          <span className="field-label">Review Notes:</span>
+                          <div className="field-value message-text">{submission.reviewNotes}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  <p>No article submissions yet</p>
                 </div>
               )}
             </div>
@@ -558,6 +705,56 @@ function AdminPage() {
       .price-value {
         color: #2e7d32;
         font-weight: 500;
+      }
+      
+      .submission-details-section {
+        margin-top: 1rem;
+        border-top: 1px solid #ddd;
+        padding-top: 0.75rem;
+      }
+      
+      .submission-toggle {
+        background: none;
+        border: none;
+        padding: 0.5rem 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+        color: #2e7d32;
+        font-weight: 500;
+        transition: color 0.2s;
+        width: 100%;
+      }
+      
+      .submission-toggle:hover {
+        color: #1b5e20;
+      }
+      
+      .toggle-icon {
+        font-size: 0.8rem;
+        display: inline-flex;
+      }
+      
+      .toggle-label {
+        flex: 1;
+      }
+      
+      .submission-content {
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+        background: #f5f5f5;
+        border-radius: 4px;
+        border-left: 3px solid #2e7d32;
+      }
+      
+      .submission-content .order-field {
+        margin-bottom: 0.75rem;
+      }
+      
+      .submission-content .order-field:last-child {
+        margin-bottom: 0;
       }
       
       .clickable {
