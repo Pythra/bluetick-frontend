@@ -432,9 +432,21 @@ function AdminPage() {
                                       <div className="field-value message-text">{order.postTitle}</div>
                                     </div>
                                   )}
+                                  {order.postSummary && (
+                                    <div className="order-field">
+                                      <span className="field-label">Post Summary:</span>
+                                      <div className="field-value message-text">{order.postSummary}</div>
+                                    </div>
+                                  )}
+                                  {order.postContent && (
+                                    <div className="order-field">
+                                      <span className="field-label">Post Content:</span>
+                                      <div className="field-value message-text" dangerouslySetInnerHTML={{ __html: order.postContent }}></div>
+                                    </div>
+                                  )}
                                   {order.postBody && (
                                     <div className="order-field">
-                                      <span className="field-label">Post Body:</span>
+                                      <span className="field-label">Post Body (Legacy):</span>
                                       <div className="field-value message-text">{order.postBody}</div>
                                     </div>
                                   )}
@@ -446,8 +458,50 @@ function AdminPage() {
                                   )}
                                   {order.fileName && (
                                     <div className="order-field">
-                                      <span className="field-label">Uploaded File:</span>
-                                      <div className="field-value">{order.fileName}</div>
+                                      <span className="field-label">Uploaded Document:</span>
+                                      <div className="field-value">
+                                        {order.fileUrl ? (
+                                          <a 
+                                            href={order.fileUrl} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            style={{ color: '#0066cc', textDecoration: 'none' }}
+                                          >
+                                            📎 {order.fileName} (Download)
+                                          </a>
+                                        ) : (
+                                          <span>📎 {order.fileName}</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                  {order.imageUrls && order.imageUrls.length > 0 && (
+                                    <div className="order-field">
+                                      <span className="field-label">Uploaded Images ({order.imageUrls.length}):</span>
+                                      <div className="field-value" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '8px' }}>
+                                        {order.imageUrls.map((imageUrl, idx) => (
+                                          <a 
+                                            key={idx}
+                                            href={imageUrl} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            style={{ display: 'block' }}
+                                          >
+                                            <img 
+                                              src={imageUrl} 
+                                              alt={`Image ${idx + 1}`}
+                                              style={{ 
+                                                width: '80px', 
+                                                height: '80px', 
+                                                objectFit: 'cover', 
+                                                borderRadius: '4px',
+                                                border: '1px solid #ddd',
+                                                cursor: 'pointer'
+                                              }}
+                                            />
+                                          </a>
+                                        ))}
+                                      </div>
                                     </div>
                                   )}
                                 </div>
@@ -537,9 +591,21 @@ function AdminPage() {
                                 <div className="field-value message-text">{order.postTitle}</div>
                               </div>
                             )}
+                            {order.postSummary && (
+                              <div className="order-field">
+                                <span className="field-label">Post Summary:</span>
+                                <div className="field-value message-text">{order.postSummary}</div>
+                              </div>
+                            )}
+                            {order.postContent && (
+                              <div className="order-field">
+                                <span className="field-label">Post Content:</span>
+                                <div className="field-value message-text" dangerouslySetInnerHTML={{ __html: order.postContent }}></div>
+                              </div>
+                            )}
                             {order.postBody && (
                               <div className="order-field">
-                                <span className="field-label">Post Body:</span>
+                                <span className="field-label">Post Body (Legacy):</span>
                                 <div className="field-value message-text">{order.postBody}</div>
                               </div>
                             )}
@@ -551,8 +617,50 @@ function AdminPage() {
                             )}
                             {order.fileName && (
                               <div className="order-field">
-                                <span className="field-label">Uploaded File:</span>
-                                <div className="field-value">{order.fileName}</div>
+                                <span className="field-label">Uploaded Document:</span>
+                                <div className="field-value">
+                                  {order.fileUrl ? (
+                                    <a 
+                                      href={order.fileUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      style={{ color: '#0066cc', textDecoration: 'none' }}
+                                    >
+                                      📎 {order.fileName} (Download)
+                                    </a>
+                                  ) : (
+                                    <span>📎 {order.fileName}</span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            {order.imageUrls && order.imageUrls.length > 0 && (
+                              <div className="order-field">
+                                <span className="field-label">Uploaded Images ({order.imageUrls.length}):</span>
+                                <div className="field-value" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '8px' }}>
+                                  {order.imageUrls.map((imageUrl, idx) => (
+                                    <a 
+                                      key={idx}
+                                      href={imageUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      style={{ display: 'block' }}
+                                    >
+                                      <img 
+                                        src={imageUrl} 
+                                        alt={`Image ${idx + 1}`}
+                                        style={{ 
+                                          width: '80px', 
+                                          height: '80px', 
+                                          objectFit: 'cover', 
+                                          borderRadius: '4px',
+                                          border: '1px solid #ddd',
+                                          cursor: 'pointer'
+                                        }}
+                                      />
+                                    </a>
+                                  ))}
+                                </div>
                               </div>
                             )}
                           </div>
@@ -607,9 +715,21 @@ function AdminPage() {
                           <div className="field-value message-text">{submission.postTitle}</div>
                         </div>
                       )}
+                      {submission.postSummary && (
+                        <div className="order-field">
+                          <span className="field-label">Post Summary:</span>
+                          <div className="field-value message-text">{submission.postSummary}</div>
+                        </div>
+                      )}
+                      {submission.postContent && (
+                        <div className="order-field">
+                          <span className="field-label">Post Content:</span>
+                          <div className="field-value message-text" dangerouslySetInnerHTML={{ __html: submission.postContent }}></div>
+                        </div>
+                      )}
                       {submission.postBody && (
                         <div className="order-field">
-                          <span className="field-label">Post Body:</span>
+                          <span className="field-label">Post Body (Legacy):</span>
                           <div className="field-value message-text">{submission.postBody}</div>
                         </div>
                       )}
@@ -621,8 +741,50 @@ function AdminPage() {
                       )}
                       {submission.fileName && (
                         <div className="order-field">
-                          <span className="field-label">Uploaded File:</span>
-                          <div className="field-value">{submission.fileName}</div>
+                          <span className="field-label">Uploaded Document:</span>
+                          <div className="field-value">
+                            {submission.fileUrl ? (
+                              <a 
+                                href={submission.fileUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                style={{ color: '#0066cc', textDecoration: 'none' }}
+                              >
+                                📎 {submission.fileName} (Download)
+                              </a>
+                            ) : (
+                              <span>📎 {submission.fileName}</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {submission.imageUrls && submission.imageUrls.length > 0 && (
+                        <div className="order-field">
+                          <span className="field-label">Uploaded Images ({submission.imageUrls.length}):</span>
+                          <div className="field-value" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '8px' }}>
+                            {submission.imageUrls.map((imageUrl, idx) => (
+                              <a 
+                                key={idx}
+                                href={imageUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                style={{ display: 'block' }}
+                              >
+                                <img 
+                                  src={imageUrl} 
+                                  alt={`Image ${idx + 1}`}
+                                  style={{ 
+                                    width: '80px', 
+                                    height: '80px', 
+                                    objectFit: 'cover', 
+                                    borderRadius: '4px',
+                                    border: '1px solid #ddd',
+                                    cursor: 'pointer'
+                                  }}
+                                />
+                              </a>
+                            ))}
+                          </div>
                         </div>
                       )}
                       {submission.cartItems && submission.cartItems.length > 0 && (

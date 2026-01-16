@@ -409,9 +409,23 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                             </div>
                           </div>
                         )}
+                        {order.postSummary && (
+                          <div style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Summary</div>
+                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                              {order.postSummary}
+                            </div>
+                          </div>
+                        )}
+                        {order.postContent && (
+                          <div style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Content</div>
+                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '300px', overflow: 'auto' }} dangerouslySetInnerHTML={{ __html: order.postContent }}></div>
+                          </div>
+                        )}
                         {order.postBody && (
                           <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Body</div>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Body (Legacy)</div>
                             <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto' }}>
                               {order.postBody}
                             </div>
@@ -426,10 +440,51 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                           </div>
                         )}
                         {order.fileName && (
-                          <div>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Uploaded File</div>
-                            <div style={{ fontSize: '13px', color: '#0066FF', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', wordBreak: 'break-all' }}>
-                              📎 {order.fileName}
+                          <div style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Uploaded Document</div>
+                            <div style={{ fontSize: '13px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                              {order.fileUrl ? (
+                                <a 
+                                  href={order.fileUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  style={{ color: '#0066FF', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                >
+                                  📎 {order.fileName} (Download)
+                                </a>
+                              ) : (
+                                <span style={{ color: '#666' }}>📎 {order.fileName}</span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        {order.imageUrls && order.imageUrls.length > 0 && (
+                          <div style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '8px' }}>Uploaded Images ({order.imageUrls.length})</div>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                              {order.imageUrls.map((imageUrl, idx) => (
+                                <div key={idx} style={{ position: 'relative' }}>
+                                  <a 
+                                    href={imageUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    style={{ display: 'block' }}
+                                  >
+                                    <img 
+                                      src={imageUrl} 
+                                      alt={`Upload ${idx + 1}`}
+                                      style={{ 
+                                        width: '100px', 
+                                        height: '100px', 
+                                        objectFit: 'cover', 
+                                        borderRadius: '4px',
+                                        border: '1px solid #ddd',
+                                        cursor: 'pointer'
+                                      }}
+                                    />
+                                  </a>
+                                </div>
+                              ))}
                             </div>
                           </div>
                         )}
