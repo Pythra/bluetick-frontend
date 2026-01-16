@@ -110,7 +110,8 @@ function ArticleSubmissionPage() {
       setError('Post summary must be 160 characters or less');
       return;
     }
-    if (!formData.postContent.trim()) {
+    const postContentText = formData.postContent.replace(/<[^>]*>/g, '').trim();
+    if (!postContentText) {
       setError('Please enter post content');
       return;
     }
@@ -123,7 +124,7 @@ function ArticleSubmissionPage() {
       const formDataToSend = new FormData();
       formDataToSend.append('postTitle', formData.postTitle.trim());
       formDataToSend.append('postSummary', formData.postSummary.trim());
-      formDataToSend.append('postContent', formData.postContent.trim());
+      formDataToSend.append('postContent', formData.postContent || '');
       formDataToSend.append('articleContent', formData.articleContent.trim());
       formDataToSend.append('orderId', orderDetails.orderId);
       formDataToSend.append('serviceType', isPublication ? 'publication' : 'other');
@@ -134,9 +135,17 @@ function ArticleSubmissionPage() {
       }
 
       if (formData.imageFiles && formData.imageFiles.length > 0) {
-        formData.imageFiles.forEach((imageFile) => {
-          formDataToSend.append('images', imageFile);
+        console.log('[Frontend] Sending images:', formData.imageFiles.length);
+        formData.imageFiles.forEach((imageFile, index) => {
+          if (imageFile && imageFile instanceof File) {
+            console.log(`[Frontend] Appending image ${index + 1}:`, imageFile.name, imageFile.type, imageFile.size);
+            formDataToSend.append('images', imageFile, imageFile.name);
+          } else {
+            console.error(`[Frontend] Invalid image file at index ${index}:`, imageFile);
+          }
         });
+      } else {
+        console.log('[Frontend] No images to send - imageFiles:', formData.imageFiles);
       }
 
       const response = await fetch(`${apiUrl}/api/orders/article-submission`, {
@@ -249,28 +258,35 @@ function ArticleSubmissionPage() {
                   modules={{
                     toolbar: [
                       [{ 'header': [1, 2, 3, false] }],
+                      [{ 'font': [] }],
                       [{ 'size': ['small', false, 'large', 'huge'] }],
                       ['bold', 'italic', 'underline', 'strike'],
-                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      [{ 'color': [] }, { 'background': [] }],
+                      [{ 'align': [] }],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
                       [{ 'script': 'sub'}, { 'script': 'super' }],
                       [{ 'indent': '-1'}, { 'indent': '+1' }],
-                      [{ 'direction': 'rtl' }],
-                      [{ 'color': [] }, { 'background': [] }],
-                      [{ 'font': [] }],
-                      [{ 'align': [] }],
+                      ['blockquote', 'code-block'],
                       ['link', 'image', 'video'],
                       ['clean'],
-                      ['blockquote', 'code-block'],
                     ],
+                    history: {
+                      delay: 1000,
+                      maxStack: 50,
+                      userOnly: false
+                    }
                   }}
                   formats={[
                     'header', 'font', 'size',
                     'bold', 'italic', 'underline', 'strike',
-                    'list', 'bullet', 'indent',
-                    'script', 'color', 'background',
-                    'align', 'link', 'image', 'video',
-                    'blockquote', 'code-block'
+                    'color', 'background',
+                    'align',
+                    'list', 'bullet', 'check', 'indent',
+                    'script',
+                    'blockquote', 'code-block',
+                    'link', 'image', 'video'
                   ]}
+                  bounds=".quill-wrapper"
                 />
               </div>
               <small className="form-help">
