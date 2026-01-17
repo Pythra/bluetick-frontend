@@ -19,6 +19,25 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
     })
   }
 
+  // Normalize image URL to ensure it has proper protocol
+  const normalizeImageUrl = (url) => {
+    if (!url) return ''
+    // If URL already has protocol, return as is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url
+    }
+    // If URL starts with //, add https:
+    if (url.startsWith('//')) {
+      return `https:${url}`
+    }
+    // If URL contains cloudfront.net, add https://
+    if (url.includes('cloudfront.net')) {
+      return `https://${url.replace(/^https?:\/\//, '')}`
+    }
+    // Default: add https://
+    return `https://${url}`
+  }
+
   // Collect all orders from all users
   const allOrders = users.flatMap(user =>
     (user.orders || []).map(order => ({
@@ -433,33 +452,38 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                         {order.postContent && (
                           <div style={{ marginBottom: '12px' }}>
                             <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Content</div>
-                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '300px', overflow: 'auto' }} dangerouslySetInnerHTML={{ __html: order.postContent }}></div>
-                          </div>
-                        )}
-                        {order.postBody && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Body (Legacy)</div>
-                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto' }}>
-                              {order.postBody}
-                            </div>
-                          </div>
-                        )}
-                        {order.articleContent && (
-                          <div style={{ marginBottom: '20px' }}>
-                            <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '8px' }}>Content / Notes</div>
                             <div 
+                              className="post-content-preview"
                               style={{ 
                                 fontSize: '14px', 
                                 color: '#333', 
                                 lineHeight: '1.6', 
                                 padding: '16px', 
-                                backgroundColor: '#f9f9f9', 
+                                backgroundColor: '#ffffff', 
                                 borderRadius: '6px', 
                                 border: '1px solid #e0e0e0',
-                                overflow: 'auto'
-                              }}
-                              dangerouslySetInnerHTML={{ __html: order.articleContent }}
-                            />
+                                maxHeight: '400px', 
+                                overflow: 'auto',
+                                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+                              }} 
+                              dangerouslySetInnerHTML={{ __html: order.postContent }}
+                            ></div>
+                          </div>
+                        )}
+                        {order.postBody && (
+                          <div style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Body (Legacy)</div>
+                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+                              {order.postBody}
+                            </div>
+                          </div>
+                        )}
+                        {order.articleContent && (
+                          <div style={{ marginBottom: '12px' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Content / Notes</div>
+                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto' }}>
+                              {order.articleContent}
+                            </div>
                           </div>
                         )}
                         {order.fileName && (
@@ -481,70 +505,68 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                             </div>
                           </div>
                         )}
-                        
-                        {/* Posted Images - Right after article content */}
+                        {/* Images within Submission Details */}
                         {order.imageUrls && order.imageUrls.length > 0 && (
-                          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '2px solid #e0e0e0' }}>
-                            <div style={{ fontSize: '16px', fontWeight: '600', color: '#121212', marginBottom: '16px' }}>
-                              📷 Posted Images ({order.imageUrls.length})
+                          <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #eee' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '12px', fontWeight: '600' }}>
+                              📷 Submitted Images ({order.imageUrls.length})
                             </div>
                             <div 
-                              className="images-grid"
                               style={{ 
                                 display: 'grid', 
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-                                gap: '16px'
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                                gap: '12px'
                               }}
                             >
-                              {order.imageUrls.map((imageUrl, idx) => (
-                                <div key={idx} style={{ 
-                                  position: 'relative',
-                                  borderRadius: '8px',
-                                  overflow: 'hidden',
-                                  border: '2px solid #e0e0e0',
-                                  backgroundColor: '#f9f9f9',
-                                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                  transition: 'transform 0.2s, box-shadow 0.2s'
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.transform = 'translateY(-4px)'
-                                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.transform = 'translateY(0)'
-                                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
-                                }}
-                                >
-                                  <a 
-                                    href={imageUrl} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    style={{ display: 'block', textDecoration: 'none' }}
+                              {order.imageUrls.map((imageUrl, idx) => {
+                                const normalizedUrl = normalizeImageUrl(imageUrl)
+                                return (
+                                  <div key={idx} style={{ 
+                                    position: 'relative',
+                                    borderRadius: '6px',
+                                    overflow: 'hidden',
+                                    border: '2px solid #e0e0e0',
+                                    backgroundColor: '#f9f9f9',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    transition: 'transform 0.2s, box-shadow 0.2s'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(-4px)'
+                                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.transform = 'translateY(0)'
+                                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                                  }}
                                   >
-                                    <img 
-                                      src={imageUrl} 
-                                      alt={`Posted image ${idx + 1}`}
-                                      style={{ 
-                                        width: '100%', 
-                                        height: '180px', 
-                                        objectFit: 'cover', 
-                                        display: 'block',
-                                        cursor: 'pointer'
-                                      }}
-                                    />
-                                    <div style={{
-                                      padding: '10px',
-                                      fontSize: '12px',
-                                      color: '#666',
-                                      textAlign: 'center',
-                                      backgroundColor: 'white',
-                                      fontWeight: '500'
-                                    }}>
-                                      Image {idx + 1}
-                                    </div>
-                                  </a>
-                                </div>
-                              ))}
+                                    <a 
+                                      href={normalizedUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      style={{ display: 'block', textDecoration: 'none' }}
+                                    >
+                                      <img 
+                                        src={normalizedUrl} 
+                                        alt={`Submitted image ${idx + 1}`}
+                                        onError={(e) => {
+                                          e.target.style.display = 'none'
+                                          const errorDiv = document.createElement('div')
+                                          errorDiv.style.cssText = 'padding: 20px; text-align: center; color: #999;'
+                                          errorDiv.textContent = 'Image not available'
+                                          e.target.parentElement.appendChild(errorDiv)
+                                        }}
+                                        style={{ 
+                                          width: '100%', 
+                                          height: '150px', 
+                                          objectFit: 'cover', 
+                                          display: 'block',
+                                          cursor: 'pointer'
+                                        }}
+                                      />
+                                    </a>
+                                  </div>
+                                )
+                              })}
                             </div>
                           </div>
                         )}
