@@ -349,7 +349,25 @@
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   border-bottom: 1px solid #cbd5e1;
-  background: #f8fafc;
+  background: #ffffff;
+  display: flex !important;
+  flex-wrap: wrap;
+  padding: 8px;
+}
+
+.quill-wrapper .ql-toolbar .ql-formats {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.quill-wrapper .ql-toolbar button {
+  width: 28px;
+  height: 24px;
+  padding: 3px 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .quill-wrapper .ql-container {

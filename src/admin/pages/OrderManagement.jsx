@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { MdExpandMore, MdCheckCircle, MdAccessTime, MdCancel } from 'react-icons/md'
+import './OrderManagement.css'
 
 export const OrderManagement = ({ users, onUpdateOrder }) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -149,22 +150,17 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
               >
                 <div
                   onClick={() => toggleOrder(order.id)}
+                  className="order-header-grid"
                   style={{
                     padding: '20px',
                     cursor: 'pointer',
                     display: 'grid',
-                    gridTemplateColumns: 'auto auto 1fr auto auto auto',
+                    gridTemplateColumns: '1fr auto auto auto',
                     gap: '16px',
                     alignItems: 'center',
                     backgroundColor: '#f9f9f9',
                   }}
                 >
-                  <StatusIcon size={24} style={{ color: statusConfig.color }} />
-                  
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#0066FF', minWidth: '30px' }}>
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-                  
                   <div style={{ flex: '1', minWidth: 0 }}>
                     <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#666' }}>
                       {order.userName}
@@ -231,11 +227,14 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                 </div>
 
                 {isExpanded && (
-                  <div style={{
-                    padding: '20px',
-                    borderTop: '1px solid #eee',
-                    backgroundColor: '#fafafa'
-                  }}>
+                  <div 
+                    className="order-details-section"
+                    style={{
+                      padding: '20px',
+                      borderTop: '1px solid #eee',
+                      backgroundColor: '#fafafa'
+                    }}
+                  >
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' }}>
                       <div>
                         <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Service</div>
@@ -269,37 +268,43 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                         <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
                           Ordered Items ({order.cartItems.length})
                         </div>
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                          gap: '12px'
-                        }}>
+                        <div 
+                          className="cart-items-grid"
+                          style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                            gap: '16px'
+                          }}
+                        >
                           {order.cartItems.map((item, idx) => (
                             <div
                               key={idx}
                               style={{
                                 backgroundColor: '#f9f9f9',
-                                padding: '12px',
-                                borderRadius: '6px',
-                                border: '1px solid #eee'
+                                padding: '16px',
+                                borderRadius: '8px',
+                                border: '1px solid #eee',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '8px'
                               }}
                             >
                               <div style={{
-                                fontSize: '14px',
+                                fontSize: '15px',
                                 fontWeight: '600',
                                 color: '#121212',
                                 marginBottom: '4px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
+                                lineHeight: '1.4',
+                                wordBreak: 'break-word'
                               }}>
                                 {item.title}
                               </div>
                               {item.category && (
                                 <div style={{
-                                  fontSize: '13px',
+                                  fontSize: '12px',
                                   color: '#666',
-                                  marginBottom: '8px'
+                                  textTransform: 'uppercase',
+                                  letterSpacing: '0.5px'
                                 }}>
                                   {item.category}
                                 </div>
@@ -308,13 +313,21 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                fontSize: '12px'
+                                marginTop: 'auto',
+                                paddingTop: '8px',
+                                borderTop: '1px solid #eee'
                               }}>
-                                <span style={{ color: '#0066FF', fontWeight: '600' }}>
+                                <span style={{ color: '#0066FF', fontWeight: '700', fontSize: '14px' }}>
                                   ₦{item.price?.toLocaleString ? item.price.toLocaleString() : item.price || 'N/A'}
                                 </span>
                                 {item.quantity && (
-                                  <span style={{ color: '#999' }}>
+                                  <span style={{ 
+                                    color: '#999', 
+                                    fontSize: '12px',
+                                    backgroundColor: '#f0f0f0',
+                                    padding: '4px 8px',
+                                    borderRadius: '4px'
+                                  }}>
                                     Qty: {item.quantity}
                                   </span>
                                 )}
@@ -390,7 +403,7 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                     )}
 
                     {/* Submission Details */}
-                    {(order.postTitle || order.postBody || order.articleContent || order.fileName) && (
+                    {(order.postTitle || order.postBody || order.articleContent || order.fileName || (order.imageUrls && order.imageUrls.length > 0)) && (
                       <div style={{
                         padding: '16px',
                         backgroundColor: 'white',
@@ -432,11 +445,21 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                           </div>
                         )}
                         {order.articleContent && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Content / Notes</div>
-                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto' }}>
-                              {order.articleContent}
-                            </div>
+                          <div style={{ marginBottom: '20px' }}>
+                            <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '8px' }}>Content / Notes</div>
+                            <div 
+                              style={{ 
+                                fontSize: '14px', 
+                                color: '#333', 
+                                lineHeight: '1.6', 
+                                padding: '16px', 
+                                backgroundColor: '#f9f9f9', 
+                                borderRadius: '6px', 
+                                border: '1px solid #e0e0e0',
+                                overflow: 'auto'
+                              }}
+                              dangerouslySetInnerHTML={{ __html: order.articleContent }}
+                            />
                           </div>
                         )}
                         {order.fileName && (
@@ -458,30 +481,67 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                             </div>
                           </div>
                         )}
+                        
+                        {/* Posted Images - Right after article content */}
                         {order.imageUrls && order.imageUrls.length > 0 && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '8px' }}>Uploaded Images ({order.imageUrls.length})</div>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                          <div style={{ marginTop: '24px', paddingTop: '24px', borderTop: '2px solid #e0e0e0' }}>
+                            <div style={{ fontSize: '16px', fontWeight: '600', color: '#121212', marginBottom: '16px' }}>
+                              📷 Posted Images ({order.imageUrls.length})
+                            </div>
+                            <div 
+                              className="images-grid"
+                              style={{ 
+                                display: 'grid', 
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+                                gap: '16px'
+                              }}
+                            >
                               {order.imageUrls.map((imageUrl, idx) => (
-                                <div key={idx} style={{ position: 'relative' }}>
+                                <div key={idx} style={{ 
+                                  position: 'relative',
+                                  borderRadius: '8px',
+                                  overflow: 'hidden',
+                                  border: '2px solid #e0e0e0',
+                                  backgroundColor: '#f9f9f9',
+                                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                  transition: 'transform 0.2s, box-shadow 0.2s'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = 'translateY(-4px)'
+                                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = 'translateY(0)'
+                                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
+                                }}
+                                >
                                   <a 
                                     href={imageUrl} 
                                     target="_blank" 
                                     rel="noopener noreferrer"
-                                    style={{ display: 'block' }}
+                                    style={{ display: 'block', textDecoration: 'none' }}
                                   >
                                     <img 
                                       src={imageUrl} 
-                                      alt={`Upload ${idx + 1}`}
+                                      alt={`Posted image ${idx + 1}`}
                                       style={{ 
-                                        width: '100px', 
-                                        height: '100px', 
+                                        width: '100%', 
+                                        height: '180px', 
                                         objectFit: 'cover', 
-                                        borderRadius: '4px',
-                                        border: '1px solid #ddd',
+                                        display: 'block',
                                         cursor: 'pointer'
                                       }}
                                     />
+                                    <div style={{
+                                      padding: '10px',
+                                      fontSize: '12px',
+                                      color: '#666',
+                                      textAlign: 'center',
+                                      backgroundColor: 'white',
+                                      fontWeight: '500'
+                                    }}>
+                                      Image {idx + 1}
+                                    </div>
                                   </a>
                                 </div>
                               ))}

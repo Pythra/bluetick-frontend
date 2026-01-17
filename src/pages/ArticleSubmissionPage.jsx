@@ -5,8 +5,8 @@ import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import './ArticleSubmissionPage.css';
 
 function ArticleSubmissionPage() {
@@ -148,11 +148,13 @@ function ArticleSubmissionPage() {
         console.log('[Frontend] No images to send - imageFiles:', formData.imageFiles);
       }
 
+      // For FormData, don't set Content-Type - browser will set it with boundary
+      const headers = { ...getAuthHeaders() };
+      delete headers['Content-Type']; // Remove Content-Type for FormData
+
       const response = await fetch(`${apiUrl}/api/orders/article-submission`, {
         method: 'POST',
-        headers: {
-          ...getAuthHeaders(),
-        },
+        headers: headers,
         body: formDataToSend,
       });
 

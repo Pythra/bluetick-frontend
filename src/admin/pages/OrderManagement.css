@@ -1,0 +1,45 @@
+/* Order Management Mobile Responsive Styles */
+
+@media (max-width: 768px) {
+  .order-header-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .order-header-grid > div:first-child {
+    order: 1;
+  }
+
+  .order-header-grid > div:nth-child(2) {
+    order: 2;
+    text-align: left !important;
+  }
+
+  .order-header-grid > div:nth-child(3) {
+    order: 3;
+  }
+
+  .order-header-grid > button {
+    order: 4;
+    width: 100%;
+  }
+
+  .cart-items-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .images-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Better spacing on mobile */
+  .order-details-section {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .images-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
