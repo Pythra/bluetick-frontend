@@ -1,22 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 .landing-page {
   position: relative;
   width: 100%;
-  padding-top: 70px;
+  padding-top: 0;
+  background: #ffffff;
 }
 
 .carousel-container {
   position: relative;
   width: 100%;
+  background: #ffffff;
   overflow: hidden;
+  padding: 0;
 }
 
 .carousel-wrapper {
   position: relative;
   width: 100%;
-  height: 600px;
-  background-color: #020617;
+  height: 520px;
+  margin: 0;
+  background-color: transparent;
+  border-radius: 0;
+  overflow: hidden;
 }
 
 .carousel-video {
@@ -104,45 +110,18 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
-.carousel-indicators {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.75rem;
-  z-index: 10;
-}
-
-.indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
-}
-
-.indicator.active {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(255, 255, 255, 1);
-  transform: scale(1.2);
-}
-
 .home-impact-section {
   position: relative;
-  margin-top: -40px;
+  margin-top: 0;
 }
 
 .home-impact-inner {
   position: relative;
   width: 100%;
   margin: 0;
-  padding: 4rem 6vw 4.5rem;
+  padding: 2.25rem 6vw 1rem;
   border-radius: 0 0 120px 120px;
-  background: #1a3a7c;
+  background: #ffffff;
   overflow: hidden;
 }
 
@@ -162,7 +141,7 @@
   height: 360px;
   top: -140px;
   right: -60px;
-  background: radial-gradient(circle at center, rgba(168, 85, 247, 0.25), rgba(26, 58, 124, 0));
+  background: radial-gradient(circle at center, rgba(148, 163, 184, 0.22), rgba(248, 250, 252, 0));
   animation-delay: 0s;
 }
 
@@ -171,16 +150,22 @@
   height: 420px;
   bottom: -140px;
   left: -90px;
-  background: radial-gradient(circle at center, rgba(236, 72, 153, 0.25), rgba(26, 58, 124, 0));
+  background: radial-gradient(circle at center, rgba(203, 213, 225, 0.28), rgba(248, 250, 252, 0));
   animation-delay: 2s;
 }
 
 .impact-text {
   position: relative;
   z-index: 1;
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto 2.5rem;
+  text-align: left;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.impact-text .section-title,
+.impact-text .services-summary-intro {
+  max-width: 42rem;
 }
 
 .impact-kicker {
@@ -191,37 +176,51 @@
   margin-bottom: 0.75rem;
 }
 
-.impact-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 2.3rem;
-  margin: 0 0 1rem;
-  color: #ffffff;
+.impact-section-title {
+  display: block;
 }
 
-.impact-subtitle {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.05rem;
-  color: rgba(226, 232, 240, 0.85);
-  line-height: 1.6;
+.home-impact-section .impact-text .impact-section-title,
+.home-impact-section .impact-text .impact-section-title .services-summary-title-black {
+  color: #111827;
+  -webkit-text-fill-color: #111827;
+}
+
+.home-impact-section .impact-text .impact-section-title .impact-title-worldline .impact-title-world-blue {
+  color: #2563eb;
+  -webkit-text-fill-color: #2563eb;
+}
+
+.impact-title-story-to-the {
+  display: inline;
+}
+
+.impact-title-worldline {
+  display: inline;
 }
 
 .impact-stats-grid {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1.5rem;
+  margin-top: 0.25rem;
 }
 
 .impact-stat-card {
-  background: rgba(15, 23, 42, 0.45);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background-color: rgba(15, 23, 42, 0.9);
+  border: none;
   border-radius: 24px;
   padding: 1.75rem 1.5rem;
   text-align: center;
-  color: #f8fafc;
+  color: #f9fafb;
   backdrop-filter: blur(6px);
-  box-shadow: inset 0 0 20px rgba(15, 23, 42, 0.25);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
 }
 
 .impact-stat-icon {
@@ -229,11 +228,12 @@
   height: 48px;
   margin: 0 auto 0.75rem;
   border-radius: 50%;
-  background: rgba(248, 250, 252, 0.08);
+  background: rgba(37, 99, 235, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
+  color: #1d4ed8;
 }
 
 .impact-stat-number {
@@ -248,7 +248,7 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  color: rgba(226, 232, 240, 0.75);
+  color: rgba(226, 232, 240, 0.92);
 }
 
 .impact-logos {
@@ -259,6 +259,7 @@
 
 .impact-logos--inline {
   margin-top: 0.25rem;
+  margin-bottom: 1.5rem;
 }
 
 @keyframes float-bubble {
@@ -281,19 +282,36 @@
 }
 
 .impact-logos .logos-carousel {
-  gap: 60px;
+  gap: 1.25rem;
+}
+
+.impact-logos .logo-item {
+  width: 120px;
+  height: 72px;
+  padding: 10px;
+}
+
+.impact-logos .logo-item--platform {
+  min-width: auto;
+  padding: 8px 10px;
 }
 
 /* Mobile Styles */
 @media (max-width: 768px) {
   .landing-page {
-    padding-top: 60px;
+    padding-top: 0;
+  }
+
+  .carousel-container {
+    padding-top: 0;
   }
 
   .carousel-wrapper {
+    width: 100%;
     height: auto;
     aspect-ratio: 16 / 9;
-    min-height: 300px;
+    min-height: 270px;
+    border-radius: 0;
   }
 
   .carousel-slide {
@@ -312,7 +330,8 @@
   }
 
   .carousel-description {
-    font-size: 1rem;
+    font-size: 1.15rem;
+    line-height: 1.55;
     margin-bottom: 1.5rem;
   }
 
@@ -321,22 +340,22 @@
     font-size: 1rem;
   }
 
-  .carousel-indicators {
-    bottom: 1rem;
-  }
-
-  .indicator {
-    width: 10px;
-    height: 10px;
-  }
-
   .home-impact-inner {
-    padding: 3rem 1.5rem 3.5rem;
+    padding: 2.25rem 1rem 1rem;
     border-radius: 0 0 80px 80px;
   }
 
-  .impact-title {
-    font-size: 1.6rem;
+  .impact-text {
+    padding: 0 12px;
+  }
+
+  .impact-title-story-to-the {
+    white-space: nowrap;
+  }
+
+  .impact-title-worldline {
+    display: block;
+    margin-top: 0.15em;
   }
 
   .impact-stats-grid {
@@ -348,7 +367,12 @@
   }
 
   .impact-logos .logos-carousel {
-    gap: 40px;
+    gap: 1rem;
+  }
+
+  .impact-logos .logo-item {
+    width: 100px;
+    height: 60px;
   }
 }
 
@@ -358,7 +382,8 @@
   }
 
   .carousel-description {
-    font-size: 0.9rem;
+    font-size: 1.05rem;
+    line-height: 1.5;
   }
 
   .carousel-button {

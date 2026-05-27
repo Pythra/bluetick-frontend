@@ -1,12 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 .verification-section {
-  padding: 40px 20px;
+  padding: 24px 20px 40px;
   position: relative;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  overflow: hidden;
   background: #ffffff;
-  margin-top: 20px;
+  margin-top: 0;
+}
+
+.verification-section.verification-services-summary {
+  padding: 0 0 40px;
+  background: #ffffff;
 }
 
 @keyframes gradientShift {
@@ -168,8 +172,9 @@
 .verification-section .section-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  text-align: left;
 }
 
 .verification-section .section-subtitle {
@@ -289,22 +294,217 @@
   animation: bounce 2.5s ease-in-out infinite;
 }
 
+/* Homepage summary styling (matches website / app services sections) */
+.verification-services-summary .container,
+.verification-services-summary-header.container {
+  padding: 1.25rem 20px 0;
+}
+
+.verification-carousel-shell {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow:
+    0 20px 45px rgba(15, 23, 42, 0.15),
+    0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.verification-carousel-track {
+  display: flex;
+  width: 100%;
+  transition: transform 0.6s ease;
+}
+
+.verification-carousel-slide {
+  position: relative;
+  min-width: 100%;
+  height: 560px;
+}
+
+.verification-carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.verification-carousel-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(15, 23, 42, 0.54) 20%, rgba(30, 64, 175, 0.22) 70%, rgba(15, 23, 42, 0.5) 100%);
+}
+
+.verification-carousel-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.25rem;
+  max-width: 760px;
+}
+
+.verification-services-summary .verification-carousel-content {
+  align-items: flex-start;
+  justify-content: flex-end;
+  max-width: none;
+  width: 100%;
+  text-align: left;
+  padding: 2rem 1.5rem 2.5rem;
+}
+
+.verification-carousel-kicker {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(191, 219, 254, 0.95);
+}
+
+.verification-carousel-content h3 {
+  margin: 0;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 2.1rem;
+  line-height: 1.2;
+}
+
+.verification-services-summary .verification-carousel-content h3 {
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.verification-carousel-subtitle {
+  margin: 0.75rem 0 1rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: rgba(248, 250, 252, 0.92);
+}
+
+.verification-carousel-types {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.verification-carousel-types li {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(191, 219, 254, 0.5);
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.verification-services-summary .verification-carousel-types--bulleted {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  margin: 0.85rem 0 0;
+  padding: 0 0 0 1.35rem;
+  list-style: disc;
+}
+
+.verification-services-summary .verification-carousel-types--bulleted li {
+  display: list-item;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.3rem 0;
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.verification-services-summary .verification-carousel-types--bulleted li::marker {
+  color: rgba(191, 219, 254, 0.95);
+}
+
+.verification-carousel-cta {
+  margin-top: 1.2rem;
+  align-self: flex-start;
+}
+
+.verification-services-summary .verification-carousel-cta {
+  align-self: center;
+}
+
+.verification-services-summary .verification-carousel-cta.btn {
+  margin-top: 1.25rem;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(191, 219, 254, 0.5);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.verification-services-summary .verification-carousel-cta.btn::before {
+  display: none;
+}
+
+.verification-services-summary .verification-carousel-cta.btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(191, 219, 254, 0.75);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+}
+
+.verification-services-summary .verification-carousel-cta.btn:active {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.verification-carousel-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.verification-carousel-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.verification-carousel-dot.active {
+  background: #bfdbfe;
+  transform: scale(1.15);
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .verification-section {
-    padding: 60px 15px;
+    padding: 32px 15px 40px;
   }
   
   .verification-section .section-title {
-    font-size: 2rem;
-    text-align: center;
+    font-size: 2.5rem;
+    text-align: left;
   }
 
   .verification-section .section-subtitle {
     font-size: 1rem;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+    text-align: left;
+    margin-left: 0;
+    margin-right: 0;
   }
   
   .verification-container {
@@ -330,6 +530,41 @@
     font-size: 16px;
     letter-spacing: 0.4px;
   }
+
+  .verification-services-summary .container {
+    padding: 1rem 15px 0;
+  }
+
+  .verification-carousel-slide {
+    height: 520px;
+  }
+
+  .verification-services-summary .verification-carousel-content {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .verification-carousel-content h3 {
+    font-size: 1.55rem;
+  }
+
+  .verification-carousel-subtitle {
+    font-size: 0.92rem;
+  }
+
+  .verification-carousel-types li {
+    font-size: 0.8rem;
+    padding: 0.38rem 0.66rem;
+  }
+
+  .verification-services-summary .verification-carousel-types--bulleted li {
+    padding: 0.28rem 0;
+    font-size: 0.82rem;
+  }
+
+  .verification-services-summary .verification-carousel-cta {
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+  }
 }
 
 /* Small mobile */
@@ -353,5 +588,33 @@
   .verification-item .verification-name {
     font-size: 14px;
     letter-spacing: 0.3px;
+  }
+
+  .verification-carousel-slide {
+    height: 480px;
+  }
+
+  .verification-services-summary .verification-carousel-content {
+    padding: 1rem 0.85rem 1.75rem;
+  }
+
+  .verification-carousel-content h3 {
+    font-size: 1.35rem;
+  }
+
+  .verification-carousel-subtitle {
+    margin-top: 0.6rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.86rem;
+  }
+
+  .verification-carousel-dot {
+    width: 9px;
+    height: 9px;
+  }
+
+  .verification-services-summary .verification-carousel-cta {
+    margin-top: 0.85rem;
+    margin-bottom: 0.15rem;
   }
 }

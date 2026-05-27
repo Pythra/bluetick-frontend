@@ -1,4 +1,5 @@
 import SectionHeader from './SectionHeader';
+import PublicationLogosCarousel from './PublicationLogosCarousel';
 import './PublicationSection.css';
 
 const packages = [
@@ -156,6 +157,7 @@ function PublicationSection() {
           title="PUBLICATION PACKAGES"
           subtitle="Comprehensive publication services across multiple platforms"
         />
+        <PublicationLogosCarousel title="" />
 
         <div className="packages-grid">
           {packages.map((pkg) => (

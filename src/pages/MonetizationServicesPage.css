@@ -1,0 +1,92 @@
+.monetization-page .monetization-intro {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.monetization-page .intro-text {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.monetization-tier {
+  margin-bottom: 3rem;
+}
+
+.monetization-tier-title {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.monetization-notice {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.monetization-notice-title {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1e40af;
+  margin: 0 0 1rem;
+}
+
+.monetization-notice-lead {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  margin: 0 0 0.75rem;
+  line-height: 1.6;
+}
+
+.monetization-notice-body {
+  font-size: 1rem;
+  color: #334155;
+  margin: 0;
+  line-height: 1.75;
+}
+
+.monetization-cart-notification {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .monetization-tier-title {
+    font-size: 1.35rem;
+  }
+
+  .monetization-notice {
+    padding: 1.5rem;
+  }
+}

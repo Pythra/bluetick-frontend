@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
-.instagram-services-section {
+.instagram-services-section:not(.instagram-services-summary) {
   padding: 40px 20px;
   position: relative;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -147,22 +147,12 @@
   }
 }
 
-.instagram-services-section .container {
+.instagram-services-section:not(.instagram-services-summary) .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0;
   position: relative;
   z-index: 1;
-}
-
-.instagram-services-section .section-subtitle {
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 40%, #38bdf8 80%, #e0f2fe 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .instagram-container {
@@ -171,7 +161,7 @@
   -webkit-backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px 50px;
-  margin-top: 50px;
+  margin-top: 0;
   margin-bottom: 40px;
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.1),
@@ -278,7 +268,7 @@
 
 /* Mobile */
 @media (max-width: 768px) {
-  .instagram-services-section {
+  .instagram-services-section:not(.instagram-services-summary) {
     padding: 60px 15px;
   }
   

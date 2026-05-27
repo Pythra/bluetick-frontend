@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import SectionHeader from './SectionHeader';
 import '../styles/FAQ.css';
 
 // FAQ Item Component
@@ -57,9 +58,10 @@ function FAQ() {
   return (
     <section className="faq-section">
       <div className="container">
-        <h2 className="section-title">Frequently Asked Questions</h2>
-        <p className="section-subtitle">Find answers to common questions about our services and processes</p>
-        
+        <SectionHeader
+          title={<span className="faq-section-title">FAQ&apos;S</span>}
+        />
+
         <div className="faq-container">
           {faqs.map((faq, index) => (
             <FAQItem 

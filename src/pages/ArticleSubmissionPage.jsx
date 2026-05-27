@@ -5,8 +5,6 @@ import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
 import './ArticleSubmissionPage.css';
 
 function ArticleSubmissionPage() {
@@ -17,8 +15,7 @@ function ArticleSubmissionPage() {
   
   const [formData, setFormData] = useState({
     postTitle: '',
-    postSummary: '',
-    postContent: '',
+    postBody: '',
     articleContent: '',
     file: null,
     fileName: '',
@@ -102,17 +99,8 @@ function ArticleSubmissionPage() {
       return;
     }
     
-    if (!formData.postSummary.trim()) {
-      setError('Please enter a post summary');
-      return;
-    }
-    if (formData.postSummary.length > 160) {
-      setError('Post summary must be 160 characters or less');
-      return;
-    }
-    const postContentText = formData.postContent.replace(/<[^>]*>/g, '').trim();
-    if (!postContentText) {
-      setError('Please enter post content');
+    if (!formData.postBody.trim()) {
+      setError('Please enter the post body/content');
       return;
     }
 
@@ -121,41 +109,21 @@ function ArticleSubmissionPage() {
     setSubmitStatus('');
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('postTitle', formData.postTitle.trim());
-      formDataToSend.append('postSummary', formData.postSummary.trim());
-      formDataToSend.append('postContent', formData.postContent || '');
-      formDataToSend.append('articleContent', formData.articleContent.trim());
-      formDataToSend.append('orderId', orderDetails.orderId);
-      formDataToSend.append('serviceType', isPublication ? 'publication' : 'other');
-      formDataToSend.append('cartItems', JSON.stringify(cartItems));
-
-      if (formData.file) {
-        formDataToSend.append('document', formData.file);
-      }
-
-      if (formData.imageFiles && formData.imageFiles.length > 0) {
-        console.log('[Frontend] Sending images:', formData.imageFiles.length);
-        formData.imageFiles.forEach((imageFile, index) => {
-          if (imageFile && imageFile instanceof File) {
-            console.log(`[Frontend] Appending image ${index + 1}:`, imageFile.name, imageFile.type, imageFile.size);
-            formDataToSend.append('images', imageFile, imageFile.name);
-          } else {
-            console.error(`[Frontend] Invalid image file at index ${index}:`, imageFile);
-          }
-        });
-      } else {
-        console.log('[Frontend] No images to send - imageFiles:', formData.imageFiles);
-      }
-
-      // For FormData, don't set Content-Type - browser will set it with boundary
-      const headers = { ...getAuthHeaders() };
-      delete headers['Content-Type']; // Remove Content-Type for FormData
-
       const response = await fetch(`${apiUrl}/api/orders/article-submission`, {
         method: 'POST',
-        headers: headers,
-        body: formDataToSend,
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postTitle: formData.postTitle.trim(),
+          postBody: formData.postBody.trim(),
+          articleContent: formData.articleContent.trim(),
+          orderId: orderDetails.orderId,
+          serviceType: isPublication ? 'publication' : 'other',
+          cartItems: cartItems,
+          fileName: formData.fileName
+        }),
       });
 
       const data = await response.json();
@@ -225,75 +193,23 @@ function ArticleSubmissionPage() {
             )}
 
             <div className="form-group">
-              <label htmlFor="postSummary">
-                Post Summary *
-                <span style={{ fontSize: '12px', fontWeight: 'normal', color: '#666', marginLeft: '8px' }}>
-                  ({formData.postSummary.length}/160 characters)
-                </span>
+              <label htmlFor="postBody">
+                {isPublication ? 'Article Content (Press Release)' : 'Post Body/Content *'}
               </label>
               <textarea
-                id="postSummary"
-                name="postSummary"
-                value={formData.postSummary}
+                id="postBody"
+                name="postBody"
+                value={formData.postBody}
                 onChange={handleInputChange}
-                placeholder="160 characters max. Our readers engage more with short, punchy headlines. Aim for 10 to 12 words max!"
-                rows={3}
+                placeholder={
+                  isPublication 
+                    ? 'Enter your press release or article content here. Include headline, body text, and any relevant details...'
+                    : 'Enter the main content of your post...'
+                }
+                rows={10}
                 className="article-textarea"
-                maxLength={160}
                 required
               />
-              <small className="form-help">
-                Our readers engage more with short, punchy headlines. Aim for 10 to 12 words max!
-              </small>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="postContent">
-                Post Content *
-              </label>
-              <div className="quill-wrapper">
-                <ReactQuill
-                  theme="snow"
-                  value={formData.postContent}
-                  onChange={(value) => setFormData(prev => ({ ...prev, postContent: value }))}
-                  placeholder="Make it count. Share the who, what, when, and how."
-                  modules={{
-                    toolbar: [
-                      [{ 'header': [1, 2, 3, false] }],
-                      [{ 'font': [] }],
-                      [{ 'size': ['small', false, 'large', 'huge'] }],
-                      ['bold', 'italic', 'underline', 'strike'],
-                      [{ 'color': [] }, { 'background': [] }],
-                      [{ 'align': [] }],
-                      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-                      [{ 'script': 'sub'}, { 'script': 'super' }],
-                      [{ 'indent': '-1'}, { 'indent': '+1' }],
-                      ['blockquote', 'code-block'],
-                      ['link', 'image', 'video'],
-                      ['clean'],
-                    ],
-                    history: {
-                      delay: 1000,
-                      maxStack: 50,
-                      userOnly: false
-                    }
-                  }}
-                  formats={[
-                    'header', 'font', 'size',
-                    'bold', 'italic', 'underline', 'strike',
-                    'color', 'background',
-                    'align',
-                    'list', 'bullet', 'check', 'indent',
-                    'script',
-                    'blockquote', 'code-block',
-                    'link', 'image', 'video'
-                  ]}
-                  bounds=".quill-wrapper"
-                />
-              </div>
-              <small className="form-help">
-                Concise press releases with an average of 800 words or less are most useful to readers.
-              </small>
             </div>
 
             <div className="form-group">
@@ -424,7 +340,7 @@ function ArticleSubmissionPage() {
                 </Button>
                 <Button 
                   type="submit" 
-                  disabled={isSubmitting || !formData.postSummary.trim() || !formData.postContent.trim() || (!isPublication && !formData.postTitle.trim()) || formData.postSummary.length > 160}
+                  disabled={isSubmitting || !formData.postBody.trim() || (!isPublication && !formData.postTitle.trim())}
                   className="submit-btn"
                 >
                   {isSubmitting 

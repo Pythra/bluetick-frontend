@@ -1,4 +1,4 @@
-.wikipedia-services-section {
+.wikipedia-services-section:not(.wikipedia-services-summary) {
   position: relative;
   padding: 80px 20px;
   background: white;
@@ -6,7 +6,15 @@
   margin: 40px 0;
 }
 
-.wikipedia-services-section .container {
+.wikipedia-services-section.wikipedia-services-summary .container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem 20px 0;
+}
+
+.wikipedia-services-section:not(.wikipedia-services-summary) .container {
   position: relative;
   z-index: 1;
   max-width: 1200px;
@@ -17,7 +25,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 20px;
-  margin-top: 40px;
+  margin-top: 0;
   align-items: center;
 }
 
@@ -88,8 +96,12 @@
 }
 
 @media (max-width: 768px) {
-  .wikipedia-services-section {
+  .wikipedia-services-section:not(.wikipedia-services-summary) {
     padding: 60px 15px;
+  }
+
+  .wikipedia-services-section.wikipedia-services-summary .container {
+    padding: 1rem 15px 0;
   }
 
   .wikipedia-container {

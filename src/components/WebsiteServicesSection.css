@@ -1,16 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 .website-services-section {
-  padding: 40px 20px;
+  padding: 24px 20px 40px;
   position: relative;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  overflow: hidden;
   background: #ffffff;
-  border-top-left-radius: 40px;
-  border-top-right-radius: 40px;
-  margin-top: 20px;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
+  margin-top: 0;
+}
+
+.website-services-section.website-services-summary {
+  padding: 0 0 40px;
 }
 
 @keyframes gradientShift {
@@ -172,8 +171,9 @@
 .website-services-section .section-header {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  text-align: left;
 }
 
 .website-services-section .section-subtitle {
@@ -293,22 +293,175 @@
   animation: bounce 2.5s ease-in-out infinite;
 }
 
+/* Homepage summary styling (matches app services section) */
+.website-services-summary .container {
+  padding: 1.25rem 20px 0;
+}
+
+.website-services-summary .website-hero-shell {
+  margin-top: 0;
+}
+
+.website-hero-shell {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow:
+    0 20px 45px rgba(15, 23, 42, 0.15),
+    0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.website-hero-image {
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+  display: block;
+}
+
+.website-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(15, 23, 42, 0.54) 20%, rgba(30, 64, 175, 0.22) 70%, rgba(15, 23, 42, 0.5) 100%);
+}
+
+.website-hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.25rem;
+  max-width: 760px;
+}
+
+.website-services-summary .website-hero-content {
+  align-items: flex-start;
+  justify-content: flex-end;
+  max-width: none;
+  width: 100%;
+  text-align: left;
+  padding: 2rem 1.5rem 2.5rem;
+}
+
+.website-services-summary .website-hero-types {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  margin: 0.85rem 0 0;
+  padding: 0 0 0 1.35rem;
+  list-style: disc;
+}
+
+.website-services-summary .website-hero-types li {
+  display: list-item;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.3rem 0;
+  margin: 0;
+  font-weight: 600;
+}
+
+.website-services-summary .website-hero-types li::marker {
+  color: rgba(191, 219, 254, 0.95);
+}
+
+.website-services-summary .website-hero-cta.btn {
+  align-self: center;
+  margin-top: 1.25rem;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(191, 219, 254, 0.5);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.website-services-summary .website-hero-cta.btn::before {
+  display: none;
+}
+
+.website-services-summary .website-hero-cta.btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(191, 219, 254, 0.75);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+}
+
+.website-services-summary .website-hero-cta.btn:active {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.website-services-summary .website-hero-content h3 {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.website-services-summary .website-hero-cta {
+  align-self: center;
+}
+
+.website-hero-kicker {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(191, 219, 254, 0.95);
+}
+
+.website-hero-content h3 {
+  margin: 0;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 2.1rem;
+  line-height: 1.2;
+}
+
+.website-hero-types {
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.website-hero-types li {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(191, 219, 254, 0.5);
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.website-hero-cta {
+  margin-top: 1.2rem;
+  align-self: flex-start;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .website-services-section {
-    padding: 60px 15px;
+    padding: 32px 15px 40px;
   }
   
   .website-services-section .section-title {
-    font-size: 2rem;
-    text-align: center;
+    font-size: 2.5rem;
+    text-align: left;
   }
 
   .website-services-section .section-subtitle {
     font-size: 1rem;
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+    text-align: left;
+    margin-left: 0;
+    margin-right: 0;
   }
   
   .websites-container {
@@ -333,6 +486,45 @@
     font-size: 16px;
     letter-spacing: 0.4px;
   }
+
+  .website-services-summary .container {
+    padding: 1rem 15px 0;
+  }
+
+  .website-hero-image {
+    height: 430px;
+  }
+
+  .website-services-summary .website-hero-image {
+    height: 520px;
+  }
+
+  .website-hero-content {
+    padding: 1.25rem;
+  }
+
+  .website-services-summary .website-hero-content {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .website-services-summary .website-hero-cta {
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .website-hero-content h3 {
+    font-size: 1.55rem;
+  }
+
+  .website-hero-types li {
+    font-size: 0.8rem;
+    padding: 0.38rem 0.66rem;
+  }
+
+  .website-services-summary .website-hero-types li {
+    padding: 0.28rem 0;
+    font-size: 0.82rem;
+  }
 }
 
 /* Small mobile */
@@ -343,7 +535,7 @@
   }
   
   .website-services-section .section-title {
-    font-size: 1.75rem;
+    font-size: 2.25rem;
   }
 
   .website-services-section .section-subtitle {
@@ -364,5 +556,30 @@
   .website-item .website-name {
     font-size: 14px;
     letter-spacing: 0.3px;
+  }
+
+  .website-hero-image {
+    height: 390px;
+  }
+
+  .website-services-summary .website-hero-image {
+    height: 480px;
+  }
+
+  .website-hero-content {
+    padding: 1rem;
+  }
+
+  .website-services-summary .website-hero-content {
+    padding: 1rem 0.85rem 1.75rem;
+  }
+
+  .website-services-summary .website-hero-cta {
+    margin-top: 0.85rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .website-hero-content h3 {
+    font-size: 1.35rem;
   }
 }

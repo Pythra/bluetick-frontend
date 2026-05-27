@@ -1,11 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&display=swap');
+
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  background: #1a3a7c;
+  position: relative;
+  background: #ffffff;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   z-index: 1000;
-  padding: 0.75rem 1.5rem;
+  padding: 0.8rem 1.6rem;
+  width: 100%;
+  margin: 0;
+  isolation: isolate;
 }
 
 .navbar-container {
@@ -19,11 +24,14 @@
 .navbar-logo {
   display: flex;
   align-items: center;
+  height: 56px;
+  overflow: hidden;
 }
 
 .logo-img {
-  height: 52px;
-  width: auto;
+  width: 220px;
+  max-width: 20vw;
+  height: auto;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
@@ -36,16 +44,16 @@
 
 .navbar-menu a,
 .navbar-menu button {
-  color: rgba(248, 250, 252, 0.9);
+  color: #2563eb;
   text-decoration: none;
   font-weight: 600;
   font-size: 1rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
   transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-family: 'Baloo 2', 'Poppins', 'Inter', sans-serif;
   background: none;
   border: none;
   cursor: pointer;
@@ -53,8 +61,8 @@
 
 .navbar-menu a:hover,
 .navbar-menu button:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.12);
+  color: #1d4ed8;
+  background: #eff6ff;
   transform: translateY(-1px);
 }
 
@@ -73,9 +81,10 @@
 }
 
 .navbar-user {
-  color: #64748b;
+  color: #1e3a8a;
   font-size: 0.85rem;
-  font-style: italic;
+  font-style: normal;
+  font-family: 'Baloo 2', 'Poppins', 'Inter', sans-serif;
 }
 
 .navbar-logout {
@@ -99,18 +108,26 @@
 .navbar-toggle span {
   width: 25px;
   height: 3px;
-  background: #ffffff;
+  background: #2563eb;
   border-radius: 2px;
   transition: all 0.3s ease;
 }
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.9rem;
+    width: 100%;
+    margin: 0;
+  }
+
+  .navbar-logo {
+    height: 58px;
   }
 
   .logo-img {
-    height: 46px;
+    width: 190px;
+    max-width: 52vw;
+    height: auto;
   }
 
   .navbar-toggle {
@@ -119,10 +136,13 @@
 
   .navbar-menu {
     position: absolute;
-    top: 100%;
+    top: calc(100% + 8px);
     left: 0;
     right: 0;
-    background: #1a3a7c;
+    background: #ffffff;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 0;
+    box-shadow: none;
     flex-direction: column;
     padding: 1rem;
     gap: 1rem;
@@ -142,7 +162,7 @@
     padding: 0.75rem 0;
     width: 100%;
     text-align: center;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #dbeafe;
   }
 
   .navbar-menu a:last-child {

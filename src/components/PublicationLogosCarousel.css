@@ -30,6 +30,10 @@
   background: transparent;
 }
 
+.publication-logos-section.impact-logos-carousel .logos-carousel {
+  gap: 1.25rem;
+}
+
 .publication-logos-section.impact-logos-carousel .publication-logos-title {
   margin-bottom: 20px;
   font-size: 1.25rem;
@@ -83,6 +87,156 @@
   filter: grayscale(0%);
 }
 
+.logo-item--platform {
+  width: auto;
+  min-width: 150px;
+  padding: 10px 12px;
+}
+
+.logo-platform {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.logo-platform--social {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.logo-platform--social:hover {
+  transform: scale(1.1);
+  background: transparent;
+  box-shadow: none;
+}
+
+.logo-platform--social .logo-platform-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.logo-platform--instagram .logo-platform-icon {
+  color: #e4405f;
+}
+
+.logo-platform--facebook .logo-platform-icon {
+  color: #1877f2;
+}
+
+.logo-platform--twitter .logo-platform-icon {
+  color: #1d9bf0;
+}
+
+.logo-platform--appstore {
+  border-color: rgba(15, 23, 42, 0.2);
+  background: #f8fafc;
+}
+
+.logo-platform--appstore .logo-platform-icon {
+  color: #0f172a;
+}
+
+.logo-platform--appstore:hover {
+  border-color: rgba(15, 23, 42, 0.35);
+  background: #f1f5f9;
+}
+
+.logo-platform--appstore.logo-platform--store:has(.logo-platform-store-badge) {
+  padding: 0.3rem 0.45rem;
+  min-height: 0;
+  gap: 0;
+}
+
+.logo-platform--appstore .logo-platform-store-badge {
+  display: block;
+  height: 2rem;
+  width: auto;
+  max-width: 8.5rem;
+  object-fit: contain;
+}
+
+.logo-platform--googleplay {
+  border-color: rgba(15, 23, 42, 0.2);
+  background: #0f172a;
+  padding: 0.35rem 0.5rem;
+}
+
+.logo-platform--googleplay .logo-platform-store-badge {
+  display: block;
+  height: 2.5rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-platform--googleplay:hover {
+  border-color: rgba(15, 23, 42, 0.45);
+  background: #1e293b;
+}
+
+.logo-platform--store {
+  gap: 0.55rem;
+  padding: 0.5rem 0.9rem 0.5rem 0.7rem;
+  border-radius: 12px;
+  min-height: 3rem;
+}
+
+.logo-item--platform:hover .logo-platform--store {
+  transform: scale(1.05);
+}
+
+.logo-platform-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+}
+
+.logo-platform-icon--store {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+.logo-platform-store-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.15;
+  text-align: left;
+}
+
+.logo-platform-store-kicker {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #64748b;
+}
+
+.logo-platform-store-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #0f172a;
+}
+
+.logo-item--platform:hover {
+  transform: none;
+}
+
+.logo-item--platform:hover .logo-platform--social {
+  transform: scale(1.08);
+}
+
 @keyframes scroll {
   0% {
     transform: translateX(0);
@@ -110,6 +264,43 @@
 
   .logos-carousel {
     gap: 30px;
+  }
+
+  .logo-item--platform {
+    min-width: 120px;
+    padding: 8px 10px;
+  }
+
+  .logo-platform--social .logo-platform-icon {
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+
+  .logo-platform--store .logo-platform-icon {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .logo-platform--googleplay .logo-platform-store-badge {
+    height: 2.15rem;
+  }
+
+  .logo-platform--appstore .logo-platform-store-badge {
+    height: 1.75rem;
+    max-width: 7.25rem;
+  }
+
+  .logo-platform--store {
+    padding: 0.4rem 0.7rem 0.4rem 0.55rem;
+    min-height: 2.6rem;
+  }
+
+  .logo-platform-store-kicker {
+    font-size: 0.52rem;
+  }
+
+  .logo-platform-store-name {
+    font-size: 0.75rem;
   }
 }
 

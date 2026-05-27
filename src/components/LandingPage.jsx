@@ -1,69 +1,39 @@
-import { useState, useEffect, useRef } from 'react';
-import Button from './Button';
+import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
-import {
-  IoNewspaperOutline,
-  IoEyeOutline,
-  IoPeopleOutline,
-  IoTimeOutline,
-} from 'react-icons/io5';
 import heroVideo from '../assets/vid.mp4';
+import clientsImage from '../assets/clients.jpg';
+import newsImage from '../assets/news.jpg';
+import onlineImage from '../assets/online.jpg';
 import './LandingPage.css';
+import './SectionHeader.css';
 
-const HERO_STATS = [
-  {
-    label: 'News Platforms',
-    value: 100,
-    suffix: '+',
-    duration: 2200,
-    icon: IoNewspaperOutline,
-  },
-  {
-    label: 'Monthly Readers',
-    value: 10,
-    suffix: 'M',
-    duration: 2000,
-    icon: IoEyeOutline,
-  },
-  {
-    label: 'Satisfied Clients',
-    value: 1000,
-    suffix: '+',
-    duration: 1800,
-    icon: IoPeopleOutline,
-  },
-  {
-    label: 'Average Delivery',
-    value: 24,
-    suffix: 'hrs',
-    duration: 1600,
-    icon: IoTimeOutline,
-  },
+const impactStats = [
+  { value: 100, suffix: '+', label: 'Different publication platforms', bg: newsImage },
+  { value: 500, suffix: '+', label: 'Satisfied customers', bg: clientsImage },
+  { value: 250, suffix: '+', label: 'High-impact launches delivered', bg: onlineImage },
 ];
 
 function LandingPage({ onScrollToSection }) {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [statValues, setStatValues] = useState(HERO_STATS.map(() => 0));
-  const statsSectionRef = useRef(null);
-  const [hasAnimatedStats, setHasAnimatedStats] = useState(false);
+  const [impactCounts, setImpactCounts] = useState(impactStats.map(() => 0));
 
   const slides = [
     {
-      title: 'Websites & Apps',
-      description: 'Transform your business with stunning websites and powerful mobile applications. From concept to launch, we deliver solutions that drive growth.',
+      title: 'We Build Apps & Websites',
+      description: 'Modern web and mobile products built for speed, growth, and results.',
       buttonText: 'Get Started',
       buttonAction: () => onScrollToSection('website-services')
     },
     {
-      title: 'Social Media Verification',
-      description: 'Get verified on major platforms and boost your digital credibility. Establish your online presence with permanent verification badges.',
+      title: 'We Handle Social Media Verification',
+      description: 'Get trusted badges and strengthen your brand credibility online.',
       buttonText: 'Get Verified',
       buttonAction: () => onScrollToSection('verification-services')
     },
     {
-      title: 'Digital Publications',
-      description: 'Amplify your message with publications on major news platforms and international sites. Reach global audiences with our comprehensive packages.',
+      title: 'We Do Media Publications',
+      description: 'Publish your story on major media platforms and reach real audiences.',
       buttonText: 'Get Published',
       buttonAction: () => onScrollToSection('publication-services')
     }
@@ -77,76 +47,27 @@ function LandingPage({ onScrollToSection }) {
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  const goToSlide = (index) => {
-    setCurrentSlide(index);
-  };
-
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries;
-        if (entry.isIntersecting) {
-          setHasAnimatedStats(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.35 }
-    );
-
-    if (statsSectionRef.current) {
-      observer.observe(statsSectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (!hasAnimatedStats) return;
-
-    let animationFrame;
+    const duration = 900; // fast count-up
     const start = performance.now();
-    const maxDuration = Math.max(...HERO_STATS.map((stat) => stat.duration));
 
-    const animate = (time) => {
-      const elapsed = time - start;
-      setStatValues((prevValues) =>
-        HERO_STATS.map((stat, index) => {
-          if (prevValues[index] === stat.value) {
-            return stat.value;
-          }
+    const step = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out
 
-          const progress = Math.min(elapsed / stat.duration, 1);
-          return Math.floor(stat.value * progress);
-        })
+      setImpactCounts(
+        impactStats.map((stat) => Math.floor(stat.value * eased))
       );
 
-      if (elapsed < maxDuration) {
-        animationFrame = requestAnimationFrame(animate);
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        setImpactCounts(impactStats.map((stat) => stat.value));
       }
     };
 
-    animationFrame = requestAnimationFrame(animate);
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [hasAnimatedStats]);
-
-  const formatStatValue = (value, stat) => {
-    const safeValue = Number.isFinite(value) ? value : 0;
-
-    if (stat.suffix === 'M') {
-      return `${safeValue}${stat.suffix}`;
-    }
-
-    if (stat.suffix === 'hrs') {
-      return `${safeValue}${stat.suffix}`;
-    }
-
-    if (stat.suffix === '+') {
-      return `${safeValue.toLocaleString()}${stat.suffix}`;
-    }
-
-    return safeValue.toLocaleString();
-  };
+    requestAnimationFrame(step);
+  }, []);
 
   return (
     <section id="landing" className="landing-page">
@@ -174,46 +95,48 @@ function LandingPage({ onScrollToSection }) {
             </div>
           ))}
         </div>
-        <div className="carousel-indicators">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              className={`indicator ${index === currentSlide ? 'active' : ''}`}
-              onClick={() => goToSlide(index)}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
       </div>
 
-      <div className="home-impact-section" ref={statsSectionRef}>
+      <div className="home-impact-section">
         <div className="home-impact-inner">
           <div className="impact-text">
-            <h3 className="impact-title">Global PR campaigns that actually scale</h3>
             <div className="impact-logos impact-logos--inline">
-              <PublicationLogosCarousel title="" className="impact-logos-carousel" />
+              <PublicationLogosCarousel
+                title=""
+                className="impact-logos-carousel"
+                includePlatformBadges
+              />
             </div>
-            <p className="impact-subtitle">
-              From founders and creators to the biggest African labels, Bluetickgeng keeps
-              stories in front of the world's most engaged news audiences.
+            <h2 className="section-title impact-section-title">
+              <span className="services-summary-title-black">Tell your </span>
+              <span className="impact-title-story-to-the">
+                <span className="services-summary-title-black">Story to the</span>
+              </span>{' '}
+              <span className="impact-title-worldline">
+                <span className="impact-title-world-blue">WORLD</span>
+              </span>
+            </h2>
+            <p className="services-summary-intro">
+              We help brands, creators, and businesses grow through website development,
+              mobile app solutions, social media verification, and strategic media visibility.
             </p>
-          </div>
-
-          <div className="impact-stats-grid">
-            {HERO_STATS.map((stat, index) => {
-              const Icon = stat.icon;
-              const displayValue = formatStatValue(statValues[index], stat);
-
-              return (
-                <div key={stat.label} className="impact-stat-card">
-                  <div className="impact-stat-icon">
-                    <Icon />
+            <div className="impact-stats-grid">
+              {impactStats.map((stat, index) => (
+                <div
+                  key={stat.label}
+                  className="impact-stat-card"
+                  style={{
+                    backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.7)), url(${stat.bg})`,
+                  }}
+                >
+                  <div className="impact-stat-number">
+                    {impactCounts[index].toLocaleString()}
+                    {stat.suffix}
                   </div>
-                  <div className="impact-stat-number">{displayValue}</div>
                   <div className="impact-stat-label">{stat.label}</div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       </div>

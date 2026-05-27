@@ -1,0 +1,137 @@
+.twitter-trend-page {
+  background: #ffffff;
+}
+
+.twitter-trend-hero {
+  padding: 7rem 1.5rem 3.5rem;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);
+}
+
+.twitter-trend-hero-inner {
+  max-width: 820px;
+  margin: 0 auto;
+  text-align: center;
+  color: #ffffff;
+}
+
+.twitter-trend-eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(191, 219, 254, 0.95);
+  font-weight: 600;
+}
+
+.twitter-trend-hero-title {
+  margin: 0 0 1rem;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.twitter-trend-hero-text {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.75;
+  color: rgba(248, 250, 252, 0.92);
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.twitter-trend-packages-section {
+  padding-top: 4rem;
+}
+
+.twitter-trend-card-media {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 1.25rem;
+  background: linear-gradient(145deg, #0f172a 0%, #1d4ed8 100%);
+}
+
+.twitter-trend-card-media img {
+  display: none;
+}
+
+.twitter-trend-card-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.04em;
+}
+
+.twitter-trend-package-list {
+  margin: 0 0 1.25rem;
+  padding-left: 1.2rem;
+  list-style: disc;
+}
+
+.twitter-trend-package-list li {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.55;
+  margin-bottom: 0.35rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.twitter-trend-package-price {
+  margin-bottom: 1.25rem;
+}
+
+.twitter-trend-package-price .price-amount {
+  font-size: 1.65rem;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.twitter-trend-notice-section {
+  padding: 0 1.5rem 4rem;
+}
+
+.twitter-trend-notice {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.twitter-trend-notice h3 {
+  margin: 0 0 0.75rem;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 1.35rem;
+  color: #1e40af;
+}
+
+.twitter-trend-notice-lead {
+  font-weight: 600;
+  color: #1e3a8a;
+  margin: 0 0 0.65rem;
+}
+
+.twitter-trend-notice p:last-child {
+  margin: 0;
+  color: #334155;
+  line-height: 1.75;
+}
+
+@media (max-width: 768px) {
+  .twitter-trend-hero {
+    padding: 6rem 1rem 2.5rem;
+  }
+
+  .twitter-trend-packages-section {
+    padding-top: 2.5rem;
+  }
+}

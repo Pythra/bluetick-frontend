@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { MdExpandMore, MdCheckCircle, MdAccessTime, MdCancel } from 'react-icons/md'
-import './OrderManagement.css'
 
 export const OrderManagement = ({ users, onUpdateOrder }) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -17,25 +16,6 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
       hour: '2-digit',
       minute: '2-digit'
     })
-  }
-
-  // Normalize image URL to ensure it has proper protocol
-  const normalizeImageUrl = (url) => {
-    if (!url) return ''
-    // If URL already has protocol, return as is
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url
-    }
-    // If URL starts with //, add https:
-    if (url.startsWith('//')) {
-      return `https:${url}`
-    }
-    // If URL contains cloudfront.net, add https://
-    if (url.includes('cloudfront.net')) {
-      return `https://${url.replace(/^https?:\/\//, '')}`
-    }
-    // Default: add https://
-    return `https://${url}`
   }
 
   // Collect all orders from all users
@@ -169,17 +149,22 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
               >
                 <div
                   onClick={() => toggleOrder(order.id)}
-                  className="order-header-grid"
                   style={{
                     padding: '20px',
                     cursor: 'pointer',
                     display: 'grid',
-                    gridTemplateColumns: '1fr auto auto auto',
+                    gridTemplateColumns: 'auto auto 1fr auto auto auto',
                     gap: '16px',
                     alignItems: 'center',
                     backgroundColor: '#f9f9f9',
                   }}
                 >
+                  <StatusIcon size={24} style={{ color: statusConfig.color }} />
+                  
+                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#0066FF', minWidth: '30px' }}>
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
+                  
                   <div style={{ flex: '1', minWidth: 0 }}>
                     <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#666' }}>
                       {order.userName}
@@ -246,14 +231,11 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                 </div>
 
                 {isExpanded && (
-                  <div 
-                    className="order-details-section"
-                    style={{
-                      padding: '20px',
-                      borderTop: '1px solid #eee',
-                      backgroundColor: '#fafafa'
-                    }}
-                  >
+                  <div style={{
+                    padding: '20px',
+                    borderTop: '1px solid #eee',
+                    backgroundColor: '#fafafa'
+                  }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' }}>
                       <div>
                         <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Service</div>
@@ -287,43 +269,37 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                         <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
                           Ordered Items ({order.cartItems.length})
                         </div>
-                        <div 
-                          className="cart-items-grid"
-                          style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                            gap: '16px'
-                          }}
-                        >
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                          gap: '12px'
+                        }}>
                           {order.cartItems.map((item, idx) => (
                             <div
                               key={idx}
                               style={{
                                 backgroundColor: '#f9f9f9',
-                                padding: '16px',
-                                borderRadius: '8px',
-                                border: '1px solid #eee',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '8px'
+                                padding: '12px',
+                                borderRadius: '6px',
+                                border: '1px solid #eee'
                               }}
                             >
                               <div style={{
-                                fontSize: '15px',
+                                fontSize: '14px',
                                 fontWeight: '600',
                                 color: '#121212',
                                 marginBottom: '4px',
-                                lineHeight: '1.4',
-                                wordBreak: 'break-word'
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
                               }}>
                                 {item.title}
                               </div>
                               {item.category && (
                                 <div style={{
-                                  fontSize: '12px',
+                                  fontSize: '13px',
                                   color: '#666',
-                                  textTransform: 'uppercase',
-                                  letterSpacing: '0.5px'
+                                  marginBottom: '8px'
                                 }}>
                                   {item.category}
                                 </div>
@@ -332,21 +308,13 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                marginTop: 'auto',
-                                paddingTop: '8px',
-                                borderTop: '1px solid #eee'
+                                fontSize: '12px'
                               }}>
-                                <span style={{ color: '#0066FF', fontWeight: '700', fontSize: '14px' }}>
+                                <span style={{ color: '#0066FF', fontWeight: '600' }}>
                                   ₦{item.price?.toLocaleString ? item.price.toLocaleString() : item.price || 'N/A'}
                                 </span>
                                 {item.quantity && (
-                                  <span style={{ 
-                                    color: '#999', 
-                                    fontSize: '12px',
-                                    backgroundColor: '#f0f0f0',
-                                    padding: '4px 8px',
-                                    borderRadius: '4px'
-                                  }}>
+                                  <span style={{ color: '#999' }}>
                                     Qty: {item.quantity}
                                   </span>
                                 )}
@@ -422,7 +390,7 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                     )}
 
                     {/* Submission Details */}
-                    {(order.postTitle || order.postBody || order.articleContent || order.fileName || (order.imageUrls && order.imageUrls.length > 0)) && (
+                    {(order.postTitle || order.postBody || order.articleContent || order.fileName) && (
                       <div style={{
                         padding: '16px',
                         backgroundColor: 'white',
@@ -441,39 +409,10 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                             </div>
                           </div>
                         )}
-                        {order.postSummary && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Summary</div>
-                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-                              {order.postSummary}
-                            </div>
-                          </div>
-                        )}
-                        {order.postContent && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Content</div>
-                            <div 
-                              className="post-content-preview"
-                              style={{ 
-                                fontSize: '14px', 
-                                color: '#333', 
-                                lineHeight: '1.6', 
-                                padding: '16px', 
-                                backgroundColor: '#ffffff', 
-                                borderRadius: '6px', 
-                                border: '1px solid #e0e0e0',
-                                maxHeight: '400px', 
-                                overflow: 'auto',
-                                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-                              }} 
-                              dangerouslySetInnerHTML={{ __html: order.postContent }}
-                            ></div>
-                          </div>
-                        )}
                         {order.postBody && (
                           <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Body (Legacy)</div>
-                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Body</div>
+                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto' }}>
                               {order.postBody}
                             </div>
                           </div>
@@ -487,86 +426,10 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                           </div>
                         )}
                         {order.fileName && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Uploaded Document</div>
-                            <div style={{ fontSize: '13px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-                              {order.fileUrl ? (
-                                <a 
-                                  href={order.fileUrl} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  style={{ color: '#0066FF', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}
-                                >
-                                  📎 {order.fileName} (Download)
-                                </a>
-                              ) : (
-                                <span style={{ color: '#666' }}>📎 {order.fileName}</span>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        {/* Images within Submission Details */}
-                        {order.imageUrls && order.imageUrls.length > 0 && (
-                          <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #eee' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '12px', fontWeight: '600' }}>
-                              📷 Submitted Images ({order.imageUrls.length})
-                            </div>
-                            <div 
-                              style={{ 
-                                display: 'grid', 
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                                gap: '12px'
-                              }}
-                            >
-                              {order.imageUrls.map((imageUrl, idx) => {
-                                const normalizedUrl = normalizeImageUrl(imageUrl)
-                                return (
-                                  <div key={idx} style={{ 
-                                    position: 'relative',
-                                    borderRadius: '6px',
-                                    overflow: 'hidden',
-                                    border: '2px solid #e0e0e0',
-                                    backgroundColor: '#f9f9f9',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                    transition: 'transform 0.2s, box-shadow 0.2s'
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(-4px)'
-                                    e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.transform = 'translateY(0)'
-                                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'
-                                  }}
-                                  >
-                                    <a 
-                                      href={normalizedUrl} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      style={{ display: 'block', textDecoration: 'none' }}
-                                    >
-                                      <img 
-                                        src={normalizedUrl} 
-                                        alt={`Submitted image ${idx + 1}`}
-                                        onError={(e) => {
-                                          e.target.style.display = 'none'
-                                          const errorDiv = document.createElement('div')
-                                          errorDiv.style.cssText = 'padding: 20px; text-align: center; color: #999;'
-                                          errorDiv.textContent = 'Image not available'
-                                          e.target.parentElement.appendChild(errorDiv)
-                                        }}
-                                        style={{ 
-                                          width: '100%', 
-                                          height: '150px', 
-                                          objectFit: 'cover', 
-                                          display: 'block',
-                                          cursor: 'pointer'
-                                        }}
-                                      />
-                                    </a>
-                                  </div>
-                                )
-                              })}
+                          <div>
+                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Uploaded File</div>
+                            <div style={{ fontSize: '13px', color: '#0066FF', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', wordBreak: 'break-all' }}>
+                              📎 {order.fileName}
                             </div>
                           </div>
                         )}

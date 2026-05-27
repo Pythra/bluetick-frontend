@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import logoImage from '../assets/bluego.png';
+import blueLogo from '../assets/bluelogo.png';
 import './Navbar.css';
 
 function Navbar({ onScrollToSection }) {
@@ -20,7 +20,7 @@ function Navbar({ onScrollToSection }) {
       <div className="navbar-container">
         <div className="navbar-logo">
           <Link to="/">
-            <img src={logoImage} alt="Bluetickgeng" className="logo-img" />
+            <img src={blueLogo} alt="Bluetickgeng Development" className="logo-img" />
           </Link>
         </div>
         <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>

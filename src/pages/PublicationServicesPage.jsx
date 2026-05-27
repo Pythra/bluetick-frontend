@@ -24,6 +24,7 @@ import {
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
+import EditorialGuidelinesSection from '../components/EditorialGuidelinesSection';
 import newsImage from '../assets/news.jpg';
 import techImage from '../assets/tech.jpg';
 import globalImage from '../assets/global.jpg';
@@ -593,6 +594,8 @@ function PublicationServicesPage() {
       </section>
 
       {/* Price List Section moved to individual category pages */}
+
+      <EditorialGuidelinesSection />
 
       {/* Guidelines & Policies Section */}
       <section className="guidelines-section">

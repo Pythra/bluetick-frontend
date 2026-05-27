@@ -1,56 +1,66 @@
 import { useNavigate } from 'react-router-dom';
 import SectionHeader from './SectionHeader';
 import Button from './Button';
+import ServicesSummaryLayout from './ServicesSummaryLayout';
+import wikipediaHeroImage from '../assets/global.jpg';
 import './WikipediaServicesSummary.css';
+import './ServicesSummaryHero.css';
 
 function WikipediaServicesSummary() {
   const navigate = useNavigate();
 
   const wikipediaServices = [
-    { name: 'INDIVIDUAL WIKIPEDIA PAGE', icon: '👤' },
-    { name: 'COMPANY WIKIPEDIA PAGE', icon: '🏢' },
-    { name: 'CONTENT REVIEW', icon: '✅' },
-    { name: 'NEWS PUBLICATIONS', icon: '📰' },
-    { name: 'QUALITY ASSURANCE', icon: '⭐' },
-    { name: 'KNOWLEDGE PANEL', icon: '🔍' },
+    'Individual Wikipedia pages',
+    'Company Wikipedia pages',
+    'Content review & quality assurance',
   ];
 
   return (
-    <section id="wikipedia-services" className="wikipedia-services-section">
-      <div className="colorful-ball ball-1"></div>
-      <div className="colorful-ball ball-2"></div>
-      <div className="colorful-ball ball-3"></div>
-      <div className="colorful-ball ball-4"></div>
-      <div className="colorful-ball ball-5"></div>
-      <div className="colorful-ball ball-6"></div>
-      <div className="colorful-ball ball-7"></div>
-      <div className="colorful-ball ball-8"></div>
-      <div className="colorful-ball ball-9"></div>
-      <div className="colorful-ball ball-10"></div>
-      <div className="container">
-        <SectionHeader
-          title="WIKIPEDIA PAGE SERVICES"
-          subtitle="Establish credibility with your own Wikipedia page. Get listed on the world's most trusted encyclopedia with professional content creation, comprehensive publications, and quality assurance for individuals and companies."
-        />
-        <div className="wikipedia-container">
-          {wikipediaServices.map((service, index) => (
-            <div key={index} className="wikipedia-item">
-              <span className="wikipedia-icon">{service.icon}</span>
-              <span className="wikipedia-name">{service.name}</span>
+    <section id="wikipedia-services" className="wikipedia-services-section wikipedia-services-summary services-summary-layout">
+      <ServicesSummaryLayout
+        copy={(
+          <>
+            <SectionHeader
+              title={(
+                <>
+                  <span className="services-summary-title-black">WIKIPEDIA PAGE</span>{' '}
+                  <span className="services-summary-title-blue">SERVICES</span>
+                </>
+              )}
+            />
+            <p className="services-summary-intro">
+              Establish credibility with your own Wikipedia page. Get listed on the world&apos;s most
+              trusted encyclopedia with professional content creation, comprehensive publications, and
+              quality assurance for individuals and companies.
+            </p>
+          </>
+        )}
+        media={(
+          <div className="services-summary-hero-shell">
+            <img
+              src={wikipediaHeroImage}
+              alt="Wikipedia page services"
+              className="services-summary-hero-image"
+            />
+            <div className="services-summary-hero-overlay"></div>
+            <div className="services-summary-hero-content">
+              <p className="services-summary-hero-kicker">What We Deliver</p>
+              <h3>Trusted Wikipedia Presence for Brands</h3>
+              <ul className="services-summary-hero-types">
+                {wikipediaServices.map((service) => (
+                  <li key={service}>{service}</li>
+                ))}
+              </ul>
+              <Button
+                onClick={() => navigate('/services/wikipedia')}
+                className="bounce-btn services-summary-hero-cta"
+              >
+                Explore Wikipedia Services
+              </Button>
             </div>
-          ))}
-          <div className="learn-more-section">
-            <Button onClick={() => navigate('/services/wikipedia')} className="bounce-btn">
-              <span className="button-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor"/>
-                </svg>
-              </span>
-              Learn More
-            </Button>
           </div>
-        </div>
-      </div>
+        )}
+      />
     </section>
   );
 }

@@ -1,59 +1,143 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SectionHeader from './SectionHeader';
 import Button from './Button';
+import ServicesSummaryLayout from './ServicesSummaryLayout';
+import socialVerificationImage from '../assets/social/verification.jpg';
+import socialMonetizationImage from '../assets/social/monetization.jpg';
+import socialTwitterTrendsImage from '../assets/social/twitter-trends.jpg';
 import './VerificationSection.css';
+
+const socialServicesSlides = [
+  {
+    kicker: 'What We Verify',
+    title: 'Social Media Verification',
+    subtitle: 'Secure official verified badges and strengthen trust across major platforms.',
+    services: [
+      'Instagram verification',
+      'Facebook verification',
+      'TikTok & YouTube verification',
+      'Telegram & WhatsApp verification',
+    ],
+    ctaLabel: 'Explore Verification Services',
+    ctaPath: '/services/verification',
+    image: socialVerificationImage,
+    hideOverlaySubtitle: false,
+  },
+  {
+    kicker: 'What We Monetize',
+    title: 'Social Media Monetization',
+    subtitle: 'Unlock revenue on Facebook, Instagram, YouTube, TikTok, Snapchat, and X.',
+    services: [
+      'Facebook page & profile monetization',
+      'Instagram & YouTube monetization',
+      'TikTok & Snapchat monetization',
+      'X (Twitter) monetization',
+    ],
+    ctaLabel: 'Explore Monetization Services',
+    ctaPath: '/services/monetization',
+    image: socialMonetizationImage,
+    hideOverlaySubtitle: false,
+  },
+  {
+    kicker: 'Trend Packages',
+    title: 'Twitter (X) Trend Packages',
+    services: [
+      'Nigeria local & national trend campaigns',
+      'Africa regional visibility packages',
+      'Global trend visibility for major launches',
+      'Strategy, execution & performance reporting',
+    ],
+    ctaLabel: 'View Trend Packages',
+    ctaPath: '/services/twitter-trends',
+    image: socialTwitterTrendsImage,
+    hideOverlaySubtitle: true,
+  },
+];
 
 function VerificationServicesSummary() {
   const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-  const verificationServices = [
-    { name: 'INSTAGRAM VERIFICATION', icon: '📷' },
-    { name: 'FACEBOOK VERIFICATION', icon: '👥' },
-    { name: 'TIKTOK VERIFICATION', icon: '🎵' },
-    { name: 'YOUTUBE VERIFICATION', icon: '📺' },
-    { name: 'TELEGRAM VERIFICATION', icon: '✈️' },
-    { name: 'WHATSAPP VERIFICATION', icon: '💬' },
-  ];
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % socialServicesSlides.length);
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <section id="verification-services" className="verification-section">
-      <div className="colorful-ball ball-1"></div>
-      <div className="colorful-ball ball-2"></div>
-      <div className="colorful-ball ball-3"></div>
-      <div className="colorful-ball ball-4"></div>
-      <div className="colorful-ball ball-5"></div>
-      <div className="colorful-ball ball-6"></div>
-      <div className="colorful-ball ball-7"></div>
-      <div className="colorful-ball ball-8"></div>
-      <div className="colorful-ball ball-9"></div>
-      <div className="colorful-ball ball-10"></div>
-      <div className="container">
-        <SectionHeader
-          title="SOCIAL MEDIA VERIFICATION RATE CARD"
-          subtitle="Establish your online presence with credibility and authenticity. Get verified on major platforms with permanent verification badges that boost your digital reputation and secure the recognition you deserve."
-        />
-        <div className="verification-container">
-          {verificationServices.map((service, index) => (
-            <div key={index} className="verification-item">
-              <span className="verification-icon">{service.icon}</span>
-              <span className="verification-name">{service.name}</span>
+    <section
+      id="verification-services"
+      className="verification-section verification-services-summary services-summary-layout"
+    >
+      <ServicesSummaryLayout
+        copy={(
+          <>
+            <SectionHeader
+              title={(
+                <>
+                  <span className="services-summary-title-black">SOCIAL MEDIA</span>{' '}
+                  <span className="services-summary-title-blue">SERVICES</span>
+                </>
+              )}
+            />
+            <p className="services-summary-intro">
+              Verification badges, full-platform monetization, and Twitter (X) trend packages — we handle{' '}
+              <span>eligibility</span>, <span>growth</span>, and{' '}
+              <span>approval from start to finish</span>.
+            </p>
+          </>
+        )}
+        media={(
+          <div className="verification-carousel-shell">
+            <div
+              className="verification-carousel-track"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {socialServicesSlides.map((slide) => (
+                <div key={slide.title} className="verification-carousel-slide">
+                  <img src={slide.image} alt={slide.title} className="verification-carousel-image" />
+                  <div className="verification-carousel-overlay"></div>
+                  <div className="verification-carousel-content">
+                    <p className="verification-carousel-kicker">{slide.kicker}</p>
+                    <h3>{slide.title}</h3>
+                    {!slide.hideOverlaySubtitle && slide.subtitle && (
+                      <p className="verification-carousel-subtitle">{slide.subtitle}</p>
+                    )}
+                    <ul className="verification-carousel-types verification-carousel-types--bulleted">
+                      {slide.services.map((service) => (
+                        <li key={service}>{service}</li>
+                      ))}
+                    </ul>
+                    <Button
+                      onClick={() => navigate(slide.ctaPath)}
+                      className="bounce-btn verification-carousel-cta"
+                    >
+                      {slide.ctaLabel}
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-          <div className="learn-more-section">
-            <Button onClick={() => navigate('/services/verification')} className="bounce-btn">
-              <span className="button-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z" fill="currentColor"/>
-                </svg>
-              </span>
-              Learn More
-            </Button>
+
+            <div className="verification-carousel-controls">
+              {socialServicesSlides.map((slide, index) => (
+                <button
+                  key={slide.title}
+                  type="button"
+                  className={`verification-carousel-dot ${index === currentSlide ? 'active' : ''}`}
+                  onClick={() => setCurrentSlide(index)}
+                  aria-label={`Go to ${slide.title}`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
-      </div>
+        )}
+      />
     </section>
   );
 }
 
 export default VerificationServicesSummary;
-

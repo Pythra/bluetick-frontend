@@ -1,0 +1,107 @@
+/* Mobile / tablet: stacked (title + intro, then media) */
+.services-summary-layout .services-summary-layout-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.services-summary-layout .services-summary-media {
+  margin-top: 0;
+}
+
+@media (max-width: 991px) {
+  .services-summary-layout .services-summary-layout-inner {
+    padding: 1.25rem 0 0;
+  }
+
+  .services-summary-layout .services-summary-copy {
+    padding: 0 20px;
+  }
+
+  .services-summary-layout .services-summary-media {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+    margin-top: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .services-summary-layout .services-summary-copy {
+    padding: 0 15px;
+  }
+}
+
+/* Desktop: two columns — copy on one side, image on the other */
+@media (min-width: 992px) {
+  .services-summary-layout .services-summary-layout-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 2.5rem 3.5rem;
+    align-items: center;
+    padding: 2.75rem 20px 3rem;
+  }
+
+  .services-summary-layout-inner--reverse .services-summary-copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .services-summary-layout-inner--reverse .services-summary-media {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .services-summary-layout .services-summary-copy {
+    padding: 0;
+  }
+
+  .services-summary-layout .services-summary-copy .section-header {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .services-summary-layout .services-summary-intro {
+    margin-top: 1.25rem;
+    margin-bottom: 0;
+  }
+
+  .services-summary-layout .services-summary-media {
+    width: 100%;
+    margin: 0;
+    min-width: 0;
+  }
+
+  .services-summary-layout .app-hero-shell,
+  .services-summary-layout .website-hero-shell,
+  .services-summary-layout .services-summary-hero-shell,
+  .services-summary-layout .verification-carousel-shell {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 20px;
+  }
+
+  .services-summary-layout .app-hero-image,
+  .services-summary-layout .website-hero-image,
+  .services-summary-layout .services-summary-hero-image {
+    height: min(440px, 52vh);
+    min-height: 360px;
+  }
+
+  .services-summary-layout .verification-carousel-slide {
+    height: min(440px, 52vh);
+    min-height: 360px;
+  }
+
+  .services-summary-layout.app-services-summary .container,
+  .services-summary-layout.website-services-summary .container,
+  .services-summary-layout.verification-services-summary .container,
+  .services-summary-layout.publication-services-summary .container,
+  .services-summary-layout.instagram-services-summary .container,
+  .services-summary-layout.wikipedia-services-summary .container,
+  .services-summary-layout.music-streaming-services-summary .container {
+    padding: 2.75rem 20px 3rem;
+  }
+}

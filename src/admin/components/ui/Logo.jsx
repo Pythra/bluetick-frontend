@@ -5,32 +5,21 @@ export const Logo = () => {
       alignItems: 'center',
       gap: '12px'
     }}>
-      <div style={{
-        width: '40px',
-        height: '40px',
-        backgroundColor: '#0066FF',
-        borderRadius: '8px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '20px',
-        fontWeight: '700',
-        color: 'white'
-      }}>
-        B
-      </div>
+      <img
+        src="/bluetickgeng-logo.png"
+        alt="Bluetickgeng Development"
+        style={{
+          width: '160px',
+          maxWidth: '100%',
+          height: 'auto',
+          objectFit: 'contain'
+        }}
+      />
       <div>
         <div style={{
           fontSize: '18px',
           fontWeight: '700',
           color: '#121212'
-        }}>
-          Bluetick
-        </div>
-        <div style={{
-          fontSize: '12px',
-          color: '#666',
-          fontWeight: '500'
         }}>
           Admin
         </div>

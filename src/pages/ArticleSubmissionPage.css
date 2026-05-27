@@ -323,58 +323,6 @@
   font-weight: bold;
 }
 
-.quill-wrapper {
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  margin-bottom: 0.5rem;
-}
-
-.quill-wrapper .ql-container {
-  min-height: 300px;
-  font-size: 1rem;
-  font-family: inherit;
-}
-
-.quill-wrapper .ql-editor {
-  min-height: 300px;
-}
-
-.quill-wrapper .ql-editor.ql-blank::before {
-  color: #94a3b8;
-  font-style: normal;
-}
-
-.quill-wrapper .ql-toolbar {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  border-bottom: 1px solid #cbd5e1;
-  background: #ffffff;
-  display: flex !important;
-  flex-wrap: wrap;
-  padding: 8px;
-}
-
-.quill-wrapper .ql-toolbar .ql-formats {
-  display: inline-flex;
-  align-items: center;
-  margin-right: 15px;
-}
-
-.quill-wrapper .ql-toolbar button {
-  width: 28px;
-  height: 24px;
-  padding: 3px 5px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.quill-wrapper .ql-container {
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
-
 @media (max-width: 768px) {
   .submission-container {
     padding: 0 0.5rem;

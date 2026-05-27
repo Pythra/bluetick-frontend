@@ -14,6 +14,7 @@ import {
   IoNewspaperOutline,
   IoDocumentTextOutline
 } from 'react-icons/io5';
+import bluegoLogo from '../assets/bluego.png';
 import './Footer.css';
 
 function Footer({ onScrollToSection }) {
@@ -26,9 +27,9 @@ function Footer({ onScrollToSection }) {
           <div className="footer-section footer-about">
             <div className="logo-container">
               {!logoError ? (
-                <img 
-                  src="/logo.png" 
-                  alt="Bluetickgeng Development" 
+                <img
+                  src={bluegoLogo}
+                  alt="Bluetickgeng"
                   className="footer-logo"
                   onError={() => setLogoError(true)}
                 />

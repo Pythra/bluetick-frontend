@@ -11,7 +11,7 @@
 .section-title {
   font-family: 'Space Grotesk', 'Inter', sans-serif;
   font-size: 1.6rem;
-  font-weight: 600;
+  font-weight: 500;
   background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 30%, #ec4899 60%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -55,7 +55,7 @@
 
 @media (max-width: 768px) {
   .section-title {
-    font-size: 1.2rem;
+    font-size: 1.75rem;
     letter-spacing: 0.5px;
   }
   
@@ -68,13 +68,238 @@
 
 @media (max-width: 480px) {
   .section-title {
-    font-size: 1.05rem;
+    font-size: 1.55rem;
     letter-spacing: 0.45px;
   }
   
   .section-subtitle {
     font-size: 0.75rem;
     line-height: 1.3;
+  }
+}
+
+/* Homepage summary sections (app → wikipedia) */
+.app-services-summary .section-header,
+.website-services-summary .section-header,
+.verification-services-summary .section-header,
+.music-streaming-services-summary .section-header,
+.publication-section .section-header,
+.publication-services-summary .section-header,
+.instagram-services-section .section-header,
+.instagram-services-summary .section-header,
+.wikipedia-services-section .section-header,
+.wikipedia-services-summary .section-header,
+.celebrities-section .section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  margin: 2.75rem 0 0.75rem;
+}
+
+.faq-section .section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  max-width: 100%;
+  margin: 2.75rem 0 0.75rem;
+}
+
+.app-services-summary .section-title,
+.website-services-summary .section-title,
+.verification-services-summary .section-title,
+.music-streaming-services-summary .section-title,
+.publication-section .section-title,
+.publication-services-summary .section-title,
+.instagram-services-section .section-title,
+.instagram-services-summary .section-title,
+.wikipedia-services-section .section-title,
+.wikipedia-services-summary .section-title,
+.celebrities-section .section-title,
+.faq-section .section-title,
+.home-impact-section .section-title {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 3rem;
+  font-weight: 500;
+  color: #94a3b8;
+  -webkit-text-fill-color: #94a3b8;
+  background: none;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.home-impact-section .section-title {
+  text-align: left;
+  margin: 0 0 0.75rem;
+  font-weight: 600;
+}
+
+.celebrities-section .section-title {
+  text-align: left;
+}
+
+.faq-section .section-title {
+  text-align: left;
+}
+
+.app-services-summary .container,
+.website-services-summary .container,
+.verification-services-summary .container,
+.verification-services-summary-header.container,
+.music-streaming-services-summary .container,
+.publication-section .container,
+.publication-services-summary .container,
+.instagram-services-section .container,
+.instagram-services-summary .container,
+.wikipedia-services-section .container,
+.wikipedia-services-summary .container,
+.celebrities-section .container {
+  padding: 1.25rem 20px 0 0;
+}
+
+.services-summary-title-black {
+  color: #94a3b8;
+  -webkit-text-fill-color: #94a3b8;
+}
+
+.services-summary-title-blue {
+  color: #2563eb;
+  -webkit-text-fill-color: #2563eb;
+}
+
+.services-summary-intro {
+  margin: 1.75rem 0 2rem;
+  max-width: 42rem;
+  text-align: left;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0.015em;
+  color: #8b9cb3;
+}
+
+.home-impact-section .services-summary-intro {
+  margin: 0 0 1.75rem;
+}
+
+.services-summary-intro span {
+  color: #8b9cb3;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .app-services-summary .section-header,
+  .website-services-summary .section-header,
+  .verification-services-summary .section-header,
+  .music-streaming-services-summary .section-header,
+  .publication-section .section-header,
+  .publication-services-summary .section-header,
+  .instagram-services-section .section-header,
+  .instagram-services-summary .section-header,
+  .wikipedia-services-section .section-header,
+  .wikipedia-services-summary .section-header,
+  .celebrities-section .section-header {
+    margin-top: 2.25rem;
+  }
+
+  .faq-section .section-header {
+    align-items: flex-start;
+    text-align: left;
+    margin: 2.25rem 0 0.75rem;
+    width: 100%;
+  }
+
+  .faq-section .section-title {
+    text-align: left;
+  }
+
+  .app-services-summary .section-title,
+  .website-services-summary .section-title,
+  .verification-services-summary .section-title,
+  .music-streaming-services-summary .section-title,
+  .publication-section .section-title,
+  .publication-services-summary .section-title,
+  .instagram-services-section .section-title,
+  .instagram-services-summary .section-title,
+  .wikipedia-services-section .section-title,
+  .wikipedia-services-summary .section-title,
+  .celebrities-section .section-title,
+  .home-impact-section .section-title {
+    font-size: 2.65rem;
+  }
+
+  .home-impact-section .services-summary-intro {
+    font-size: 1.3rem;
+    line-height: 1.8;
+  }
+
+  .app-services-summary .container,
+  .website-services-summary .container,
+  .verification-services-summary .container,
+  .verification-services-summary-header.container,
+  .music-streaming-services-summary .container,
+  .publication-section .container,
+  .publication-services-summary .container,
+  .instagram-services-section .container,
+  .instagram-services-summary .container,
+  .wikipedia-services-section .container,
+  .wikipedia-services-summary .container,
+  .celebrities-section .container {
+    padding: 1rem 15px 0 0;
+  }
+
+  .services-summary-intro {
+    margin-top: 1.5rem;
+    margin-bottom: 1.75rem;
+    font-size: 1.3rem;
+    line-height: 1.8;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-services-summary .section-header,
+  .website-services-summary .section-header,
+  .verification-services-summary .section-header,
+  .music-streaming-services-summary .section-header,
+  .publication-section .section-header,
+  .publication-services-summary .section-header,
+  .instagram-services-section .section-header,
+  .instagram-services-summary .section-header,
+  .wikipedia-services-section .section-header,
+  .wikipedia-services-summary .section-header,
+  .celebrities-section .section-header {
+    margin-top: 2rem;
+  }
+
+  .faq-section .section-header {
+    margin-top: 2rem;
+  }
+
+  .app-services-summary .section-title,
+  .website-services-summary .section-title,
+  .verification-services-summary .section-title,
+  .music-streaming-services-summary .section-title,
+  .publication-section .section-title,
+  .publication-services-summary .section-title,
+  .instagram-services-section .section-title,
+  .instagram-services-summary .section-title,
+  .wikipedia-services-section .section-title,
+  .wikipedia-services-summary .section-title,
+  .celebrities-section .section-title,
+  .home-impact-section .section-title {
+    font-size: 2.4rem;
+  }
+
+  .services-summary-intro {
+    margin-top: 1.25rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.15rem;
+    line-height: 1.75;
+    letter-spacing: 0.01em;
   }
 }
 

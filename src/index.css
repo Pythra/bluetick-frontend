@@ -22,11 +22,13 @@ body {
   min-width: 320px;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #ffffff;
 }
 
 #root {
   width: 100%;
   min-height: 100vh;
+  background: #ffffff;
 }
 
 h1, h2, h3, h4, h5, h6 {

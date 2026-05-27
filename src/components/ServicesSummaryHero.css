@@ -1,0 +1,200 @@
+.services-summary-hero-shell {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow:
+    0 20px 45px rgba(15, 23, 42, 0.15),
+    0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.services-summary-hero-image {
+  width: 100%;
+  height: 560px;
+  object-fit: cover;
+  display: block;
+}
+
+.services-summary-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(15, 23, 42, 0.54) 20%,
+    rgba(30, 64, 175, 0.22) 70%,
+    rgba(15, 23, 42, 0.5) 100%
+  );
+}
+
+.services-summary-hero-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: none;
+  text-align: left;
+  padding: 2rem 1.5rem 2.5rem;
+}
+
+.services-summary-hero-kicker {
+  margin: 0 0 0.6rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(191, 219, 254, 0.95);
+}
+
+.services-summary-hero-content h3 {
+  margin: 0;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 2.1rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+
+.services-summary-hero-types {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  margin: 0.85rem 0 0;
+  padding: 0 0 0 1.35rem;
+  list-style: disc;
+}
+
+.services-summary-hero-types li {
+  display: list-item;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.3rem 0;
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.services-summary-hero-types li::marker {
+  color: rgba(191, 219, 254, 0.95);
+}
+
+.services-summary-hero-cta {
+  align-self: center;
+  margin-top: 1.25rem;
+}
+
+.services-summary-hero-cta.btn {
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(191, 219, 254, 0.5);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.services-summary-hero-cta.btn::before {
+  display: none;
+}
+
+.services-summary-hero-cta.btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(191, 219, 254, 0.75);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+}
+
+.services-summary-hero-cta.btn:active {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.publication-section.publication-services-summary,
+.instagram-services-section.instagram-services-summary,
+.wikipedia-services-section.wikipedia-services-summary,
+.music-streaming-services-section.music-streaming-services-summary {
+  padding: 0 0 40px;
+  margin: 0;
+  background: #ffffff;
+  overflow: visible;
+}
+
+.publication-section.publication-services-summary .container,
+.instagram-services-section.instagram-services-summary .container,
+.wikipedia-services-section.wikipedia-services-summary .container,
+.music-streaming-services-section.music-streaming-services-summary .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.25rem 20px 0;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .publication-section.publication-services-summary,
+  .instagram-services-section.instagram-services-summary,
+  .wikipedia-services-section.wikipedia-services-summary,
+  .music-streaming-services-section.music-streaming-services-summary {
+    padding: 0 0 40px;
+  }
+
+  .publication-section.publication-services-summary .container,
+  .instagram-services-section.instagram-services-summary .container,
+  .wikipedia-services-section.wikipedia-services-summary .container,
+  .music-streaming-services-section.music-streaming-services-summary .container {
+    padding: 1rem 15px 0;
+  }
+
+  .services-summary-hero-image {
+    height: 520px;
+  }
+
+  .services-summary-hero-content {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .services-summary-hero-content h3 {
+    font-size: 1.55rem;
+  }
+
+  .services-summary-hero-types li {
+    padding: 0.28rem 0;
+    font-size: 0.82rem;
+  }
+
+  .services-summary-hero-cta {
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .publication-section.publication-services-summary .container,
+  .instagram-services-section.instagram-services-summary .container,
+  .wikipedia-services-section.wikipedia-services-summary .container,
+  .music-streaming-services-section.music-streaming-services-summary .container {
+    padding: 1rem 15px 0;
+  }
+
+  .services-summary-hero-image {
+    height: 480px;
+  }
+
+  .services-summary-hero-content {
+    padding: 1rem 0.85rem 1.75rem;
+  }
+
+  .services-summary-hero-content h3 {
+    font-size: 1.35rem;
+  }
+
+  .services-summary-hero-cta {
+    margin-top: 0.85rem;
+    margin-bottom: 0.15rem;
+  }
+}

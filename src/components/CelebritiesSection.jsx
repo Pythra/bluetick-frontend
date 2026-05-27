@@ -9,40 +9,75 @@ import kenzyImage from '../assets/kenzy.jpg';
 import oxladeImage from '../assets/oxlade.jpg';
 import joblaqImage from '../assets/joblaq.jpg';
 import mayorkunImage from '../assets/mayorkun.jpg';
+import SectionHeader from './SectionHeader';
 import './CelebritiesSection.css';
 
-function CelebritiesSection() {
-  const celebrities = [
-    { name: 'Don Jazzy', image: donjazzImage },
-    { name: 'Blord', image: blordImage },
-    { name: 'Eniola', image: eniolaImage },
-    { name: 'Sandra', image: sandraImage },
-    { name: 'Clintianoo', image: clintianooImage },
-    { name: 'Reekado', image: reekadoImage },
-    { name: 'Skibii', image: skibiiImage },
-    { name: 'Kenzy', image: kenzyImage },
-    { name: 'Oxlade', image: oxladeImage },
-    { name: 'Joblaq', image: joblaqImage },
-    { name: 'Mayorkun', image: mayorkunImage },
-  ];
+const celebrities = [
+  { name: 'Don Jazzy', image: donjazzImage },
+  { name: 'Blord', image: blordImage },
+  { name: 'Eniola', image: eniolaImage },
+  { name: 'Sandra', image: sandraImage },
+  { name: 'Clintianoo', image: clintianooImage },
+  { name: 'Reekado', image: reekadoImage },
+  { name: 'Skibii', image: skibiiImage },
+  { name: 'Kenzy', image: kenzyImage },
+  { name: 'Oxlade', image: oxladeImage },
+  { name: 'Joblaq', image: joblaqImage },
+  { name: 'Mayorkun', image: mayorkunImage },
+];
+
+const rowSplitIndex = Math.ceil(celebrities.length / 2);
+const topRowCelebrities = celebrities.slice(0, rowSplitIndex);
+const bottomRowCelebrities = celebrities.slice(rowSplitIndex);
+
+function CelebrityMarqueeRow({ items, direction }) {
+  const duplicatedItems = [...items, ...items];
 
   return (
-    <section className="celebrities-section">
+    <div className="celebrities-marquee-viewport">
+      <div
+        className={`celebrities-marquee-track celebrities-marquee-track--${direction}`}
+        aria-hidden={false}
+      >
+        {duplicatedItems.map((celebrity, index) => (
+          <article
+            key={`${celebrity.name}-${index}`}
+            className="celebrity-marquee-item"
+            aria-hidden={index >= items.length}
+          >
+            <img
+              src={celebrity.image}
+              alt={celebrity.name}
+              className="celebrity-marquee-image"
+              loading="lazy"
+            />
+            <p className="celebrity-marquee-name">{celebrity.name}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CelebritiesSection() {
+  return (
+    <section className="celebrities-section" aria-label="Celebrities we have worked with">
       <div className="container">
-        <h2 className="celebrities-title">Notable celebrities we've worked with</h2>
-        <div className="celebrities-grid">
-          {celebrities.map((celebrity, index) => (
-            <div key={index} className="celebrity-card">
-              <div className="celebrity-image-wrapper">
-                <img 
-                  src={celebrity.image} 
-                  alt={celebrity.name} 
-                  className="celebrity-image"
-                />
-              </div>
-              <h3 className="celebrity-name">{celebrity.name}</h3>
-            </div>
-          ))}
+        <SectionHeader
+          title={(
+            <>
+              <span className="services-summary-title-black">NOTABLE CELEBRITIES</span>{' '}
+              <span className="services-summary-title-blue">WE&apos;VE WORKED WITH</span>
+            </>
+          )}
+        />
+        <p className="celebrities-section-intro">
+          A few of the artists and creators we have partnered with.
+        </p>
+
+        <div className="celebrities-marquee-rows">
+          <CelebrityMarqueeRow items={topRowCelebrities} direction="right" />
+          <CelebrityMarqueeRow items={bottomRowCelebrities} direction="left" />
         </div>
       </div>
     </section>
@@ -50,4 +85,3 @@ function CelebritiesSection() {
 }
 
 export default CelebritiesSection;
-

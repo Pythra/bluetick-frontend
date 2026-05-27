@@ -1,9 +1,9 @@
 import './SectionHeader.css';
 
-function SectionHeader({ title, subtitle }) {
+function SectionHeader({ title, subtitle, homepage = false }) {
   return (
-    <div className="section-header">
-      <h2 className="section-title">{title}</h2>
+    <div className={`section-header ${homepage ? 'section-header--homepage' : ''}`}>
+      <h2 className={`section-title ${homepage ? 'section-title--homepage' : ''}`}>{title}</h2>
       {subtitle && <p className="section-subtitle">{subtitle}</p>}
     </div>
   );
