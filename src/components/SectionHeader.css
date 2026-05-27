@@ -26,7 +26,7 @@
 
 .section-subtitle {
   font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 30%, #93c5fd 70%, #60a5fa 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -38,7 +38,7 @@
   font-style: normal;
   text-align: center;
   max-width: 800px;
-  padding: 0 20px;
+  padding: 0 14px;
   animation: fadeInOut 4s ease-in-out infinite;
 }
 
@@ -60,9 +60,11 @@
   }
   
   .section-subtitle {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     letter-spacing: 0.2px;
     line-height: 1.35;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 }
 
@@ -73,8 +75,10 @@
   }
   
   .section-subtitle {
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     line-height: 1.3;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
 
@@ -156,7 +160,7 @@
 .wikipedia-services-section .container,
 .wikipedia-services-summary .container,
 .celebrities-section .container {
-  padding: 1.25rem 20px 0 0;
+  padding: 1.25rem 16px 0 16px;
 }
 
 .services-summary-title-black {
@@ -229,11 +233,12 @@
   .celebrities-section .section-title,
   .home-impact-section .section-title {
     font-size: 2.65rem;
+    text-align: left;
   }
 
   .home-impact-section .services-summary-intro {
-    font-size: 1.3rem;
-    line-height: 1.8;
+    font-size: 1.12rem;
+    line-height: 1.75;
   }
 
   .app-services-summary .container,
@@ -248,14 +253,14 @@
   .wikipedia-services-section .container,
   .wikipedia-services-summary .container,
   .celebrities-section .container {
-    padding: 1rem 15px 0 0;
+    padding: 1rem 10px 0 10px;
   }
 
   .services-summary-intro {
     margin-top: 1.5rem;
     margin-bottom: 1.75rem;
-    font-size: 1.3rem;
-    line-height: 1.8;
+    font-size: 1.12rem;
+    line-height: 1.75;
     max-width: 100%;
   }
 }
@@ -292,14 +297,36 @@
   .celebrities-section .section-title,
   .home-impact-section .section-title {
     font-size: 2.4rem;
+    text-align: left;
+  }
+
+  .home-impact-section .services-summary-intro {
+    font-size: 1.02rem;
+    line-height: 1.68;
   }
 
   .services-summary-intro {
     margin-top: 1.25rem;
     margin-bottom: 1.5rem;
-    font-size: 1.15rem;
-    line-height: 1.75;
+    font-size: 1.02rem;
+    line-height: 1.7;
     letter-spacing: 0.01em;
+  }
+
+  .app-services-summary .container,
+  .website-services-summary .container,
+  .verification-services-summary .container,
+  .verification-services-summary-header.container,
+  .music-streaming-services-summary .container,
+  .publication-section .container,
+  .publication-services-summary .container,
+  .instagram-services-section .container,
+  .instagram-services-summary .container,
+  .wikipedia-services-section .container,
+  .wikipedia-services-summary .container,
+  .celebrities-section .container {
+    padding-left: 8px;
+    padding-right: 8px;
   }
 }
 

@@ -44,6 +44,36 @@
   text-transform: uppercase;
 }
 
+/* App Store / Google Play: bare badges (no pill wrapper) on homepage impact strip */
+.publication-logos-section.impact-logos-carousel .logo-item--platform:has(.logo-store-bare) {
+  width: auto;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  background: transparent;
+}
+
+.publication-logos-section.impact-logos-carousel .logo-store-bare {
+  display: block;
+  height: 2.35rem;
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+}
+
+.publication-logos-section.impact-logos-carousel .logo-store-bare--googleplay {
+  height: 3.25rem;
+}
+
+.publication-logos-section.impact-logos-carousel .logo-item--platform:has(.logo-store-bare):hover {
+  transform: none;
+}
+
+.publication-logos-section.impact-logos-carousel .logo-item--platform:has(.logo-store-bare):hover .logo-store-bare {
+  transform: scale(1.06);
+  transition: transform 0.3s ease;
+}
+
 .logos-carousel-wrapper {
   overflow: hidden;
   position: relative;
@@ -301,6 +331,14 @@
 
   .logo-platform-store-name {
     font-size: 0.75rem;
+  }
+
+  .publication-logos-section.impact-logos-carousel .logo-store-bare {
+    height: 2rem;
+  }
+
+  .publication-logos-section.impact-logos-carousel .logo-store-bare--googleplay {
+    height: 2.95rem;
   }
 }
 

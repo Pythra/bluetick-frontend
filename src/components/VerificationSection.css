@@ -492,7 +492,7 @@
 /* Mobile */
 @media (max-width: 768px) {
   .verification-section {
-    padding: 32px 15px 40px;
+    padding: 32px 12px 40px;
   }
   
   .verification-section .section-title {
@@ -501,7 +501,7 @@
   }
 
   .verification-section .section-subtitle {
-    font-size: 1rem;
+    font-size: 0.85rem;
     text-align: left;
     margin-left: 0;
     margin-right: 0;

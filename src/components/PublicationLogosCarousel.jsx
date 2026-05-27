@@ -27,7 +27,7 @@ const platformCarouselItems = [
     type: 'social',
     brand: 'facebook',
     name: 'Facebook',
-    href: 'https://www.facebook.com/bluetickgeng1',
+    href: 'https://www.facebook.com/bluetickgeng',
     Icon: IoLogoFacebook,
   },
   {
@@ -78,6 +78,8 @@ function PublicationLogosCarousel({
   className = '',
   includePlatformBadges = false,
 }) {
+  const isImpactLogosStrip =
+    typeof className === 'string' && className.includes('impact-logos-carousel');
   const publicationLogos = [
     { type: 'image', name: 'Punch', image: punchLogo },
     { type: 'image', name: 'Guardian', image: guardianLogo },
@@ -121,26 +123,34 @@ function PublicationLogosCarousel({
                   </a>
                 )}
                 {item.type === 'store' && (
-                  <div
-                    className={`logo-platform logo-platform--store logo-platform--${item.brand}`}
-                    aria-label={item.name}
-                  >
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="logo-platform-store-badge"
-                      />
-                    ) : (
-                      <>
-                        <item.Icon className="logo-platform-icon logo-platform-icon--store" aria-hidden="true" />
-                        <span className="logo-platform-store-text">
-                          <span className="logo-platform-store-kicker">{item.kicker}</span>
-                          <span className="logo-platform-store-name">{item.storeName}</span>
-                        </span>
-                      </>
-                    )}
-                  </div>
+                  isImpactLogosStrip && item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className={`logo-store-bare logo-store-bare--${item.brand}`}
+                    />
+                  ) : (
+                    <div
+                      className={`logo-platform logo-platform--store logo-platform--${item.brand}`}
+                      aria-label={item.name}
+                    >
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="logo-platform-store-badge"
+                        />
+                      ) : (
+                        <>
+                          <item.Icon className="logo-platform-icon logo-platform-icon--store" aria-hidden="true" />
+                          <span className="logo-platform-store-text">
+                            <span className="logo-platform-store-kicker">{item.kicker}</span>
+                            <span className="logo-platform-store-name">{item.storeName}</span>
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )
                 )}
               </div>
             ))}

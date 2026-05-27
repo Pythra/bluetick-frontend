@@ -9,37 +9,57 @@
 }
 
 @media (max-width: 991px) {
-  .services-summary-layout .services-summary-layout-inner {
-    padding: 1.25rem 0 0;
+  /* Do not use padding shorthand here — it would wipe horizontal padding from
+     SectionHeader / section .container rules on this same element. */
+  .services-summary-layout .container.services-summary-layout-inner {
+    padding-top: 1.25rem;
   }
 
   .services-summary-layout .services-summary-copy {
-    padding: 0 20px;
+    padding: 0;
   }
 
   .services-summary-layout .services-summary-media {
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
     margin-top: 1.25rem;
+  }
+
+  /* Hero / image cards sit inside the padded container (no edge-to-edge breakout) */
+  .services-summary-layout .app-hero-shell,
+  .services-summary-layout .website-hero-shell,
+  .services-summary-layout .services-summary-hero-shell,
+  .services-summary-layout .verification-carousel-shell {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 16px;
   }
 }
 
 @media (max-width: 768px) {
   .services-summary-layout .services-summary-copy {
-    padding: 0 15px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .services-summary-layout .services-summary-copy {
+    padding: 0;
   }
 }
 
 /* Desktop: two columns — copy on one side, image on the other */
 @media (min-width: 992px) {
-  .services-summary-layout .services-summary-layout-inner {
+  .services-summary-layout .container.services-summary-layout-inner {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 2.5rem 3.5rem;
     align-items: center;
-    padding: 2.75rem 20px 3rem;
+    padding: 2.75rem 16px 3rem;
   }
 
   .services-summary-layout-inner--reverse .services-summary-copy {
@@ -102,6 +122,6 @@
   .services-summary-layout.instagram-services-summary .container,
   .services-summary-layout.wikipedia-services-summary .container,
   .services-summary-layout.music-streaming-services-summary .container {
-    padding: 2.75rem 20px 3rem;
+    padding: 2.75rem 16px 3rem;
   }
 }

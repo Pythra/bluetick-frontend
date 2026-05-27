@@ -151,6 +151,34 @@
     grid-template-columns: 1fr;
   }
 
+  .services-page {
+    padding: 1.25rem 0 2rem;
+  }
+
+  .services-page .page-header {
+    padding: 0 10px;
+    margin-bottom: 2rem;
+  }
+
+  .services-page .page-header .section-header {
+    text-align: left;
+    align-items: flex-start;
+    margin-bottom: 0;
+  }
+
+  .services-page .page-header .section-title {
+    text-align: left;
+  }
+
+  .services-page .page-header .section-subtitle {
+    text-align: left;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .custom-app-title,
   .consultation-title {
     font-size: 2rem;
@@ -158,6 +186,10 @@
 }
 
 @media (max-width: 480px) {
+  .services-page .page-header {
+    padding: 0 8px;
+  }
+
   .custom-app-title,
   .consultation-title {
     font-size: 1.75rem;

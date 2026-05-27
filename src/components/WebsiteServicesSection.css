@@ -449,7 +449,7 @@
 /* Mobile */
 @media (max-width: 768px) {
   .website-services-section {
-    padding: 32px 15px 40px;
+    padding: 32px 12px 40px;
   }
   
   .website-services-section .section-title {
@@ -458,7 +458,7 @@
   }
 
   .website-services-section .section-subtitle {
-    font-size: 1rem;
+    font-size: 0.85rem;
     text-align: left;
     margin-left: 0;
     margin-right: 0;
@@ -488,7 +488,7 @@
   }
 
   .website-services-summary .container {
-    padding: 1rem 15px 0;
+    padding: 1rem 10px 0;
   }
 
   .website-hero-image {
@@ -539,7 +539,7 @@
   }
 
   .website-services-section .section-subtitle {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
   }
 
   .website-item {

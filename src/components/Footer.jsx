@@ -8,6 +8,7 @@ import {
   IoLogoTiktok,
   IoLogoFacebook,
   IoLogoTwitter,
+  IoLogoWhatsapp,
   IoGlobeOutline,
   IoPhonePortraitOutline,
   IoCheckmarkCircleOutline,
@@ -15,6 +16,7 @@ import {
   IoDocumentTextOutline
 } from 'react-icons/io5';
 import bluegoLogo from '../assets/bluego.png';
+import { companyWhatsappNumbers } from '../config/companyContact';
 import './Footer.css';
 
 function Footer({ onScrollToSection }) {
@@ -84,6 +86,21 @@ function Footer({ onScrollToSection }) {
                 <IoCallOutline className="contact-icon" />
                 <span>+234 906 943 1949</span>
               </a>
+              <div className="contact-whatsapp-block">
+                <span className="contact-whatsapp-title">WhatsApp</span>
+                {companyWhatsappNumbers.map(({ display, waMe }) => (
+                  <a
+                    key={waMe}
+                    href={`https://wa.me/${waMe}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="contact-link"
+                  >
+                    <IoLogoWhatsapp className="contact-icon" aria-hidden="true" />
+                    <span>{display}</span>
+                  </a>
+                ))}
+              </div>
               <div className="contact-link address-link">
                 <IoLocationOutline className="contact-icon" />
                 <span>NO 6A GOODNEWS STREET, SANGOTEDO, LAGOS STATE, NIGERIA</span>
@@ -115,7 +132,7 @@ function Footer({ onScrollToSection }) {
                 <span>TikTok</span>
               </a>
               <a 
-                href="https://www.facebook.com/bluetickgeng1" 
+                href="https://www.facebook.com/bluetickgeng" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="social-link"
