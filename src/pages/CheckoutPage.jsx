@@ -277,9 +277,9 @@ function CheckoutPage() {
 
               <div className="dva-section">
                 <div className="bank-info">
-                  <p><strong>Bank Name:</strong> KudaBank</p>
+                  <p><strong>Bank Name:</strong> Moniepoint MFB</p>
                   <p><strong>Account Name:</strong> BLUETICKGENG DEVELOPMENT</p>
-                  <p><strong>Account Number:</strong> 3002433836</p>
+                  <p><strong>Account Number:</strong> 9069439149 </p>
                 </div>
 
                 <button
