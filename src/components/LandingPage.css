@@ -516,9 +516,9 @@
   }
 
   .landing-impact-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.35rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.45rem;
   }
 
   .landing-impact-icon {

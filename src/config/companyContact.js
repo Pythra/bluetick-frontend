@@ -6,5 +6,8 @@ export const companyWhatsappNumbers = [
   { display: '+234 913 883 2111', waMe: '2349138832111' },
 ];
 
-/** Primary line for demo / sales inquiries */
-export const companyWhatsappDemoUrl = `https://wa.me/${companyWhatsappNumbers[0].waMe}?text=${encodeURIComponent("Hi, I'd like to book a demo.")}`;
+/** Demo / sales — footer line ending in 111 (+234 913 883 2111) */
+const companyWhatsappDemoLine =
+  companyWhatsappNumbers.find((n) => n.waMe.endsWith('111')) ?? companyWhatsappNumbers[1];
+
+export const companyWhatsappDemoUrl = `https://wa.me/${companyWhatsappDemoLine.waMe}?text=${encodeURIComponent("Hi, I'd like to book a demo.")}`;
