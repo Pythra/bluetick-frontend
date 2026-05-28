@@ -6,6 +6,7 @@ import {
   IoRocketOutline,
 } from 'react-icons/io5';
 import Navbar from './Navbar';
+import { useAuth } from '../contexts/AuthContext';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
 import heroVideo from '../assets/vid.mp4';
 import { companyWhatsappDemoUrl } from '../config/companyContact';
@@ -52,6 +53,7 @@ const impactStats = [
 
 function LandingPage({ onScrollToSection }) {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [activeSlide, setActiveSlide] = useState(0);
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef(null);
@@ -104,7 +106,9 @@ function LandingPage({ onScrollToSection }) {
               for business growth and credibility.
             </p>
 
-            <div className="landing-actions">
+            <div
+              className={`landing-actions${isAuthenticated ? ' landing-actions--auth' : ''}`}
+            >
               <button
                 type="button"
                 className="landing-btn landing-btn-primary"
@@ -112,13 +116,15 @@ function LandingPage({ onScrollToSection }) {
               >
                 Place Order
               </button>
-              <button
-                type="button"
-                className="landing-btn landing-btn-secondary"
-                onClick={() => navigate('/signup')}
-              >
-                Get Started
-              </button>
+              {!isAuthenticated && (
+                <button
+                  type="button"
+                  className="landing-btn landing-btn-secondary"
+                  onClick={() => navigate('/signup')}
+                >
+                  Get Started
+                </button>
+              )}
               <a
                 href={companyWhatsappDemoUrl}
                 target="_blank"

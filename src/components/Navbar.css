@@ -44,8 +44,7 @@
   flex-wrap: nowrap;
 }
 
-.navbar-link,
-.navbar-logout {
+.navbar-link {
   border: 0;
   background: transparent;
   color: #1e3a8a;
@@ -59,8 +58,7 @@
   transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
 }
 
-.navbar-link:hover,
-.navbar-logout:hover {
+.navbar-link:hover {
   background: #eaf3ff;
   color: #1d4ed8;
 }
@@ -75,18 +73,53 @@
   font-size: 0.9rem;
 }
 
+.navbar-logout,
+.navbar-signup {
+  border: 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  padding: 0.38rem 0.85rem;
+  font-size: 0.84rem;
+  line-height: 1.2;
+  cursor: pointer;
+  border-radius: 999px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
 .navbar-logout {
   background: #fee2e2;
   border: 1px solid #fecaca;
   color: #991b1b;
-  font-weight: 600;
-  padding: 0.3rem 0.62rem;
-  font-size: 0.84rem;
+  box-shadow:
+    0 2px 4px rgba(153, 27, 27, 0.12),
+    0 4px 10px rgba(254, 202, 202, 0.45);
 }
 
 .navbar-logout:hover {
   background: #fecaca;
   color: #7f1d1d;
+  transform: translateY(-1px);
+  box-shadow:
+    0 3px 6px rgba(153, 27, 27, 0.16),
+    0 6px 14px rgba(254, 202, 202, 0.55);
+}
+
+.navbar-signup {
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #93c5fd;
+  color: #1d4ed8;
+  box-shadow:
+    0 2px 4px rgba(37, 99, 235, 0.14),
+    0 4px 10px rgba(147, 197, 253, 0.4);
+}
+
+.navbar-signup:hover {
+  background: linear-gradient(180deg, #ffffff 0%, #e0f2fe 100%);
+  color: #1e40af;
+  transform: translateY(-1px);
+  box-shadow:
+    0 3px 6px rgba(37, 99, 235, 0.18),
+    0 6px 14px rgba(147, 197, 253, 0.48);
 }
 
 @media (min-width: 769px) {
@@ -133,8 +166,7 @@
     gap: 0.1rem;
   }
 
-  .navbar-link,
-  .navbar-logout {
+  .navbar-link {
     font-size: 0.92rem;
     padding: 0.32rem 0.5rem;
   }
@@ -143,9 +175,10 @@
     font-size: 0.96rem;
   }
 
-  .navbar-logout {
+  .navbar-logout,
+  .navbar-signup {
     font-size: 0.88rem;
-    padding: 0.34rem 0.7rem;
+    padding: 0.4rem 0.8rem;
   }
 }
 
@@ -159,10 +192,15 @@
     transform: translateY(-50%) scale(1.28);
   }
 
-  .navbar-link,
-  .navbar-logout {
+  .navbar-link {
     font-size: 0.88rem;
     padding: 0.28rem 0.42rem;
+  }
+
+  .navbar-logout,
+  .navbar-signup {
+    font-size: 0.84rem;
+    padding: 0.36rem 0.72rem;
   }
 }
 
@@ -235,8 +273,7 @@
     transform: translateY(0);
   }
 
-  .navbar-link,
-  .navbar-logout {
+  .navbar-link {
     width: 100%;
     text-align: center;
     font-size: 0.86rem;
@@ -245,13 +282,12 @@
     border-radius: 0;
   }
 
-  .navbar-logout {
-    border: 1px solid #fecaca;
-    background: #fee2e2;
+  .navbar-logout,
+  .navbar-signup {
     width: auto;
     min-width: 130px;
     margin-top: 0.35rem;
-    border-radius: 8px;
+    border-radius: 999px;
   }
 
   .navbar-menu > :last-child {

@@ -46,10 +46,7 @@ function Navbar({ onScrollToSection }) {
             Services
             <IoChevronDownOutline />
           </button>
-          <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/signup'))}>
-            Affiliate Program
-          </button>
-          <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/services/publications'))}>
+          <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/blog'))}>
             Blog
           </button>
           <button
@@ -60,9 +57,17 @@ function Navbar({ onScrollToSection }) {
           >
             My Account
           </button>
-          {isAuthenticated && (
+          {isAuthenticated ? (
             <button type="button" className="navbar-logout" onClick={handleLogout}>
               Logout
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="navbar-signup"
+              onClick={() => handleAction(() => navigate('/signup'))}
+            >
+              Sign Up
             </button>
           )}
         </div>

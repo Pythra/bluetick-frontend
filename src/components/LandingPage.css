@@ -434,6 +434,10 @@
     gap: 0.5rem;
   }
 
+  .landing-actions--auth {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .landing-btn {
     width: 100%;
     justify-content: center;
