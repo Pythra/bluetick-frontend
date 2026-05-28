@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
+import { useEffect } from 'react';
 import { createBrowserHistory } from 'history';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
@@ -38,6 +39,29 @@ import FAQ from './components/FAQ';
 import './App.css';
 
 function HomePage() {
+  useEffect(() => {
+    const sections = document.querySelectorAll('.scroll-pop');
+    if (!sections.length) return undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.18,
+        rootMargin: '0px 0px -40px 0px',
+      }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, []);
+
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -48,15 +72,15 @@ function HomePage() {
   return (
     <>
       <LandingPage onScrollToSection={scrollToSection} />
-      <AppServicesSummary />
-      <WebsiteServicesSummary />
-      <VerificationServicesSummary />
-      <MusicStreamingVerificationSummary />
-      <PublicationServicesSummary />
-      <InstagramServicesSummary />
-      <WikipediaServicesSummary />
-      <CelebritiesSection />
-      <FAQ />
+      <div className="scroll-pop"><AppServicesSummary /></div>
+      <div className="scroll-pop"><WebsiteServicesSummary /></div>
+      <div className="scroll-pop"><VerificationServicesSummary /></div>
+      <div className="scroll-pop"><MusicStreamingVerificationSummary /></div>
+      <div className="scroll-pop"><PublicationServicesSummary /></div>
+      <div className="scroll-pop"><InstagramServicesSummary /></div>
+      <div className="scroll-pop"><WikipediaServicesSummary /></div>
+      <div className="scroll-pop"><CelebritiesSection /></div>
+      <div className="scroll-pop"><FAQ /></div>
       <Footer onScrollToSection={scrollToSection} />
     </>
   );

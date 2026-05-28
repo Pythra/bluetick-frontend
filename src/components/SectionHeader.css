@@ -148,19 +148,19 @@
   text-align: left;
 }
 
-.app-services-summary .container,
-.website-services-summary .container,
-.verification-services-summary .container,
+.app-services-summary .container:not(.services-summary-layout-inner),
+.website-services-summary .container:not(.services-summary-layout-inner),
+.verification-services-summary .container:not(.services-summary-layout-inner),
 .verification-services-summary-header.container,
-.music-streaming-services-summary .container,
-.publication-section .container,
-.publication-services-summary .container,
-.instagram-services-section .container,
-.instagram-services-summary .container,
-.wikipedia-services-section .container,
-.wikipedia-services-summary .container,
+.music-streaming-services-summary .container:not(.services-summary-layout-inner),
+.publication-section .container:not(.services-summary-layout-inner),
+.publication-services-summary .container:not(.services-summary-layout-inner),
+.instagram-services-section .container:not(.services-summary-layout-inner),
+.instagram-services-summary .container:not(.services-summary-layout-inner),
+.wikipedia-services-section .container:not(.services-summary-layout-inner),
+.wikipedia-services-summary .container:not(.services-summary-layout-inner),
 .celebrities-section .container {
-  padding: 1.25rem 16px 0 16px;
+  padding: 1.25rem 0.75rem 0;
 }
 
 .services-summary-title-black {
@@ -241,20 +241,7 @@
     line-height: 1.75;
   }
 
-  .app-services-summary .container,
-  .website-services-summary .container,
-  .verification-services-summary .container,
-  .verification-services-summary-header.container,
-  .music-streaming-services-summary .container,
-  .publication-section .container,
-  .publication-services-summary .container,
-  .instagram-services-section .container,
-  .instagram-services-summary .container,
-  .wikipedia-services-section .container,
-  .wikipedia-services-summary .container,
-  .celebrities-section .container {
-    padding: 1rem 10px 0 10px;
-  }
+  /* Horizontal padding for summary sections: ServicesSummaryLayout.css (--summary-gutter) */
 
   .services-summary-intro {
     margin-top: 1.5rem;
@@ -262,6 +249,12 @@
     font-size: 1.12rem;
     line-height: 1.75;
     max-width: 100%;
+  }
+
+  .app-services-summary .section-title,
+  .website-services-summary .section-title {
+    white-space: nowrap;
+    font-size: clamp(1.6rem, 7.2vw, 2.25rem);
   }
 }
 
@@ -313,21 +306,11 @@
     letter-spacing: 0.01em;
   }
 
-  .app-services-summary .container,
-  .website-services-summary .container,
-  .verification-services-summary .container,
-  .verification-services-summary-header.container,
-  .music-streaming-services-summary .container,
-  .publication-section .container,
-  .publication-services-summary .container,
-  .instagram-services-section .container,
-  .instagram-services-summary .container,
-  .wikipedia-services-section .container,
-  .wikipedia-services-summary .container,
-  .celebrities-section .container {
-    padding-left: 8px;
-    padding-right: 8px;
+  .app-services-summary .section-title,
+  .website-services-summary .section-title {
+    font-size: clamp(1.45rem, 7vw, 1.9rem);
   }
+
 }
 
 

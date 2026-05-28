@@ -1,8 +1,8 @@
 .services-summary-hero-shell {
   position: relative;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
   border-radius: 0;
   overflow: hidden;
   box-shadow:
@@ -91,28 +91,7 @@
   margin-top: 1.25rem;
 }
 
-.services-summary-hero-cta.btn {
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(191, 219, 254, 0.5);
-  color: #ffffff;
-  box-shadow: none;
-}
-
-.services-summary-hero-cta.btn::before {
-  display: none;
-}
-
-.services-summary-hero-cta.btn:hover {
-  background: rgba(255, 255, 255, 0.28);
-  border-color: rgba(191, 219, 254, 0.75);
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
-}
-
-.services-summary-hero-cta.btn:active {
-  background: rgba(255, 255, 255, 0.22);
-  transform: translateY(-2px) scale(1.01);
-}
+/* Transparent glass CTA — see Button.css `.services-summary-hero-cta.btn` */
 
 .publication-section.publication-services-summary,
 .instagram-services-section.instagram-services-summary,
@@ -130,7 +109,6 @@
 .music-streaming-services-section.music-streaming-services-summary .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.25rem 20px 0;
   position: relative;
   z-index: 1;
 }
@@ -141,13 +119,6 @@
   .wikipedia-services-section.wikipedia-services-summary,
   .music-streaming-services-section.music-streaming-services-summary {
     padding: 0 0 40px;
-  }
-
-  .publication-section.publication-services-summary .container,
-  .instagram-services-section.instagram-services-summary .container,
-  .wikipedia-services-section.wikipedia-services-summary .container,
-  .music-streaming-services-section.music-streaming-services-summary .container {
-    padding: 1rem 10px 0;
   }
 
   .services-summary-hero-image {
@@ -174,13 +145,6 @@
 }
 
 @media (max-width: 480px) {
-  .publication-section.publication-services-summary .container,
-  .instagram-services-section.instagram-services-summary .container,
-  .wikipedia-services-section.wikipedia-services-summary .container,
-  .music-streaming-services-section.music-streaming-services-summary .container {
-    padding: 1rem 8px 0;
-  }
-
   .services-summary-hero-image {
     height: 480px;
   }

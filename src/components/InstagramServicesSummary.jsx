@@ -56,7 +56,7 @@ function InstagramServicesSummary() {
                 onClick={() => navigate('/services/instagram')}
                 className="bounce-btn services-summary-hero-cta"
               >
-                Explore Instagram Promotion
+                Order Now
               </Button>
             </div>
           </div>

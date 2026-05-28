@@ -1,19 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import teanewsImage from '../assets/teanews.jpg';
-import onlineImage from '../assets/online.jpg';
-import clientsImage from '../assets/clients.jpg';
-import newsImage from '../assets/news.jpg';
 import './StatsSection.css';
 
 function StatsSection() {
   const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = u  seRef(null);
+  const sectionRef = useRef(null);
 
   const stats = [
-    { value: 500, suffix: '+', label: 'Satisfied Clients', icon: '👥', bg: clientsImage },
-    { value: 100, suffix: '+', label: 'News Platforms', icon: '📰', bg: newsImage },
-    { value: 10, suffix: 'M', label: 'Monthly Readers', icon: '👁️', bg: onlineImage },
-    { value: 24, suffix: 'hrs', label: 'Average Delivery', icon: '⚡', bg: teanewsImage },
+    { value: 500, suffix: '+', label: 'Satisfied Clients', icon: '👥' },
+    { value: 100, suffix: '+', label: 'News Platforms', icon: '📰' },
+    { value: 10, suffix: 'M', label: 'Monthly Readers', icon: '👁️' },
+    { value: 24, suffix: 'hrs', label: 'Average Delivery', icon: '⚡' },
   ];
 
   useEffect(() => {
@@ -43,13 +39,7 @@ function StatsSection() {
     <section ref={sectionRef} className="stats-section">
       <div className="stats-container">
         {stats.map((stat, index) => (
-          <div
-            key={index}
-            className="stat-item"
-            style={{
-              backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.55)), url(${stat.bg})`
-            }}
-          >
+          <div key={index} className="stat-item">
             <div className="stat-icon">{stat.icon}</div>
             <div className="stat-value">
               {isVisible ? (

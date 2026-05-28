@@ -62,13 +62,14 @@
   gap: 20px;
 }
 
-/* Homepage summary styling (matches website services section) */
-.app-services-summary .container {
-  padding: 1.25rem 20px 0;
-}
-
 .app-services-summary .app-hero-shell {
   margin-top: 0;
+}
+
+.app-services-summary.services-summary-layout .app-hero-shell {
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .app-hero-shell {
@@ -143,26 +144,6 @@
 .app-services-summary .app-hero-cta.btn {
   align-self: center;
   margin-top: 1.25rem;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(191, 219, 254, 0.5);
-  color: #ffffff;
-  box-shadow: none;
-}
-
-.app-services-summary .app-hero-cta.btn::before {
-  display: none;
-}
-
-.app-services-summary .app-hero-cta.btn:hover {
-  background: rgba(255, 255, 255, 0.28);
-  border-color: rgba(191, 219, 254, 0.75);
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
-}
-
-.app-services-summary .app-hero-cta.btn:active {
-  background: rgba(255, 255, 255, 0.22);
-  transform: translateY(-2px) scale(1.01);
 }
 
 .app-hero-kicker {
@@ -283,10 +264,6 @@
 @media (max-width: 768px) {
   .app-services-section {
     padding: 32px 15px 40px;
-  }
-
-  .app-services-summary .container {
-    padding: 1rem 15px 0;
   }
 
   .app-hero-image {

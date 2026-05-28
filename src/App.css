@@ -11,3 +11,25 @@ html {
 * {
   box-sizing: border-box;
 }
+
+.scroll-pop {
+  opacity: 0;
+  transform: translateY(28px) scale(0.965);
+  transform-origin: center bottom;
+  transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 0.68, 0.2, 1.08);
+  will-change: transform, opacity;
+}
+
+.scroll-pop.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-pop,
+  .scroll-pop.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

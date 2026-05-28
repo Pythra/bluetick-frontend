@@ -55,7 +55,7 @@ function WikipediaServicesSummary() {
                 onClick={() => navigate('/services/wikipedia')}
                 className="bounce-btn services-summary-hero-cta"
               >
-                Explore Wikipedia Services
+                Order Now
               </Button>
             </div>
           </div>

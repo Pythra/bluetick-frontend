@@ -55,7 +55,7 @@ function PublicationServicesSummary() {
                 onClick={() => navigate('/services/publications')}
                 className="bounce-btn services-summary-hero-cta"
               >
-                Explore Publication Packages
+                Order Now
               </Button>
             </div>
           </div>

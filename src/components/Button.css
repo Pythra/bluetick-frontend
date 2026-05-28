@@ -48,10 +48,62 @@
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
 }
 
+/* Service section hero image CTAs — transparent glass on photo overlays */
+.services-summary-hero-cta.btn,
+.app-services-summary .app-hero-cta.btn,
+.website-services-summary .website-hero-cta.btn,
+.verification-services-summary .verification-carousel-cta.btn {
+  padding: 0.72rem 1.55rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.services-summary-hero-cta.btn::before,
+.app-services-summary .app-hero-cta.btn::before,
+.website-services-summary .website-hero-cta.btn::before,
+.verification-services-summary .verification-carousel-cta.btn::before {
+  display: none;
+}
+
+.services-summary-hero-cta.btn:hover,
+.app-services-summary .app-hero-cta.btn:hover,
+.website-services-summary .website-hero-cta.btn:hover,
+.verification-services-summary .verification-carousel-cta.btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.62);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+}
+
+.services-summary-hero-cta.btn:active,
+.app-services-summary .app-hero-cta.btn:active,
+.website-services-summary .website-hero-cta.btn:active,
+.verification-services-summary .verification-carousel-cta.btn:active {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.16);
+}
+
 @media (max-width: 768px) {
   .btn {
     padding: 0.8rem 1.5rem;
     font-size: 0.95rem;
+  }
+
+  .services-summary-hero-cta.btn,
+  .app-services-summary .app-hero-cta.btn,
+  .website-services-summary .website-hero-cta.btn,
+  .verification-services-summary .verification-carousel-cta.btn {
+    padding: 0.62rem 1.2rem;
+    font-size: 0.84rem;
   }
 }
 

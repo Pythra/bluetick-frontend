@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { IoChevronDownOutline } from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
 import blueLogo from '../assets/bluelogo.png';
 import './Navbar.css';
@@ -15,6 +16,15 @@ function Navbar({ onScrollToSection }) {
     navigate('/');
   };
 
+  const handleAction = (callback) => {
+    if (typeof callback === 'function') {
+      callback();
+    }
+    setIsMenuOpen(false);
+  };
+
+  const scrollTarget = (sectionId) => () => onScrollToSection?.(sectionId);
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -24,17 +34,36 @@ function Navbar({ onScrollToSection }) {
           </Link>
         </div>
         <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
-          <a href="#website-services" onClick={() => { onScrollToSection('website-services'); setIsMenuOpen(false); }}>Websites</a>
-          <a href="#app-services" onClick={() => { onScrollToSection('app-services'); setIsMenuOpen(false); }}>Apps</a>
-          <a href="#verification-services" onClick={() => { onScrollToSection('verification-services'); setIsMenuOpen(false); }}>Verification</a>
-          <a href="#publication-services" onClick={() => { onScrollToSection('publication-services'); setIsMenuOpen(false); }}>Publications</a>
-          {isAuthenticated ? (
-            <>
-              <span className="navbar-user">{user?.email}</span>
-              <button className="navbar-logout" onClick={handleLogout}>Logout</button>
-            </>
-          ) : (
-            <Link to="/signup" className="navbar-signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+          <button type="button" className="navbar-link with-caret" onClick={() => handleAction(scrollTarget('landing'))}>
+            About Bluetick
+            <IoChevronDownOutline />
+          </button>
+          <button type="button" className="navbar-link with-caret" onClick={() => handleAction(scrollTarget('publication-services'))}>
+            PR Agencies
+            <IoChevronDownOutline />
+          </button>
+          <button type="button" className="navbar-link with-caret" onClick={() => handleAction(scrollTarget('website-services'))}>
+            Services
+            <IoChevronDownOutline />
+          </button>
+          <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/signup'))}>
+            Affiliate Program
+          </button>
+          <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/services/publications'))}>
+            Blog
+          </button>
+          <button
+            type="button"
+            className="navbar-link"
+            onClick={() => handleAction(() => navigate(isAuthenticated ? '/checkout' : '/login'))}
+            title={isAuthenticated ? user?.email || 'My Account' : 'My Account'}
+          >
+            My Account
+          </button>
+          {isAuthenticated && (
+            <button type="button" className="navbar-logout" onClick={handleLogout}>
+              Logout
+            </button>
           )}
         </div>
         <button className="navbar-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>

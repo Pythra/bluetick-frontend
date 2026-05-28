@@ -52,7 +52,7 @@ function AppServicesSummary() {
                 ))}
               </ul>
               <Button onClick={() => navigate('/services/apps')} className="bounce-btn app-hero-cta">
-                Explore App Services
+                Order Now
               </Button>
             </div>
           </div>
