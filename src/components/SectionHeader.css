@@ -256,6 +256,15 @@
     white-space: nowrap;
     font-size: clamp(1.6rem, 7.2vw, 2.25rem);
   }
+
+  .website-services-summary .section-title {
+    white-space: normal;
+    line-height: 1.18;
+  }
+
+  .website-services-summary .services-summary-title-black {
+    display: block;
+  }
 }
 
 @media (max-width: 480px) {
@@ -309,6 +318,11 @@
   .app-services-summary .section-title,
   .website-services-summary .section-title {
     font-size: clamp(1.45rem, 7vw, 1.9rem);
+  }
+
+  .website-services-summary .section-title {
+    white-space: normal;
+    line-height: 1.2;
   }
 
 }

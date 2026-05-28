@@ -1,71 +1,53 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  IoCheckmarkCircleOutline,
+  IoPeopleOutline,
+  IoRocketOutline,
+} from 'react-icons/io5';
 import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import socialVerificationImage from '../assets/social/verification.jpg';
-import socialMonetizationImage from '../assets/social/monetization.jpg';
-import socialTwitterTrendsImage from '../assets/social/twitter-trends.jpg';
 import './VerificationSection.css';
 
-const socialServicesSlides = [
+const socialServiceCategories = [
   {
-    kicker: 'What We Verify',
-    title: 'Social Media Verification',
-    subtitle: 'Secure official verified badges and strengthen trust across major platforms.',
+    title: 'Verification Services',
+    icon: IoCheckmarkCircleOutline,
+    iconTone: 'mint',
     services: [
-      'Instagram verification',
-      'Facebook verification',
-      'TikTok & YouTube verification',
-      'Telegram & WhatsApp verification',
+      'Instagram, Facebook, TikTok, and YouTube verification',
+      'Telegram and WhatsApp verification support',
+      'Eligibility guidance and profile readiness review',
     ],
-    ctaLabel: 'Order Now',
     ctaPath: '/services/verification',
-    image: socialVerificationImage,
-    hideOverlaySubtitle: false,
   },
   {
-    kicker: 'What We Monetize',
-    title: 'Social Media Monetization',
-    subtitle: 'Unlock revenue on Facebook, Instagram, YouTube, TikTok, Snapchat, and X.',
+    title: 'Monetization Services',
+    icon: IoPeopleOutline,
+    iconTone: 'sky',
     services: [
-      'Facebook page & profile monetization',
-      'Instagram & YouTube monetization',
-      'TikTok & Snapchat monetization',
-      'X (Twitter) monetization',
+      'Facebook and Instagram monetization setup',
+      'YouTube, TikTok, Snapchat, and X monetization',
+      'End-to-end payout configuration assistance',
     ],
-    ctaLabel: 'Order Now',
     ctaPath: '/services/monetization',
-    image: socialMonetizationImage,
-    hideOverlaySubtitle: false,
   },
   {
-    kicker: 'Trend Packages',
-    title: 'Twitter (X) Trend Packages',
+    title: 'Trend & Growth Campaigns',
+    icon: IoRocketOutline,
+    iconTone: 'amber',
     services: [
-      'Nigeria local & national trend campaigns',
-      'Africa regional visibility packages',
-      'Global trend visibility for major launches',
-      'Strategy, execution & performance reporting',
+      'Local, national, and regional trend campaigns',
+      'Launch amplification for products and announcements',
+      'Execution support with performance reporting',
     ],
-    ctaLabel: 'Order Now',
     ctaPath: '/services/twitter-trends',
-    image: socialTwitterTrendsImage,
-    hideOverlaySubtitle: true,
   },
 ];
 
 function VerificationServicesSummary() {
   const navigate = useNavigate();
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % socialServicesSlides.length);
-    }, 4500);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <section
@@ -84,53 +66,57 @@ function VerificationServicesSummary() {
               )}
             />
             <p className="services-summary-intro">
-              Verification badges, full-platform monetization, and Twitter (X) trend packages — we handle{' '}
-              <span>eligibility</span>, <span>growth</span>, and{' '}
-              <span>approval from start to finish</span>.
+              We offer three core social media service categories to help brands build trust, grow reach,
+              and convert visibility into measurable business outcomes.
             </p>
           </>
         )}
         media={(
-          <div className="verification-carousel-shell">
-            <div
-              className="verification-carousel-track"
-              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-            >
-              {socialServicesSlides.map((slide) => (
-                <div key={slide.title} className="verification-carousel-slide">
-                  <img src={slide.image} alt={slide.title} className="verification-carousel-image" />
-                  <div className="verification-carousel-overlay"></div>
-                  <div className="verification-carousel-content">
-                    <p className="verification-carousel-kicker">{slide.kicker}</p>
-                    <h3>{slide.title}</h3>
-                    {!slide.hideOverlaySubtitle && slide.subtitle && (
-                      <p className="verification-carousel-subtitle">{slide.subtitle}</p>
-                    )}
-                    <ul className="verification-carousel-types verification-carousel-types--bulleted">
-                      {slide.services.map((service) => (
-                        <li key={service}>{service}</li>
-                      ))}
-                    </ul>
-                    <Button
-                      onClick={() => navigate(slide.ctaPath)}
-                      className="bounce-btn verification-carousel-cta"
-                    >
-                      {slide.ctaLabel}
-                    </Button>
-                  </div>
+          <div className="verification-overview-media">
+            <div className="verification-carousel-shell verification-overview-shell">
+              <div className="verification-carousel-slide verification-overview-slide">
+                <img
+                  src={socialVerificationImage}
+                  alt="Social media services overview"
+                  className="verification-carousel-image"
+                />
+                <div className="verification-carousel-overlay"></div>
+                <div className="verification-carousel-content verification-overview-content">
+                  <p className="verification-carousel-kicker">Service Overview</p>
+                  <h3>We Offer:</h3>
+                  <ul className="verification-carousel-types verification-carousel-types--bulleted">
+                    <li>Social Media Verification</li>
+                    <li>Social Media Monetization</li>
+                    <li>Twitter (X) Trend Packages</li>
+                  </ul>
                 </div>
-              ))}
+              </div>
             </div>
 
-            <div className="verification-carousel-controls">
-              {socialServicesSlides.map((slide, index) => (
-                <button
-                  key={slide.title}
-                  type="button"
-                  className={`verification-carousel-dot ${index === currentSlide ? 'active' : ''}`}
-                  onClick={() => setCurrentSlide(index)}
-                  aria-label={`Go to ${slide.title}`}
-                />
+            <div className="social-services-category-grid">
+              {socialServiceCategories.map((category) => (
+                <article key={category.title} className="social-services-category-card">
+                  <div className="social-services-card-head">
+                    <span
+                      className={`social-services-category-icon social-services-category-icon--${category.iconTone}`}
+                      aria-hidden="true"
+                    >
+                      <category.icon />
+                    </span>
+                    <h4>{category.title}</h4>
+                  </div>
+                  <ul className="social-services-category-list">
+                    {category.services.map((service) => (
+                      <li key={service}>{service}</li>
+                    ))}
+                  </ul>
+                  <Button
+                    onClick={() => navigate(category.ctaPath)}
+                    className="social-services-category-cta"
+                  >
+                    Order now
+                  </Button>
+                </article>
               ))}
             </div>
           </div>
