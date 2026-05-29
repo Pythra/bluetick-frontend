@@ -1,30 +1,95 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  IoAirplaneOutline,
+  IoCartOutline,
+  IoFitnessOutline,
+  IoGameControllerOutline,
+  IoGlobeOutline,
+  IoPeopleOutline,
+  IoPlayCircleOutline,
+  IoReceiptOutline,
+  IoRocketOutline,
+  IoWalletOutline,
+} from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
 import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
-import SectionHeader from '../components/SectionHeader';
-import Button from '../components/Button';
+import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
-import './ServicesPage.css';
+import appHeroImage from '../assets/app.png';
+import './ServiceDetailPage.css';
 
 const appServices = [
-  { title: 'Health & Fitness Apps', price: 3300000 },
-  { title: 'E-commerce Apps', price: 2250000 },
-  { title: 'Fintech & Banking Apps', price: 9000000 },
-  { title: 'Social Media Apps', price: 5250000 },
-  { title: 'Travel & Booking Apps', price: 3750000 },
-  { title: 'Productivity Apps', price: 6000000 },
-  { title: 'Streaming & Entertainment Apps', price: 5700000 },
-  { title: 'Gaming Apps', price: 7500000 },
-  { title: 'Bill Payment Apps', price: 4800000 },
-  { title: 'Cryptocurrency Apps', price: 3450000 },
+  {
+    title: 'Health & Fitness Apps',
+    price: 3300000,
+    icon: IoFitnessOutline,
+    description: 'Workout tracking, wellness dashboards, and subscription-ready fitness experiences.',
+  },
+  {
+    title: 'E-commerce Apps',
+    price: 2250000,
+    icon: IoCartOutline,
+    description: 'Product catalogs, secure checkout, and order management for mobile storefronts.',
+  },
+  {
+    title: 'Fintech & Banking Apps',
+    price: 9000000,
+    icon: IoWalletOutline,
+    description: 'Digital wallets, transfers, KYC flows, and compliant financial product interfaces.',
+  },
+  {
+    title: 'Social Media Apps',
+    price: 5250000,
+    icon: IoPeopleOutline,
+    description: 'Feeds, messaging, profiles, and engagement features built for growing communities.',
+  },
+  {
+    title: 'Travel & Booking Apps',
+    price: 3750000,
+    icon: IoAirplaneOutline,
+    description: 'Trip planning, reservations, itineraries, and real-time booking confirmations.',
+  },
+  {
+    title: 'Productivity Apps',
+    price: 6000000,
+    icon: IoRocketOutline,
+    description: 'Task management, team workflows, and tools that help users stay organized on the go.',
+  },
+  {
+    title: 'Streaming & Entertainment Apps',
+    price: 5700000,
+    icon: IoPlayCircleOutline,
+    description: 'Media libraries, live streams, and content discovery tuned for retention.',
+  },
+  {
+    title: 'Gaming Apps',
+    price: 7500000,
+    icon: IoGameControllerOutline,
+    description: 'Gameplay loops, leaderboards, in-app purchases, and multiplayer-ready architecture.',
+  },
+  {
+    title: 'Bill Payment Apps',
+    price: 4800000,
+    icon: IoReceiptOutline,
+    description: 'Utility payments, receipts, reminders, and simple bill-management for end users.',
+  },
+  {
+    title: 'Cryptocurrency Apps',
+    price: 3450000,
+    icon: IoGlobeOutline,
+    description: 'Portfolio views, trading flows, and secure wallet interactions for crypto users.',
+  },
 ];
 
 const customAppInfo = {
   title: 'Custom App Development',
-  description: 'For clients with new app ideas, we offer tailored solutions. Schedule a meeting with us to discuss your unique needs.',
-  startingPrice: 3750000
+  meta: 'Custom build',
+  description:
+    'For clients with new app ideas, we offer tailored solutions. Schedule a meeting with us to discuss your unique needs.',
+  startingPrice: 3750000,
+  icon: IoRocketOutline,
 };
 
 function AppServicesPage() {
@@ -41,7 +106,7 @@ function AppServicesPage() {
       category: 'app',
       quantity: 1,
     });
-    
+
     if (result.success) {
       setShowCartNotification(true);
       setTimeout(() => setShowCartNotification(false), 3000);
@@ -59,62 +124,59 @@ function AppServicesPage() {
   };
 
   return (
-    <div className="services-page">
+    <div className="service-detail-page">
       <Navbar onScrollToSection={scrollToSection} />
-      <div className="page-header">
-        <Button onClick={() => navigate('/')} className="back-button">
-          ← Back to Home
-        </Button>
-        <SectionHeader
-          title="APP DEVELOPMENT SERVICES"
-          subtitle="Popular App Types & Pricing"
-        />
-      </div>
-      <div className="container">
-        <div className="services-grid">
-          {appServices.map((service, index) => (
-            <div key={index} className="service-card-detailed">
-              <h3 className="service-card-title">{service.title}</h3>
-              <div className="service-card-price">
-                Starting from <span className="price-amount">{formatPrice(service.price, '₦')}</span>
-              </div>
-              <Button 
-                onClick={() => handleAddToCart(service)} 
-                className="order-button"
-              >
-                Add to Cart
-              </Button>
-            </div>
-          ))}
-        </div>
-        <div className="custom-app-section">
-          <h3 className="custom-app-title">{customAppInfo.title}</h3>
-          <p className="custom-app-description">{customAppInfo.description}</p>
-          <div className="custom-app-price">
-            Starting from <span className="price-amount">{formatPrice(customAppInfo.startingPrice, '₦')}</span>
+
+      <div className="service-detail-shell">
+        <header className="service-detail-hero">
+          <img src={appHeroImage} alt="" className="service-detail-hero-image" />
+          <div className="service-detail-hero-overlay" aria-hidden="true" />
+          <div className="service-detail-hero-content">
+            <h1 className="service-detail-title">
+              <span className="services-summary-title-black">APP DEVELOPMENT</span>
+              <span className="services-summary-title-blue">SERVICES</span>
+            </h1>
+            <p className="service-detail-lead">
+              Popular app types and starting prices — add any package to your cart or book a custom build.
+            </p>
           </div>
-        </div>
+        </header>
+
+        <main className="service-detail-main">
+          <div className="service-detail-grid">
+            {appServices.map((service) => (
+              <ServiceDetailCard
+                key={service.title}
+                title={service.title}
+                meta="Mobile app"
+                description={service.description}
+                price={formatPrice(service.price, '₦')}
+                icon={service.icon}
+                onAddToCart={() => handleAddToCart(service)}
+              />
+            ))}
+          </div>
+
+          <ServiceDetailCard
+            title={customAppInfo.title}
+            meta={customAppInfo.meta}
+            description={customAppInfo.description}
+            price={formatPrice(customAppInfo.startingPrice, '₦')}
+            icon={customAppInfo.icon}
+            feature
+          />
+        </main>
       </div>
+
       {showCartNotification && (
-        <div className="cart-notification" style={{
-          position: 'fixed',
-          top: '100px',
-          right: '20px',
-          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-          color: '#ffffff',
-          padding: '16px 24px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)',
-          zIndex: 1000,
-          animation: 'slideIn 0.3s ease'
-        }}>
+        <div className="service-detail-cart-notification" role="status">
           Item added to cart!
         </div>
       )}
+
       <Footer />
     </div>
   );
 }
 
 export default AppServicesPage;
-

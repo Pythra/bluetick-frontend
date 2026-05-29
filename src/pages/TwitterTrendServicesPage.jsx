@@ -1,14 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IoInformationCircleOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
 import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
-import SectionHeader from '../components/SectionHeader';
-import Button from '../components/Button';
+import CountryFlag from '../components/CountryFlag';
+import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import verificationHeroImage from '../assets/social/verification.jpg';
 import { twitterTrendNotice, twitterTrendPackages } from '../data/twitterTrendPackages';
-import './PublicationServicesPage.css';
-import './TwitterTrendServicesPage.css';
+import './ServiceDetailPage.css';
+
+function buildTrendDescription(pkg) {
+  const highlights = pkg.highlights.join(' · ');
+  return `${pkg.description} ${highlights}`;
+}
 
 function TwitterTrendServicesPage() {
   const navigate = useNavigate();
@@ -42,66 +48,63 @@ function TwitterTrendServicesPage() {
   };
 
   return (
-    <div className="publication-page twitter-trend-page">
-      {showCartNotification && (
-        <div className="cart-notification">Item added to cart!</div>
-      )}
+    <div className="service-detail-page">
       <Navbar onScrollToSection={scrollToSection} />
 
-      <section className="twitter-trend-hero">
-        <div className="twitter-trend-hero-inner">
-          <p className="twitter-trend-eyebrow">BLUETICKGENG · X (Twitter)</p>
-          <h1 className="twitter-trend-hero-title">Trend Package Services</h1>
-          <p className="twitter-trend-hero-text">
-            Professional trend campaigns built like premium PR packages — clear tiers, fast delivery,
-            and measurable visibility on X.
-          </p>
-        </div>
-      </section>
+      <div className="service-detail-shell">
+        <header className="service-detail-hero">
+          <img src={verificationHeroImage} alt="" className="service-detail-hero-image" />
+          <div className="service-detail-hero-overlay" aria-hidden="true" />
+          <div className="service-detail-hero-content">
+            <h1 className="service-detail-title">
+              <span className="services-summary-title-black">TWITTER (X)</span>
+              <span className="services-summary-title-blue">TREND SERVICES</span>
+            </h1>
+            <p className="service-detail-lead">
+              Premium trend promotion packages for brands, artists, campaigns, and announcements across
+              Nigeria, Uganda, South Africa, Kenya, and Ghana.
+            </p>
+          </div>
+        </header>
 
-      <section className="publication-packages twitter-trend-packages-section">
-        <div className="container">
-          <SectionHeader
-            title="CHOOSE YOUR TREND PACKAGE"
-            subtitle="Select the visibility tier that matches your campaign goals"
+        <main className="service-detail-main">
+          <section className="service-detail-section">
+            <h2 className="service-detail-section-title">Twitter (X) Trend Packages</h2>
+            <p className="service-detail-section-lead">
+              Premium trend promotion packages for brands, artists, campaigns &amp; announcements.
+            </p>
+            <div className="service-detail-grid">
+              {twitterTrendPackages.map((pkg) => (
+                <ServiceDetailCard
+                  key={pkg.id}
+                  title={pkg.title}
+                  meta={`Delivery: ${pkg.delivery}`}
+                  description={buildTrendDescription(pkg)}
+                  price={formatPrice(pkg.price, '₦')}
+                  pricePrefix=""
+                  iconNode={<CountryFlag code={pkg.countryCode} alt={`${pkg.title} flag`} />}
+                  onAddToCart={() => handleAddToCart(pkg)}
+                />
+              ))}
+            </div>
+          </section>
+
+          <ServiceDetailCard
+            title="Important Notice"
+            meta="Campaign details"
+            description={`${twitterTrendNotice.lead} ${twitterTrendNotice.body}`}
+            price="See packages above"
+            icon={IoInformationCircleOutline}
+            feature
           />
-          <div className="packages-grid">
-            {twitterTrendPackages.map((pkg) => (
-              <div key={pkg.id} className={`package-card ${pkg.popular ? 'popular' : ''}`}>
-                {pkg.popular && <div className="popular-badge">Most Popular</div>}
-                <div className="package-card-media twitter-trend-card-media">
-                  <div className="twitter-trend-card-badge">X Trend</div>
-                  <span className="package-category-pill">{pkg.delivery}</span>
-                </div>
-                <h3 className="package-title">{pkg.title}</h3>
-                <div className="package-delivery">Delivery: {pkg.delivery}</div>
-                <p className="package-description">{pkg.description}</p>
-                <ul className="twitter-trend-package-list">
-                  {pkg.highlights.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-                <div className="twitter-trend-package-price">
-                  <span className="price-amount">{formatPrice(pkg.price, '₦')}</span>
-                </div>
-                <Button onClick={() => handleAddToCart(pkg)} className="package-button">
-                  Select Package
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </main>
+      </div>
 
-      <section className="twitter-trend-notice-section">
-        <div className="container">
-          <div className="twitter-trend-notice">
-            <h3>Important Notice</h3>
-            <p className="twitter-trend-notice-lead">{twitterTrendNotice.lead}</p>
-            <p>{twitterTrendNotice.body}</p>
-          </div>
+      {showCartNotification && (
+        <div className="service-detail-cart-notification" role="status">
+          Item added to cart!
         </div>
-      </section>
+      )}
 
       <Footer />
     </div>

@@ -44,8 +44,8 @@
   text-transform: uppercase;
 }
 
-/* App Store / Google Play: bare badges (no pill wrapper) on homepage impact strip */
-.publication-logos-section.impact-logos-carousel .logo-item--platform:has(.logo-store-bare) {
+/* App Store / Google Play: bare badges (no bordered pill wrapper) */
+.logo-item--platform:has(.logo-store-bare) {
   width: auto;
   min-width: 0;
   height: auto;
@@ -53,25 +53,25 @@
   background: transparent;
 }
 
-.publication-logos-section.impact-logos-carousel .logo-store-bare {
+.logo-store-bare {
   display: block;
   height: 2.35rem;
   width: auto;
   max-width: none;
   object-fit: contain;
+  transition: transform 0.3s ease;
 }
 
-.publication-logos-section.impact-logos-carousel .logo-store-bare--googleplay {
+.logo-store-bare--googleplay {
   height: 3.25rem;
 }
 
-.publication-logos-section.impact-logos-carousel .logo-item--platform:has(.logo-store-bare):hover {
+.logo-item--platform:has(.logo-store-bare):hover {
   transform: none;
 }
 
-.publication-logos-section.impact-logos-carousel .logo-item--platform:has(.logo-store-bare):hover .logo-store-bare {
+.logo-item--platform:has(.logo-store-bare):hover .logo-store-bare {
   transform: scale(1.06);
-  transition: transform 0.3s ease;
 }
 
 .logos-carousel-wrapper {
@@ -117,6 +117,17 @@
   filter: grayscale(0%);
 }
 
+.logo-image--boomplay,
+.logo-image--amazon-music {
+  filter: none;
+  max-height: 52px;
+}
+
+.logo-item:hover .logo-image--boomplay,
+.logo-item:hover .logo-image--amazon-music {
+  filter: none;
+}
+
 .logo-item--platform {
   width: auto;
   min-width: 150px;
@@ -127,10 +138,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: #ffffff;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
-  transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  transition: transform 0.3s ease;
 }
 
 .logo-platform--social {
@@ -167,22 +178,12 @@
   color: #1d9bf0;
 }
 
-.logo-platform--appstore {
-  border-color: rgba(15, 23, 42, 0.2);
-  background: #f8fafc;
-}
-
 .logo-platform--appstore .logo-platform-icon {
   color: #0f172a;
 }
 
-.logo-platform--appstore:hover {
-  border-color: rgba(15, 23, 42, 0.35);
-  background: #f1f5f9;
-}
-
 .logo-platform--appstore.logo-platform--store:has(.logo-platform-store-badge) {
-  padding: 0.3rem 0.45rem;
+  padding: 0;
   min-height: 0;
   gap: 0;
 }
@@ -196,9 +197,7 @@
 }
 
 .logo-platform--googleplay {
-  border-color: rgba(15, 23, 42, 0.2);
-  background: #0f172a;
-  padding: 0.35rem 0.5rem;
+  padding: 0;
 }
 
 .logo-platform--googleplay .logo-platform-store-badge {
@@ -208,16 +207,11 @@
   object-fit: contain;
 }
 
-.logo-platform--googleplay:hover {
-  border-color: rgba(15, 23, 42, 0.45);
-  background: #1e293b;
-}
-
 .logo-platform--store {
   gap: 0.55rem;
-  padding: 0.5rem 0.9rem 0.5rem 0.7rem;
-  border-radius: 12px;
-  min-height: 3rem;
+  padding: 0;
+  border-radius: 0;
+  min-height: 0;
 }
 
 .logo-item--platform:hover .logo-platform--store {
@@ -333,11 +327,11 @@
     font-size: 0.75rem;
   }
 
-  .publication-logos-section.impact-logos-carousel .logo-store-bare {
+  .logo-store-bare {
     height: 2rem;
   }
 
-  .publication-logos-section.impact-logos-carousel .logo-store-bare--googleplay {
+  .logo-store-bare--googleplay {
     height: 2.95rem;
   }
 }

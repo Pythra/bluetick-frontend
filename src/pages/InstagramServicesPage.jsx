@@ -1,26 +1,40 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IoLogoInstagram } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
+import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
-import Button from '../components/Button';
+import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
-import './InstagramServicesPage.css';
+import instagramHeroImage from '../assets/online.jpg';
+import {
+  getInstagramCartTitle,
+  instagramBlogPromotions,
+  instagramWizkidnewsPackages,
+} from '../data/instagramPromotionServices';
+import './ServiceDetailPage.css';
+
+const blogPromotionDescription =
+  'Feature your brand, music, or content on a top Nigerian Instagram blog and reach engaged entertainment audiences.';
+
+const wizkidDescription =
+  'Premium placement on Wizkidnews — choose post duration or collaboration packages for sustained visibility.';
 
 function InstagramServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
-  const handleAddToCart = async (item) => {
+  const handleAddToCart = async (item, section) => {
     const result = await addToCart({
-      itemId: item.id || `${item.title}-${Date.now()}`,
-      title: item.title || item.name,
+      itemId: `instagram-${item.id}-${Date.now()}`,
+      title: getInstagramCartTitle(item),
       price: item.price,
-      description: item.description || '',
+      description: section,
       category: 'instagram',
       quantity: 1,
     });
-    
+
     if (result.success) {
       setShowCartNotification(true);
       setTimeout(() => setShowCartNotification(false), 3000);
@@ -37,352 +51,68 @@ function InstagramServicesPage() {
     }, 100);
   };
 
+  const renderCards = (items, sectionLabel, description) =>
+    items.map((item) => (
+      <ServiceDetailCard
+        key={item.id}
+        title={item.title}
+        meta={item.note ? `${sectionLabel} · ${item.note}` : sectionLabel}
+        description={description}
+        price={formatPrice(item.price, '₦')}
+        pricePrefix=""
+        icon={IoLogoInstagram}
+        onAddToCart={() => handleAddToCart(item, sectionLabel)}
+      />
+    ));
+
   return (
-    <div className="instagram-page">
+    <div className="service-detail-page">
+      <Navbar onScrollToSection={scrollToSection} />
+
+      <div className="service-detail-shell">
+        <header className="service-detail-hero">
+          <img src={instagramHeroImage} alt="" className="service-detail-hero-image" />
+          <div className="service-detail-hero-overlay" aria-hidden="true" />
+          <div className="service-detail-hero-content">
+            <h1 className="service-detail-title">
+              <span className="services-summary-title-black">INSTAGRAM BLOG</span>
+              <span className="services-summary-title-blue">PROMOTION</span>
+            </h1>
+            <p className="service-detail-lead">
+              Get your content featured on Nigeria&apos;s most popular Instagram pages — from
+              entertainment blogs to celebrity news platforms with millions of followers.
+            </p>
+          </div>
+        </header>
+
+        <main className="service-detail-main">
+          <section className="service-detail-section">
+            <h2 className="service-detail-section-title">Instagram Blogs Promotions</h2>
+            <p className="service-detail-section-lead">
+              Per-page pricing for top Instagram blogs and entertainment accounts.
+            </p>
+            <div className="service-detail-grid">
+              {renderCards(instagramBlogPromotions, 'Instagram blog', blogPromotionDescription)}
+            </div>
+          </section>
+
+          <section className="service-detail-section">
+            <h2 className="service-detail-section-title">Wizkidnews</h2>
+            <p className="service-detail-section-lead">
+              Dedicated packages for posts and collaborations on Wizkidnews.
+            </p>
+            <div className="service-detail-grid">
+              {renderCards(instagramWizkidnewsPackages, 'Wizkidnews', wizkidDescription)}
+            </div>
+          </section>
+        </main>
+      </div>
+
       {showCartNotification && (
-        <div className="cart-notification">
+        <div className="service-detail-cart-notification" role="status">
           Item added to cart!
         </div>
       )}
-      <Navbar onScrollToSection={scrollToSection} />
-      
-      {/* Hero Section */}
-      <section className="instagram-hero">
-        <div className="hero-overlay"></div>
-        <div className="hero-container">
-          <h1 className="hero-title">Instagram Promotion Services</h1>
-          <p className="hero-subtitle">
-            Get Your Content Featured on Top Instagram Pages - Reach Millions of Followers
-          </p>
-          <p className="hero-description">
-            Promote your brand, music, or content on Nigeria's most popular Instagram pages. 
-            From entertainment blogs to celebrity news platforms, we connect you with audiences that matter.
-          </p>
-        </div>
-      </section>
-
-      {/* Instagram Pages Price List Section */}
-      <section className="instagram-price-section">
-        <div className="container">
-          <h2 className="section-title">Price List for Instagram Pages</h2>
-          
-          <div className="instagram-price-container">
-            <div className="instagram-category">
-              <h3 className="instagram-category-title">Instagram Blogs Promotions</h3>
-              <div className="instagram-price-grid">
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Alabareports</span>
-                    <span className="instagram-price">₦70,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Alabareports', price: '₦70,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Gossipmill</span>
-                    <span className="instagram-price">₦750,000</span>
-                    <span className="instagram-note">Account 1</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Gossipmill - Account 1', price: '₦750,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Gossipmill</span>
-                    <span className="instagram-price">₦400,000</span>
-                    <span className="instagram-note">Account 2</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Gossipmill - Account 2', price: '₦400,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">WahalaNetwork</span>
-                    <span className="instagram-price">₦300,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'WahalaNetwork', price: '₦300,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Instablog</span>
-                    <span className="instagram-price">₦900,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Instablog', price: '₦900,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Themixhq</span>
-                    <span className="instagram-price">₦750,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Themixhq', price: '₦750,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Gossiploaded</span>
-                    <span className="instagram-price">₦200,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Gossiploaded', price: '₦200,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Thecontentlovers</span>
-                    <span className="instagram-price">₦300,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Thecontentlovers', price: '₦300,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Olofofonija</span>
-                    <span className="instagram-price">₦200,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Olofofonija', price: '₦200,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Notjustok</span>
-                    <span className="instagram-price">₦800,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Notjustok', price: '₦800,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Gistloverblog</span>
-                    <span className="instagram-price">₦700,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Gistloverblog', price: '₦700,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Samklef</span>
-                    <span className="instagram-price">₦750,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Samklef', price: '₦750,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">FunnyAfrica</span>
-                    <span className="instagram-price">₦500,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'FunnyAfrica', price: '₦500,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Tundeednut</span>
-                    <span className="instagram-price">₦1,000,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Tundeednut', price: '₦1,000,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">NaijaEverything</span>
-                    <span className="instagram-price">₦350,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'NaijaEverything', price: '₦350,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Yabaleftonline</span>
-                    <span className="instagram-price">₦650,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Yabaleftonline', price: '₦650,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">GoldmyneTV</span>
-                    <span className="instagram-price">₦250,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'GoldmyneTV', price: '₦250,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Lindaikejisblog</span>
-                    <span className="instagram-price">₦650,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Lindaikejisblog', price: '₦650,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Shallipopi News</span>
-                    <span className="instagram-price">₦200,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Shallipopi News', price: '₦200,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Officialbisloded</span>
-                    <span className="instagram-price">₦500,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Officialbisloded', price: '₦500,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="instagram-category">
-              <h3 className="instagram-category-title">Wizkidnews</h3>
-              <div className="instagram-price-grid">
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">24 Hours Post</span>
-                    <span className="instagram-price">₦180,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: '24 Hours Post', price: '₦180,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">1 Day Post</span>
-                    <span className="instagram-price">₦250,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: '1 Day Post', price: '₦250,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">3 Days Post</span>
-                    <span className="instagram-price">₦500,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: '3 Days Post', price: '₦500,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Collaboration Post (3 Days)</span>
-                    <span className="instagram-price">₦800,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Collaboration Post (3 Days)', price: '₦800,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-                <div className="instagram-price-item">
-                  <div className="instagram-info">
-                    <span className="instagram-name">Collaboration Post (6 Days)</span>
-                    <span className="instagram-price">₦2,300,000</span>
-                  </div>
-                  <Button 
-                    onClick={() => handleAddToCart({ title: 'Collaboration Post (6 Days)', price: '₦2,300,000', category: 'instagram' })} 
-                    className="price-order-btn"
-                  >
-                    Add to Cart
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <Footer onScrollToSection={scrollToSection} />
     </div>
@@ -390,6 +120,3 @@ function InstagramServicesPage() {
 }
 
 export default InstagramServicesPage;
-
-
-

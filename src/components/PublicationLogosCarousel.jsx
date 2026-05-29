@@ -13,9 +13,22 @@ import dailyPostLogo from '../assets/platforms/dailypost.jpg';
 import nairametricsLogo from '../assets/platforms/nairametrics.png';
 import techCabalLogo from '../assets/platforms/techcabal.png';
 import vanguardLogo from '../assets/platforms/Vanguard.png';
+import { amazonMusicLogo, boomplayLogo } from '../assets/streamingBrandLogos';
 import './PublicationLogosCarousel.css';
 
 const platformCarouselItems = [
+  {
+    type: 'image',
+    name: 'Boomplay',
+    image: boomplayLogo,
+    brand: 'boomplay',
+  },
+  {
+    type: 'image',
+    name: 'Amazon Music',
+    image: amazonMusicLogo,
+    brand: 'amazon-music',
+  },
   {
     type: 'social',
     brand: 'instagram',
@@ -78,8 +91,6 @@ function PublicationLogosCarousel({
   className = '',
   includePlatformBadges = false,
 }) {
-  const isImpactLogosStrip =
-    typeof className === 'string' && className.includes('impact-logos-carousel');
   const publicationLogos = [
     { type: 'image', name: 'Punch', image: punchLogo },
     { type: 'image', name: 'Guardian', image: guardianLogo },
@@ -109,7 +120,11 @@ function PublicationLogosCarousel({
                 className={`logo-item ${item.type !== 'image' ? 'logo-item--platform' : ''}`}
               >
                 {item.type === 'image' && (
-                  <img src={item.image} alt={item.name} className="logo-image" />
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className={`logo-image${item.brand ? ` logo-image--${item.brand}` : ''}`}
+                  />
                 )}
                 {item.type === 'social' && (
                   <a
@@ -123,7 +138,7 @@ function PublicationLogosCarousel({
                   </a>
                 )}
                 {item.type === 'store' && (
-                  isImpactLogosStrip && item.image ? (
+                  item.image ? (
                     <img
                       src={item.image}
                       alt={item.name}
@@ -134,21 +149,11 @@ function PublicationLogosCarousel({
                       className={`logo-platform logo-platform--store logo-platform--${item.brand}`}
                       aria-label={item.name}
                     >
-                      {item.image ? (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="logo-platform-store-badge"
-                        />
-                      ) : (
-                        <>
-                          <item.Icon className="logo-platform-icon logo-platform-icon--store" aria-hidden="true" />
-                          <span className="logo-platform-store-text">
-                            <span className="logo-platform-store-kicker">{item.kicker}</span>
-                            <span className="logo-platform-store-name">{item.storeName}</span>
-                          </span>
-                        </>
-                      )}
+                      <item.Icon className="logo-platform-icon logo-platform-icon--store" aria-hidden="true" />
+                      <span className="logo-platform-store-text">
+                        <span className="logo-platform-store-kicker">{item.kicker}</span>
+                        <span className="logo-platform-store-name">{item.storeName}</span>
+                      </span>
                     </div>
                   )
                 )}

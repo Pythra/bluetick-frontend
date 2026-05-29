@@ -5,39 +5,37 @@ import ServicesSummaryLayout from './ServicesSummaryLayout';
 import musicHeroImage from '../assets/mayorkun.jpg';
 import './ServicesSummaryHero.css';
 
-function MusicStreamingVerificationSummary() {
+function TikTokArtistServicesSummary() {
   const navigate = useNavigate();
 
   const highlightServices = [
-    'Spotify & Apple Music verification',
-    'Boomplay, Audiomack & Deezer verification',
-    'YouTube Official Artist Channel (OAC)',
+    'TikTok song claim under your artist profile',
+    'Micro influencer campaigns using your sound',
+    'Packages from 25 to 1,000 influencers',
   ];
 
   return (
     <section
-      id="music-streaming-services"
+      id="tiktok-artist-services"
       className="music-streaming-services-section music-streaming-services-summary services-summary-layout"
     >
       <ServicesSummaryLayout
-        reverse
         copy={(
           <>
             <SectionHeader
               title={(
                 <>
-                  <span className="services-summary-title-black">MUSIC ARTIST</span>
+                  <span className="services-summary-title-black">TIKTOK FOR</span>
                   <span className="services-summary-title-row">
-                    <span className="services-summary-title-black">STREAMING </span>
-                    <span className="services-summary-title-blue">VERIFICATION</span>
+                    <span className="services-summary-title-black">ARTIST </span>
+                    <span className="services-summary-title-blue">SERVICES</span>
                   </span>
                 </>
               )}
             />
             <p className="services-summary-intro">
-              Get verified artist profiles on Spotify, Apple Music, Boomplay, YouTube OAC, and every
-              major streaming platform. We handle eligibility, profile setup, and platform approval from
-              start to finish.
+              Promotional packages for artists and labels — from song claiming and analytics setup to
+              influencer sound campaigns that drive reach on TikTok.
             </p>
           </>
         )}
@@ -45,23 +43,23 @@ function MusicStreamingVerificationSummary() {
           <div className="services-summary-hero-shell">
             <img
               src={musicHeroImage}
-              alt="Music artist streaming platform verification"
+              alt="TikTok artist services and promotional packages"
               className="services-summary-hero-image"
             />
             <div className="services-summary-hero-overlay"></div>
             <div className="services-summary-hero-content">
-              <p className="services-summary-hero-kicker">What We Verify</p>
-              <h3>Official Artist Profiles on Top Platforms</h3>
+              <p className="services-summary-hero-kicker">THE BOSS MUSIC · TikTok</p>
+              <h3>Services &amp; Promotional Packages</h3>
               <ul className="services-summary-hero-types">
                 {highlightServices.map((service) => (
                   <li key={service}>{service}</li>
                 ))}
               </ul>
               <Button
-                onClick={() => navigate('/services/music-streaming')}
+                onClick={() => navigate('/services/tiktok-artist')}
                 className="bounce-btn services-summary-hero-cta"
               >
-                View Streaming Verification Prices
+                Order now
               </Button>
             </div>
           </div>
@@ -71,4 +69,4 @@ function MusicStreamingVerificationSummary() {
   );
 }
 
-export default MusicStreamingVerificationSummary;
+export default TikTokArtistServicesSummary;

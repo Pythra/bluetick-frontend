@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { IoChevronDownOutline } from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
 import blueLogo from '../assets/bluelogo.png';
 import './Navbar.css';
@@ -34,17 +33,14 @@ function Navbar({ onScrollToSection }) {
           </Link>
         </div>
         <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
-          <button type="button" className="navbar-link with-caret" onClick={() => handleAction(scrollTarget('landing'))}>
+          <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('landing'))}>
             About Bluetick
-            <IoChevronDownOutline />
           </button>
-          <button type="button" className="navbar-link with-caret" onClick={() => handleAction(scrollTarget('publication-services'))}>
+          <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('publication-services'))}>
             PR Agencies
-            <IoChevronDownOutline />
           </button>
-          <button type="button" className="navbar-link with-caret" onClick={() => handleAction(scrollTarget('website-services'))}>
+          <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('website-services'))}>
             Services
-            <IoChevronDownOutline />
           </button>
           <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/blog'))}>
             Blog

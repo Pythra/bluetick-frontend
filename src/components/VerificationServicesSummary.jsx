@@ -34,13 +34,13 @@ const socialServiceCategories = [
     ctaPath: '/services/monetization',
   },
   {
-    title: 'Trend & Growth Campaigns',
+    title: 'Twitter Trend Services',
     icon: IoRocketOutline,
     iconTone: 'amber',
     services: [
-      'Local, national, and regional trend campaigns',
-      'Launch amplification for products and announcements',
-      'Execution support with performance reporting',
+      'Nigeria, Ghana, Kenya, Uganda & South Africa X trends',
+      '24–48 hour delivery on country trend packages',
+      'Hashtag strategy, timing, and performance reporting',
     ],
     ctaPath: '/services/twitter-trends',
   },
@@ -87,38 +87,39 @@ function VerificationServicesSummary() {
                   <ul className="verification-carousel-types verification-carousel-types--bulleted">
                     <li>Social Media Verification</li>
                     <li>Social Media Monetization</li>
-                    <li>Twitter (X) Trend Packages</li>
+                    <li>Twitter Trend Services</li>
                   </ul>
                 </div>
               </div>
             </div>
-
-            <div className="social-services-category-grid">
-              {socialServiceCategories.map((category) => (
-                <article key={category.title} className="social-services-category-card">
-                  <div className="social-services-card-head">
-                    <span
-                      className={`social-services-category-icon social-services-category-icon--${category.iconTone}`}
-                      aria-hidden="true"
-                    >
-                      <category.icon />
-                    </span>
-                    <h4>{category.title}</h4>
-                  </div>
-                  <ul className="social-services-category-list">
-                    {category.services.map((service) => (
-                      <li key={service}>{service}</li>
-                    ))}
-                  </ul>
-                  <Button
-                    onClick={() => navigate(category.ctaPath)}
-                    className="social-services-category-cta"
+          </div>
+        )}
+        below={(
+          <div className="social-services-category-grid">
+            {socialServiceCategories.map((category) => (
+              <article key={category.title} className="social-services-category-card">
+                <div className="social-services-card-head">
+                  <span
+                    className={`social-services-category-icon social-services-category-icon--${category.iconTone}`}
+                    aria-hidden="true"
                   >
-                    Order now
-                  </Button>
-                </article>
-              ))}
-            </div>
+                    <category.icon />
+                  </span>
+                  <h4>{category.title}</h4>
+                </div>
+                <ul className="social-services-category-list">
+                  {category.services.map((service) => (
+                    <li key={service}>{service}</li>
+                  ))}
+                </ul>
+                <Button
+                  onClick={() => navigate(category.ctaPath)}
+                  className="social-services-category-cta"
+                >
+                  Order now
+                </Button>
+              </article>
+            ))}
           </div>
         )}
       />

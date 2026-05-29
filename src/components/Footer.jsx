@@ -7,9 +7,11 @@ import {
   IoLogoTiktok,
   IoLogoFacebook,
   IoLogoTwitter,
+  IoLogoWhatsapp,
   IoDocumentTextOutline
 } from 'react-icons/io5';
 import bluegoLogo from '../assets/bluego.png';
+import { companyWhatsappDemoDisplay, companyWhatsappDemoUrl } from '../config/companyContact';
 import './Footer.css';
 
 function Footer({ onScrollToSection }) {
@@ -132,6 +134,15 @@ function Footer({ onScrollToSection }) {
               <a href="tel:+2349069431949" className="contact-link">
                 <IoCallOutline className="contact-icon" />
                 <span>+234 906 943 1949</span>
+              </a>
+              <a
+                href={companyWhatsappDemoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-link"
+              >
+                <IoLogoWhatsapp className="contact-icon" />
+                <span>{companyWhatsappDemoDisplay}</span>
               </a>
               <div className="social-links">
                 <a

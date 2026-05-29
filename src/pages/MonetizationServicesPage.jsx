@@ -1,18 +1,63 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  IoCashOutline,
+  IoInformationCircleOutline,
+  IoLogoFacebook,
+  IoLogoInstagram,
+  IoLogoTiktok,
+  IoLogoTwitter,
+  IoLogoYoutube,
+  IoMegaphoneOutline,
+  IoWalletOutline,
+} from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
 import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
-import SectionHeader from '../components/SectionHeader';
-import Button from '../components/Button';
+import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import verificationHeroImage from '../assets/social/verification.jpg';
 import {
   monetizationImportantNotice,
   monetizationPackages,
   monetizationSetupServices,
 } from '../data/socialMonetizationServices';
-import './ServicesPage.css';
-import './MonetizationServicesPage.css';
+import './ServiceDetailPage.css';
+
+const monetizationDescriptions = {
+  'Facebook Page Monetization':
+    'Full Facebook Page monetization setup from eligibility through payout configuration.',
+  'Facebook Profile Monetization':
+    'Profile-level monetization enablement with compliance and revenue tool setup.',
+  'Instagram Monetization':
+    'Instagram monetization tools, bonuses, and payout readiness for creators and brands.',
+  'YouTube Channel Monetization':
+    'YouTube Partner Program monetization including watch hours, subs, and AdSense linkage.',
+  'TikTok Account Monetization':
+    'TikTok monetization program enrollment and creator fund readiness support.',
+  'Snapchat Monetization':
+    'Snapchat monetization features setup for Spotlight and creator revenue programs.',
+  'X (Twitter) Monetization':
+    'X monetization and creator revenue setup for eligible accounts.',
+  'Facebook In-Stream Ads Setup': 'In-stream ads configuration and approval for Facebook video content.',
+  'Facebook Stars Setup': 'Facebook Stars gifting setup so fans can support your live streams.',
+  'Instagram Gifts Setup': 'Instagram Gifts activation for Reels and live monetization moments.',
+  'Instagram Subscription Setup': 'Instagram Subscriptions setup for recurring fan revenue.',
+  'TikTok Creativity Program Setup': 'TikTok Creativity Program Beta enrollment and eligibility support.',
+  'Social Media Payout Setup Assistance':
+    'Cross-platform payout account linking, tax, and banking configuration assistance.',
+};
+
+function getMonetizationIcon(title) {
+  if (title.includes('Facebook')) return IoLogoFacebook;
+  if (title.includes('Instagram')) return IoLogoInstagram;
+  if (title.includes('YouTube')) return IoLogoYoutube;
+  if (title.includes('TikTok')) return IoLogoTiktok;
+  if (title.includes('Snapchat')) return IoMegaphoneOutline;
+  if (title.includes('X (Twitter)') || title.includes('Twitter')) return IoLogoTwitter;
+  if (title.includes('Payout')) return IoWalletOutline;
+  return IoCashOutline;
+}
 
 function MonetizationServicesPage() {
   const navigate = useNavigate();
@@ -45,65 +90,75 @@ function MonetizationServicesPage() {
     }, 100);
   };
 
-  const renderServiceGrid = (services, tier) => (
-    <div className="services-grid">
-      {services.map((service) => (
-        <div key={service.title} className="service-card-detailed">
-          <h3 className="service-card-title">{service.title}</h3>
-          <div className="service-card-price">
-            <span className="price-amount">{formatPrice(service.price, '₦')}</span>
-          </div>
-          <Button onClick={() => handleAddToCart(service, tier)} className="order-button">
-            Add to Cart
-          </Button>
-        </div>
-      ))}
-    </div>
-  );
+  const renderCards = (services, tier, metaLabel) =>
+    services.map((service) => (
+      <ServiceDetailCard
+        key={`${tier}-${service.title}`}
+        title={service.title}
+        meta={metaLabel}
+        description={
+          monetizationDescriptions[service.title] ||
+          'End-to-end monetization support from eligibility through approval and payout setup.'
+        }
+        price={formatPrice(service.price, '₦')}
+        pricePrefix=""
+        icon={getMonetizationIcon(service.title)}
+        onAddToCart={() => handleAddToCart(service, tier)}
+      />
+    ));
 
   return (
-    <div className="services-page monetization-page">
+    <div className="service-detail-page">
       <Navbar onScrollToSection={scrollToSection} />
-      <div className="page-header">
-        <Button onClick={() => navigate('/')} className="back-button">
-          ← Back to Home
-        </Button>
-        <SectionHeader
-          title="SOCIAL MEDIA MONETIZATION SERVICES"
-          subtitle="Turn your audience into revenue across every major platform"
-        />
-      </div>
 
-      <div className="container">
-        <div className="monetization-intro">
-          <p className="intro-text">
-            From full platform monetization to creator tools and payout setup, we manage eligibility,
-            growth, and approval end to end so you can focus on creating content.
-          </p>
-        </div>
+      <div className="service-detail-shell">
+        <header className="service-detail-hero">
+          <img src={verificationHeroImage} alt="" className="service-detail-hero-image" />
+          <div className="service-detail-hero-overlay" aria-hidden="true" />
+          <div className="service-detail-hero-content">
+            <h1 className="service-detail-title">
+              <span className="services-summary-title-black">SOCIAL MEDIA</span>
+              <span className="services-summary-title-blue">MONETIZATION</span>
+            </h1>
+            <p className="service-detail-lead">
+              Turn your audience into revenue across Facebook, Instagram, YouTube, TikTok, Snapchat,
+              and X — we handle eligibility, setup, and approval end to end.
+            </p>
+          </div>
+        </header>
 
-        <div className="monetization-tier">
-          <h3 className="monetization-tier-title">Platform Monetization Packages</h3>
-          {renderServiceGrid(monetizationPackages, 'package')}
-        </div>
+        <main className="service-detail-main">
+          <section className="service-detail-section">
+            <h2 className="service-detail-section-title">Platform Monetization Packages</h2>
+            <div className="service-detail-grid">
+              {renderCards(monetizationPackages, 'package', 'Monetization package')}
+            </div>
+          </section>
 
-        <div className="monetization-tier">
-          <h3 className="monetization-tier-title">Creator Revenue Setup Services</h3>
-          {renderServiceGrid(monetizationSetupServices, 'setup')}
-        </div>
+          <section className="service-detail-section">
+            <h2 className="service-detail-section-title">Creator Revenue Setup Services</h2>
+            <div className="service-detail-grid">
+              {renderCards(monetizationSetupServices, 'setup', 'Setup service')}
+            </div>
+          </section>
 
-        <div className="monetization-notice">
-          <h3 className="monetization-notice-title">Important Notice</h3>
-          <p className="monetization-notice-lead">{monetizationImportantNotice.lead}</p>
-          <p className="monetization-notice-body">{monetizationImportantNotice.body}</p>
-        </div>
+          <ServiceDetailCard
+            title="Important Notice"
+            meta="Before you order"
+            description={`${monetizationImportantNotice.lead} ${monetizationImportantNotice.body}`}
+            price="See packages above"
+            icon={IoInformationCircleOutline}
+            feature
+          />
+        </main>
       </div>
 
       {showCartNotification && (
-        <div className="cart-notification monetization-cart-notification">
+        <div className="service-detail-cart-notification" role="status">
           Item added to cart!
         </div>
       )}
+
       <Footer />
     </div>
   );

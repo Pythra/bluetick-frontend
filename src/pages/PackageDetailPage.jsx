@@ -72,26 +72,26 @@ const packageDetails = {
       { name: 'Punch', price: '₦80,000', logo: punchLogo },
       { name: 'BusinessDay', price: '₦80,000', logo: businessDayLogo },
       { name: 'Legit', price: '₦300,000', logo: legitLogo },
-      { name: 'The Nation', price: '₦30,000', logo: theNationLogo },
-      { name: 'Vanguard', price: '₦20,000', logo: vanguardLogo },
-      { name: 'ThisDay', price: '₦20,000', logo: thisDayLogo },
-      { name: 'The Guardian', price: '₦30,000', logo: guardianLogo },
-      { name: 'The Cable', price: '₦25,000', logo: cableLogo },
-      { name: 'Leadership', price: '₦30,000', logo: leadershipLogo },
-      { name: 'Daily Trust', price: '₦20,000', logo: dailyTrustLogo },
-      { name: 'Daily Post', price: '₦20,000', logo: dailyPostLogo },
-      { name: 'The Sun', price: '₦20,000', logo: sunOnlineLogo },
+      { name: 'The Nation', price: '₦60,000', logo: theNationLogo },
+      { name: 'Vanguard', price: '₦30,000', logo: vanguardLogo },
+      { name: 'ThisDay', price: '₦30,000', logo: thisDayLogo },
+      { name: 'The Guardian', price: '₦70,000', logo: guardianLogo },
+      { name: 'The Cable', price: '₦300,000', logo: cableLogo },
+      { name: 'Leadership', price: '₦60,000', logo: leadershipLogo },
+      { name: 'Daily Trust', price: '₦30,000', logo: dailyTrustLogo },
+      { name: 'Daily Post', price: '₦30,000', logo: dailyPostLogo },
+      { name: 'The Sun', price: '₦30,000', logo: sunOnlineLogo },
       { name: 'The Telegraph', price: '₦20,000', logo: telegraphLogo },
       { name: 'Tribune', price: '₦30,000', logo: tribuneLogo },
       { name: 'Champion', price: '₦20,000', logo: championLogo },
-      { name: 'Blueprint', price: '₦20,000', logo: blueprintLogo },
+      { name: 'Blueprint', price: '₦30,000', logo: blueprintLogo },
       { name: 'Peoples Daily', price: '₦20,000', logo: peoplesDailyLogo },
       { name: 'GhanaWeb', price: '₦100,000', logo: ghanaWebLogo },
-      { name: 'Pulse', price: '₦20,000', logo: pulseLogo },
+      { name: 'Pulse', price: '₦300,000', logo: pulseLogo },
       
       // Tech & Business
-      { name: 'Techpoint', price: '₦20,000', logo: techpointLogo },
-      { name: 'TechCabal', price: '₦25,000', logo: techCabalLogo },
+      { name: 'Techpoint', price: '₦300,000', logo: techpointLogo },
+      { name: 'TechCabal', price: '₦300,000', logo: techCabalLogo },
       
       // Movie Platforms
       { name: 'Nollywire', price: '₦300,000', logo: null },
@@ -116,8 +116,8 @@ const packageDetails = {
     description: 'Focused tech PR on leading African and international tech platforms.',
     platforms: [
       // African Tech
-      { name: 'Techpoint', price: '₦250,000', logo: techpointLogo },
-      { name: 'TechCabal', price: '₦250,000', logo: techCabalLogo },
+      { name: 'Techpoint', price: '₦300,000', logo: techpointLogo },
+      { name: 'TechCabal', price: '₦300,000', logo: techCabalLogo },
       
       // Cybersecurity
       { name: 'Cybersecurity Insiders', price: '₦700,000', logo: null },
@@ -257,7 +257,7 @@ const packageDetails = {
     description: 'Forbes, Fox News, BBC News, Bloomberg, Business Insider, Yahoo Finance and premium international platforms. Maximum authority and credibility with international market access.',
     platforms: [
       // Premium News Outlets
-      { name: 'Forbes', price: '₦4,500,000', logo: forbesLogo },
+      { name: 'Forbes', price: '₦9,730,000', logo: forbesLogo },
       { name: 'Fox News', price: '₦5,250,000', logo: foxLogo },
       { name: 'BBC News', price: '₦7,950,000', logo: bbcNewsLogo },
       { name: 'Bloomberg', price: '₦3,525,000', logo: bloombergNewsLogo },

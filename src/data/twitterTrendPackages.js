@@ -1,58 +1,72 @@
 export const twitterTrendPackages = [
   {
-    id: 'nigeria-local',
-    title: 'Nigeria Local Trend',
+    id: 'nigeria',
+    countryCode: 'NG',
+    title: 'Nigeria Trend',
     price: 150000,
-    delivery: '3–6 Hours',
-    popular: false,
+    delivery: '24–48 Hours',
     description:
-      'Targeted Nigeria visibility with localized hashtag strategy, engagement support, and trend chart placement.',
+      'Premium X (Twitter) trend placement in Nigeria for brands, artists, campaigns, and announcements.',
     highlights: [
       'Nigeria trends chart placement',
-      'Localized hashtag & copy strategy',
+      'Hashtag strategy and engagement support',
+      'Campaign reporting summary',
+    ],
+  },
+  {
+    id: 'uganda',
+    countryCode: 'UG',
+    title: 'Uganda Trend',
+    price: 925000,
+    delivery: '24–48 Hours',
+    description:
+      'Targeted trend visibility in Uganda with coordinated content push and localized hashtag planning.',
+    highlights: [
+      'Uganda trends chart placement',
+      'Localized copy and timing strategy',
       'Engagement amplification',
     ],
   },
   {
-    id: 'nigeria-national',
-    title: 'Nigeria National Trend',
-    price: 350000,
-    delivery: '6–12 Hours',
-    popular: true,
-    description:
-      'Dominant national presence on X with sustained momentum, ideal for launches, campaigns, and brand moments.',
-    highlights: [
-      'Priority national trend positioning',
-      'Multi-city reach & coordination',
-      'Campaign analytics summary',
-    ],
-  },
-  {
-    id: 'africa-regional',
-    title: 'Africa Regional Trend',
-    price: 650000,
-    delivery: '12–24 Hours',
-    popular: false,
-    description:
-      'Cross-border African visibility for artists, brands, and public figures seeking regional buzz.',
-    highlights: [
-      'Regional trend coverage',
-      'Influencer & community push',
-      'Dedicated campaign manager',
-    ],
-  },
-  {
-    id: 'global-visibility',
-    title: 'Global Trend Visibility',
-    price: 1200000,
+    id: 'south-africa',
+    countryCode: 'ZA',
+    title: 'South Africa Trend',
+    price: 899000,
     delivery: '24–48 Hours',
-    popular: false,
     description:
-      'Worldwide trend campaigns for major announcements, product drops, and reputation management.',
+      'South Africa trend campaigns built for launches, brand moments, and high-visibility announcements on X.',
     highlights: [
-      'Global trend targeting',
-      'Premium support & monitoring',
-      'Full performance reporting',
+      'South Africa trends chart placement',
+      'Multi-audience reach coordination',
+      'Post-campaign performance summary',
+    ],
+  },
+  {
+    id: 'kenya',
+    countryCode: 'KE',
+    title: 'Kenya Trend',
+    price: 899000,
+    delivery: '24–48 Hours',
+    description:
+      'Kenya-focused trend packages for artists, public figures, and brands seeking strong national buzz on X.',
+    highlights: [
+      'Kenya trends chart placement',
+      'Hashtag and content coordination',
+      'Dedicated campaign support',
+    ],
+  },
+  {
+    id: 'ghana',
+    countryCode: 'GH',
+    title: 'Ghana Trend',
+    price: 599900,
+    delivery: '24–48 Hours',
+    description:
+      'Ghana trend promotion for campaigns and announcements with structured execution and reporting.',
+    highlights: [
+      'Ghana trends chart placement',
+      'Engagement and momentum support',
+      'Campaign analytics summary',
     ],
   },
 ];

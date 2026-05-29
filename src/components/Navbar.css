@@ -40,7 +40,7 @@
 .navbar-menu {
   display: flex;
   align-items: center;
-  gap: 0.08rem;
+  gap: 1.25rem;
   flex-wrap: nowrap;
 }
 
@@ -63,16 +63,6 @@
   color: #1d4ed8;
 }
 
-.navbar-link.with-caret {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.16rem;
-}
-
-.navbar-link.with-caret svg {
-  font-size: 0.9rem;
-}
-
 .navbar-logout,
 .navbar-signup {
   border: 0;
@@ -88,7 +78,7 @@
 
 .navbar-logout {
   background: #fee2e2;
-  border: 1px solid #fecaca;
+  border: none;
   color: #991b1b;
   box-shadow:
     0 2px 4px rgba(153, 27, 27, 0.12),
@@ -163,16 +153,12 @@
   }
 
   .navbar-menu {
-    gap: 0.1rem;
+    gap: 1.75rem;
   }
 
   .navbar-link {
     font-size: 0.92rem;
-    padding: 0.32rem 0.5rem;
-  }
-
-  .navbar-link.with-caret svg {
-    font-size: 0.96rem;
+    padding: 0.32rem 0.15rem;
   }
 
   .navbar-logout,
@@ -194,7 +180,11 @@
 
   .navbar-link {
     font-size: 0.88rem;
-    padding: 0.28rem 0.42rem;
+    padding: 0.28rem 0.1rem;
+  }
+
+  .navbar-menu {
+    gap: 1.35rem;
   }
 
   .navbar-logout,
@@ -326,9 +316,5 @@
     border-bottom: none;
   }
 
-  .navbar-link.with-caret {
-    justify-content: center;
-    gap: 0.4rem;
-  }
 }
 

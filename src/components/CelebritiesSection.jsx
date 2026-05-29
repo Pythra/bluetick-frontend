@@ -66,14 +66,11 @@ function CelebritiesSection() {
         <SectionHeader
           title={(
             <>
-              <span className="services-summary-title-black">NOTABLE CELEBRITIES</span>{' '}
+              <span className="services-summary-title-black">NOTABLE CELEBRITIES</span>
               <span className="services-summary-title-blue">WE&apos;VE WORKED WITH</span>
             </>
           )}
         />
-        <p className="celebrities-section-intro">
-          A few of the artists and creators we have partnered with.
-        </p>
 
         <div className="celebrities-marquee-rows">
           <CelebrityMarqueeRow items={topRowCelebrities} direction="right" />

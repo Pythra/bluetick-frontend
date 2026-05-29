@@ -9,6 +9,7 @@ import AppServicesSummary from './components/AppServicesSummary';
 import WebsiteServicesSummary from './components/WebsiteServicesSummary';
 import VerificationServicesSummary from './components/VerificationServicesSummary';
 import MusicStreamingVerificationSummary from './components/MusicStreamingVerificationSummary';
+import TikTokArtistServicesSummary from './components/TikTokArtistServicesSummary';
 import PublicationServicesSummary from './components/PublicationServicesSummary';
 import InstagramServicesSummary from './components/InstagramServicesSummary';
 import WikipediaServicesSummary from './components/WikipediaServicesSummary';
@@ -20,6 +21,7 @@ import VerificationServicesPage from './pages/VerificationServicesPage';
 import MonetizationServicesPage from './pages/MonetizationServicesPage';
 import TwitterTrendServicesPage from './pages/TwitterTrendServicesPage';
 import MusicStreamingVerificationPage from './pages/MusicStreamingVerificationPage';
+import TikTokArtistServicesPage from './pages/TikTokArtistServicesPage';
 import PublicationServicesPage from './pages/PublicationServicesPage';
 import InstagramServicesPage from './pages/InstagramServicesPage';
 import WikipediaServicesPage from './pages/WikipediaServicesPage';
@@ -78,6 +80,7 @@ function HomePage() {
       <div className="scroll-pop"><WebsiteServicesSummary /></div>
       <div className="scroll-pop"><VerificationServicesSummary /></div>
       <div className="scroll-pop"><MusicStreamingVerificationSummary /></div>
+      <div className="scroll-pop"><TikTokArtistServicesSummary /></div>
       <div className="scroll-pop"><PublicationServicesSummary /></div>
       <div className="scroll-pop"><InstagramServicesSummary /></div>
       <div className="scroll-pop"><WikipediaServicesSummary /></div>
@@ -111,6 +114,7 @@ function App() {
               <Route path="/services/monetization" element={<MonetizationServicesPage />} />
               <Route path="/services/twitter-trends" element={<TwitterTrendServicesPage />} />
               <Route path="/services/music-streaming" element={<MusicStreamingVerificationPage />} />
+              <Route path="/services/tiktok-artist" element={<TikTokArtistServicesPage />} />
               <Route path="/services/publications">
                 <Route index element={<PublicationServicesPage />} />
                 <Route path="package/:id" element={<PackageDetailPage />} />

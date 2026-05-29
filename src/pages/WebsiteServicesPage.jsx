@@ -1,18 +1,46 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IoCodeSlashOutline, IoGlobeOutline, IoRocketOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
 import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
-import SectionHeader from '../components/SectionHeader';
-import Button from '../components/Button';
+import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
-import './ServicesPage.css';
+import websiteHeroImage from '../assets/tech.jpg';
+import { companyWhatsappSessionUrl } from '../config/companyContact';
+import './ServiceDetailPage.css';
 
 const websiteServices = [
-  { title: 'Basic Informational Website', price: 525000 },
-  { title: 'Standard Website', price: 1500000 },
-  { title: 'Custom Web Applications', price: 3750000 },
+  {
+    title: 'Basic Informational Website',
+    price: 525000,
+    icon: IoGlobeOutline,
+    description:
+      'A clean, professional site for your brand with essential pages, contact flows, and mobile-friendly layouts.',
+  },
+  {
+    title: 'Standard Website',
+    price: 1500000,
+    icon: IoCodeSlashOutline,
+    description:
+      'Multi-page websites with stronger content structure, SEO foundations, and room to grow your online presence.',
+  },
+  {
+    title: 'Custom Web Applications',
+    price: 3750000,
+    icon: IoRocketOutline,
+    description:
+      'Tailored web apps with dashboards, user accounts, integrations, and workflows built around your business.',
+  },
 ];
+
+const startupConsultation = {
+  title: 'Startup Consultation',
+  meta: 'Guidance & strategy',
+  description:
+    'Starting a business is a bold step — we help you shape your web presence, product direction, and launch plan. Bluetickgeng Development partners with founders to turn vision into a strong digital foundation for long-term growth.',
+  icon: IoRocketOutline,
+};
 
 function WebsiteServicesPage() {
   const navigate = useNavigate();
@@ -28,7 +56,7 @@ function WebsiteServicesPage() {
       category: 'website',
       quantity: 1,
     });
-    
+
     if (result.success) {
       setShowCartNotification(true);
       setTimeout(() => setShowCartNotification(false), 3000);
@@ -46,69 +74,61 @@ function WebsiteServicesPage() {
   };
 
   return (
-    <div className="services-page">
+    <div className="service-detail-page">
       <Navbar onScrollToSection={scrollToSection} />
-      <div className="page-header">
-        <Button onClick={() => navigate('/')} className="back-button">
-          ← Back to Home
-        </Button>
-        <SectionHeader
-          title="WEBSITE DEVELOPMENT SERVICES"
-          subtitle="Website Types & Pricing"
-        />
+
+      <div className="service-detail-shell">
+        <header className="service-detail-hero">
+          <img src={websiteHeroImage} alt="" className="service-detail-hero-image" />
+          <div className="service-detail-hero-overlay" aria-hidden="true" />
+          <div className="service-detail-hero-content">
+            <h1 className="service-detail-title">
+              <span className="services-summary-title-black">WEBSITE DEVELOPMENT</span>
+              <span className="services-summary-title-blue">SERVICES</span>
+            </h1>
+            <p className="service-detail-lead">
+              Responsive, SEO-friendly websites that are easy to manage — pick a package and add it to your cart.
+            </p>
+          </div>
+        </header>
+
+        <main className="service-detail-main">
+          <div className="service-detail-grid">
+            {websiteServices.map((service) => (
+              <ServiceDetailCard
+                key={service.title}
+                title={service.title}
+                meta="Website package"
+                description={service.description}
+                price={formatPrice(service.price, '₦')}
+                icon={service.icon}
+                onAddToCart={() => handleAddToCart(service)}
+              />
+            ))}
+          </div>
+
+          <ServiceDetailCard
+            title={startupConsultation.title}
+            meta={startupConsultation.meta}
+            description={startupConsultation.description}
+            price="On request"
+            icon={startupConsultation.icon}
+            feature
+            featureCtaHref={companyWhatsappSessionUrl}
+            featureCtaLabel="Book a session"
+          />
+        </main>
       </div>
-      <div className="container">
-        <div className="services-grid">
-          {websiteServices.map((service, index) => (
-            <div key={index} className="service-card-detailed">
-              <h3 className="service-card-title">{service.title}</h3>
-              <div className="service-card-price">
-                Starting from <span className="price-amount">{formatPrice(service.price, '₦')}</span>
-              </div>
-              <Button 
-                onClick={() => handleAddToCart(service)} 
-                className="order-button"
-              >
-                Add to Cart
-              </Button>
-            </div>
-          ))}
-        </div>
-        <div className="website-description">
-          <p>Our websites are designed to be responsive, SEO-friendly, and easy to manage.</p>
-        </div>
-        <div className="startup-consultation">
-          <h3 className="consultation-title">Startup Consultation</h3>
-          <p className="consultation-description">
-            Starting a business is a <strong>BOLD STEP</strong>, but with our expert guidance, you don't have to tackle this alone - 
-            let's team up and make it easier. At <strong>BLUETICKGENG DEVELOPMENT</strong>, we're your partners in bringing your vision to life.
-          </p>
-          <p className="consultation-description">
-            We will provide the tools and guidance you need to bring your startup dreams to life. Let's work together 
-            to build a strong foundation for your success - because when you succeed, we succeed.
-          </p>
-        </div>
-      </div>
+
       {showCartNotification && (
-        <div className="cart-notification" style={{
-          position: 'fixed',
-          top: '100px',
-          right: '20px',
-          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-          color: '#ffffff',
-          padding: '16px 24px',
-          borderRadius: '8px',
-          boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)',
-          zIndex: 1000,
-          animation: 'slideIn 0.3s ease'
-        }}>
+        <div className="service-detail-cart-notification" role="status">
           Item added to cart!
         </div>
       )}
+
       <Footer />
     </div>
   );
 }
 
 export default WebsiteServicesPage;
-

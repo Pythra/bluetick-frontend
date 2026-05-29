@@ -54,4 +54,20 @@ const convertKToFullNumber = (price) => {
   return price;
 };
 
-export { formatPrice, convertKToFullNumber };
+/**
+ * Extracts numeric amount from formatted price strings for cart/checkout.
+ * @param {string|number} price
+ * @returns {number}
+ */
+const parsePriceToNumber = (price) => {
+  if (typeof price === 'number' && !Number.isNaN(price)) {
+    return price;
+  }
+  if (typeof price === 'string') {
+    const numericValue = price.replace(/[^0-9.]/g, '');
+    return numericValue ? parseInt(numericValue, 10) : 0;
+  }
+  return 0;
+};
+
+export { formatPrice, convertKToFullNumber, parsePriceToNumber };

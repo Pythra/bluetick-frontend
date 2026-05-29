@@ -19,12 +19,16 @@ import {
   IoChevronDown,
   IoChevronUp,
   IoStar,
-  IoChatbubbleEllipses
+  IoChatbubbleEllipses,
+  IoCalendarOutline,
+  IoLinkOutline,
+  IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
 import EditorialGuidelinesSection from '../components/EditorialGuidelinesSection';
+import PublicationFeaturedSplit from '../components/PublicationFeaturedSplit';
 import newsImage from '../assets/news.jpg';
 import techImage from '../assets/tech.jpg';
 import globalImage from '../assets/global.jpg';
@@ -59,31 +63,32 @@ import thisDayLogo from '../assets/platforms/thisday.jpg';
 import tribuneLogo from '../assets/platforms/tribune.png';
 import vanguardLogo from '../assets/platforms/Vanguard.png';
 import './PublicationServicesPage.css';
+import './PublicationServicesPage.editorial.css';
 
 // African News Platforms
 const africanPlatforms = [
   { name: 'Punch', price: '\u20a680000', logo: punchLogo },
   { name: 'BusinessDay', price: '\u20a680000', logo: businessDayLogo },
   { name: 'Legit', price: 'NGN300,000', logo: legitLogo },
-  { name: 'The Nation', price: '\u20a6300000', logo: theNationLogo },
+  { name: 'The Nation', price: '\u20a660000', logo: theNationLogo },
   { name: 'Independent', price: '\u20a620000', logo: independentLogo },
-  { name: 'Vanguard', price: '\u20a620000', logo: vanguardLogo },
-  { name: 'ThisDay', price: '\u20a620000', logo: thisDayLogo },
-  { name: 'SunOnline', price: '\u20a620000', logo: sunOnlineLogo },
+  { name: 'Vanguard', price: '\u20a630000', logo: vanguardLogo },
+  { name: 'ThisDay', price: '\u20a630000', logo: thisDayLogo },
+  { name: 'SunOnline', price: '\u20a630000', logo: sunOnlineLogo },
   { name: 'Daily Telegraph', price: '\u20a620000', logo: telegraphLogo },
-  { name: 'Daily Trust', price: '\u20a620000', logo: dailyTrustLogo },
-  { name: 'Daily Post', price: '\u20a620000', logo: dailyPostLogo },
+  { name: 'Daily Trust', price: '\u20a630000', logo: dailyTrustLogo },
+  { name: 'Daily Post', price: '\u20a630000', logo: dailyPostLogo },
   { name: 'Nairametrics', price: '\u20a630000', logo: nairametricsLogo },
   { name: 'Nairaland', price: '\u20a650000', logo: forbesLogo },
-  { name: 'The Cable', price: '\u20a625000', logo: cableLogo },
-  { name: 'Guardian', price: '\u20a630000', logo: guardianLogo },
-  { name: 'Leadership', price: '\u20a630000', logo: leadershipLogo },
+  { name: 'The Cable', price: '\u20a6300000', logo: cableLogo },
+  { name: 'Guardian', price: '\u20a670000', logo: guardianLogo },
+  { name: 'Leadership', price: '\u20a660000', logo: leadershipLogo },
   { name: 'Tribune', price: '\u20a630000', logo: tribuneLogo },
   { name: 'Champion', price: '\u20a620000', logo: championLogo },
   { name: "People's Daily", price: '\u20a620000', logo: peoplesDailyLogo },
-  { name: 'Blueprint', price: '\u20a620000', logo: blueprintLogo },
+  { name: 'Blueprint', price: '\u20a630000', logo: blueprintLogo },
   { name: 'GhanaWeb', price: 'NGN100,000', logo: ghanaWebLogo },
-  { name: 'Pulse', price: '\u20a620000', logo: pulseLogo },
+  { name: 'Pulse', price: '\u20a6300000', logo: pulseLogo },
   { name: 'OkayAfrican', price: '\u20a62500000', logo: null },
   { name: 'PeaceFm Online', price: '\u20a6800000', logo: null },
   { name: 'B&FT Online', price: '\u20a6800000', logo: null },
@@ -96,7 +101,7 @@ const africanPlatforms = [
 
 // International Platforms
 const internationalPlatforms = [
-  { name: 'Forbes', price: 'NGN 4,500,000', logo: forbesLogo },
+  { name: 'Forbes', price: 'NGN 9,730,000', logo: forbesLogo },
   { name: 'Fox News', price: 'NGN 5,250,000', logo: foxLogo },
   { name: 'BBC News', price: 'NGN 7,950,000', logo: bbcNewsLogo },
   { name: 'Bloomberg', price: 'NGN 3,525,000', logo: bloombergNewsLogo },
@@ -217,8 +222,8 @@ const ukPlatforms = [
 
 // Tech & Startup Platforms
 const techPlatforms = [
-  { name: 'Techpoint', price: 'NGN250,000', logo: techpointLogo },
-  { name: 'TechCabal', price: '\u20a625000', logo: techCabalLogo },
+  { name: 'Techpoint', price: '\u20a6300000', logo: techpointLogo },
+  { name: 'TechCabal', price: '\u20a6300000', logo: techCabalLogo },
   { name: 'Cybersecurity Insiders', price: '\u20a6700000', logo: null },
   { name: 'TechRound', price: '\u20a61600000', logo: null },
   { name: 'Startup Observer', price: '\u20a6500000', logo: null },
@@ -342,6 +347,40 @@ const packages = [
     delivery: '2-7 Working Days',
     categoryId: 'international',
     image: globalImage,
+  },
+];
+
+const additionalPublicationServices = [
+  {
+    id: 'backdate',
+    title: 'Backdating an article',
+    price: '₦50,000',
+    unit: 'per article',
+    description:
+      'Request a past publication date on supported outlets when your announcement needs to align with an earlier milestone.',
+    icon: IoCalendarOutline,
+    accent: 'calendar',
+  },
+  {
+    id: 'links',
+    title: 'Including links in an article',
+    price: '₦100,000',
+    unit: 'per article',
+    description:
+      'Add branded or campaign URLs in the body of the piece where the outlet allows in-article hyperlinks.',
+    icon: IoLinkOutline,
+    accent: 'links',
+  },
+  {
+    id: 'reputation',
+    title: 'Deleting an existing article',
+    subtitle: 'Reputation management',
+    price: '₦500,000',
+    unit: 'per article',
+    description:
+      'Request removal or suppression of a live article that is affecting your brand or public narrative.',
+    icon: IoShieldCheckmarkOutline,
+    accent: 'reputation',
   },
 ];
 
@@ -472,135 +511,230 @@ function PublicationServicesPage() {
     }, 100);
   };
 
+  const scrollToPackages = () => {
+    document.getElementById('publication-packages')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const scrollToHowItWorks = () => {
+    document.getElementById('publication-how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const mastheadStats = [
+    { value: '20,000+', label: 'Media outlets' },
+    { value: '6–24 hrs', label: 'Fast placements' },
+    { value: '5', label: 'Curated packages' },
+    { value: 'Global', label: 'Africa · UK · Tech' },
+  ];
+
   return (
     <div className="publication-page">
       {showCartNotification && (
-        <div className="cart-notification">
+        <div className="publication-toast" role="status">
           Item added to cart!
         </div>
       )}
       <Navbar onScrollToSection={scrollToSection} />
-      
-      {/* Hero Section */}
-      <section
-        className="publication-hero"
-        style={{
-          backgroundImage: `linear-gradient(135deg, rgba(15, 23, 42, 0.55), rgba(30, 64, 175, 0.5)), url(${newsImage})`
-        }}
-      >
-        <div className="hero-container">
-          <h1 className="hero-title">Press Release Distribution Services in Nigeria</h1>
-          <p className="hero-subtitle">
-            Get Your Brand Featured on 20,000+ News Platforms Across Nigeria, Africa, and the Globe - Fast
-          </p>
-          <p className="hero-description">
-            From Punch to Forbes, our press release distribution service gets your brand story guaranteed placements 
-            on top African and international platforms in 24 hours
-          </p>
+
+      <section className="publication-masthead">
+        <div className="publication-masthead-grid container">
+          <div className="publication-masthead-copy">
+            <p className="publication-eyebrow">Bluetickgeng · Press &amp; Media Distribution</p>
+            <h1 className="publication-masthead-title">
+              <span className="publication-masthead-title-line">Press release distribution</span>
+              <span className="publication-masthead-title-accent">across Nigeria, Africa &amp; the world</span>
+            </h1>
+            <p className="publication-masthead-lead">
+              From Punch and Vanguard to Forbes and BBC — we place your story on trusted news platforms with
+              editorial review, live links, and campaign reports you can share with clients and investors.
+            </p>
+            <div className="publication-masthead-actions">
+              <button type="button" className="publication-btn publication-btn-primary" onClick={scrollToPackages}>
+                Browse packages
+              </button>
+              <button type="button" className="publication-btn publication-btn-ghost" onClick={scrollToHowItWorks}>
+                How it works
+              </button>
+            </div>
+            <dl className="publication-masthead-stats">
+              {mastheadStats.map((stat) => (
+                <div key={stat.label} className="publication-stat">
+                  <dt>{stat.value}</dt>
+                  <dd>{stat.label}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+          <div className="publication-masthead-visual" aria-hidden="true">
+            <img src={newsImage} alt="" className="publication-masthead-image" />
+            <div className="publication-masthead-visual-overlay" />
+            <p className="publication-masthead-visual-tag">As seen on leading outlets</p>
+          </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="how-it-works">
+      <section id="publication-packages" className="publication-packages">
         <div className="container">
-          <h2 className="section-title">How it works</h2>
-          <div className="steps-grid">
-            {howItWorks.map((step, index) => {
-              const IconComponent = step.icon;
+          <header className="publication-section-head">
+            <p className="publication-section-kicker">Regional bundles</p>
+            <h2 className="publication-section-title">
+              Choose a publication package
+            </h2>
+            <p className="publication-section-lead">
+              Each bundle targets a media region — African dailies, UK press, Google News, tech outlets, or global
+              tier-one publications. Select a package to view outlets and per-platform pricing.
+            </p>
+          </header>
+          <div className="publication-packages-grid">
+            {packages.map((pkg) => {
+              const category = publicationCategories.find((cat) => cat.id === pkg.categoryId);
               return (
-                <div key={index} className="step-card">
-                  <div className="step-icon-wrapper">
-                    <IconComponent className="step-icon" />
-                    <div className="step-number">Step {step.step}</div>
+                <article
+                  key={pkg.id}
+                  className={`publication-package-card publication-package-card--${pkg.categoryId} ${pkg.popular ? 'is-featured' : ''}`}
+                >
+                  {pkg.popular && <span className="publication-package-ribbon">Most popular</span>}
+                  <div className="publication-package-media">
+                    <img src={pkg.image} alt="" />
+                    {category && (
+                      <span className="publication-package-region">{category.title}</span>
+                    )}
                   </div>
-                  <h3 className="step-title">{step.title}</h3>
-                  <p className="step-description">{step.description}</p>
-                </div>
+                  <div className="publication-package-body">
+                    <p className="publication-package-delivery">
+                      <IoTime aria-hidden="true" />
+                      {pkg.delivery}
+                    </p>
+                    <h3 className="publication-package-name">{pkg.title}</h3>
+                    <p className="publication-package-desc">{pkg.description}</p>
+                    {category?.logos?.length > 0 && (
+                      <div className="publication-package-logos" aria-label="Sample outlets">
+                        {category.logos.slice(0, 6).map((logo) => (
+                          <img key={logo.alt} src={logo.src} alt={logo.alt} />
+                        ))}
+                      </div>
+                    )}
+                    <Button
+                      onClick={() => navigate(`/services/publications/package/${pkg.id}`)}
+                      className="publication-package-cta"
+                    >
+                      View outlets &amp; pricing
+                    </Button>
+                  </div>
+                </article>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* PR Goals Section */}
-      <section className="pr-goals">
+      <PublicationFeaturedSplit />
+
+      <section className="publication-additional-services">
         <div className="container">
-          <h2 className="section-title">What Are Your PR Goals?</h2>
-          <div className="goals-grid">
-            {prGoals.map((goal, index) => {
+          <header className="publication-section-head">
+            <p className="publication-section-kicker">Extras</p>
+            <h2 className="publication-section-title">Additional services &amp; fees</h2>
+            <p className="publication-section-lead">
+              Optional add-ons beyond standard package placement — request these when you submit your
+              press release or during checkout.
+            </p>
+          </header>
+          <div className="publication-addon-grid">
+            {additionalPublicationServices.map((service) => {
+              const IconComponent = service.icon;
+              return (
+                <article
+                  key={service.id}
+                  className={`publication-addon-card publication-addon-card--${service.accent}`}
+                >
+                  <div className="publication-addon-card-icon" aria-hidden="true">
+                    <IconComponent />
+                  </div>
+                  <div className="publication-addon-card-body">
+                    <h3 className="publication-addon-card-title">{service.title}</h3>
+                    {service.subtitle ? (
+                      <p className="publication-addon-card-sub">{service.subtitle}</p>
+                    ) : null}
+                    <p className="publication-addon-card-desc">{service.description}</p>
+                  </div>
+                  <footer className="publication-addon-card-footer">
+                    <span className="publication-addon-price">{service.price}</span>
+                    <span className="publication-addon-unit">{service.unit}</span>
+                  </footer>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section id="publication-how-it-works" className="publication-process">
+        <div className="container">
+          <header className="publication-section-head publication-section-head--center">
+            <p className="publication-section-kicker">Simple workflow</p>
+            <h2 className="publication-section-title">How it works</h2>
+          </header>
+          <ol className="publication-process-steps">
+            {howItWorks.map((step) => {
+              const IconComponent = step.icon;
+              return (
+                <li key={step.step} className="publication-process-step">
+                  <span className="publication-process-step-num">{step.step}</span>
+                  <div className="publication-process-step-icon">
+                    <IconComponent aria-hidden="true" />
+                  </div>
+                  <div className="publication-process-step-copy">
+                    <h3>{step.title}</h3>
+                    <p>{step.description}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      </section>
+
+      <section className="publication-goals">
+        <div className="container">
+          <header className="publication-section-head">
+            <p className="publication-section-kicker">Campaign objectives</p>
+            <h2 className="publication-section-title">What are your PR goals?</h2>
+            <p className="publication-section-lead">
+              Whether you need local buzz, tech credibility, or global authority — we match your story to the right
+              outlets.
+            </p>
+          </header>
+          <div className="publication-goals-grid">
+            {prGoals.map((goal) => {
               const IconComponent = goal.icon;
               return (
-                <div key={index} className="goal-card">
-                  <IconComponent className="goal-icon" />
-                  <h3 className="goal-title">{goal.title}</h3>
-                  <p className="goal-subtitle">{goal.subtitle}</p>
-                  <ul className="goal-features">
-                    {goal.features.map((feature, idx) => (
-                      <li key={idx}>
-                        <IoCheckmarkCircle className="feature-check" />
+                <article key={goal.title} className="publication-goal-card">
+                  <IconComponent className="publication-goal-icon" aria-hidden="true" />
+                  <h3>{goal.title}</h3>
+                  <p className="publication-goal-sub">{goal.subtitle}</p>
+                  <ul>
+                    {goal.features.map((feature) => (
+                      <li key={feature}>
+                        <IoCheckmarkCircle aria-hidden="true" />
                         {feature}
                       </li>
                     ))}
                   </ul>
-                </div>
+                </article>
               );
             })}
           </div>
         </div>
       </section>
-
-      {/* Packages Section */}
-      <section className="publication-packages">
-        <div className="container">
-          <h2 className="section-title">Choose PR Packages That Fit Your Needs</h2>
-          <div className="packages-grid">
-            {packages.map((pkg) => {
-              const category = publicationCategories.find((cat) => cat.id === pkg.categoryId);
-              return (
-                <div key={pkg.id} className={`package-card ${pkg.popular ? 'popular' : ''}`}>
-                  {pkg.popular && <div className="popular-badge">MOST POPULAR</div>}
-                  <div className="package-card-media">
-                    <img src={pkg.image} alt={`${pkg.title} visual`} />
-                    {category && <span className="package-category-pill">{category.title}</span>}
-                  </div>
-                  <h3 className="package-title">{pkg.title}</h3>
-                  <div className="package-delivery">Delivery: {pkg.delivery}</div>
-                  <p className="package-description">{pkg.description}</p>
-                  {category && category.logos && category.logos.length > 0 && (
-                    <div className="package-logo-strip">
-                      <div className="package-logo-track">
-                        {[...category.logos, ...category.logos].map((logo, index) => (
-                          <div
-                            key={`${pkg.id}-${logo.alt}-${index}`}
-                            className="package-logo-chip"
-                          >
-                            <img src={logo.src} alt={logo.alt} />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <Button 
-                    onClick={() => navigate(`/services/publications/package/${pkg.id}`)} 
-                    className="package-button"
-                  >
-                    Select Package
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Price List Section moved to individual category pages */}
 
       <EditorialGuidelinesSection />
 
-      {/* Guidelines & Policies Section */}
-      <section className="guidelines-section">
+      <section className="publication-policies">
         <div className="container">
-          <h2 className="section-title">Publication Guidelines & Policies</h2>
+          <header className="publication-section-head">
+            <p className="publication-section-kicker">Before you publish</p>
+            <h2 className="publication-section-title">Guidelines &amp; policies</h2>
+          </header>
           
           <div className="guidelines-warning">
             <p className="warning-text">
@@ -643,34 +777,18 @@ function PublicationServicesPage() {
               </div>
             </div>
           </div>
-
-          <div className="additional-services">
-            <h3 className="additional-services-title">Additional Services & Fees</h3>
-            <div className="services-list">
-              <div className="service-fee-item">
-                <span className="service-name">Backdating an article</span>
-                <span className="service-price">NGN50,000 per article</span>
-              </div>
-              <div className="service-fee-item">
-                <span className="service-name">Including links in an article</span>
-                <span className="service-price">NGN100,000 per article</span>
-              </div>
-              <div className="service-fee-item">
-                <span className="service-name">Deleting already existing article (Reputation management)</span>
-                <span className="service-price">NGN500,000 per article</span>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
       {/* Price List Section moved to individual category pages */}
 
-      {/* Testimonials Section */}
-      <section className="testimonials-section">
+      <section className="publication-testimonials">
         <div className="container">
-          <h2 className="section-title">What Our Clients Say</h2>
-          <div className="testimonial-grid">
+          <header className="publication-section-head publication-section-head--center">
+            <p className="publication-section-kicker">Client stories</p>
+            <h2 className="publication-section-title">What our clients say</h2>
+          </header>
+          <div className="publication-testimonials-grid">
             <TestimonialCard
               name="Michael Adebayo"
               role="Founder, FinTech Solutions"
@@ -713,22 +831,18 @@ function PublicationServicesPage() {
 // Testimonial Card Component
 function TestimonialCard({ name, role, content, rating }) {
   return (
-    <div className="testimonial-card">
-      <div className="testimonial-content">
-        <p className="testimonial-text">"{content}"</p>
-        <div className="testimonial-rating">
-          {[...Array(5)].map((_, i) => (
-            <span key={i} className={i < rating ? 'star filled' : 'star'}>
-              {i < rating ? '★' : '☆'}
-            </span>
-          ))}
-        </div>
+    <blockquote className="publication-quote-card">
+      <div className="publication-quote-stars" aria-label={`${rating} out of 5 stars`}>
+        {[...Array(5)].map((_, i) => (
+          <IoStar key={i} className={i < rating ? 'is-filled' : ''} aria-hidden="true" />
+        ))}
       </div>
-      <div className="testimonial-author">
-        <h4 className="author-name">{name}</h4>
-        <p className="author-role">{role}</p>
-      </div>
-    </div>
+      <p>&ldquo;{content}&rdquo;</p>
+      <footer>
+        <cite>{name}</cite>
+        <span>{role}</span>
+      </footer>
+    </blockquote>
   );
 }
 
