@@ -34,7 +34,6 @@ import ArticleSubmissionPage from './pages/ArticleSubmissionPage';
 import AdminPage from './pages/AdminPage';
 import AdminApp from './admin/AdminApp';
 import Footer from './components/Footer';
-import { useAuth } from './contexts/AuthContext';
 import TermsAndConditions from './pages/legal/TermsAndConditions';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import RefundPolicy from './pages/legal/RefundPolicy';
@@ -135,17 +134,12 @@ function App() {
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
             </Routes>
-            <CartIconWrapper />
+            <CartIcon />
           </div>
         </Router>
       </CartProvider>
     </AuthProvider>
   );
-}
-
-function CartIconWrapper() {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <CartIcon /> : null;
 }
 
 export default App;

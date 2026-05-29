@@ -73,6 +73,10 @@
 
 .package-platforms-panel {
   margin-bottom: 1.5rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .package-platforms-panel .publication-section-title {

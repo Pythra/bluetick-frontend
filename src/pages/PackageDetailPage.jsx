@@ -371,7 +371,7 @@ function PackageDetailPage() {
           <p className="package-detail-description">{packageData.description}</p>
         </header>
 
-        <div className="publication-process-card package-platforms-panel">
+        <section className="package-platforms-panel">
           <h2 className="publication-section-title">
             {meta?.listTitle ?? 'Select outlets'}
           </h2>
@@ -398,7 +398,7 @@ function PackageDetailPage() {
               );
             })}
           </div>
-        </div>
+        </section>
 
         {packageData.note ? (
           <div className="package-detail-note">
