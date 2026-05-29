@@ -28,6 +28,7 @@ import WikipediaServicesPage from './pages/WikipediaServicesPage';
 import PackageDetailPage from './pages/PackageDetailPage';
 import SignUpPage from './pages/SignUpPage';
 import LoginPage from './pages/LoginPage';
+import MyAccountPage from './pages/MyAccountPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ArticleSubmissionPage from './pages/ArticleSubmissionPage';
 import AdminPage from './pages/AdminPage';
@@ -123,6 +124,7 @@ function App() {
               <Route path="/services/wikipedia" element={<WikipediaServicesPage />} />
               <Route path="/signup" element={<SignUpPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/account" element={<MyAccountPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/article-submission" element={<ArticleSubmissionPage />} />
               <Route path="/admin" element={<AdminApp />} />

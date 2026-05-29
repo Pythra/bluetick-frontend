@@ -1,0 +1,243 @@
+.my-account-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  font-family: 'Poppins', 'Inter', sans-serif;
+}
+
+.my-account-main {
+  flex: 1;
+  padding: 5.5rem 1.25rem 3rem;
+}
+
+.my-account-container {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.my-account-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 1.25rem;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.my-account-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #2563eb;
+}
+
+.my-account-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.my-account-lead {
+  margin: 0 0 2rem;
+  max-width: 36rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #475569;
+}
+
+.my-account-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.my-account-card {
+  padding: 1.35rem 1.25rem 1.5rem;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.04),
+    0 8px 24px rgba(37, 99, 235, 0.08),
+    0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.my-account-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.15rem;
+}
+
+.my-account-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 1.25rem;
+}
+
+.my-account-card-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.my-account-details {
+  margin: 0;
+}
+
+.my-account-detail-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.my-account-detail-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.my-account-detail-row dt {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.my-account-detail-row dd {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.my-account-card-text {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.my-account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.my-account-btn-primary.btn,
+.my-account-btn-secondary.btn {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.my-account-btn-primary.btn {
+  background: #0f172a;
+  color: #fff;
+}
+
+.my-account-btn-primary.btn::before,
+.my-account-btn-secondary.btn::before {
+  display: none;
+}
+
+.my-account-btn-primary.btn:hover {
+  background: #1e293b;
+}
+
+.my-account-btn-secondary.btn {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.my-account-btn-secondary.btn:hover {
+  background: #dbeafe;
+}
+
+.my-account-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.my-account-logout:hover {
+  color: #dc2626;
+}
+
+.my-account-help {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #64748b;
+}
+
+.my-account-help a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.my-account-help a:hover {
+  text-decoration: underline;
+}
+
+.my-account-back {
+  margin: 1.75rem 0 0;
+  font-size: 0.9rem;
+}
+
+.my-account-back a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.my-account-back a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .my-account-main {
+    padding-top: 4.75rem;
+  }
+
+  .my-account-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .my-account-detail-row {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+}

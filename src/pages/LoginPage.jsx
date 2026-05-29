@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -7,6 +7,7 @@ import './AuthPage.css';
 
 function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -36,7 +37,8 @@ function LoginPage() {
 
     try {
       await login(formData.email, formData.password);
-      navigate('/');
+      const redirectTo = location.state?.from || '/account';
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || 'Failed to login. Please check your credentials.');
     } finally {

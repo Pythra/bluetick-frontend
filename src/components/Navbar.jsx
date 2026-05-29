@@ -34,7 +34,7 @@ function Navbar({ onScrollToSection }) {
         </div>
         <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
           <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('landing'))}>
-            About Bluetick
+            About Us
           </button>
           <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('publication-services'))}>
             PR Agencies
@@ -48,7 +48,7 @@ function Navbar({ onScrollToSection }) {
           <button
             type="button"
             className="navbar-link"
-            onClick={() => handleAction(() => navigate(isAuthenticated ? '/checkout' : '/login'))}
+            onClick={() => handleAction(() => navigate(isAuthenticated ? '/account' : '/login'))}
             title={isAuthenticated ? user?.email || 'My Account' : 'My Account'}
           >
             My Account

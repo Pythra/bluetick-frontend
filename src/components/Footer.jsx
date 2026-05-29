@@ -50,7 +50,7 @@ function Footer({ onScrollToSection }) {
             <ul className="footer-links">
               <li>
                 <a href="#landing" onClick={(e) => { e.preventDefault(); onScrollToSection('landing'); }}>
-                  About Bluetickgeng
+                  About Us
                 </a>
               </li>
               <li>
@@ -68,7 +68,7 @@ function Footer({ onScrollToSection }) {
                 <Link to="/signup">Affiliate Program</Link>
               </li>
               <li>
-                <Link to="/login">My Account</Link>
+                <Link to="/account">My Account</Link>
               </li>
             </ul>
           </div>
