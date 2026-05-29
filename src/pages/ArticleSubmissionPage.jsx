@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { IoDocumentTextOutline, IoCloudUploadOutline } from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
@@ -10,9 +11,10 @@ import './ArticleSubmissionPage.css';
 function ArticleSubmissionPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated, apiUrl, authFetch } = useAuth();
   const { cartItems } = useCart();
-  
+
   const [formData, setFormData] = useState({
     postTitle: '',
     postBody: '',
@@ -20,63 +22,109 @@ function ArticleSubmissionPage() {
     file: null,
     fileName: '',
     images: [],
-    imageFiles: []
+    imageFiles: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
   const [error, setError] = useState('');
+  const [orderFromLink, setOrderFromLink] = useState(null);
+  const [loadingOrder, setLoadingOrder] = useState(false);
 
-  // Get order details from navigation state or cart
+  const orderIdFromQuery = searchParams.get('orderId');
   const orderDetails = location.state || {};
-  const isPublication = cartItems.some(item => item.category === 'publication');
+  const resolvedOrderId = orderDetails.orderId || orderIdFromQuery;
+  const displayItems =
+    cartItems.length > 0 ? cartItems : orderFromLink?.cartItems || [];
+  const isPublication =
+    displayItems.some((item) => item.category === 'publication') ||
+    orderFromLink?.cartItems?.some((item) => item.category === 'publication');
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      const returnPath = `${location.pathname}${location.search}`;
+      navigate('/login', { state: { from: returnPath } });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, location.pathname, location.search]);
+
+  useEffect(() => {
+    if (!orderIdFromQuery || !isAuthenticated) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadOrder = async () => {
+      setLoadingOrder(true);
+      setError('');
+      try {
+        const response = await authFetch(`${apiUrl}/api/orders/${orderIdFromQuery}`);
+        const data = await response.json();
+        if (!response.ok || !data.success || !data.order) {
+          throw new Error(data.error || 'Unable to load order details');
+        }
+        if (data.order.paymentStatus !== 'paid') {
+          throw new Error('This order is still awaiting payment confirmation.');
+        }
+        if (!cancelled) {
+          setOrderFromLink(data.order);
+        }
+      } catch (loadError) {
+        if (!cancelled) {
+          setError(loadError.message || 'Unable to load order details.');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingOrder(false);
+        }
+      }
+    };
+
+    loadOrder();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [orderIdFromQuery, isAuthenticated, apiUrl, authFetch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        file: file,
-        fileName: file.name
+        file,
+        fileName: file.name,
       }));
     }
   };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    
-    // Limit to 2 images
+
     if (files.length + formData.images.length > 2) {
       setError('Maximum 2 images allowed');
       return;
     }
 
-    files.forEach(file => {
+    files.forEach((file) => {
       if (!file.type.startsWith('image/')) {
         setError('Only image files are allowed');
         return;
       }
 
-      // Create preview URL
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData(prev => ({
+      reader.onload = (event) => {
+        setFormData((prev) => ({
           ...prev,
-          images: [...prev.images, e.target.result],
-          imageFiles: [...prev.imageFiles, file]
+          images: [...prev.images, event.target.result],
+          imageFiles: [...prev.imageFiles, file],
         }));
       };
       reader.readAsDataURL(file);
@@ -84,23 +132,31 @@ function ArticleSubmissionPage() {
   };
 
   const removeImage = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
-      imageFiles: prev.imageFiles.filter((_, i) => i !== index)
+      imageFiles: prev.imageFiles.filter((_, i) => i !== index),
     }));
+  };
+
+  const handleBack = () => {
+    if (cartItems.length > 0) {
+      navigate('/checkout');
+      return;
+    }
+    navigate('/account');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!isPublication && !formData.postTitle.trim()) {
-      setError('Please enter a post title');
+
+    if (!formData.postTitle.trim()) {
+      setError(isPublication ? 'Please enter a headline for your press release' : 'Please enter a post title');
       return;
     }
-    
+
     if (!formData.postBody.trim()) {
-      setError('Please enter the post body/content');
+      setError('Please enter the article body');
       return;
     }
 
@@ -115,10 +171,10 @@ function ArticleSubmissionPage() {
           postTitle: formData.postTitle.trim(),
           postBody: formData.postBody.trim(),
           articleContent: formData.articleContent.trim(),
-          orderId: orderDetails.orderId,
+          orderId: resolvedOrderId,
           serviceType: isPublication ? 'publication' : 'other',
-          cartItems: cartItems,
-          fileName: formData.fileName
+          cartItems: displayItems,
+          fileName: formData.fileName,
         }),
       });
 
@@ -129,15 +185,13 @@ function ArticleSubmissionPage() {
       }
 
       setSubmitStatus('success');
-      
-      // Clear cart after successful submission
+
       setTimeout(() => {
         navigate('/');
       }, 3000);
-
-    } catch (error) {
-      console.error('Article submission error:', error);
-      setError(error.message || 'Failed to submit article. Please try again.');
+    } catch (submitError) {
+      console.error('Article submission error:', submitError);
+      setError(submitError.message || 'Failed to submit article. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -147,232 +201,275 @@ function ArticleSubmissionPage() {
     return null;
   }
 
-  return (
-    <>
-      <Navbar />
+  if (loadingOrder) {
+    return (
       <div className="article-submission-page">
-        <div className="submission-container">
-          <h1>
-            {isPublication 
-              ? 'Submit Your Article for Publication' 
-              : 'Submit Your Instructions'
-            }
-          </h1>
-          
-          <div className="order-info">
-            <h3>Order Summary</h3>
-            <div className="cart-items-summary">
-              {cartItems.map((item, index) => (
-                <div key={index} className="summary-item">
-                  <span className="item-title">{item.title}</span>
-                  <span className="item-price">{item.price}</span>
-                </div>
-              ))}
-            </div>
+        <Navbar />
+        <main className="article-submission-main">
+          <div className="article-submission-shell">
+            <p className="article-submission-loading">Loading your order…</p>
           </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
-          <form onSubmit={handleSubmit} className="submission-form">
-            {!isPublication && (
-              <div className="form-group">
-                <label htmlFor="postTitle">Post Title *</label>
-                <input
-                  type="text"
-                  id="postTitle"
-                  name="postTitle"
-                  value={formData.postTitle}
-                  onChange={handleInputChange}
-                  placeholder="Enter your post title"
-                  className="form-control"
-                  required
-                />
-              </div>
-            )}
+  const publicationGuidelines = [
+    'Use a clear headline and lead paragraph — who, what, when, where, why.',
+    'Keep paragraphs short (2–4 sentences) for easy reading on news sites.',
+    'Include quotes, names, and titles where relevant.',
+    'Paste plain text or upload a .doc / .pdf if you already have a formatted release.',
+    'Our team may lightly edit for outlet style before publication.',
+  ];
 
-            <div className="form-group">
-              <label htmlFor="postBody">
-                {isPublication ? 'Article Content (Press Release)' : 'Post Body/Content *'}
-              </label>
-              <textarea
-                id="postBody"
-                name="postBody"
-                value={formData.postBody}
-                onChange={handleInputChange}
-                placeholder={
-                  isPublication 
-                    ? 'Enter your press release or article content here. Include headline, body text, and any relevant details...'
-                    : 'Enter the main content of your post...'
-                }
-                rows={10}
-                className="article-textarea"
-                required
-              />
-            </div>
+  const generalGuidelines = [
+    'Be specific about what you want published or delivered.',
+    'Include links, names, and deadlines in the notes field if needed.',
+    'Upload a document if your brief is longer than the text box.',
+  ];
 
-            <div className="form-group">
-              <label htmlFor="articleContent">
-                {isPublication ? 'Additional Notes' : 'Additional Instructions'}
-              </label>
-              <textarea
-                id="articleContent"
-                name="articleContent"
-                value={formData.articleContent}
-                onChange={handleInputChange}
-                placeholder="Any additional notes or instructions for our team..."
-                rows={5}
-                className="article-textarea"
-              />
-              <small className="form-help">
-                {isPublication 
-                  ? 'Include any specific requirements or notes for our editorial team.'
-                  : 'Add any special instructions or requirements for your post.'
-                }
-              </small>
-            </div>
+  return (
+    <div className="article-submission-page">
+      <Navbar />
 
-            <div className="form-group file-upload-container">
-              <label>Upload Document (Optional)</label>
-              <div className="file-upload-wrapper">
-                <input
-                  type="file"
-                  id="file-upload"
-                  onChange={handleFileChange}
-                  className="file-upload-input"
-                  accept=".doc,.docx,.pdf,.txt"
-                />
-                <label htmlFor="file-upload" className="file-upload-label">
-                  {formData.fileName || 'Choose a file...'}
-                </label>
-                {formData.fileName && (
-                  <span className="file-upload-clear" onClick={() => setFormData(prev => ({ ...prev, file: null, fileName: '' }))}>
-                    ×
-                  </span>
-                )}
-              </div>
-              <small className="form-help">Supported formats: .doc, .docx, .pdf, .txt (Max 10MB)</small>
-            </div>
+      <main className="article-submission-main">
+        <div className="article-submission-shell">
+          <header className="article-submission-header">
+            <p className="article-submission-kicker">
+              {isPublication ? 'Press release submission' : 'Order instructions'}
+            </p>
+            <h1 className="article-submission-title">
+              {isPublication
+                ? 'Submit your article for publication'
+                : 'Submit your instructions'}
+            </h1>
+            <p className="article-submission-lead">
+              {isPublication
+                ? 'Send your headline, body copy, and any files. We will review and distribute to the outlets in your order.'
+                : 'Tell us exactly what you need so our team can complete your order.'}
+            </p>
+          </header>
 
-            <div className="form-group file-upload-container">
-              <label>Upload Images (Optional - Max 2 images)</label>
-              <div className="file-upload-wrapper">
-                <input
-                  type="file"
-                  id="image-upload"
-                  onChange={handleImageChange}
-                  className="file-upload-input"
-                  accept="image/*"
-                  multiple
-                  disabled={formData.images.length >= 2}
-                />
-                <label htmlFor="image-upload" className="file-upload-label">
-                  {formData.images.length >= 2 ? 'Maximum images reached' : `Choose image${formData.images.length > 0 ? 's' : ''}...`}
-                </label>
-              </div>
-              <small className="form-help">Supported formats: JPG, PNG, GIF, WebP (Max 2 images)</small>
-              
-              {formData.images.length > 0 && (
-                <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '12px' }}>
-                  {formData.images.map((image, index) => (
-                    <div key={index} style={{ position: 'relative', borderRadius: '6px', overflow: 'hidden', backgroundColor: '#f0f0f0' }}>
-                      <img 
-                        src={image} 
-                        alt={`Preview ${index + 1}`} 
-                        style={{ width: '100%', height: '100px', objectFit: 'cover' }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        style={{
-                          position: 'absolute',
-                          top: '4px',
-                          right: '4px',
-                          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '24px',
-                          height: '24px',
-                          cursor: 'pointer',
-                          fontSize: '14px',
-                          lineHeight: '1',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        ×
-                      </button>
-                    </div>
+          <div className="article-submission-layout">
+            <aside className="article-submission-sidebar">
+              <section className="article-panel article-order-panel">
+                <h2>Order summary</h2>
+                <ul className="article-order-list">
+                  {displayItems.length > 0 ? (
+                    displayItems.map((item, index) => (
+                      <li key={`${item.title}-${index}`}>
+                        <span>{item.title}</span>
+                        <strong>{item.price}</strong>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="article-order-empty">No items in this order.</li>
+                  )}
+                </ul>
+              </section>
+
+              <section className="article-panel article-guidelines-panel">
+                <h2>{isPublication ? 'Formatting tips' : 'Guidelines'}</h2>
+                <ul>
+                  {(isPublication ? publicationGuidelines : generalGuidelines).map((tip) => (
+                    <li key={tip}>{tip}</li>
                   ))}
+                </ul>
+              </section>
+            </aside>
+
+            <div className="article-submission-content">
+              {error && !submitStatus && (
+                <div className="article-alert article-alert-error" role="alert">
+                  {error}
                 </div>
               )}
+
+              {submitStatus === 'success' ? (
+                <div className="article-alert article-alert-success">
+                  <h3>Submission received</h3>
+                  <p>
+                    {isPublication
+                      ? 'Our editorial team will review your press release and proceed with placement on your selected platforms.'
+                      : 'Our team will review your instructions and proceed with your order.'}
+                  </p>
+                  <p className="article-alert-note">Redirecting you to the homepage…</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="article-form">
+                  <section className="article-form-section">
+                    <div className="article-form-section-head">
+                      <IoDocumentTextOutline aria-hidden="true" />
+                      <div>
+                        <h2>{isPublication ? 'Press release content' : 'Post details'}</h2>
+                        <p>Headline and main body text for your submission.</p>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="postTitle">
+                        {isPublication ? 'Headline *' : 'Post title *'}
+                      </label>
+                      <input
+                        type="text"
+                        id="postTitle"
+                        name="postTitle"
+                        value={formData.postTitle}
+                        onChange={handleInputChange}
+                        placeholder={
+                          isPublication
+                            ? 'e.g. Acme launches new payment product in Lagos'
+                            : 'Enter your post title'
+                        }
+                        className="form-control"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="postBody">
+                        {isPublication ? 'Article body *' : 'Post body *'}
+                      </label>
+                      <textarea
+                        id="postBody"
+                        name="postBody"
+                        value={formData.postBody}
+                        onChange={handleInputChange}
+                        placeholder={
+                          isPublication
+                            ? 'Write your full press release here. Start with a strong opening paragraph, then add supporting details, quotes, and a boilerplate about your company if needed.'
+                            : 'Enter the main content of your post…'
+                        }
+                        rows={12}
+                        className="article-textarea"
+                        required
+                      />
+                      <small className="form-help">
+                        {isPublication
+                          ? 'Plain text is fine. Use line breaks between paragraphs.'
+                          : 'Include all content you want our team to use.'}
+                      </small>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="articleContent">
+                        {isPublication ? 'Editorial notes' : 'Additional instructions'}
+                      </label>
+                      <textarea
+                        id="articleContent"
+                        name="articleContent"
+                        value={formData.articleContent}
+                        onChange={handleInputChange}
+                        placeholder="Preferred outlets, embargo dates, contact details, link preferences…"
+                        rows={4}
+                        className="article-textarea article-textarea-compact"
+                      />
+                    </div>
+                  </section>
+
+                  <section className="article-form-section">
+                    <div className="article-form-section-head">
+                      <IoCloudUploadOutline aria-hidden="true" />
+                      <div>
+                        <h2>Files &amp; images</h2>
+                        <p>Optional uploads to support your submission.</p>
+                      </div>
+                    </div>
+
+                    <div className="form-group file-upload-container">
+                      <label htmlFor="file-upload">Document (optional)</label>
+                      <div className="file-upload-wrapper">
+                        <input
+                          type="file"
+                          id="file-upload"
+                          onChange={handleFileChange}
+                          className="file-upload-input"
+                          accept=".doc,.docx,.pdf,.txt"
+                        />
+                        <label htmlFor="file-upload" className="file-upload-label">
+                          {formData.fileName || 'Choose .doc, .docx, .pdf, or .txt'}
+                        </label>
+                        {formData.fileName && (
+                          <button
+                            type="button"
+                            className="file-upload-clear"
+                            onClick={() => setFormData((prev) => ({ ...prev, file: null, fileName: '' }))}
+                            aria-label="Remove file"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="form-group file-upload-container">
+                      <label htmlFor="image-upload">Images (optional, max 2)</label>
+                      <div className="file-upload-wrapper">
+                        <input
+                          type="file"
+                          id="image-upload"
+                          onChange={handleImageChange}
+                          className="file-upload-input"
+                          accept="image/*"
+                          multiple
+                          disabled={formData.images.length >= 2}
+                        />
+                        <label htmlFor="image-upload" className="file-upload-label">
+                          {formData.images.length >= 2
+                            ? 'Maximum images reached'
+                            : 'Choose JPG, PNG, GIF, or WebP'}
+                        </label>
+                      </div>
+
+                      {formData.images.length > 0 && (
+                        <div className="article-image-previews">
+                          {formData.images.map((image, index) => (
+                            <div key={index} className="article-image-preview">
+                              <img src={image} alt={`Upload preview ${index + 1}`} />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(index)}
+                                aria-label={`Remove image ${index + 1}`}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
+                  <div className="form-actions">
+                    <Button type="button" variant="secondary" onClick={handleBack} className="cancel-btn">
+                      {cartItems.length > 0 ? 'Back to checkout' : 'Back to account'}
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={
+                        isSubmitting ||
+                        !formData.postBody.trim() ||
+                        !formData.postTitle.trim()
+                      }
+                      className="submit-btn"
+                    >
+                      {isSubmitting
+                        ? 'Submitting…'
+                        : isPublication
+                          ? 'Submit for publication'
+                          : 'Submit instructions'}
+                    </Button>
+                  </div>
+                </form>
+              )}
             </div>
-
-            {error && (
-              <div className="error-message">
-                {error}
-              </div>
-            )}
-
-            {submitStatus === 'success' ? (
-              <div className="success-message">
-                <h3>Submission Successful!</h3>
-                <p>
-                  {isPublication 
-                    ? 'Your article has been submitted successfully. Our editorial team will review it and proceed with publication on your selected platforms.'
-                    : 'Your instructions have been submitted successfully. Our team will review them and proceed with your order.'
-                  }
-                </p>
-                <p>You will be redirected to the homepage shortly...</p>
-              </div>
-            ) : (
-              <div className="form-actions">
-                <Button 
-                  type="button" 
-                  variant="secondary" 
-                  onClick={() => navigate('/checkout')}
-                  className="cancel-btn"
-                >
-                  Back to Checkout
-                </Button>
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting || !formData.postBody.trim() || (!isPublication && !formData.postTitle.trim())}
-                  className="submit-btn"
-                >
-                  {isSubmitting 
-                    ? 'Submitting...' 
-                    : isPublication 
-                      ? 'Submit Article' 
-                      : 'Submit Post'
-                  }
-                </Button>
-              </div>
-            )}
-          </form>
-
-          <div className="guidelines">
-            <h3>Guidelines</h3>
-            {isPublication ? (
-              <ul>
-                <li>Ensure your press release is newsworthy and relevant</li>
-                <li>Include a compelling headline that summarizes your story</li>
-                <li>Provide detailed body content with key information</li>
-                <li>Double-check all facts and figures before submission</li>
-                <li>Our editorial team may make minor adjustments to meet platform requirements</li>
-              </ul>
-            ) : (
-              <ul>
-                <li>Be as specific as possible about your requirements</li>
-                <li>Include any preferences or special instructions</li>
-                <li>Provide contact information if additional clarification is needed</li>
-                <li>Our team will review your instructions and proceed accordingly</li>
-              </ul>
-            )}
           </div>
         </div>
-      </div>
+      </main>
+
       <Footer />
-    </>
+    </div>
   );
 }
 

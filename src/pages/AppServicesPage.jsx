@@ -18,6 +18,7 @@ import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
 import appHeroImage from '../assets/app.png';
+import appHeroVideo from '../assets/app.mp4';
 import './ServiceDetailPage.css';
 
 const appServices = [
@@ -129,7 +130,16 @@ function AppServicesPage() {
 
       <div className="service-detail-shell">
         <header className="service-detail-hero">
-          <img src={appHeroImage} alt="" className="service-detail-hero-image" />
+          <video
+            className="service-detail-hero-image"
+            src={appHeroVideo}
+            poster={appHeroImage}
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-hidden="true"
+          />
           <div className="service-detail-hero-overlay" aria-hidden="true" />
           <div className="service-detail-hero-content">
             <h1 className="service-detail-title">

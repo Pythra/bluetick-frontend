@@ -1,59 +1,80 @@
-/* Mobile-only floating cart — rendered globally from App.jsx */
+/* Floating cart — portaled to document.body from App.jsx */
 .cart-icon-button {
-  display: none;
+  position: fixed;
+  right: calc(1.25rem + env(safe-area-inset-right, 0px));
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow:
+    0 4px 20px rgba(59, 130, 246, 0.45),
+    0 2px 8px rgba(15, 23, 42, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
+}
+
+.cart-icon-button:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 6px 24px rgba(59, 130, 246, 0.5),
+    0 4px 12px rgba(15, 23, 42, 0.14);
+}
+
+.cart-icon-button:active {
+  transform: scale(0.96);
+}
+
+.cart-icon {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #ec4899;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  line-height: 1;
+  border: 2px solid #ffffff;
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
   .cart-icon-button {
-    position: fixed;
-    right: max(1rem, env(safe-area-inset-right, 0px));
-    bottom: max(1.15rem, env(safe-area-inset-bottom, 0px));
-    z-index: 1100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 56px;
     height: 56px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: #ffffff;
-    cursor: pointer;
-    box-shadow:
-      0 4px 20px rgba(59, 130, 246, 0.45),
-      0 2px 8px rgba(15, 23, 42, 0.12);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .cart-icon-button:active {
-    transform: scale(0.96);
+    right: calc(1rem + env(safe-area-inset-right, 0px));
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   }
 
   .cart-icon {
     width: 24px;
     height: 24px;
-  }
-
-  .cart-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 999px;
-    background: #ec4899;
-    color: #ffffff;
-    font-size: 0.7rem;
-    font-weight: 700;
-    font-family: 'Inter', sans-serif;
-    line-height: 1;
-    border: 2px solid #ffffff;
-    box-sizing: border-box;
   }
 }

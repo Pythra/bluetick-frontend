@@ -27,6 +27,7 @@ function CheckoutPage() {
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('');
   const [paymentError, setPaymentError] = useState('');
+  const [bankSuccessMessage, setBankSuccessMessage] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -103,14 +104,25 @@ function CheckoutPage() {
     !priceSummary.hasMixedCurrencies &&
     priceSummary.invalidItems.length === 0;
 
-  const redirectAfterOrder = useCallback(
+  const redirectAfterPaystackSuccess = useCallback(
     (orderId, items) => {
       const hasPublicationItems = items.some((item) => item.category === 'publication');
-      navigate('/article-submission', {
+
+      if (hasPublicationItems) {
+        navigate('/article-submission', {
+          state: {
+            orderId,
+            serviceType: 'publication',
+            cartItems: items,
+          },
+        });
+        return;
+      }
+
+      navigate('/account', {
         state: {
           orderId,
-          serviceType: hasPublicationItems ? 'publication' : 'other',
-          cartItems: items,
+          paymentSuccess: true,
         },
       });
     },
@@ -187,7 +199,7 @@ function CheckoutPage() {
         }
 
         if (data.verified) {
-          setPaymentStatus('success');
+          setPaymentStatus('paystack-success');
           setPaymentReference('');
           setPaymentUrl('');
 
@@ -198,8 +210,8 @@ function CheckoutPage() {
           }
 
           setTimeout(() => {
-            redirectAfterOrder(data.orderId, cartSnapshot);
-          }, 1500);
+            redirectAfterPaystackSuccess(data.orderId, cartSnapshot);
+          }, 1200);
         } else if (!isAutomatic) {
           setPaymentError('Payment not confirmed yet. Complete checkout in Paystack and try again.');
         }
@@ -211,7 +223,7 @@ function CheckoutPage() {
         setIsVerifyingPayment(false);
       }
     },
-    [apiUrl, authFetch, cartItems, fetchCart, isVerifyingPayment, paymentReference, redirectAfterOrder]
+    [apiUrl, authFetch, cartItems, fetchCart, isVerifyingPayment, paymentReference, redirectAfterPaystackSuccess]
   );
 
   useEffect(() => {
@@ -231,7 +243,11 @@ function CheckoutPage() {
 
     setPaymentError('');
     setPaymentStatus('');
+    setBankSuccessMessage('');
     setIsClaimingPayment(true);
+
+    const cartSnapshot = [...cartItems];
+    const hasPublicationItems = cartSnapshot.some((item) => item.category === 'publication');
 
     try {
       const response = await authFetch(`${apiUrl}/api/payments/bank-transfer/claim`, {
@@ -249,14 +265,12 @@ function CheckoutPage() {
         throw new Error(data.error || 'Unable to submit payment claim.');
       }
 
-      setPaymentStatus('success');
-
-      setTimeout(() => {
-        redirectAfterOrder(
-          data.orderId,
-          data.cartInfo?.cartItems || cartItems
-        );
-      }, 2000);
+      setPaymentStatus('bank-pending');
+      setBankSuccessMessage(
+        hasPublicationItems
+          ? 'After your payment is confirmed, you will receive an email containing the link to create your publication.'
+          : 'After your payment is confirmed, you will receive an email with your order details and next steps.'
+      );
 
       try {
         await fetchCart();
@@ -312,6 +326,19 @@ function CheckoutPage() {
         {loading ? (
           <div className="checkout-state-card">
             <p>Loading your cart…</p>
+          </div>
+        ) : paymentStatus === 'bank-pending' ? (
+          <div className="checkout-state-card checkout-state-card--success">
+            <div className="checkout-alert checkout-alert--success checkout-alert--bank" role="status">
+              <p>{bankSuccessMessage}</p>
+              <button
+                type="button"
+                className="checkout-btn checkout-btn--primary checkout-btn--inline"
+                onClick={() => navigate('/account')}
+              >
+                Go to my account
+              </button>
+            </div>
           </div>
         ) : cartItems.length === 0 ? (
           <div className="checkout-state-card checkout-state-card--empty">
@@ -404,9 +431,9 @@ function CheckoutPage() {
                 </div>
               )}
 
-              {paymentStatus === 'success' ? (
+              {paymentStatus === 'paystack-success' ? (
                 <div className="checkout-alert checkout-alert--success" role="status">
-                  <p>Payment received! Redirecting you to complete your order details…</p>
+                  <p>Payment confirmed! Taking you to the next step…</p>
                 </div>
               ) : (
                 <>

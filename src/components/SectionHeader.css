@@ -101,6 +101,14 @@
   margin: 2.75rem 0 0.75rem;
 }
 
+.testimonials-section .section-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  margin: 2.75rem 0 0.75rem;
+}
+
 .faq-section .section-header {
   display: flex;
   flex-direction: column;
@@ -122,6 +130,7 @@
 .wikipedia-services-section .section-title,
 .wikipedia-services-summary .section-title,
 .celebrities-section .section-title,
+.testimonials-section .section-title,
 .faq-section .section-title,
 .home-impact-section .section-title {
   font-family: 'Poppins', 'Inter', sans-serif;
@@ -144,6 +153,41 @@
   text-align: left;
 }
 
+.testimonials-section .section-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  gap: 0.08em;
+}
+
+.faq-section .section-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+  gap: 0.08em;
+  position: static;
+  left: auto;
+  transform: none;
+}
+
+.faq-section .section-title::after,
+.faq-section .section-title::before {
+  display: none !important;
+  content: none !important;
+}
+
+.faq-section .section-title > .services-summary-title-black,
+.faq-section .section-title > .services-summary-title-blue,
+.testimonials-section .section-title > .services-summary-title-black,
+.testimonials-section .section-title > .services-summary-title-blue {
+  display: block;
+}
+
 .app-services-summary .section-title,
 .website-services-summary .section-title,
 .verification-services-summary .section-title,
@@ -151,10 +195,6 @@
 .publication-services-summary .section-title,
 .instagram-services-summary .section-title,
 .wikipedia-services-summary .section-title {
-  text-align: left;
-}
-
-.faq-section .section-title {
   text-align: left;
 }
 
@@ -169,7 +209,12 @@
 .instagram-services-summary .container:not(.services-summary-layout-inner),
 .wikipedia-services-section .container:not(.services-summary-layout-inner),
 .wikipedia-services-summary .container:not(.services-summary-layout-inner),
-.celebrities-section .container {
+.celebrities-section .container,
+.testimonials-section .container {
+  padding: 1.25rem 0.75rem 0;
+}
+
+.faq-section .container {
   padding: 1.25rem 0.75rem 0;
 }
 
@@ -215,7 +260,8 @@
   .instagram-services-summary .section-header,
   .wikipedia-services-section .section-header,
   .wikipedia-services-summary .section-header,
-  .celebrities-section .section-header {
+  .celebrities-section .section-header,
+  .testimonials-section .section-header {
     margin-top: 2.25rem;
   }
 
@@ -226,11 +272,18 @@
     width: 100%;
   }
 
-  .faq-section .section-title {
-    text-align: left;
-  }
+.faq-section .section-title {
+  text-align: left;
+  text-decoration: none;
+}
 
-  .app-services-summary .section-title,
+.faq-section .section-title::after,
+.faq-section .section-title::before {
+  display: none !important;
+  content: none !important;
+}
+
+.app-services-summary .section-title,
   .website-services-summary .section-title,
   .verification-services-summary .section-title,
   .music-streaming-services-summary .section-title,
@@ -241,6 +294,8 @@
   .wikipedia-services-section .section-title,
   .wikipedia-services-summary .section-title,
   .celebrities-section .section-title,
+  .testimonials-section .section-title,
+  .faq-section .section-title,
   .home-impact-section .section-title {
     font-size: 2.65rem;
     text-align: left;
@@ -307,6 +362,8 @@
   .wikipedia-services-section .section-title,
   .wikipedia-services-summary .section-title,
   .celebrities-section .section-title,
+  .testimonials-section .section-title,
+  .faq-section .section-title,
   .home-impact-section .section-title {
     font-size: 2.4rem;
     text-align: left;

@@ -111,7 +111,7 @@ function Footer({ onScrollToSection }) {
                 </a>
               </li>
               <li>
-                <a href="#celebrities" onClick={(e) => { e.preventDefault(); onScrollToSection('celebrities'); }}>
+                <a href="#testimonials" onClick={(e) => { e.preventDefault(); onScrollToSection('testimonials'); }}>
                   Testimonials
                 </a>
               </li>

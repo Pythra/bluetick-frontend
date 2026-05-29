@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,7 +16,7 @@ function CartIcon() {
     location.pathname.startsWith(prefix)
   );
 
-  if (isAdminRoute) {
+  if (isAdminRoute || typeof document === 'undefined') {
     return null;
   }
 
@@ -27,7 +28,7 @@ function CartIcon() {
     navigate('/checkout');
   };
 
-  return (
+  return createPortal(
     <button
       type="button"
       className="cart-icon-button"
@@ -51,7 +52,8 @@ function CartIcon() {
       {isAuthenticated && cartItemCount > 0 ? (
         <span className="cart-badge">{cartItemCount > 99 ? '99+' : cartItemCount}</span>
       ) : null}
-    </button>
+    </button>,
+    document.body
   );
 }
 

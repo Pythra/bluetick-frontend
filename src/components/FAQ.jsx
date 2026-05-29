@@ -56,10 +56,15 @@ function FAQ() {
   ];
 
   return (
-    <section className="faq-section">
+    <section id="faq" className="faq-section">
       <div className="container">
         <SectionHeader
-          title={<span className="faq-section-title">FAQ&apos;S</span>}
+          title={(
+            <>
+              <span className="services-summary-title-black">FREQUENTLY ASKED</span>
+              <span className="services-summary-title-blue">QUESTIONS</span>
+            </>
+          )}
         />
 
         <div className="faq-container">

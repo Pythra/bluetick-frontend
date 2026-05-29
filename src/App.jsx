@@ -14,6 +14,7 @@ import PublicationServicesSummary from './components/PublicationServicesSummary'
 import InstagramServicesSummary from './components/InstagramServicesSummary';
 import WikipediaServicesSummary from './components/WikipediaServicesSummary';
 import CelebritiesSection from './components/CelebritiesSection';
+import TestimonialsSection from './components/TestimonialsSection';
 import CartIcon from './components/CartIcon';
 import AppServicesPage from './pages/AppServicesPage';
 import WebsiteServicesPage from './pages/WebsiteServicesPage';
@@ -85,6 +86,7 @@ function HomePage() {
       <div className="scroll-pop"><InstagramServicesSummary /></div>
       <div className="scroll-pop"><WikipediaServicesSummary /></div>
       <div className="scroll-pop"><CelebritiesSection /></div>
+      <div className="scroll-pop"><TestimonialsSection /></div>
       <div className="scroll-pop"><FAQ /></div>
       <Footer onScrollToSection={scrollToSection} />
     </>

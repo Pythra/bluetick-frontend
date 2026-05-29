@@ -19,11 +19,10 @@ import {
   IoLayersOutline,
   IoChevronDown,
   IoChevronUp,
-  IoStar,
   IoChatbubbleEllipses,
   IoCalendarOutline,
   IoLinkOutline,
-  IoShieldCheckmarkOutline,
+  IoTrashOutline,
 } from 'react-icons/io5';
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
@@ -294,7 +293,7 @@ const publicationCategories = baseCategories.map((category) => {
 
   return {
     ...category,
-    logos: platformsWithLogos.slice(0, 10).map((platform) => ({
+    logos: platformsWithLogos.map((platform) => ({
       src: getPublicationPlatformLogo(platform),
       alt: platform.name,
     })),
@@ -384,7 +383,7 @@ const additionalPublicationServices = [
     unit: 'per article',
     description:
       'Request removal or suppression of a live article that is affecting your brand or public narrative.',
-    icon: IoShieldCheckmarkOutline,
+    icon: IoTrashOutline,
     accent: 'reputation',
   },
 ];
@@ -556,8 +555,23 @@ function PublicationServicesPage() {
               <button type="button" className="publication-btn publication-btn-primary" onClick={scrollToPackages}>
                 Browse packages
               </button>
-              <button type="button" className="publication-btn publication-btn-ghost" onClick={scrollToHowItWorks}>
-                How it works
+              <button
+                type="button"
+                className="publication-btn publication-btn-journey"
+                onClick={scrollToHowItWorks}
+              >
+                <span className="publication-btn-journey-pips" aria-hidden="true">
+                  {[1, 2, 3, 4].map((stepNum, index) => (
+                    <span key={stepNum} className="publication-btn-journey-pip-wrap">
+                      {index > 0 && <span className="publication-btn-journey-dash" />}
+                      <span className="publication-btn-journey-pip">{stepNum}</span>
+                    </span>
+                  ))}
+                </span>
+                <span className="publication-btn-journey-label">
+                  How it works
+                  <IoChevronDown aria-hidden="true" />
+                </span>
               </button>
             </div>
             <div className="publication-masthead-stats" role="list" aria-label="Publication highlights">
@@ -623,11 +637,7 @@ function PublicationServicesPage() {
                     <h3 className="publication-package-name">{pkg.title}</h3>
                     <p className="publication-package-desc">{pkg.description}</p>
                     {category?.logos?.length > 0 && (
-                      <div className="publication-package-logos" aria-label="Sample outlets">
-                        {category.logos.slice(0, 6).map((logo) => (
-                          <img key={logo.alt} src={logo.src} alt={logo.alt} />
-                        ))}
-                      </div>
+                      <PublicationPackageLogosMarquee logos={category.logos} />
                     )}
                     <Button
                       onClick={() => navigate(`/services/publications/package/${pkg.id}`)}
@@ -640,6 +650,47 @@ function PublicationServicesPage() {
               );
             })}
           </div>
+        </div>
+      </section>
+
+      <section id="publication-how-it-works" className="publication-workflow">
+        <div className="publication-workflow-bg" aria-hidden="true" />
+        <div className="container publication-workflow-inner">
+          <header className="publication-workflow-header">
+            <div className="publication-workflow-intro">
+              <p className="publication-workflow-eyebrow">From checkout to live links</p>
+              <h2 className="publication-workflow-title">How it works</h2>
+              <p className="publication-workflow-lead">
+                Pick a package, submit your story, we handle editorial placement — then you get every live URL in one report.
+              </p>
+            </div>
+            <div className="publication-workflow-stamp" aria-hidden="true">
+              <span className="publication-workflow-stamp-num">4</span>
+              <span className="publication-workflow-stamp-label">steps</span>
+            </div>
+          </header>
+
+          <ol className="publication-workflow-steps">
+            {howItWorks.map((step, index) => {
+              const IconComponent = step.icon;
+              const isLast = index === howItWorks.length - 1;
+              return (
+                <li key={step.step} className="publication-workflow-step">
+                  <div className="publication-workflow-rail" aria-hidden="true">
+                    <span className="publication-workflow-node">
+                      <IconComponent />
+                    </span>
+                    {!isLast && <span className="publication-workflow-connector" />}
+                  </div>
+                  <div className="publication-workflow-card">
+                    <span className="publication-workflow-index">Step {step.step}</span>
+                    <h3>{step.title}</h3>
+                    <p>{step.description}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </section>
 
@@ -696,34 +747,6 @@ function PublicationServicesPage() {
                 </article>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      <section id="publication-how-it-works" className="publication-process">
-        <div className="container">
-          <div className="publication-process-card">
-            <header className="publication-section-head publication-section-head--center">
-              <p className="publication-section-kicker">Simple workflow</p>
-              <h2 className="publication-section-title">How it works</h2>
-            </header>
-            <ol className="publication-process-steps">
-              {howItWorks.map((step) => {
-                const IconComponent = step.icon;
-                return (
-                  <li key={step.step} className="publication-process-step">
-                    <span className="publication-process-step-num">{step.step}</span>
-                    <div className="publication-process-step-icon">
-                      <IconComponent aria-hidden="true" />
-                    </div>
-                    <div className="publication-process-step-copy">
-                      <h3>{step.title}</h3>
-                      <p>{step.description}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
           </div>
         </div>
       </section>
@@ -816,67 +839,27 @@ function PublicationServicesPage() {
 
       {/* Price List Section moved to individual category pages */}
 
-      <section className="publication-testimonials">
-        <div className="container">
-          <header className="publication-section-head publication-section-head--center">
-            <p className="publication-section-kicker">Client stories</p>
-            <h2 className="publication-section-title">What our clients say</h2>
-          </header>
-          <div className="publication-testimonials-grid">
-            <TestimonialCard
-              name="Michael Adebayo"
-              role="Founder, FinTech Solutions"
-              content="The team at Bluetickgeng made our product launch a huge success. Our press release appeared on Punch, Guardian, and Vanguard, giving us the credibility we needed in the Nigerian market."
-              rating={5}
-            />
-            <TestimonialCard
-              name="Chiamaka Okafor"
-              role="Marketing Director, E-commerce Platform"
-              content="Outstanding service! They wrote our press release, got it published on multiple platforms, and provided detailed reports. The SEO benefits were noticeable within weeks. Worth every naira!"
-              rating={5}
-            />
-            <TestimonialCard
-              name="David Thompson"
-              role="Brand Manager, Entertainment Company"
-              content="We've used Bluetickgeng for multiple press releases. Their network is impressive, turnaround is fast, and the quality is consistently excellent. They're now our go-to for all publication needs."
-              rating={5}
-            />
-            <TestimonialCard
-              name="Amina Hassan"
-              role="Public Relations Manager"
-              content="The 'As Seen On' badges we received helped boost our brand credibility significantly. The team is responsive, professional, and delivers exactly what they promise. Highly recommended!"
-              rating={5}
-            />
-            <TestimonialCard
-              name="James Okonkwo"
-              role="Startup Founder"
-              content="As a new startup, getting featured on reputable platforms was crucial. Bluetickgeng made it happen quickly and affordably. The exposure helped us secure our first major client. Thank you!"
-              rating={5}
-            />
-          </div>
-        </div>
-      </section>
-
       <Footer onScrollToSection={scrollToSection} />
     </div>
   );
 }
 
-// Testimonial Card Component
-function TestimonialCard({ name, role, content, rating }) {
+// Per-card sliding outlet logos (no wrapper box — sits on card background)
+function PublicationPackageLogosMarquee({ logos }) {
+  if (!logos?.length) {
+    return null;
+  }
+
+  const duplicatedLogos = [...logos, ...logos];
+
   return (
-    <blockquote className="publication-quote-card">
-      <div className="publication-quote-stars" aria-label={`${rating} out of 5 stars`}>
-        {[...Array(5)].map((_, i) => (
-          <IoStar key={i} className={i < rating ? 'is-filled' : ''} aria-hidden="true" />
+    <div className="publication-package-logos-marquee" aria-label="Sample outlets">
+      <div className="publication-package-logos-track">
+        {duplicatedLogos.map((logo, index) => (
+          <img key={`${logo.alt}-${index}`} src={logo.src} alt={logo.alt} loading="lazy" />
         ))}
       </div>
-      <p>&ldquo;{content}&rdquo;</p>
-      <footer>
-        <cite>{name}</cite>
-        <span>{role}</span>
-      </footer>
-    </blockquote>
+    </div>
   );
 }
 
