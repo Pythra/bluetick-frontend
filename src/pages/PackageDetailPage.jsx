@@ -1,10 +1,10 @@
- import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
-import SectionHeader from '../components/SectionHeader';
-import { IoCheckmarkCircle, IoArrowBack } from 'react-icons/io5';
+import { IoCheckmarkCircle, IoArrowBack, IoTime } from 'react-icons/io5';
 import punchLogo from '../assets/punch.png';
 import guardianLogo from '../assets/guardian.png';
 import pulseLogo from '../assets/pulse.png';
@@ -33,7 +33,20 @@ import theNationLogo from '../assets/platforms/thenation.png';
 import thisDayLogo from '../assets/platforms/thisday.jpg';
 import tribuneLogo from '../assets/platforms/tribune.png';
 import vanguardLogo from '../assets/platforms/Vanguard.png';
+import './PublicationServicesPage.editorial.css';
 import './PackageDetailPage.css';
+
+const packageMeta = {
+  1: { delivery: '6–24 Hours', listTitle: 'African outlets' },
+  2: { delivery: '6–24 Hours', listTitle: 'Tech & startup outlets' },
+  3: { delivery: '24–48 Hours', listTitle: 'UK outlets' },
+  4: { delivery: '24–48 Hours', listTitle: 'Google News outlets' },
+  5: { delivery: '2–7 Working Days', listTitle: 'Global outlets' },
+};
+
+function resolvePlatformLogo(platform) {
+  return platform.logo || logoMap[platform.name] || null;
+}
 
 const logoMap = {
   Punch: punchLogo,
@@ -282,16 +295,18 @@ function PackageDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const packageId = parseInt(id);
+  const [showCartNotification, setShowCartNotification] = useState(false);
+  const packageId = parseInt(id, 10);
   const packageData = packageDetails[packageId];
+  const meta = packageMeta[packageId];
 
   if (!packageData) {
     return (
-      <div className="package-detail-page">
+      <div className="publication-page package-detail-page">
         <Navbar onScrollToSection={() => {}} />
-        <div className="container" style={{ padding: '100px 20px', textAlign: 'center' }}>
-          <h1>Package Not Found</h1>
-          <Button onClick={() => navigate('/services/publications')}>Back to Publications</Button>
+        <div className="package-detail-empty container">
+          <h1>Package not found</h1>
+          <Button onClick={() => navigate('/services/publications')}>Back to publications</Button>
         </div>
         <Footer onScrollToSection={() => {}} />
       </div>
@@ -301,15 +316,16 @@ function PackageDetailPage() {
   const handleAddToCart = async (platform) => {
     const result = await addToCart({
       itemId: `${packageData.title}-${platform.name}-${Date.now()}`,
-      title: `${platform.name} - ${packageData.title}`,
+      title: `${platform.name} — ${packageData.title}`,
       price: platform.price,
       description: packageData.description,
       category: 'publication',
       quantity: 1,
     });
-    
+
     if (result.success) {
-      alert(`${platform.name} added to cart!`);
+      setShowCartNotification(true);
+      setTimeout(() => setShowCartNotification(false), 3000);
     }
   };
 
@@ -324,61 +340,77 @@ function PackageDetailPage() {
   };
 
   return (
-    <div className="package-detail-page">
+    <div className="publication-page package-detail-page">
+      {showCartNotification && (
+        <div className="publication-toast" role="status">
+          Item added to cart!
+        </div>
+      )}
       <Navbar onScrollToSection={scrollToSection} />
-      <div className="package-detail-container">
-        <div className="package-header">
-          <Button 
-            onClick={() => navigate('/services/publications')} 
-            className="back-button"
-          >
-            <IoArrowBack /> Back to Packages
-          </Button>
+      <div className="package-detail-shell">
+        <button
+          type="button"
+          className="package-detail-back"
+          onClick={() => navigate('/services/publications')}
+        >
+          <IoArrowBack aria-hidden="true" />
+          Back to packages
+        </button>
+
+        <header className="package-detail-header">
+          <p className="publication-section-kicker">Publication package</p>
+          {meta?.delivery ? (
+            <p className="package-detail-delivery">
+              <IoTime aria-hidden="true" />
+              Typical delivery: {meta.delivery}
+            </p>
+          ) : null}
           <h1 className="package-detail-title">{packageData.title}</h1>
           <p className="package-detail-description">{packageData.description}</p>
-        </div>
+        </header>
 
-        <div className="platforms-section">
-          <h2 className="platforms-section-title">View Platforms</h2>
-          <div className="platforms-grid">
-            {packageData.platforms.map((platform, index) => (
-              <div key={index} className="platform-card">
-                <div className="platform-info">
-                  {logoMap[platform.name] ? (
-                    <div className="platform-logo-wrapper" data-name={platform.name}>
+        <div className="publication-process-card package-platforms-panel">
+          <h2 className="publication-section-title">
+            {meta?.listTitle ?? 'Select outlets'}
+          </h2>
+          <div className="package-platforms-grid">
+            {packageData.platforms.map((platform) => {
+              const logo = resolvePlatformLogo(platform);
+              return (
+                <article key={platform.name} className="package-platform-card">
+                  <div className="package-platform-media">
+                    {logo ? (
                       <img
-                        src={logoMap[platform.name]}
+                        src={logo}
                         alt={platform.name}
-                        className="platform-logo-image"
-                        onError={(e) => {
-                          // If image fails to load, show the name instead
-                          e.target.style.display = 'none';
-                          e.target.parentElement.style.background = 'transparent';
-                        }}
+                        className="package-platform-logo"
                       />
-                    </div>
-                  ) : (
-                    <h3 className="platform-name">{platform.name}</h3>
-                  )}
-                  <div className="platform-price">{platform.price}</div>
-                </div>
-                <Button
-                  onClick={() => handleAddToCart(platform)}
-                  className="platform-add-btn"
-                >
-                  Add to Cart
-                </Button>
-              </div>
-            ))}
+                    ) : (
+                      <h3 className="package-platform-name-fallback">{platform.name}</h3>
+                    )}
+                  </div>
+                  <footer className="package-platform-footer">
+                    <span className="package-platform-price">{platform.price}</span>
+                    <Button
+                      type="button"
+                      className="package-platform-order-btn"
+                      onClick={() => handleAddToCart(platform)}
+                    >
+                      Place order
+                    </Button>
+                  </footer>
+                </article>
+              );
+            })}
           </div>
         </div>
 
-        {packageData.note && (
-          <div className="package-note">
-            <IoCheckmarkCircle className="note-icon" />
+        {packageData.note ? (
+          <div className="package-detail-note">
+            <IoCheckmarkCircle aria-hidden="true" />
             <p>{packageData.note}</p>
           </div>
-        )}
+        ) : null}
       </div>
       <Footer onScrollToSection={scrollToSection} />
     </div>

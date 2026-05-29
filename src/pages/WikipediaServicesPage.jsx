@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   IoBookOutline,
@@ -32,6 +32,34 @@ function WikipediaServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [showCartNotification, setShowCartNotification] = useState(false);
+  const wikiVideoRef = useRef(null);
+
+  useEffect(() => {
+    const video = wikiVideoRef.current;
+    if (!video) return undefined;
+
+    const showFirstFrame = () => {
+      try {
+        if (video.readyState >= 1 && video.currentTime < 0.05) {
+          video.currentTime = 0.01;
+        }
+      } catch {
+        // Some browsers block seek until enough data is loaded
+      }
+    };
+
+    video.addEventListener('loadeddata', showFirstFrame);
+    video.addEventListener('loadedmetadata', showFirstFrame);
+
+    if (video.readyState >= 1) {
+      showFirstFrame();
+    }
+
+    return () => {
+      video.removeEventListener('loadeddata', showFirstFrame);
+      video.removeEventListener('loadedmetadata', showFirstFrame);
+    };
+  }, []);
 
   const handleAddToCart = async (item, category) => {
     const result = await addToCart({
@@ -70,11 +98,12 @@ function WikipediaServicesPage() {
           <div className="wikipedia-page-split">
             <aside className="wikipedia-page-video" aria-label="Wikipedia services overview video">
               <video
+                ref={wikiVideoRef}
                 className="wikipedia-page-video-player"
                 src={wikipediaHeroVideo}
                 controls
                 playsInline
-                preload="metadata"
+                preload="auto"
               />
             </aside>
 

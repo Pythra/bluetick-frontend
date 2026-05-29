@@ -412,6 +412,20 @@
   background: #fff;
 }
 
+.publication-process-card {
+  padding: 2rem 1.5rem 1.75rem;
+  border-radius: 18px;
+  background: #f5f9ff;
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.04),
+    0 8px 24px rgba(37, 99, 235, 0.08),
+    0 16px 40px rgba(15, 23, 42, 0.06);
+}
+
+.publication-process-card .publication-section-head {
+  margin-bottom: 1.5rem;
+}
+
 .publication-process-steps {
   list-style: none;
   margin: 0;
@@ -424,9 +438,10 @@
 .publication-process-step {
   position: relative;
   padding: 1.25rem 1rem 1.25rem 1.15rem;
-  background: var(--pub-paper);
-  border: 1px solid var(--pub-border);
+  background: #ffffff;
+  border: 1px solid rgba(37, 99, 235, 0.1);
   border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
 }
 
 .publication-process-step-num {
@@ -775,13 +790,21 @@
 
 .publication-addon-card-footer {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   margin-top: auto;
   padding: 0.9rem 1.25rem 1.15rem;
   border-top: 1px solid var(--pub-border);
   background: var(--pub-paper);
+}
+
+.publication-addon-card-pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  min-width: 0;
 }
 
 .publication-addon-price {
@@ -796,6 +819,30 @@
   font-weight: 500;
   color: var(--pub-muted);
   white-space: nowrap;
+}
+
+.publication-addon-order-btn.btn {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: var(--pub-ink);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.publication-addon-order-btn.btn::before {
+  display: none;
+}
+
+.publication-addon-order-btn.btn:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
 }
 
 /* Policies (legacy class names inside) */
@@ -1033,8 +1080,11 @@
   }
 
   .publication-addon-card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.2rem;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .publication-addon-order-btn.btn {
+    width: 100%;
   }
 }

@@ -62,11 +62,16 @@
 .wikipedia-page-video-player {
   display: block;
   width: 100%;
-  height: auto;
   max-width: 100%;
-  max-height: min(48vh, 340px);
-  object-fit: contain;
+  aspect-ratio: 9 / 16;
+  max-height: min(48vh, 400px);
+  height: auto;
+  object-fit: cover;
+  object-position: center top;
   margin: 0 auto;
+  background: #0f172a;
+  border-radius: 12px;
+  vertical-align: middle;
 }
 
 .wikipedia-page-content {
@@ -126,7 +131,7 @@
 @media (min-width: 768px) {
   .wikipedia-page-video-player {
     max-width: min(360px, 90vw);
-    max-height: min(45vh, 320px);
+    max-height: min(50vh, 380px);
   }
 }
 
@@ -148,6 +153,7 @@
     width: 100%;
     max-width: 100%;
     max-height: 380px;
+    min-height: 214px;
   }
 }
 
@@ -159,5 +165,6 @@
 
   .wikipedia-page-video-player {
     max-height: 400px;
+    min-height: 225px;
   }
 }

@@ -356,6 +356,7 @@ const additionalPublicationServices = [
     id: 'backdate',
     title: 'Backdating an article',
     price: '₦50,000',
+    priceValue: 50000,
     unit: 'per article',
     description:
       'Request a past publication date on supported outlets when your announcement needs to align with an earlier milestone.',
@@ -366,6 +367,7 @@ const additionalPublicationServices = [
     id: 'links',
     title: 'Including links in an article',
     price: '₦100,000',
+    priceValue: 100000,
     unit: 'per article',
     description:
       'Add branded or campaign URLs in the body of the piece where the outlet allows in-article hyperlinks.',
@@ -377,6 +379,7 @@ const additionalPublicationServices = [
     title: 'Deleting an existing article',
     subtitle: 'Reputation management',
     price: '₦500,000',
+    priceValue: 500000,
     unit: 'per article',
     description:
       'Request removal or suppression of a live article that is affecting your brand or public narrative.',
@@ -629,7 +632,7 @@ function PublicationServicesPage() {
                       onClick={() => navigate(`/services/publications/package/${pkg.id}`)}
                       className="publication-package-cta"
                     >
-                      View outlets &amp; pricing
+                      Place order
                     </Button>
                   </div>
                 </article>
@@ -670,8 +673,24 @@ function PublicationServicesPage() {
                     <p className="publication-addon-card-desc">{service.description}</p>
                   </div>
                   <footer className="publication-addon-card-footer">
-                    <span className="publication-addon-price">{service.price}</span>
-                    <span className="publication-addon-unit">{service.unit}</span>
+                    <div className="publication-addon-card-pricing">
+                      <span className="publication-addon-price">{service.price}</span>
+                      <span className="publication-addon-unit">{service.unit}</span>
+                    </div>
+                    <Button
+                      type="button"
+                      className="publication-addon-order-btn"
+                      onClick={() =>
+                        handleAddToCart({
+                          id: `publication-addon-${service.id}`,
+                          title: service.title,
+                          price: service.priceValue,
+                          description: service.description,
+                        })
+                      }
+                    >
+                      Place order
+                    </Button>
                   </footer>
                 </article>
               );
@@ -682,27 +701,29 @@ function PublicationServicesPage() {
 
       <section id="publication-how-it-works" className="publication-process">
         <div className="container">
-          <header className="publication-section-head publication-section-head--center">
-            <p className="publication-section-kicker">Simple workflow</p>
-            <h2 className="publication-section-title">How it works</h2>
-          </header>
-          <ol className="publication-process-steps">
-            {howItWorks.map((step) => {
-              const IconComponent = step.icon;
-              return (
-                <li key={step.step} className="publication-process-step">
-                  <span className="publication-process-step-num">{step.step}</span>
-                  <div className="publication-process-step-icon">
-                    <IconComponent aria-hidden="true" />
-                  </div>
-                  <div className="publication-process-step-copy">
-                    <h3>{step.title}</h3>
-                    <p>{step.description}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+          <div className="publication-process-card">
+            <header className="publication-section-head publication-section-head--center">
+              <p className="publication-section-kicker">Simple workflow</p>
+              <h2 className="publication-section-title">How it works</h2>
+            </header>
+            <ol className="publication-process-steps">
+              {howItWorks.map((step) => {
+                const IconComponent = step.icon;
+                return (
+                  <li key={step.step} className="publication-process-step">
+                    <span className="publication-process-step-num">{step.step}</span>
+                    <div className="publication-process-step-icon">
+                      <IconComponent aria-hidden="true" />
+                    </div>
+                    <div className="publication-process-step-copy">
+                      <h3>{step.title}</h3>
+                      <p>{step.description}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
         </div>
       </section>
 
