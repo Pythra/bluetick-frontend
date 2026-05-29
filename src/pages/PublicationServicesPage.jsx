@@ -16,6 +16,7 @@ import {
   IoPeople,
   IoEye,
   IoTime,
+  IoLayersOutline,
   IoChevronDown,
   IoChevronUp,
   IoStar,
@@ -520,10 +521,10 @@ function PublicationServicesPage() {
   };
 
   const mastheadStats = [
-    { value: '20,000+', label: 'Media outlets' },
-    { value: '6–24 hrs', label: 'Fast placements' },
-    { value: '5', label: 'Curated packages' },
-    { value: 'Global', label: 'Africa · UK · Tech' },
+    { value: '20,000+', label: 'Media outlets', icon: IoNewspaperOutline, iconTone: 'mint' },
+    { value: '6–24 hrs', label: 'Fast placements', icon: IoTime, iconTone: 'sky' },
+    { value: '5', label: 'Curated packages', icon: IoLayersOutline, iconTone: 'amber' },
+    { value: 'Global', label: 'Africa · UK · Tech', icon: IoGlobe, iconTone: 'mint' },
   ];
 
   return (
@@ -555,14 +556,25 @@ function PublicationServicesPage() {
                 How it works
               </button>
             </div>
-            <dl className="publication-masthead-stats">
-              {mastheadStats.map((stat) => (
-                <div key={stat.label} className="publication-stat">
-                  <dt>{stat.value}</dt>
-                  <dd>{stat.label}</dd>
-                </div>
-              ))}
-            </dl>
+            <div className="publication-masthead-stats" role="list" aria-label="Publication highlights">
+              {mastheadStats.map((stat) => {
+                const StatIcon = stat.icon;
+                return (
+                  <article key={stat.label} className="publication-stat" role="listitem">
+                    <div className="publication-stat-top">
+                      <div
+                        className={`publication-stat-icon publication-stat-icon--${stat.iconTone}`}
+                        aria-hidden="true"
+                      >
+                        <StatIcon />
+                      </div>
+                      <p className="publication-stat-value">{stat.value}</p>
+                    </div>
+                    <p className="publication-stat-label">{stat.label}</p>
+                  </article>
+                );
+              })}
+            </div>
           </div>
           <div className="publication-masthead-visual" aria-hidden="true">
             <img src={newsImage} alt="" className="publication-masthead-image" />

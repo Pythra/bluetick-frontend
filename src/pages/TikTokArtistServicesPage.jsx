@@ -6,7 +6,7 @@ import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
-import musicHeroImage from '../assets/mayorkun.jpg';
+import tiktokArtistHeroImage from '../assets/social/tiktok-artist.jpg';
 import {
   tiktokArtistTermsFooter,
   tiktokArtistTermsSections,
@@ -59,7 +59,11 @@ function TikTokArtistServicesPage() {
 
       <div className="service-detail-shell">
         <header className="service-detail-hero">
-          <img src={musicHeroImage} alt="" className="service-detail-hero-image" />
+          <img
+            src={tiktokArtistHeroImage}
+            alt="Person scrolling TikTok on a phone — artist promotion and sound campaigns"
+            className="service-detail-hero-image"
+          />
           <div className="service-detail-hero-overlay" aria-hidden="true" />
           <div className="service-detail-hero-content">
             <h1 className="service-detail-title">

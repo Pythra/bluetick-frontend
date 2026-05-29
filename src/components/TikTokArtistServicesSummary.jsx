@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
-import musicHeroImage from '../assets/mayorkun.jpg';
+import tiktokArtistHeroImage from '../assets/social/tiktok-artist.jpg';
 import './ServicesSummaryHero.css';
 
 function TikTokArtistServicesSummary() {
@@ -42,8 +42,8 @@ function TikTokArtistServicesSummary() {
         media={(
           <div className="services-summary-hero-shell">
             <img
-              src={musicHeroImage}
-              alt="TikTok artist services and promotional packages"
+              src={tiktokArtistHeroImage}
+              alt="Person scrolling TikTok on a phone — artist promotion and sound campaigns"
               className="services-summary-hero-image"
             />
             <div className="services-summary-hero-overlay"></div>
