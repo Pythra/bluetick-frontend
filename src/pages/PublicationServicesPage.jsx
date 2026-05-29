@@ -63,6 +63,7 @@ import theNationLogo from '../assets/platforms/thenation.png';
 import thisDayLogo from '../assets/platforms/thisday.jpg';
 import tribuneLogo from '../assets/platforms/tribune.png';
 import vanguardLogo from '../assets/platforms/Vanguard.png';
+import { getPublicationPlatformLogo } from '../utils/publicationPlatformLogos';
 import './PublicationServicesPage.css';
 import './PublicationServicesPage.editorial.css';
 
@@ -287,14 +288,14 @@ const baseCategories = [
 ];
 
 const publicationCategories = baseCategories.map((category) => {
-  // Filter platforms to only include those with a logo
-  const platformsWithLogos = category.platforms.filter(platform => platform.logo);
-  
+  const platformsWithLogos = category.platforms.filter(
+    (platform) => getPublicationPlatformLogo(platform)
+  );
+
   return {
     ...category,
-    // Only include up to 10 platforms with logos
     logos: platformsWithLogos.slice(0, 10).map((platform) => ({
-      src: platform.logo,
+      src: getPublicationPlatformLogo(platform),
       alt: platform.name,
     })),
   };

@@ -8,7 +8,7 @@ import './CheckoutPage.css';
 
 function CheckoutPage() {
   const navigate = useNavigate();
-  const { isAuthenticated, apiUrl, getAuthHeaders } = useAuth();
+  const { isAuthenticated, apiUrl, authFetch } = useAuth();
   const {
     cartItems,
     cartItemCount,
@@ -68,9 +68,8 @@ function CheckoutPage() {
     setIsClaimingPayment(true);
 
     try {
-      const response = await fetch(`${apiUrl}/api/payments/bank-transfer/claim`, {
+      const response = await authFetch(`${apiUrl}/api/payments/bank-transfer/claim`, {
         method: 'POST',
-        headers: getAuthHeaders(),
       });
 
       let data;

@@ -10,7 +10,7 @@ import './ArticleSubmissionPage.css';
 function ArticleSubmissionPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, apiUrl, getAuthHeaders } = useAuth();
+  const { isAuthenticated, apiUrl, authFetch } = useAuth();
   const { cartItems } = useCart();
   
   const [formData, setFormData] = useState({
@@ -109,12 +109,8 @@ function ArticleSubmissionPage() {
     setSubmitStatus('');
 
     try {
-      const response = await fetch(`${apiUrl}/api/orders/article-submission`, {
+      const response = await authFetch(`${apiUrl}/api/orders/article-submission`, {
         method: 'POST',
-        headers: {
-          ...getAuthHeaders(),
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           postTitle: formData.postTitle.trim(),
           postBody: formData.postBody.trim(),

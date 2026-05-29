@@ -12,11 +12,10 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  const { apiUrl, isAuthenticated, getAuthHeaders } = useAuth();
+  const { apiUrl, isAuthenticated, authFetch } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch cart when user is authenticated
   useEffect(() => {
     if (isAuthenticated) {
       fetchCart();
@@ -30,10 +29,7 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${apiUrl}/api/cart`, {
-        headers: getAuthHeaders(),
-      });
-
+      const response = await authFetch(`${apiUrl}/api/cart`);
       const data = await response.json();
 
       if (response.ok && data.success) {
@@ -54,9 +50,8 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${apiUrl}/api/cart/items`, {
+      const response = await authFetch(`${apiUrl}/api/cart/items`, {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: JSON.stringify({
           itemId: item.itemId || item.id || `${item.category}-${Date.now()}`,
           title: item.title || item.name,
@@ -72,9 +67,13 @@ export const CartProvider = ({ children }) => {
       if (response.ok && data.success) {
         setCartItems(data.cart.items || []);
         return { success: true };
-      } else {
-        throw new Error(data.error || 'Failed to add item to cart');
       }
+
+      if (response.status === 401 || response.status === 403) {
+        throw new Error('Your session expired. Please log in again.');
+      }
+
+      throw new Error(data.error || 'Failed to add item to cart');
     } catch (error) {
       console.error('Error adding to cart:', error);
       alert(`Failed to add item to cart: ${error.message}`);
@@ -89,9 +88,8 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${apiUrl}/api/cart/items/${itemId}`, {
+      const response = await authFetch(`${apiUrl}/api/cart/items/${itemId}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
       });
 
       const data = await response.json();
@@ -111,9 +109,8 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${apiUrl}/api/cart/items/${itemId}`, {
+      const response = await authFetch(`${apiUrl}/api/cart/items/${itemId}`, {
         method: 'PUT',
-        headers: getAuthHeaders(),
         body: JSON.stringify({ quantity }),
       });
 
@@ -134,9 +131,8 @@ export const CartProvider = ({ children }) => {
 
     try {
       setLoading(true);
-      const response = await fetch(`${apiUrl}/api/cart`, {
+      const response = await authFetch(`${apiUrl}/api/cart`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
       });
 
       const data = await response.json();
@@ -164,16 +160,7 @@ export const CartProvider = ({ children }) => {
     fetchCart,
   };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 
 export default CartContext;
-
-
-
-
-

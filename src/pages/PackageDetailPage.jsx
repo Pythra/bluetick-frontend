@@ -33,6 +33,8 @@ import theNationLogo from '../assets/platforms/thenation.png';
 import thisDayLogo from '../assets/platforms/thisday.jpg';
 import tribuneLogo from '../assets/platforms/tribune.png';
 import vanguardLogo from '../assets/platforms/Vanguard.png';
+import PlatformLogo from '../components/PlatformLogo';
+import { getPublicationPlatformLogo } from '../utils/publicationPlatformLogos';
 import './PublicationServicesPage.editorial.css';
 import './PackageDetailPage.css';
 
@@ -45,7 +47,7 @@ const packageMeta = {
 };
 
 function resolvePlatformLogo(platform) {
-  return platform.logo || logoMap[platform.name] || null;
+  return getPublicationPlatformLogo(platform) || logoMap[platform.name] || null;
 }
 
 const logoMap = {
@@ -375,19 +377,12 @@ function PackageDetailPage() {
           </h2>
           <div className="package-platforms-grid">
             {packageData.platforms.map((platform) => {
-              const logo = resolvePlatformLogo(platform);
+              const hasLogo = Boolean(resolvePlatformLogo(platform));
               return (
                 <article key={platform.name} className="package-platform-card">
                   <div className="package-platform-media">
-                    {logo ? (
-                      <img
-                        src={logo}
-                        alt={platform.name}
-                        className="package-platform-logo"
-                      />
-                    ) : (
-                      <h3 className="package-platform-name-fallback">{platform.name}</h3>
-                    )}
+                    {hasLogo ? <PlatformLogo platform={platform} /> : null}
+                    <h3 className="package-platform-name">{platform.name}</h3>
                   </div>
                   <footer className="package-platform-footer">
                     <span className="package-platform-price">{platform.price}</span>
