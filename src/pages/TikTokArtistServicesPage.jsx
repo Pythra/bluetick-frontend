@@ -71,7 +71,7 @@ function TikTokArtistServicesPage() {
               <span className="services-summary-title-blue">SERVICES & PACKAGES</span>
             </h1>
             <p className="service-detail-lead">
-              Song claiming, micro influencer sound campaigns, and full terms for THE BOSS MUSIC
+              Song claiming, micro influencer sound campaigns, and full terms for BLUETICKGENG
               DISTRIBUTION &amp; MARKETING — powered by Bluetickgeng Development.
             </p>
           </div>
@@ -131,7 +131,7 @@ function TikTokArtistServicesPage() {
           <section className="service-detail-section tiktok-artist-terms">
             <h2 className="service-detail-section-title">Terms of Service</h2>
             <p className="service-detail-section-lead">
-              THE BOSS MUSIC DISTRIBUTION &amp; MARKETING — TikTok Influencer Sound Promotion Packages.
+              BLUETICKGENG DISTRIBUTION &amp; MARKETING — TikTok Influencer Sound Promotion Packages.
               By purchasing or using our TikTok promotion services, you agree to the following:
             </p>
             <div className="tiktok-artist-terms-body">

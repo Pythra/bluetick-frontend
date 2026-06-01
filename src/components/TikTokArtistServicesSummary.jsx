@@ -48,7 +48,7 @@ function TikTokArtistServicesSummary() {
             />
             <div className="services-summary-hero-overlay"></div>
             <div className="services-summary-hero-content">
-              <p className="services-summary-hero-kicker">THE BOSS MUSIC · TikTok</p>
+              <p className="services-summary-hero-kicker">BLUETICKGENG · TikTok</p>
               <h3>Services &amp; Promotional Packages</h3>
               <ul className="services-summary-hero-types">
                 {highlightServices.map((service) => (

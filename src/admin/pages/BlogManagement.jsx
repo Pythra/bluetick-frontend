@@ -13,6 +13,7 @@ const defaultFormData = {
 export const BlogManagement = ({ apiUrl, adminToken }) => {
   const [formData, setFormData] = useState(defaultFormData)
   const [posts, setPosts] = useState([])
+  const [editingPostId, setEditingPostId] = useState(null)
   const [loadingPosts, setLoadingPosts] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [error, setError] = useState('')
@@ -74,27 +75,84 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
         isPublished: formData.isPublished,
       }
 
-      const response = await fetch(`${apiUrl}/api/admin/blog-posts`, {
-        method: 'POST',
+      const isEditing = Boolean(editingPostId)
+      const response = await fetch(
+        isEditing ? `${apiUrl}/api/admin/blog-posts/${editingPostId}` : `${apiUrl}/api/admin/blog-posts`,
+        {
+          method: isEditing ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      )
+
+      const data = await response.json()
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || `Failed to ${isEditing ? 'update' : 'create'} blog post`)
+      }
+
+      setSuccess(isEditing ? 'Blog post updated successfully.' : 'Blog post created successfully.')
+      setFormData(defaultFormData)
+      setEditingPostId(null)
+      await loadPosts()
+    } catch (submitError) {
+      setError(submitError.message || `Unable to ${editingPostId ? 'update' : 'create'} blog post`)
+    } finally {
+      setSubmitLoading(false)
+    }
+  }
+
+  const handleEditPost = (post) => {
+    setError('')
+    setSuccess('')
+    setEditingPostId(post.id)
+    setFormData({
+      title: post.title || '',
+      excerpt: post.excerpt || '',
+      content: post.content || '',
+      author: post.author || 'Bluetick Editorial',
+      category: post.category || 'General',
+      imageUrls: (post.imageUrls || []).join('\n'),
+      isPublished: Boolean(post.isPublished),
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null)
+    setFormData(defaultFormData)
+    setError('')
+    setSuccess('')
+  }
+
+  const handleDeletePost = async (post) => {
+    const shouldDelete = window.confirm(`Delete "${post.title}"? This action cannot be undone.`)
+    if (!shouldDelete) return
+
+    setError('')
+    setSuccess('')
+    try {
+      const response = await fetch(`${apiUrl}/api/admin/blog-posts/${post.id}`, {
+        method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${adminToken}`,
         },
-        body: JSON.stringify(payload),
       })
 
       const data = await response.json()
       if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to create blog post')
+        throw new Error(data.error || 'Failed to delete blog post')
       }
 
-      setSuccess('Blog post created successfully.')
-      setFormData(defaultFormData)
+      if (editingPostId === post.id) {
+        handleCancelEdit()
+      }
+      setSuccess('Blog post deleted successfully.')
       await loadPosts()
-    } catch (submitError) {
-      setError(submitError.message || 'Unable to create blog post')
-    } finally {
-      setSubmitLoading(false)
+    } catch (deleteError) {
+      setError(deleteError.message || 'Unable to delete blog post')
     }
   }
 
@@ -106,7 +164,9 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
     <div style={{ display: 'grid', gap: '20px' }}>
       <div style={{ background: '#fff', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <div style={{ marginBottom: '16px' }}>
-          <h2 style={{ margin: 0, fontSize: '20px', color: '#121212' }}>Create blog post</h2>
+          <h2 style={{ margin: 0, fontSize: '20px', color: '#121212' }}>
+            {editingPostId ? 'Edit blog post' : 'Create blog post'}
+          </h2>
           <p style={{ margin: '8px 0 0', color: '#555', fontSize: '14px' }}>
             Use your existing image upload flow, then paste those image URLs below.
           </p>
@@ -175,22 +235,41 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
           {error ? <p style={{ color: '#c62828', margin: 0 }}>{error}</p> : null}
           {success ? <p style={{ color: '#2e7d32', margin: 0 }}>{success}</p> : null}
 
-          <button
-            type="submit"
-            disabled={submitLoading}
-            style={{
-              border: 'none',
-              borderRadius: '8px',
-              background: '#0066ff',
-              color: '#fff',
-              fontWeight: 600,
-              padding: '11px 16px',
-              cursor: submitLoading ? 'not-allowed' : 'pointer',
-              opacity: submitLoading ? 0.65 : 1,
-            }}
-          >
-            {submitLoading ? 'Creating...' : 'Create post'}
-          </button>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <button
+              type="submit"
+              disabled={submitLoading}
+              style={{
+                border: 'none',
+                borderRadius: '8px',
+                background: '#0066ff',
+                color: '#fff',
+                fontWeight: 600,
+                padding: '11px 16px',
+                cursor: submitLoading ? 'not-allowed' : 'pointer',
+                opacity: submitLoading ? 0.65 : 1,
+              }}
+            >
+              {submitLoading ? (editingPostId ? 'Saving...' : 'Creating...') : editingPostId ? 'Save changes' : 'Create post'}
+            </button>
+            {editingPostId ? (
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                style={{
+                  border: '1px solid #d0d7e2',
+                  borderRadius: '8px',
+                  background: '#fff',
+                  color: '#334155',
+                  fontWeight: 600,
+                  padding: '11px 16px',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel edit
+              </button>
+            ) : null}
+          </div>
         </form>
       </div>
 
@@ -250,6 +329,40 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
                   >
                     {post.isPublished ? 'Published' : 'Draft'}
                   </span>
+                </div>
+                <div style={{ marginTop: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleEditPost(post)}
+                    style={{
+                      border: '1px solid #bfd4ff',
+                      background: '#eef4ff',
+                      color: '#1d4ed8',
+                      borderRadius: '6px',
+                      padding: '6px 10px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeletePost(post)}
+                    style={{
+                      border: '1px solid #fecaca',
+                      background: '#fff1f2',
+                      color: '#b91c1c',
+                      borderRadius: '6px',
+                      padding: '6px 10px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}
