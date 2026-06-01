@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const defaultFormData = {
   title: '',
@@ -6,27 +6,20 @@ const defaultFormData = {
   content: '',
   author: 'Bluetick Editorial',
   category: 'General',
-  imageUrls: '',
   isPublished: true,
 }
 
 export const BlogManagement = ({ apiUrl, adminToken }) => {
   const [formData, setFormData] = useState(defaultFormData)
+  const [imageFiles, setImageFiles] = useState([])
+  const [imagePreviews, setImagePreviews] = useState([])
+  const [existingImageUrls, setExistingImageUrls] = useState([])
   const [posts, setPosts] = useState([])
   const [editingPostId, setEditingPostId] = useState(null)
   const [loadingPosts, setLoadingPosts] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-
-  const normalizedImagesPreview = useMemo(
-    () =>
-      formData.imageUrls
-        .split(/\r?\n|,/)
-        .map((value) => value.trim())
-        .filter(Boolean),
-    [formData.imageUrls]
-  )
 
   const loadPosts = useCallback(async () => {
     if (!adminToken) return
@@ -58,6 +51,40 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
     }))
   }
 
+  const handleImageSelection = (event) => {
+    const files = Array.from(event.target.files || [])
+    if (!files.length) return
+
+    const validFiles = files.filter((file) => file.type.startsWith('image/'))
+    if (validFiles.length !== files.length) {
+      setError('Only image files are allowed.')
+    }
+
+    setImageFiles((prev) => [...prev, ...validFiles])
+
+    Promise.all(
+      validFiles.map(
+        (file) =>
+          new Promise((resolve) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(reader.result)
+            reader.readAsDataURL(file)
+          })
+      )
+    ).then((previewData) => {
+      setImagePreviews((prev) => [...prev, ...previewData])
+    })
+  }
+
+  const removeNewImage = (index) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index))
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const removeExistingImage = (index) => {
+    setExistingImageUrls((prev) => prev.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     setSubmitLoading(true)
@@ -65,15 +92,15 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
     setSuccess('')
 
     try {
-      const payload = {
-        title: formData.title.trim(),
-        excerpt: formData.excerpt.trim(),
-        content: formData.content.trim(),
-        author: formData.author.trim() || 'Bluetick Editorial',
-        category: formData.category.trim() || 'General',
-        imageUrls: normalizedImagesPreview,
-        isPublished: formData.isPublished,
-      }
+      const payload = new FormData()
+      payload.append('title', formData.title.trim())
+      payload.append('excerpt', formData.excerpt.trim())
+      payload.append('content', formData.content.trim())
+      payload.append('author', formData.author.trim() || 'Bluetick Editorial')
+      payload.append('category', formData.category.trim() || 'General')
+      payload.append('isPublished', String(formData.isPublished))
+      payload.append('existingImageUrls', JSON.stringify(existingImageUrls))
+      imageFiles.forEach((file) => payload.append('images', file))
 
       const isEditing = Boolean(editingPostId)
       const response = await fetch(
@@ -81,10 +108,9 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
         {
           method: isEditing ? 'PUT' : 'POST',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${adminToken}`,
           },
-          body: JSON.stringify(payload),
+          body: payload,
         }
       )
 
@@ -96,6 +122,9 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
       setSuccess(isEditing ? 'Blog post updated successfully.' : 'Blog post created successfully.')
       setFormData(defaultFormData)
       setEditingPostId(null)
+      setImageFiles([])
+      setImagePreviews([])
+      setExistingImageUrls([])
       await loadPosts()
     } catch (submitError) {
       setError(submitError.message || `Unable to ${editingPostId ? 'update' : 'create'} blog post`)
@@ -114,15 +143,20 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
       content: post.content || '',
       author: post.author || 'Bluetick Editorial',
       category: post.category || 'General',
-      imageUrls: (post.imageUrls || []).join('\n'),
       isPublished: Boolean(post.isPublished),
     })
+    setExistingImageUrls(post.imageUrls || [])
+    setImageFiles([])
+    setImagePreviews([])
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleCancelEdit = () => {
     setEditingPostId(null)
     setFormData(defaultFormData)
+    setImageFiles([])
+    setImagePreviews([])
+    setExistingImageUrls([])
     setError('')
     setSuccess('')
   }
@@ -168,7 +202,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
             {editingPostId ? 'Edit blog post' : 'Create blog post'}
           </h2>
           <p style={{ margin: '8px 0 0', color: '#555', fontSize: '14px' }}>
-            Use your existing image upload flow, then paste those image URLs below.
+            Select images directly from your device. Selected images upload automatically when you save.
           </p>
         </div>
 
@@ -214,14 +248,48 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
             rows={10}
             style={textareaStyle}
           />
-          <textarea
-            name="imageUrls"
-            value={formData.imageUrls}
-            onChange={handleChange}
-            placeholder="Paste image URLs (one per line or comma separated)"
-            rows={4}
-            style={textareaStyle}
-          />
+          <div style={{ display: 'grid', gap: '10px' }}>
+            <label style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>Images</label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageSelection}
+              style={inputStyle}
+            />
+
+            {existingImageUrls.length > 0 ? (
+              <div style={{ display: 'grid', gap: '8px' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>Current images</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {existingImageUrls.map((url, index) => (
+                    <div key={`${url}-${index}`} style={previewCardStyle}>
+                      <img src={url} alt={`Current ${index + 1}`} style={previewImageStyle} />
+                      <button type="button" onClick={() => removeExistingImage(index)} style={removeImageBtnStyle}>
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {imagePreviews.length > 0 ? (
+              <div style={{ display: 'grid', gap: '8px' }}>
+                <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>New selected images</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {imagePreviews.map((preview, index) => (
+                    <div key={`preview-${index}`} style={previewCardStyle}>
+                      <img src={preview} alt={`Selected ${index + 1}`} style={previewImageStyle} />
+                      <button type="button" onClick={() => removeNewImage(index)} style={removeImageBtnStyle}>
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#222' }}>
             <input
               type="checkbox"
@@ -386,4 +454,32 @@ const textareaStyle = {
   ...inputStyle,
   resize: 'vertical',
   lineHeight: 1.5,
+}
+
+const previewCardStyle = {
+  border: '1px solid #dbe3f0',
+  borderRadius: '8px',
+  padding: '6px',
+  background: '#fff',
+  display: 'grid',
+  gap: '6px',
+}
+
+const previewImageStyle = {
+  width: '110px',
+  height: '80px',
+  objectFit: 'cover',
+  borderRadius: '6px',
+  display: 'block',
+}
+
+const removeImageBtnStyle = {
+  border: '1px solid #fecaca',
+  background: '#fff1f2',
+  color: '#b91c1c',
+  borderRadius: '6px',
+  padding: '4px 8px',
+  fontSize: '12px',
+  fontWeight: 600,
+  cursor: 'pointer',
 }
