@@ -97,9 +97,22 @@ function SignUpPage() {
     <div className="auth-page">
       <Navbar onScrollToSection={scrollToSection} />
       <div className="auth-container">
+        <section className="auth-hero-panel" aria-label="Why create an account">
+          <p className="auth-kicker">Bluetick Client Access</p>
+          <h1 className="auth-hero-title">Create your account and launch faster.</h1>
+          <p className="auth-hero-description">
+            Manage orders, submit publication content, and track updates from one professional dashboard,
+            all designed with the same premium experience as our homepage.
+          </p>
+          <ul className="auth-feature-list">
+            <li>Checkout and service progress in one place</li>
+            <li>Faster support and publication coordination</li>
+            <li>Secure access to your account and order history</li>
+          </ul>
+        </section>
         <div className="auth-card">
           <h1 className="auth-title">Sign Up</h1>
-          <p className="auth-subtitle">Create an account to get started</p>
+          <p className="auth-subtitle">Join Bluetick and get started in less than a minute.</p>
 
           {error && <div className="auth-error">{error}</div>}
 

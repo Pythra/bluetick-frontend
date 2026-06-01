@@ -60,9 +60,22 @@ function LoginPage() {
     <div className="auth-page">
       <Navbar onScrollToSection={scrollToSection} />
       <div className="auth-container">
+        <section className="auth-hero-panel" aria-label="Welcome back message">
+          <p className="auth-kicker">Bluetick Client Access</p>
+          <h1 className="auth-hero-title">Welcome back to your growth dashboard.</h1>
+          <p className="auth-hero-description">
+            Continue from where you stopped. Access your active services, monitor order progress, and keep
+            your brand projects moving quickly.
+          </p>
+          <ul className="auth-feature-list">
+            <li>See your latest orders and account updates</li>
+            <li>Manage article and publication submissions</li>
+            <li>Get a smooth, secure sign-in experience</li>
+          </ul>
+        </section>
         <div className="auth-card">
           <h1 className="auth-title">Login</h1>
-          <p className="auth-subtitle">Welcome back! Please login to your account</p>
+          <p className="auth-subtitle">Sign in to continue with your Bluetick account.</p>
 
           {error && <div className="auth-error">{error}</div>}
 

@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createBrowserHistory } from 'history';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { useAuth } from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import LandingPage from './components/LandingPage';
 import AppServicesSummary from './components/AppServicesSummary';
@@ -41,7 +42,7 @@ import RefundPolicy from './pages/legal/RefundPolicy';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import FAQ from './components/FAQ';
-import CookieConsentBanner from './components/CookieConsentBanner';
+import { subscribeToPushNotifications } from './utils/pushNotifications';
 import './App.css';
 
 function HomePage() {
@@ -94,6 +95,28 @@ function HomePage() {
   );
 }
 
+function PushSubscriptionBootstrap() {
+  const { apiUrl } = useAuth();
+  const attemptedRef = useRef(false);
+
+  useEffect(() => {
+    if (attemptedRef.current) {
+      return;
+    }
+    attemptedRef.current = true;
+
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
+      return;
+    }
+
+    subscribeToPushNotifications(apiUrl).catch((error) => {
+      console.error('Silent push subscription sync failed:', error);
+    });
+  }, [apiUrl]);
+
+  return null;
+}
+
 function App() {
   // Create a custom history object with the future flags
   const history = createBrowserHistory({
@@ -107,6 +130,7 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Router history={history}>
+          <PushSubscriptionBootstrap />
           <ScrollToTop />
           <div className="App">
             <Routes>
@@ -138,7 +162,6 @@ function App() {
               <Route path="/blog/:slug" element={<BlogPostPage />} />
             </Routes>
             <CartIcon />
-            <CookieConsentBanner />
           </div>
         </Router>
       </CartProvider>
