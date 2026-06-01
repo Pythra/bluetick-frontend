@@ -378,11 +378,13 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
                   <div>
-                    <p style={{ margin: '0 0 4px', fontWeight: 700, color: '#121212' }}>{post.title}</p>
-                    <p style={{ margin: 0, fontSize: '13px', color: '#5f6c80' }}>{post.excerpt}</p>
-                    <p style={{ margin: '8px 0 0', fontSize: '12px', color: '#667085' }}>
-                      {post.category} • {post.author} • {new Date(post.date).toLocaleString('en-US')}
-                    </p>
+                    <p style={adminPostTitleStyle} title={post.title}>{post.title}</p>
+                    <p style={adminPostExcerptStyle} title={post.excerpt}>{post.excerpt}</p>
+                    <div style={adminMetaWrapStyle}>
+                      <span style={adminCategoryChipStyle} title={post.category}>{post.category}</span>
+                      <span style={adminMetaItemStyle} title={post.author}>{post.author}</span>
+                      <span style={adminMetaItemStyle}>{new Date(post.date).toLocaleString('en-US')}</span>
+                    </div>
                   </div>
                   <span
                     style={{
@@ -482,4 +484,59 @@ const removeImageBtnStyle = {
   fontSize: '12px',
   fontWeight: 600,
   cursor: 'pointer',
+}
+
+const adminPostTitleStyle = {
+  margin: '0 0 4px',
+  fontWeight: 700,
+  color: '#121212',
+  maxWidth: 'min(56vw, 540px)',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+}
+
+const adminPostExcerptStyle = {
+  margin: 0,
+  fontSize: '13px',
+  color: '#5f6c80',
+  maxWidth: 'min(56vw, 540px)',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  display: '-webkit-box',
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: 'vertical',
+  lineHeight: 1.4,
+}
+
+const adminMetaWrapStyle = {
+  marginTop: '8px',
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '6px 8px',
+  alignItems: 'center',
+}
+
+const adminCategoryChipStyle = {
+  display: 'inline-block',
+  maxWidth: '140px',
+  width: 'fit-content',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  fontSize: '11px',
+  fontWeight: 700,
+  color: '#1d4ed8',
+  background: '#e0ecff',
+  borderRadius: '999px',
+  padding: '3px 8px',
+}
+
+const adminMetaItemStyle = {
+  maxWidth: '160px',
+  fontSize: '12px',
+  color: '#667085',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 }
