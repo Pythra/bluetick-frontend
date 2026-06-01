@@ -41,6 +41,7 @@ import RefundPolicy from './pages/legal/RefundPolicy';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import FAQ from './components/FAQ';
+import CookieConsentBanner from './components/CookieConsentBanner';
 import './App.css';
 
 function HomePage() {
@@ -137,6 +138,7 @@ function App() {
               <Route path="/blog/:slug" element={<BlogPostPage />} />
             </Routes>
             <CartIcon />
+            <CookieConsentBanner />
           </div>
         </Router>
       </CartProvider>

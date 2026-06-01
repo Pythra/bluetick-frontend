@@ -6,6 +6,7 @@ import { UserManagement } from './pages/UserManagement'
 import { CartManagement } from './pages/CartManagement'
 import { OrderManagement } from './pages/OrderManagement'
 import { SubmissionManagement } from './pages/SubmissionManagement'
+import { BlogManagement } from './pages/BlogManagement'
 import { useAuth } from '../contexts/AuthContext'
 
 function AdminApp() {
@@ -296,7 +297,8 @@ function AdminApp() {
       'users': 'User Management',
       'carts': 'Shopping Carts',
       'orders': 'Orders',
-      'submissions': 'Article Submissions'
+      'submissions': 'Article Submissions',
+      'blog': 'Blog Management',
     }
     return titles[activeTab] || 'Dashboard'
   }
@@ -401,6 +403,8 @@ function AdminApp() {
           <OrderManagement users={users} onUpdateOrder={handleUpdateOrderStatus} />
         ) : activeTab === 'submissions' ? (
           <SubmissionManagement users={users} />
+        ) : activeTab === 'blog' ? (
+          <BlogManagement apiUrl={apiUrl} adminToken={adminToken} />
         ) : null}
       </div>
     </div>

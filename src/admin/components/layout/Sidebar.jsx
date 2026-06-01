@@ -1,6 +1,6 @@
 import React from 'react'
 import { Logo } from '../ui/Logo'
-import { MdDashboard, MdPeople, MdShoppingCart, MdInventory2, MdArticle, MdLogout } from 'react-icons/md'
+import { MdDashboard, MdPeople, MdShoppingCart, MdInventory2, MdArticle, MdEditNote, MdLogout } from 'react-icons/md'
 
 const menuItems = [
 	{ id: 'dashboard', label: 'Dashboard', icon: MdDashboard },
@@ -8,6 +8,7 @@ const menuItems = [
 	{ id: 'carts', label: 'Shopping Carts', icon: MdShoppingCart },
 	{ id: 'orders', label: 'Orders', icon: MdInventory2 },
 	{ id: 'submissions', label: 'Submissions', icon: MdArticle },
+	{ id: 'blog', label: 'Blog', icon: MdEditNote },
 	{ id: 'signout', label: 'Sign out', icon: MdLogout },
 ]
 
