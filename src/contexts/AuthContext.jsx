@@ -147,7 +147,7 @@ export const AuthProvider = ({ children }) => {
     return () => clearInterval(intervalId);
   }, [token, refreshAuth]);
 
-  const signup = async (email, password, passwordConfirmation, firstName, lastName, phone) => {
+  const signup = async (email, password, passwordConfirmation, firstName, lastName) => {
     try {
       const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: 'POST',
@@ -160,7 +160,6 @@ export const AuthProvider = ({ children }) => {
           passwordConfirmation,
           firstName,
           lastName,
-          phone,
         }),
       });
 
@@ -202,6 +201,30 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async (credential) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ credential }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to login with Google');
+      }
+
+      persistSession(data.token, data.user);
+      return { success: true, user: data.user };
+    } catch (error) {
+      console.error('Google login error:', error);
+      throw error;
+    }
+  };
+
   const getAuthHeaders = () => {
     const activeToken = localStorage.getItem('token') || token;
     if (!activeToken) return {};
@@ -219,6 +242,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user && !!token,
     signup,
     login,
+    loginWithGoogle,
     logout,
     getAuthHeaders,
     authFetch,

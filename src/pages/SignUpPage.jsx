@@ -3,16 +3,16 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 import './AuthPage.css';
 
 function SignUpPage() {
   const navigate = useNavigate();
-  const { signup } = useAuth();
+  const { signup, loginWithGoogle } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
     password: '',
     passwordConfirmation: '',
   });
@@ -37,19 +37,10 @@ function SignUpPage() {
       !formData.firstName ||
       !formData.lastName ||
       !formData.email ||
-      !formData.phone ||
       !formData.password ||
       !formData.passwordConfirmation
     ) {
       setError('All fields are required');
-      setLoading(false);
-      return;
-    }
-
-    // Phone validation
-    const phoneRegex = /^\+?[\d\s-]{10,}$/;
-    if (!phoneRegex.test(formData.phone)) {
-      setError('Please enter a valid phone number (at least 10 digits)');
       setLoading(false);
       return;
     }
@@ -72,12 +63,24 @@ function SignUpPage() {
       formData.password,
       formData.passwordConfirmation,
       formData.firstName,
-      formData.lastName,
-      formData.phone
+      formData.lastName
     );
       navigate('/');
     } catch (err) {
       setError(err.message || 'Failed to sign up. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async (credential) => {
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle(credential);
+      navigate('/');
+    } catch (err) {
+      setError(err.message || 'Google sign-up failed.');
     } finally {
       setLoading(false);
     }
@@ -98,7 +101,6 @@ function SignUpPage() {
       <Navbar onScrollToSection={scrollToSection} />
       <div className="auth-container">
         <section className="auth-hero-panel" aria-label="Why create an account">
-          <p className="auth-kicker">Bluetick Client Access</p>
           <h1 className="auth-hero-title">Create your account and launch faster.</h1>
           <p className="auth-hero-description">
             Manage orders, submit publication content, and track updates from one professional dashboard,
@@ -157,21 +159,6 @@ function SignUpPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="phone">Phone Number</label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                required
-                placeholder="Enter your phone number (e.g., +1234567890)"
-                pattern="^\+?[\d\s-]{10,}$"
-                title="Please enter a valid phone number (at least 10 digits, can include +, -, or spaces)"
-              />
-            </div>
-
-            <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
                 type="password"
@@ -203,6 +190,13 @@ function SignUpPage() {
               {loading ? 'Signing up...' : 'Sign Up'}
             </button>
           </form>
+
+          <div className="auth-divider"><span>or</span></div>
+          <GoogleAuthButton
+            onCredential={handleGoogleSignup}
+            onError={(message) => setError(message)}
+            disabled={loading}
+          />
 
           <p className="auth-link">
             Already have an account? <Link to="/login">Login</Link>

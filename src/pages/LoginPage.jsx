@@ -3,12 +3,13 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 import './AuthPage.css';
 
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -46,6 +47,20 @@ function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = async (credential) => {
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle(credential);
+      const redirectTo = location.state?.from || '/account';
+      navigate(redirectTo, { replace: true });
+    } catch (err) {
+      setError(err.message || 'Google sign-in failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const scrollToSection = (sectionId) => {
     navigate('/');
     setTimeout(() => {
@@ -61,7 +76,6 @@ function LoginPage() {
       <Navbar onScrollToSection={scrollToSection} />
       <div className="auth-container">
         <section className="auth-hero-panel" aria-label="Welcome back message">
-          <p className="auth-kicker">Bluetick Client Access</p>
           <h1 className="auth-hero-title">Welcome back to your growth dashboard.</h1>
           <p className="auth-hero-description">
             Continue from where you stopped. Access your active services, monitor order progress, and keep
@@ -110,6 +124,13 @@ function LoginPage() {
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
+
+          <div className="auth-divider"><span>or</span></div>
+          <GoogleAuthButton
+            onCredential={handleGoogleLogin}
+            onError={(message) => setError(message)}
+            disabled={loading}
+          />
 
           <p className="auth-link">
             Don't have an account? <Link to="/signup">Sign Up</Link>
