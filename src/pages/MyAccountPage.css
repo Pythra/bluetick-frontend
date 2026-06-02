@@ -2,13 +2,13 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f1f5f9;
+  background: #ffffff;
   font-family: 'Poppins', 'Inter', sans-serif;
 }
 
 .my-account-main {
   flex: 1;
-  padding: 1.5rem 1.25rem 3rem;
+  padding: 1.5rem 1.25rem 3rem 2rem;
 }
 
 .my-account-loading {
@@ -25,21 +25,32 @@
 .my-account-shell {
   display: grid;
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
-  gap: 1.5rem;
-  max-width: 1120px;
-  margin: 0 auto;
-  align-items: start;
+  gap: 2.25rem;
+  max-width: 1160px;
+  margin: 0;
+  align-items: stretch;
 }
 
 /* Sidebar */
 .my-account-sidebar {
   position: sticky;
   top: 1.25rem;
-  padding: 1.25rem 1rem;
+  align-self: stretch;
+  min-height: min(680px, calc(100vh - 9rem));
+  display: flex;
+  flex-direction: column;
+  margin-left: -0.75rem;
+  padding: 1.5rem 1.1rem 1.75rem;
   background: #fff;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+}
+
+.my-account-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .my-account-profile {
@@ -195,9 +206,10 @@
 
 .my-account-dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(140px, 180px);
-  grid-auto-rows: minmax(148px, auto);
-  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(150px, auto);
+  gap: 1.75rem 2.25rem;
+  max-width: 760px;
 }
 
 .my-account-dash-card {
@@ -206,24 +218,20 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 1.25rem 1rem;
-  border: 1px solid rgba(37, 99, 235, 0.12);
+  padding: 1.5rem 1.25rem;
+  border: none;
   border-radius: 16px;
-  background: linear-gradient(165deg, #f0f7ff 0%, #e8f1fe 100%);
+  background: #f8fafc;
   color: #0f172a;
   font-family: inherit;
   text-align: center;
   cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .my-account-dash-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(37, 99, 235, 0.28);
-  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.12);
+  background: #f1f5f9;
 }
 
 .my-account-dash-card-icon {
@@ -245,22 +253,6 @@
   line-height: 1.5;
   color: #475569;
   max-width: 16rem;
-}
-
-.my-account-dash-card--logout {
-  grid-row: 1 / span 3;
-  grid-column: 3;
-  background: linear-gradient(165deg, #dbeafe 0%, #bfdbfe 100%);
-  border-color: rgba(29, 78, 216, 0.2);
-}
-
-.my-account-dash-card--logout .my-account-dash-card-icon {
-  color: #1e40af;
-}
-
-.my-account-dash-card--logout:hover {
-  border-color: rgba(29, 78, 216, 0.35);
-  box-shadow: 0 10px 28px rgba(29, 78, 216, 0.15);
 }
 
 /* Detail panels (orders, account) */
@@ -500,13 +492,8 @@
 
 @media (max-width: 900px) {
   .my-account-dashboard-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .my-account-dash-card--logout {
-    grid-row: auto;
-    grid-column: 1 / -1;
-    min-height: 120px;
+    gap: 1.25rem;
+    max-width: none;
   }
 }
 
@@ -522,6 +509,9 @@
 
   .my-account-sidebar {
     position: static;
+    min-height: 0;
+    margin-left: 0;
+    align-self: auto;
   }
 
   .my-account-profile {

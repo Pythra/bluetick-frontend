@@ -129,16 +129,16 @@ function AppServicesPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero">
+        <header className="service-detail-hero service-detail-hero--app">
           <video
             className="service-detail-hero-image"
             src={appHeroVideo}
             poster={appHeroImage}
             autoPlay
-            muted
             loop
             playsInline
-            aria-hidden="true"
+            controls
+            preload="metadata"
           />
           <div className="service-detail-hero-overlay" aria-hidden="true" />
           <div className="service-detail-hero-content">

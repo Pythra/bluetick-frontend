@@ -208,13 +208,6 @@ function MyAccountPage() {
       onClick: () => goToSection(SECTIONS.orders),
     },
     {
-      key: 'services',
-      title: 'Our services',
-      description: 'Browse verification, publications, and other BlueTick packages',
-      icon: IoNewspaperOutline,
-      onClick: () => navigate('/services/publications'),
-    },
-    {
       key: 'checkout',
       title: 'Checkout',
       description:
@@ -357,19 +350,6 @@ function MyAccountPage() {
             </button>
           );
         })}
-        <button
-          type="button"
-          className="my-account-dash-card my-account-dash-card--logout"
-          onClick={handleLogout}
-        >
-          <span className="my-account-dash-card-icon" aria-hidden="true">
-            <IoLogOutOutline />
-          </span>
-          <span className="my-account-dash-card-title">Log out</span>
-          <span className="my-account-dash-card-desc">
-            Sign out when you are done to keep your account secure on shared devices.
-          </span>
-        </button>
       </div>
     </div>
   );
