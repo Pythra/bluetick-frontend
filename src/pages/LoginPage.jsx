@@ -3,13 +3,12 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import GoogleAuthButton from '../components/GoogleAuthButton';
 import './AuthPage.css';
 
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, loginWithGoogle } = useAuth();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -42,20 +41,6 @@ function LoginPage() {
       navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || 'Failed to login. Please check your credentials.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async (credential) => {
-    setError('');
-    setLoading(true);
-    try {
-      await loginWithGoogle(credential);
-      const redirectTo = location.state?.from || '/account';
-      navigate(redirectTo, { replace: true });
-    } catch (err) {
-      setError(err.message || 'Google sign-in failed.');
     } finally {
       setLoading(false);
     }
@@ -124,13 +109,6 @@ function LoginPage() {
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
-
-          <div className="auth-divider"><span>or</span></div>
-          <GoogleAuthButton
-            onCredential={handleGoogleLogin}
-            onError={(message) => setError(message)}
-            disabled={loading}
-          />
 
           <p className="auth-link">
             Don't have an account? <Link to="/signup">Sign Up</Link>

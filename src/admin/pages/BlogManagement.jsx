@@ -223,21 +223,29 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
             placeholder="Short excerpt for blog listing"
             style={inputStyle}
           />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <input
-              name="author"
-              value={formData.author}
-              onChange={handleChange}
-              placeholder="Author"
-              style={inputStyle}
-            />
-            <input
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              placeholder="Category"
-              style={inputStyle}
-            />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', alignItems: 'flex-start' }}>
+            <div>
+              <input
+                name="author"
+                value={formData.author}
+                onChange={handleChange}
+                placeholder="Author"
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ display: 'grid', gap: '4px' }}>
+              <label htmlFor="blog-category-input" style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>
+                Category
+              </label>
+              <input
+                id="blog-category-input"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                placeholder="Category"
+                style={inputStyle}
+              />
+            </div>
           </div>
           <textarea
             name="content"

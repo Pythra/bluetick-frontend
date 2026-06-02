@@ -67,7 +67,14 @@ function AdminApp() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = (requireConfirmation = true) => {
+    if (requireConfirmation) {
+      const shouldLogout = window.confirm('Are you sure you want to log out?')
+      if (!shouldLogout) {
+        return
+      }
+    }
+
     localStorage.removeItem('adminToken')
     setAdminToken(null)
     setIsLoggedIn(false)
@@ -93,7 +100,7 @@ function AdminApp() {
 
       if (!response.ok) {
         if (response.status === 403) {
-          handleLogout()
+          handleLogout(false)
           return
         }
         throw new Error(data.error || 'Failed to fetch users')

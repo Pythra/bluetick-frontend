@@ -10,6 +10,10 @@ function Navbar({ onScrollToSection }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    const shouldLogout = window.confirm('Are you sure you want to log out?');
+    if (!shouldLogout) {
+      return;
+    }
     logout();
     setIsMenuOpen(false);
     navigate('/');

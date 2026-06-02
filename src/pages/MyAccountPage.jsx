@@ -117,6 +117,10 @@ function MyAccountPage() {
   };
 
   const handleLogout = () => {
+    const shouldLogout = window.confirm('Are you sure you want to log out?');
+    if (!shouldLogout) {
+      return;
+    }
     logout();
     navigate('/');
   };

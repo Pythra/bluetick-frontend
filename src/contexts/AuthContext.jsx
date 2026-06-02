@@ -147,7 +147,7 @@ export const AuthProvider = ({ children }) => {
     return () => clearInterval(intervalId);
   }, [token, refreshAuth]);
 
-  const signup = async (email, password, passwordConfirmation, firstName, lastName) => {
+  const signup = async (email, password, passwordConfirmation, firstName, lastName, phone) => {
     try {
       const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: 'POST',
@@ -160,6 +160,7 @@ export const AuthProvider = ({ children }) => {
           passwordConfirmation,
           firstName,
           lastName,
+          phone,
         }),
       });
 

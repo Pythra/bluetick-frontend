@@ -3,15 +3,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import GoogleAuthButton from '../components/GoogleAuthButton';
 import './AuthPage.css';
 
 function SignUpPage() {
   const navigate = useNavigate();
-  const { signup, loginWithGoogle } = useAuth();
+  const { signup } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    phone: '',
     email: '',
     password: '',
     passwordConfirmation: '',
@@ -36,6 +36,7 @@ function SignUpPage() {
     if (
       !formData.firstName ||
       !formData.lastName ||
+      !formData.phone ||
       !formData.email ||
       !formData.password ||
       !formData.passwordConfirmation
@@ -63,24 +64,12 @@ function SignUpPage() {
       formData.password,
       formData.passwordConfirmation,
       formData.firstName,
-      formData.lastName
+      formData.lastName,
+      formData.phone
     );
       navigate('/');
     } catch (err) {
       setError(err.message || 'Failed to sign up. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignup = async (credential) => {
-    setError('');
-    setLoading(true);
-    try {
-      await loginWithGoogle(credential);
-      navigate('/');
-    } catch (err) {
-      setError(err.message || 'Google sign-up failed.');
     } finally {
       setLoading(false);
     }
@@ -159,6 +148,19 @@ function SignUpPage() {
             </div>
 
             <div className="form-group">
+              <label htmlFor="phone">Phone number</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                placeholder="Enter your phone number"
+              />
+            </div>
+
+            <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
                 type="password"
@@ -190,13 +192,6 @@ function SignUpPage() {
               {loading ? 'Signing up...' : 'Sign Up'}
             </button>
           </form>
-
-          <div className="auth-divider"><span>or</span></div>
-          <GoogleAuthButton
-            onCredential={handleGoogleSignup}
-            onError={(message) => setError(message)}
-            disabled={loading}
-          />
 
           <p className="auth-link">
             Already have an account? <Link to="/login">Login</Link>
