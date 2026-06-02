@@ -17,6 +17,7 @@ import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import appHeroImage from '../assets/app.png';
 import appHeroVideo from '../assets/app.mp4';
 import './ServiceDetailPage.css';
@@ -184,6 +185,7 @@ function AppServicesPage() {
         </div>
       )}
 
+      <ClientsSection />
       <Footer />
     </div>
   );

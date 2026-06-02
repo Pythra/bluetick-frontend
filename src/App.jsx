@@ -33,6 +33,7 @@ import LoginPage from './pages/LoginPage';
 import MyAccountPage from './pages/MyAccountPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ArticleSubmissionPage from './pages/ArticleSubmissionPage';
+import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
 import AdminPage from './pages/AdminPage';
 import AdminApp from './admin/AdminApp';
 import Footer from './components/Footer';
@@ -43,6 +44,7 @@ import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import AboutPage from './pages/AboutPage';
 import FAQ from './components/FAQ';
+import ClientsSection from './components/ClientsSection';
 import { subscribeToPushNotifications } from './utils/pushNotifications';
 import './App.css';
 
@@ -91,6 +93,7 @@ function HomePage() {
       <div className="scroll-pop"><CelebritiesSection /></div>
       <div className="scroll-pop"><TestimonialsSection /></div>
       <div className="scroll-pop"><FAQ /></div>
+      <ClientsSection className="landing-page" />
       <Footer onScrollToSection={scrollToSection} />
     </>
   );
@@ -154,6 +157,7 @@ function App() {
               <Route path="/account" element={<MyAccountPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/article-submission" element={<ArticleSubmissionPage />} />
+              <Route path="/project-onboarding" element={<ProjectOnboardingPage />} />
               <Route path="/admin" element={<AdminApp />} />
               <Route path="/admin-dashboard" element={<AdminApp />} />
               <Route path="/terms" element={<TermsAndConditions />} />

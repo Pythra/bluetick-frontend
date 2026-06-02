@@ -3,8 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import Button from '../components/Button';
-import { IoCheckmarkCircle, IoArrowBack, IoTime } from 'react-icons/io5';
+import { IoCheckmarkCircle, IoTime } from 'react-icons/io5';
 import punchLogo from '../assets/punch.png';
 import guardianLogo from '../assets/guardian.png';
 import pulseLogo from '../assets/pulse.png';
@@ -310,6 +311,7 @@ function PackageDetailPage() {
           <h1>Package not found</h1>
           <Button onClick={() => navigate('/services/publications')}>Back to publications</Button>
         </div>
+        <ClientsSection />
         <Footer onScrollToSection={() => {}} />
       </div>
     );
@@ -350,15 +352,6 @@ function PackageDetailPage() {
       )}
       <Navbar onScrollToSection={scrollToSection} />
       <div className="package-detail-shell">
-        <button
-          type="button"
-          className="package-detail-back"
-          onClick={() => navigate('/services/publications')}
-        >
-          <IoArrowBack aria-hidden="true" />
-          Back to packages
-        </button>
-
         <header className="package-detail-header">
           <p className="publication-section-kicker">Publication package</p>
           {meta?.delivery ? (
@@ -407,6 +400,7 @@ function PackageDetailPage() {
           </div>
         ) : null}
       </div>
+      <ClientsSection />
       <Footer onScrollToSection={scrollToSection} />
     </div>
   );

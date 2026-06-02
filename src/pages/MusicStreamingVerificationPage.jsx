@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar';
 import StreamingPlatformLogo from '../components/StreamingPlatformLogo';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import musicHeroImage from '../assets/mayorkun.jpg';
 import {
   musicProfilePlacements,
@@ -183,6 +184,7 @@ function MusicStreamingVerificationPage() {
         </div>
       )}
 
+      <ClientsSection />
       <Footer />
     </div>
   );

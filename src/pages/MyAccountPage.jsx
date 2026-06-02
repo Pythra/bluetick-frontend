@@ -62,10 +62,6 @@ function getPaymentStatusLabel(order) {
   return { text: order.paymentStatus || 'Pending', tone: 'pending' };
 }
 
-function orderHasPublicationItems(order) {
-  return Array.isArray(order.cartItems) && order.cartItems.some((item) => item.category === 'publication');
-}
-
 function getUserInitials(user) {
   const first = user.firstName?.trim()?.[0] || '';
   const last = user.lastName?.trim()?.[0] || '';
@@ -250,10 +246,8 @@ function MyAccountPage() {
           {orders.map((order) => {
             const paymentStatus = getPaymentStatusLabel(order);
             const orderId = order._id;
-            const showPublicationLink =
-              order.paymentStatus === 'paid' &&
-              orderHasPublicationItems(order) &&
-              !order.publicationSubmissionComplete;
+            const showOnboardingLink =
+              order.paymentStatus === 'paid' && !order.onboardingComplete;
 
             return (
               <li key={orderId} className="my-account-order-card">
@@ -288,15 +282,15 @@ function MyAccountPage() {
                   </p>
                 )}
 
-                {showPublicationLink && (
+                {showOnboardingLink && (
                   <Button
                     type="button"
                     className="my-account-order-action"
-                    onClick={() => navigate(`/article-submission?orderId=${orderId}`)}
+                    onClick={() => navigate(`/project-onboarding?orderId=${orderId}`)}
                   >
-                    {order.pendingPublicationCount > 1
-                      ? `Submit articles (${order.pendingPublicationCount} remaining)`
-                      : 'Submit your article'}
+                    {order.onboardingPendingCount > 0
+                      ? `Submit project details (${order.onboardingPendingCount} remaining)`
+                      : 'Submit project details'}
                   </Button>
                 )}
               </li>

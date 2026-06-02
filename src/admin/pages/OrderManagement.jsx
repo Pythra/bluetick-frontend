@@ -389,6 +389,47 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                       </div>
                     )}
 
+                    {(order.clientProfile || order.metadata?.clientProfile) && (
+                      <div style={{
+                        padding: '16px',
+                        backgroundColor: 'white',
+                        borderRadius: '6px',
+                        marginBottom: '20px',
+                        border: '1px solid #eee',
+                      }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
+                          Client profile
+                        </div>
+                        <pre style={{ fontSize: '12px', whiteSpace: 'pre-wrap', margin: 0 }}>
+                          {JSON.stringify(order.clientProfile || order.metadata?.clientProfile, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+
+                    {((order.projectSubmissions || order.metadata?.projectSubmissions || []).length > 0) && (
+                      <div style={{
+                        padding: '16px',
+                        backgroundColor: 'white',
+                        borderRadius: '6px',
+                        marginBottom: '20px',
+                        border: '1px solid #eee',
+                      }}>
+                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
+                          Project onboarding submissions
+                        </div>
+                        {(order.projectSubmissions || order.metadata?.projectSubmissions || []).map((entry, idx) => (
+                          <div key={idx} style={{ marginBottom: '12px', padding: '10px', background: '#f5f5f5', borderRadius: '6px' }}>
+                            <div style={{ fontWeight: 600, marginBottom: '6px' }}>
+                              {entry.formType} — {entry.title || 'Service'}
+                            </div>
+                            <pre style={{ fontSize: '12px', whiteSpace: 'pre-wrap', margin: 0 }}>
+                              {JSON.stringify(entry.formData || entry, null, 2)}
+                            </pre>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     {/* Submission Details */}
                     {(order.postTitle || order.postBody || order.articleContent || order.fileName) && (
                       <div style={{

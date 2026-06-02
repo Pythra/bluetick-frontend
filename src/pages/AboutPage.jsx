@@ -4,6 +4,10 @@ import Footer from '../components/Footer';
 import teamMain from '../assets/about/team-main.jpg';
 import teamCrew from '../assets/about/team-crew.jpg';
 import connectDm from '../assets/about/connect-dm.jpg';
+import punchLogo from '../assets/punch.png';
+import businessDayLogo from '../assets/platforms/buisnessday.png';
+import vanguardLogo from '../assets/platforms/Vanguard.png';
+import PlatformLogo from '../components/PlatformLogo';
 import './AboutPage.css';
 
 const serviceGroups = [
@@ -52,16 +56,17 @@ const serviceGroups = [
   },
 ];
 
-const mediaFeatures = [
-  'BusinessDay',
-  'The Punch',
-  'Vanguard',
-  'ThisDay',
-  'Independent',
-  'Tribune',
-  'PM News',
-  'GhanaWeb',
-  'New Telegraph',
+/** Local bundled logos where available; others resolve via publicationPlatformLogos. */
+const aboutMediaPlatforms = [
+  { name: 'BusinessDay', logo: businessDayLogo },
+  { name: 'The Punch', logo: punchLogo },
+  { name: 'Vanguard', logo: vanguardLogo },
+  { name: 'ThisDay' },
+  { name: 'Independent' },
+  { name: 'Tribune' },
+  { name: 'PM News' },
+  { name: 'GhanaWeb' },
+  { name: 'New Telegraph' },
 ];
 
 const whyChoose = [
@@ -180,11 +185,26 @@ function AboutPage() {
             </p>
           </div>
           <p className="about-features-label">Featured by major media platforms including</p>
-          <div className="about-features">
-            {mediaFeatures.map((name) => (
-              <span key={name} className="about-feature-chip">
-                {name}
-              </span>
+          <div className="about-features" role="list" aria-label="Media platform logos">
+            {aboutMediaPlatforms.map((platform) => (
+              <div
+                key={platform.name}
+                className="about-media-logo-item"
+                role="listitem"
+                title={platform.name}
+              >
+                {platform.logo ? (
+                  <img
+                    src={platform.logo}
+                    alt={platform.name}
+                    className="about-media-logo"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <PlatformLogo platform={{ name: platform.name }} className="about-media-logo" />
+                )}
+              </div>
             ))}
           </div>
         </div>

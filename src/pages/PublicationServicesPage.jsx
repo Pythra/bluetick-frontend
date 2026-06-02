@@ -27,6 +27,7 @@ import {
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import EditorialGuidelinesSection from '../components/EditorialGuidelinesSection';
 import PublicationFeaturedSplit from '../components/PublicationFeaturedSplit';
 import newsImage from '../assets/news.jpg';
@@ -839,6 +840,7 @@ function PublicationServicesPage() {
 
       {/* Price List Section moved to individual category pages */}
 
+      <ClientsSection />
       <Footer onScrollToSection={scrollToSection} />
     </div>
   );

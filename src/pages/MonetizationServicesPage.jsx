@@ -16,6 +16,7 @@ import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import verificationHeroImage from '../assets/social/verification.jpg';
 import {
   monetizationImportantNotice,
@@ -159,6 +160,7 @@ function MonetizationServicesPage() {
         </div>
       )}
 
+      <ClientsSection />
       <Footer />
     </div>
   );

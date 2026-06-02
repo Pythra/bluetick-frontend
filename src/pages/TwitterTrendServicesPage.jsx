@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar';
 import CountryFlag from '../components/CountryFlag';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import verificationHeroImage from '../assets/social/verification.jpg';
 import { twitterTrendNotice, twitterTrendPackages } from '../data/twitterTrendPackages';
 import './ServiceDetailPage.css';
@@ -106,6 +107,7 @@ function TwitterTrendServicesPage() {
         </div>
       )}
 
+      <ClientsSection />
       <Footer />
     </div>
   );

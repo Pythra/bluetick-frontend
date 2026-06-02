@@ -6,6 +6,7 @@ import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import websiteHeroImage from '../assets/tech.jpg';
 import { companyWhatsappSessionUrl } from '../config/companyContact';
 import './ServiceDetailPage.css';
@@ -126,6 +127,7 @@ function WebsiteServicesPage() {
         </div>
       )}
 
+      <ClientsSection />
       <Footer />
     </div>
   );

@@ -41,7 +41,7 @@ function Navbar({ onScrollToSection }) {
             About Us
           </button>
           <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('publication-services'))}>
-            PR Agencies
+            Publication Services
           </button>
           <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('website-services'))}>
             Services

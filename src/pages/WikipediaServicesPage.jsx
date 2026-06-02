@@ -13,6 +13,7 @@ import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import wikipediaHeroVideo from '../assets/wiki.mp4';
 import {
   googleKnowledgePanelPackages,
@@ -211,6 +212,7 @@ function WikipediaServicesPage() {
         </div>
       )}
 
+      <ClientsSection />
       <Footer onScrollToSection={scrollToSection} />
     </div>
   );

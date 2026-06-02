@@ -105,25 +105,9 @@ function CheckoutPage() {
     priceSummary.invalidItems.length === 0;
 
   const redirectAfterPaystackSuccess = useCallback(
-    (orderId, items) => {
-      const hasPublicationItems = items.some((item) => item.category === 'publication');
-
-      if (hasPublicationItems) {
-        navigate('/article-submission', {
-          state: {
-            orderId,
-            serviceType: 'publication',
-            cartItems: items,
-          },
-        });
-        return;
-      }
-
-      navigate('/account', {
-        state: {
-          orderId,
-          paymentSuccess: true,
-        },
+    (orderId) => {
+      navigate(`/project-onboarding?orderId=${orderId}`, {
+        state: { orderId, paymentSuccess: true },
       });
     },
     [navigate]

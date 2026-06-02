@@ -98,8 +98,8 @@ function ArticleSubmissionPage() {
           } else if (pubs[0]?.itemId) {
             setActiveTargetItemId(pubs[0].itemId);
           }
-          if (pubs.length === 0 && data.order.hasNonPublicationItems) {
-            setError('This order does not include publication services. Our team will contact you about your other services.');
+          if (pubs.length === 0) {
+            navigate(`/project-onboarding?orderId=${orderIdFromQuery}`, { replace: true });
           }
         }
       } catch (loadError) {

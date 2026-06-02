@@ -6,6 +6,7 @@ import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import ClientsSection from '../components/ClientsSection';
 import instagramHeroImage from '../assets/online.jpg';
 import {
   getInstagramCartTitle,
@@ -114,6 +115,7 @@ function InstagramServicesPage() {
         </div>
       )}
 
+      <ClientsSection />
       <Footer onScrollToSection={scrollToSection} />
     </div>
   );
