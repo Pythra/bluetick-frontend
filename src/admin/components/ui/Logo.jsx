@@ -1,10 +1,6 @@
 export const Logo = () => {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '12px'
-    }}>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
       <img
         src="/bluetickgeng-logo.png"
         alt="Bluetickgeng Development"
@@ -12,18 +8,9 @@ export const Logo = () => {
           width: '160px',
           maxWidth: '100%',
           height: 'auto',
-          objectFit: 'contain'
+          objectFit: 'contain',
         }}
       />
-      <div>
-        <div style={{
-          fontSize: '18px',
-          fontWeight: '700',
-          color: '#121212'
-        }}>
-          Admin
-        </div>
-      </div>
     </div>
-  )
-}
+  );
+};

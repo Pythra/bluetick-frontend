@@ -1,8 +1,20 @@
 import './Button.css';
 
-function Button({ children, onClick, variant = 'primary', className = '' }) {
+function Button({
+  children,
+  onClick,
+  variant = 'primary',
+  className = '',
+  type = 'button',
+  disabled = false,
+}) {
   return (
-    <button className={`btn btn-${variant} ${className}`} onClick={onClick}>
+    <button
+      type={type}
+      className={`btn btn-${variant} ${className}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

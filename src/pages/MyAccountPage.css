@@ -2,18 +2,13 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f8fafc;
+  background: #f1f5f9;
   font-family: 'Poppins', 'Inter', sans-serif;
 }
 
 .my-account-main {
   flex: 1;
-  padding: 0 1.25rem 3rem;
-}
-
-.my-account-container {
-  max-width: 920px;
-  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
 }
 
 .my-account-loading {
@@ -26,72 +21,273 @@
   font-size: 0.95rem;
 }
 
-.my-account-kicker {
-  margin: 0 0 0.35rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #2563eb;
+/* Shell: sidebar + content */
+.my-account-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+  gap: 1.5rem;
+  max-width: 1120px;
+  margin: 0 auto;
+  align-items: start;
 }
 
-.my-account-title {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.75rem, 4vw, 2.25rem);
+/* Sidebar */
+.my-account-sidebar {
+  position: sticky;
+  top: 1.25rem;
+  padding: 1.25rem 1rem;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+}
+
+.my-account-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.my-account-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.my-account-profile-text {
+  min-width: 0;
+}
+
+.my-account-greeting {
+  margin: 0 0 0.15rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-account-email {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.my-account-sidebar-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #dc2626;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.my-account-sidebar-logout:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.my-account-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.my-account-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.6rem 0.65rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #475569;
+  font-size: 0.88rem;
+  font-weight: 500;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.my-account-nav-link svg {
+  flex-shrink: 0;
+  font-size: 1.1rem;
+}
+
+.my-account-nav-link:hover {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.my-account-nav-link.is-active {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.my-account-nav-badge {
+  margin-left: auto;
+  min-width: 1.25rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Main content area */
+.my-account-content {
+  min-width: 0;
+}
+
+/* Dashboard */
+.my-account-dashboard-head {
+  margin-bottom: 1.25rem;
+}
+
+.my-account-dashboard-title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.35rem, 3vw, 1.65rem);
   font-weight: 600;
   letter-spacing: -0.02em;
   color: #0f172a;
 }
 
-.my-account-lead {
-  margin: 0 0 2rem;
-  max-width: 36rem;
-  font-size: 1rem;
-  line-height: 1.65;
-  color: #475569;
+.my-account-dashboard-lead {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #64748b;
 }
 
-.my-account-grid {
+.my-account-dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(140px, 180px);
+  grid-auto-rows: minmax(148px, auto);
+  gap: 1rem;
 }
 
-.my-account-card {
-  padding: 1.35rem 1.25rem 1.5rem;
-  background: #fff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  box-shadow:
-    0 2px 4px rgba(15, 23, 42, 0.04),
-    0 8px 24px rgba(37, 99, 235, 0.08),
-    0 16px 40px rgba(15, 23, 42, 0.06);
-}
-
-.my-account-card-head {
+.my-account-dash-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 1.15rem;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.25rem 1rem;
+  border: 1px solid rgba(37, 99, 235, 0.12);
+  border-radius: 16px;
+  background: linear-gradient(165deg, #f0f7ff 0%, #e8f1fe 100%);
+  color: #0f172a;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.my-account-card-icon {
+.my-account-dash-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.28);
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.12);
+}
+
+.my-account-dash-card-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 12px;
-  background: #eff6ff;
+  font-size: 1.65rem;
   color: #2563eb;
-  font-size: 1.25rem;
 }
 
-.my-account-card-title {
-  margin: 0;
-  font-size: 1.05rem;
+.my-account-dash-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.my-account-dash-card-desc {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #475569;
+  max-width: 16rem;
+}
+
+.my-account-dash-card--logout {
+  grid-row: 1 / span 3;
+  grid-column: 3;
+  background: linear-gradient(165deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: rgba(29, 78, 216, 0.2);
+}
+
+.my-account-dash-card--logout .my-account-dash-card-icon {
+  color: #1e40af;
+}
+
+.my-account-dash-card--logout:hover {
+  border-color: rgba(29, 78, 216, 0.35);
+  box-shadow: 0 10px 28px rgba(29, 78, 216, 0.15);
+}
+
+/* Detail panels (orders, account) */
+.my-account-panel {
+  padding: 1.35rem 1.35rem 1.5rem;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+}
+
+.my-account-panel-head {
+  margin-bottom: 1.15rem;
+}
+
+.my-account-panel-title {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
   font-weight: 600;
   color: #0f172a;
+}
+
+.my-account-panel-lead {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #64748b;
 }
 
 .my-account-details {
@@ -100,7 +296,7 @@
 
 .my-account-detail-row {
   display: grid;
-  grid-template-columns: 110px 1fr;
+  grid-template-columns: 120px 1fr;
   gap: 0.75rem;
   padding: 0.65rem 0;
   border-bottom: 1px solid #f1f5f9;
@@ -126,77 +322,10 @@
   word-break: break-word;
 }
 
-.my-account-card-text {
-  margin: 0 0 1rem;
-  font-size: 0.92rem;
-  line-height: 1.6;
-  color: #475569;
-}
-
-.my-account-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.my-account-btn-primary.btn,
-.my-account-btn-secondary.btn {
-  width: 100%;
-  padding: 0.7rem 1rem;
-  border-radius: 999px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.my-account-btn-primary.btn {
-  background: #0f172a;
-  color: #fff;
-}
-
-.my-account-btn-primary.btn::before,
-.my-account-btn-secondary.btn::before {
-  display: none;
-}
-
-.my-account-btn-primary.btn:hover {
-  background: #1e293b;
-}
-
-.my-account-btn-secondary.btn {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid rgba(37, 99, 235, 0.2);
-}
-
-.my-account-btn-secondary.btn:hover {
-  background: #dbeafe;
-}
-
-.my-account-logout {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  margin-top: 0.35rem;
-  padding: 0.55rem 0.75rem;
-  border: none;
-  background: transparent;
-  color: #64748b;
-  font-size: 0.88rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-.my-account-logout:hover {
-  color: #dc2626;
-}
-
 .my-account-help {
-  margin: 1rem 0 0;
+  margin: 1.15rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9;
   font-size: 0.82rem;
   line-height: 1.55;
   color: #64748b;
@@ -213,7 +342,8 @@
 }
 
 .my-account-back {
-  margin: 1.75rem 0 0;
+  max-width: 1120px;
+  margin: 1.5rem auto 0;
   font-size: 0.9rem;
 }
 
@@ -227,36 +357,7 @@
   text-decoration: underline;
 }
 
-.my-account-orders {
-  margin-top: 1.5rem;
-  padding: 1.35rem 1.25rem 1.5rem;
-  background: #fff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  box-shadow:
-    0 2px 4px rgba(15, 23, 42, 0.04),
-    0 8px 24px rgba(37, 99, 235, 0.08),
-    0 16px 40px rgba(15, 23, 42, 0.06);
-}
-
-.my-account-orders-head {
-  margin-bottom: 1.15rem;
-}
-
-.my-account-orders-title {
-  margin: 0 0 0.35rem;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.my-account-orders-lead {
-  margin: 0;
-  font-size: 0.88rem;
-  line-height: 1.55;
-  color: #64748b;
-}
-
+/* Orders */
 .my-account-orders-empty,
 .my-account-orders-error {
   margin: 0;
@@ -397,12 +498,49 @@
   background: #1e293b;
 }
 
-@media (max-width: 768px) {
-  .my-account-main {
-    padding: 0 1rem 3rem;
+@media (max-width: 900px) {
+  .my-account-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .my-account-grid {
+  .my-account-dash-card--logout {
+    grid-row: auto;
+    grid-column: 1 / -1;
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 768px) {
+  .my-account-main {
+    padding: 1rem 1rem 2.5rem;
+  }
+
+  .my-account-shell {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .my-account-sidebar {
+    position: static;
+  }
+
+  .my-account-profile {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .my-account-nav-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+
+  .my-account-nav-link {
+    font-size: 0.82rem;
+    padding: 0.55rem 0.5rem;
+  }
+
+  .my-account-dashboard-grid {
     grid-template-columns: 1fr;
   }
 

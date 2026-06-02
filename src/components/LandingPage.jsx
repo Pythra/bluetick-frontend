@@ -6,6 +6,7 @@ import {
   IoRocketOutline,
 } from 'react-icons/io5';
 import Navbar from './Navbar';
+import PlaceOrderDropdown from './PlaceOrderDropdown';
 import { useAuth } from '../contexts/AuthContext';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
 import heroVideo from '../assets/vid.mp4';
@@ -109,13 +110,7 @@ function LandingPage({ onScrollToSection }) {
             <div
               className={`landing-actions${isAuthenticated ? ' landing-actions--auth' : ''}`}
             >
-              <button
-                type="button"
-                className="landing-btn landing-btn-primary"
-                onClick={() => navigate('/services/publications')}
-              >
-                Place Order
-              </button>
+              <PlaceOrderDropdown />
               {!isAuthenticated && (
                 <button
                   type="button"

@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import RichTextEditor from '../components/RichTextEditor';
+import ContentPreviewModal from '../components/ContentPreviewModal';
 import './ArticleSubmissionPage.css';
 
 function ArticleSubmissionPage() {
@@ -30,6 +31,7 @@ function ArticleSubmissionPage() {
   const [error, setError] = useState('');
   const [orderFromLink, setOrderFromLink] = useState(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const orderIdFromQuery = searchParams.get('orderId');
   const orderDetails = location.state || {};
@@ -140,6 +142,15 @@ function ArticleSubmissionPage() {
     }));
   };
 
+  const handlePreview = () => {
+    if (!formData.postTitle.trim() && !getPlainTextFromHtml(formData.postBody)) {
+      setError('Add a headline or body before previewing.');
+      return;
+    }
+    setError('');
+    setShowPreview(true);
+  };
+
   const handleBack = () => {
     if (cartItems.length > 0) {
       navigate('/checkout');
@@ -159,7 +170,7 @@ function ArticleSubmissionPage() {
     e.preventDefault();
 
     const plainPostBody = getPlainTextFromHtml(formData.postBody);
-    const plainArticleContent = getPlainTextFromHtml(formData.articleContent);
+    const plainArticleContent = formData.articleContent.trim();
 
     if (!formData.postTitle.trim()) {
       setError(isPublication ? 'Please enter a headline for your press release' : 'Please enter a post title');
@@ -181,7 +192,7 @@ function ArticleSubmissionPage() {
         body: JSON.stringify({
           postTitle: formData.postTitle.trim(),
           postBody: formData.postBody.trim(),
-          articleContent: plainArticleContent ? formData.articleContent.trim() : '',
+          articleContent: plainArticleContent,
           orderId: resolvedOrderId,
           serviceType: isPublication ? 'publication' : 'other',
           cartItems: displayItems,
@@ -363,12 +374,16 @@ function ArticleSubmissionPage() {
                       <label htmlFor="articleContent">
                         {isPublication ? 'Editorial notes' : 'Additional instructions'}
                       </label>
-                      <RichTextEditor
+                      <textarea
+                        id="articleContent"
+                        name="articleContent"
                         value={formData.articleContent}
-                        onChange={(value) => setFormData((prev) => ({ ...prev, articleContent: value }))}
+                        onChange={handleInputChange}
                         placeholder="Preferred outlets, embargo dates, contact details, link preferences..."
-                        minHeight={140}
+                        className="article-textarea article-textarea-compact"
+                        rows={5}
                       />
+                      <small className="form-help">Plain text only — no formatting.</small>
                     </div>
                   </section>
 
@@ -449,6 +464,9 @@ function ArticleSubmissionPage() {
                     <Button type="button" variant="secondary" onClick={handleBack} className="cancel-btn">
                       {cartItems.length > 0 ? 'Back to checkout' : 'Back to account'}
                     </Button>
+                    <Button type="button" variant="secondary" onClick={handlePreview} className="preview-btn">
+                      Preview
+                    </Button>
                     <Button
                       type="submit"
                       disabled={
@@ -473,6 +491,19 @@ function ArticleSubmissionPage() {
       </main>
 
       <Footer />
+
+      <ContentPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        dialogTitle={isPublication ? 'Press release preview' : 'Submission preview'}
+        title={formData.postTitle}
+        category={isPublication ? 'Press release' : 'Submission'}
+        author="You"
+        contentHtml={formData.postBody}
+        images={formData.images}
+        notes={formData.articleContent}
+        notesLabel={isPublication ? 'Editorial notes' : 'Additional instructions'}
+      />
     </div>
   );
 }

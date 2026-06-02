@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import RichTextEditor from '../../components/RichTextEditor'
+import ContentPreviewModal from '../../components/ContentPreviewModal'
 import { formatBlogDate } from '../../data/blogPosts'
+import '../../pages/BlogPage.css'
 import '../components/AdminBlogPostsGrid.css'
 
 const handleAdminCardImageError = (event) => {
@@ -30,6 +32,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
   const [submitLoading, setSubmitLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showPreview, setShowPreview] = useState(false)
 
   const getPlainTextFromHtml = (htmlValue = '') =>
     htmlValue
@@ -101,6 +104,17 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
   const removeExistingImage = (index) => {
     setExistingImageUrls((prev) => prev.filter((_, i) => i !== index))
   }
+
+  const handlePreview = () => {
+    if (!formData.title.trim() && !getPlainTextFromHtml(formData.content)) {
+      setError('Add a title or content before previewing.')
+      return
+    }
+    setError('')
+    setShowPreview(true)
+  }
+
+  const previewImages = [...existingImageUrls, ...imagePreviews]
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -219,6 +233,17 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
 
   return (
     <div style={{ display: 'grid', gap: '20px' }}>
+      <ContentPreviewModal
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        dialogTitle="Blog post preview"
+        title={formData.title}
+        subtitle={formData.excerpt}
+        category={formData.category}
+        author={formData.author}
+        contentHtml={formData.content}
+        images={previewImages}
+      />
       <div style={{ background: '#fff', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <div style={{ marginBottom: '16px' }}>
           <h2 style={{ margin: 0, fontSize: '20px', color: '#121212' }}>
@@ -322,6 +347,21 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
 
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <button
+              type="button"
+              onClick={handlePreview}
+              style={{
+                border: '1px solid #bfd4ff',
+                borderRadius: '8px',
+                background: '#eef4ff',
+                color: '#1d4ed8',
+                fontWeight: 600,
+                padding: '11px 16px',
+                cursor: 'pointer',
+              }}
+            >
+              Preview
+            </button>
+            <button
               type="submit"
               disabled={submitLoading}
               style={{
@@ -359,22 +399,13 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
       </div>
 
       <div className="admin-blog-posts-section" style={{ background: '#fff', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+        <div className="section-head">
           <h2>Published & draft posts</h2>
           <button
             type="button"
+            className="admin-blog-refresh-btn"
             onClick={loadPosts}
             disabled={loadingPosts}
-            style={{
-              border: '1px solid #d0d7e2',
-              background: '#f7f9fc',
-              color: '#1f2937',
-              borderRadius: '6px',
-              fontWeight: 600,
-              fontSize: '13px',
-              padding: '8px 12px',
-              cursor: loadingPosts ? 'not-allowed' : 'pointer',
-            }}
           >
             {loadingPosts ? 'Loading...' : 'Refresh'}
           </button>
@@ -383,32 +414,28 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
         {posts.length === 0 ? (
           <p className="admin-blog-posts-empty">No blog posts yet.</p>
         ) : (
-          <div className="admin-blog-grid">
+          <div className="blog-grid">
             {posts.map((post) => (
-              <article key={post.id} className="admin-blog-card">
+              <article key={post.id} className="blog-card admin-blog-card-item">
                 <span
                   className={`admin-blog-card-status ${post.isPublished ? 'is-published' : 'is-draft'}`}
                 >
                   {post.isPublished ? 'Published' : 'Draft'}
                 </span>
-                {post.imageUrls?.[0] ? (
-                  <div className="admin-blog-card-image-wrap">
-                    <img
-                      src={post.imageUrls[0]}
-                      alt={post.title}
-                      loading="lazy"
-                      onError={handleAdminCardImageError}
-                    />
-                  </div>
-                ) : (
-                  <div className="admin-blog-card-image-wrap">
-                    <img src="/bluelogo.png" alt="" style={{ objectFit: 'contain', padding: '1rem', background: '#e2e8f0' }} />
-                  </div>
-                )}
-                <span className="admin-blog-card-category">{post.category}</span>
-                <h3 className="admin-blog-card-title">{post.title}</h3>
-                <p className="admin-blog-card-excerpt">{post.excerpt}</p>
-                <div className="admin-blog-card-meta">
+                <div className="blog-card-image-wrap">
+                  <img
+                    src={post.imageUrls?.[0] || '/bluelogo.png'}
+                    alt={post.title}
+                    className="blog-card-image"
+                    loading="lazy"
+                    style={post.imageUrls?.[0] ? undefined : { objectFit: 'contain', padding: '1rem' }}
+                    onError={handleAdminCardImageError}
+                  />
+                </div>
+                <span className="blog-card-category">{post.category}</span>
+                <h2>{post.title}</h2>
+                <p className="blog-card-excerpt">{post.excerpt}</p>
+                <div className="blog-card-meta">
                   <span>{post.author}</span>
                   <span>{formatBlogDate(post.date)}</span>
                   <span>{post.readTime}</span>

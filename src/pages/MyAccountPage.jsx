@@ -1,12 +1,26 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { IoBagOutline, IoLogOutOutline, IoPersonOutline } from 'react-icons/io5';
+import {
+  IoBagOutline,
+  IoCartOutline,
+  IoGridOutline,
+  IoLogOutOutline,
+  IoNewspaperOutline,
+  IoPersonOutline,
+  IoShieldCheckmarkOutline,
+} from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import './MyAccountPage.css';
+
+const SECTIONS = {
+  dashboard: 'dashboard',
+  orders: 'orders',
+  account: 'account',
+};
 
 function formatField(value) {
   if (value === undefined || value === null || String(value).trim() === '') {
@@ -52,10 +66,28 @@ function orderHasPublicationItems(order) {
   return Array.isArray(order.cartItems) && order.cartItems.some((item) => item.category === 'publication');
 }
 
+function getUserInitials(user) {
+  const first = user.firstName?.trim()?.[0] || '';
+  const last = user.lastName?.trim()?.[0] || '';
+  if (first || last) {
+    return `${first}${last}`.toUpperCase();
+  }
+  return user.email?.trim()?.[0]?.toUpperCase() || '?';
+}
+
+function getDisplayName(user) {
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+  if (fullName) {
+    return fullName;
+  }
+  return user.email?.split('@')[0] || 'Account';
+}
+
 function MyAccountPage() {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading, logout, apiUrl, authFetch } = useAuth();
   const { cartItemCount, fetchCart } = useCart();
+  const [activeSection, setActiveSection] = useState(SECTIONS.dashboard);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
@@ -125,6 +157,11 @@ function MyAccountPage() {
     navigate('/');
   };
 
+  const goToSection = (sectionId) => {
+    setActiveSection(sectionId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (loading) {
     return (
       <div className="my-account-page">
@@ -139,6 +176,7 @@ function MyAccountPage() {
     return null;
   }
 
+  const displayName = getDisplayName(user);
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ');
 
   const profileRows = [
@@ -148,149 +186,268 @@ function MyAccountPage() {
     { label: 'Account ID', value: formatField(user.id) },
   ];
 
+  const navItems = [
+    { id: SECTIONS.dashboard, label: 'Dashboard', icon: IoGridOutline },
+    { id: SECTIONS.orders, label: 'Orders', icon: IoBagOutline },
+    { id: SECTIONS.account, label: 'Account info', icon: IoPersonOutline },
+  ];
+
+  const dashboardCards = [
+    {
+      key: 'account',
+      title: 'Account info',
+      description: 'View your name, email, phone, and account details',
+      icon: IoPersonOutline,
+      onClick: () => goToSection(SECTIONS.account),
+    },
+    {
+      key: 'orders',
+      title: 'Orders',
+      description: 'Check your order history, payment status, and article submissions',
+      icon: IoBagOutline,
+      onClick: () => goToSection(SECTIONS.orders),
+    },
+    {
+      key: 'services',
+      title: 'Our services',
+      description: 'Browse verification, publications, and other BlueTick packages',
+      icon: IoNewspaperOutline,
+      onClick: () => navigate('/services/publications'),
+    },
+    {
+      key: 'checkout',
+      title: 'Checkout',
+      description:
+        cartItemCount > 0
+          ? `${cartItemCount} item${cartItemCount === 1 ? '' : 's'} waiting in your cart`
+          : 'Review your cart and complete your next purchase',
+      icon: IoCartOutline,
+      onClick: () => navigate('/checkout'),
+    },
+    {
+      key: 'verification',
+      title: 'Verification services',
+      description: 'Explore Instagram, music, and platform verification options',
+      icon: IoShieldCheckmarkOutline,
+      onClick: () => navigate('/services/verification'),
+    },
+  ];
+
+  const renderOrdersPanel = () => (
+    <section className="my-account-panel" aria-labelledby="my-account-orders-heading">
+      <header className="my-account-panel-head">
+        <h2 id="my-account-orders-heading" className="my-account-panel-title">
+          Your orders
+        </h2>
+        <p className="my-account-panel-lead">
+          Services you have paid for or claimed via bank transfer appear here.
+        </p>
+      </header>
+
+      {ordersLoading ? (
+        <p className="my-account-orders-empty">Loading your orders…</p>
+      ) : ordersError ? (
+        <p className="my-account-orders-error" role="alert">
+          {ordersError}
+        </p>
+      ) : orders.length === 0 ? (
+        <p className="my-account-orders-empty">You have no orders yet.</p>
+      ) : (
+        <ul className="my-account-order-list">
+          {orders.map((order) => {
+            const paymentStatus = getPaymentStatusLabel(order);
+            const orderId = order._id;
+            const showPublicationLink =
+              order.paymentStatus === 'paid' && orderHasPublicationItems(order);
+
+            return (
+              <li key={orderId} className="my-account-order-card">
+                <div className="my-account-order-top">
+                  <div>
+                    <h3 className="my-account-order-name">{order.productName}</h3>
+                    <p className="my-account-order-date">Placed {formatOrderDate(order.createdAt)}</p>
+                  </div>
+                  <div className="my-account-order-meta">
+                    <span className="my-account-order-amount">{formatOrderAmount(order)}</span>
+                    <span className={`my-account-order-badge my-account-order-badge--${paymentStatus.tone}`}>
+                      {paymentStatus.text}
+                    </span>
+                  </div>
+                </div>
+
+                {order.cartItems?.length > 0 && (
+                  <ul className="my-account-order-items">
+                    {order.cartItems.map((item, index) => (
+                      <li key={`${item.itemId || item.title}-${index}`}>
+                        <span>{item.title}</span>
+                        {item.price ? <strong>{item.price}</strong> : null}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {order.paymentGateway === 'bank_transfer' && order.paymentStatus === 'pending' && (
+                  <p className="my-account-order-note">
+                    We received your payment claim and are verifying your bank transfer. You will get an email once
+                    it is confirmed.
+                  </p>
+                )}
+
+                {showPublicationLink && (
+                  <Button
+                    type="button"
+                    className="my-account-order-action"
+                    onClick={() => navigate(`/article-submission?orderId=${orderId}`)}
+                  >
+                    Submit your article
+                  </Button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+
+  const renderAccountPanel = () => (
+    <section className="my-account-panel" aria-labelledby="my-account-profile-heading">
+      <header className="my-account-panel-head">
+        <h2 id="my-account-profile-heading" className="my-account-panel-title">
+          Account info
+        </h2>
+        <p className="my-account-panel-lead">Your profile details on file with BlueTick.</p>
+      </header>
+      <dl className="my-account-details">
+        {profileRows.map((row) => (
+          <div key={row.label} className="my-account-detail-row">
+            <dt>{row.label}</dt>
+            <dd>{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="my-account-help">
+        Need to update your details? Contact us at{' '}
+        <a href="mailto:Info@bluetickgeng.com">Info@bluetickgeng.com</a>.
+      </p>
+    </section>
+  );
+
+  const renderDashboard = () => (
+    <div className="my-account-dashboard">
+      <header className="my-account-dashboard-head">
+        <h2 className="my-account-dashboard-title">Dashboard</h2>
+        <p className="my-account-dashboard-lead">Choose a section to manage your account and services.</p>
+      </header>
+      <div className="my-account-dashboard-grid">
+        {dashboardCards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <button
+              key={card.key}
+              type="button"
+              className="my-account-dash-card"
+              onClick={card.onClick}
+            >
+              <span className="my-account-dash-card-icon" aria-hidden="true">
+                <Icon />
+              </span>
+              <span className="my-account-dash-card-title">{card.title}</span>
+              <span className="my-account-dash-card-desc">{card.description}</span>
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          className="my-account-dash-card my-account-dash-card--logout"
+          onClick={handleLogout}
+        >
+          <span className="my-account-dash-card-icon" aria-hidden="true">
+            <IoLogOutOutline />
+          </span>
+          <span className="my-account-dash-card-title">Log out</span>
+          <span className="my-account-dash-card-desc">
+            Sign out when you are done to keep your account secure on shared devices.
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="my-account-page">
       <Navbar onScrollToSection={scrollToSection} />
 
       <main className="my-account-main">
-        <div className="my-account-container">
-          <header className="my-account-header">
-            <p className="my-account-kicker">Account</p>
-            <h1 className="my-account-title">My Account</h1>
-            <p className="my-account-lead">Your profile details, orders, and quick links for services.</p>
-          </header>
-
-          <div className="my-account-grid">
-            <section className="my-account-card" aria-labelledby="my-account-profile-heading">
-              <div className="my-account-card-head">
-                <span className="my-account-card-icon" aria-hidden="true">
-                  <IoPersonOutline />
-                </span>
-                <h2 id="my-account-profile-heading" className="my-account-card-title">
-                  Profile details
-                </h2>
+        <div className="my-account-shell">
+          <aside className="my-account-sidebar" aria-label="Account navigation">
+            <div className="my-account-profile">
+              <span className="my-account-avatar" aria-hidden="true">
+                {getUserInitials(user)}
+              </span>
+              <div className="my-account-profile-text">
+                <p className="my-account-greeting">Hi, {displayName}</p>
+                <p className="my-account-email">{formatField(user.email)}</p>
               </div>
-              <dl className="my-account-details">
-                {profileRows.map((row) => (
-                  <div key={row.label} className="my-account-detail-row">
-                    <dt>{row.label}</dt>
-                    <dd>{row.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </section>
-
-            <section className="my-account-card" aria-labelledby="my-account-actions-heading">
-              <div className="my-account-card-head">
-                <span className="my-account-card-icon" aria-hidden="true">
-                  <IoBagOutline />
-                </span>
-                <h2 id="my-account-actions-heading" className="my-account-card-title">
-                  Quick actions
-                </h2>
-              </div>
-              <p className="my-account-card-text">
-                {cartItemCount > 0
-                  ? `You have ${cartItemCount} item${cartItemCount === 1 ? '' : 's'} in your cart.`
-                  : 'Your cart is empty. Browse services to place a new order.'}
-              </p>
-              <div className="my-account-actions">
-                <Button onClick={() => navigate('/checkout')} className="my-account-btn-primary">
-                  {cartItemCount > 0 ? 'Go to checkout' : 'View checkout'}
-                </Button>
-                <Button onClick={() => navigate('/services/publications')} className="my-account-btn-secondary">
-                  Browse services
-                </Button>
-                <button type="button" className="my-account-logout" onClick={handleLogout}>
-                  <IoLogOutOutline aria-hidden="true" />
-                  Log out
-                </button>
-              </div>
-              <p className="my-account-help">
-                Need to update your details? Contact us at{' '}
-                <a href="mailto:Info@bluetickgeng.com">Info@bluetickgeng.com</a>.
-              </p>
-            </section>
-          </div>
-
-          <section className="my-account-orders" aria-labelledby="my-account-orders-heading">
-            <div className="my-account-orders-head">
-              <h2 id="my-account-orders-heading" className="my-account-orders-title">
-                Your orders
-              </h2>
-              <p className="my-account-orders-lead">
-                Services you have paid for or claimed via bank transfer appear here.
-              </p>
             </div>
 
-            {ordersLoading ? (
-              <p className="my-account-orders-empty">Loading your orders…</p>
-            ) : ordersError ? (
-              <p className="my-account-orders-error" role="alert">{ordersError}</p>
-            ) : orders.length === 0 ? (
-              <p className="my-account-orders-empty">You have no orders yet.</p>
-            ) : (
-              <ul className="my-account-order-list">
-                {orders.map((order) => {
-                  const paymentStatus = getPaymentStatusLabel(order);
-                  const orderId = order._id;
-                  const showPublicationLink =
-                    order.paymentStatus === 'paid' && orderHasPublicationItems(order);
+            <button type="button" className="my-account-sidebar-logout" onClick={handleLogout}>
+              <IoLogOutOutline aria-hidden="true" />
+              Log out
+            </button>
 
+            <nav className="my-account-nav">
+              <ul className="my-account-nav-list">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeSection === item.id;
                   return (
-                    <li key={orderId} className="my-account-order-card">
-                      <div className="my-account-order-top">
-                        <div>
-                          <h3 className="my-account-order-name">{order.productName}</h3>
-                          <p className="my-account-order-date">
-                            Placed {formatOrderDate(order.createdAt)}
-                          </p>
-                        </div>
-                        <div className="my-account-order-meta">
-                          <span className="my-account-order-amount">{formatOrderAmount(order)}</span>
-                          <span className={`my-account-order-badge my-account-order-badge--${paymentStatus.tone}`}>
-                            {paymentStatus.text}
-                          </span>
-                        </div>
-                      </div>
-
-                      {order.cartItems?.length > 0 && (
-                        <ul className="my-account-order-items">
-                          {order.cartItems.map((item, index) => (
-                            <li key={`${item.itemId || item.title}-${index}`}>
-                              <span>{item.title}</span>
-                              {item.price ? <strong>{item.price}</strong> : null}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
-                      {order.paymentGateway === 'bank_transfer' && order.paymentStatus === 'pending' && (
-                        <p className="my-account-order-note">
-                          We received your payment claim and are verifying your bank transfer. You will get an email once it is confirmed.
-                        </p>
-                      )}
-
-                      {showPublicationLink && (
-                        <Button
-                          type="button"
-                          className="my-account-order-action"
-                          onClick={() => navigate(`/article-submission?orderId=${orderId}`)}
-                        >
-                          Submit your article
-                        </Button>
-                      )}
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        className={`my-account-nav-link${isActive ? ' is-active' : ''}`}
+                        onClick={() => goToSection(item.id)}
+                        aria-current={isActive ? 'page' : undefined}
+                      >
+                        <Icon aria-hidden="true" />
+                        {item.label}
+                      </button>
                     </li>
                   );
                 })}
+                <li>
+                  <button
+                    type="button"
+                    className="my-account-nav-link"
+                    onClick={() => navigate('/services/publications')}
+                  >
+                    <IoNewspaperOutline aria-hidden="true" />
+                    Our services
+                  </button>
+                </li>
+                <li>
+                  <button type="button" className="my-account-nav-link" onClick={() => navigate('/checkout')}>
+                    <IoCartOutline aria-hidden="true" />
+                    Checkout
+                    {cartItemCount > 0 ? (
+                      <span className="my-account-nav-badge">{cartItemCount}</span>
+                    ) : null}
+                  </button>
+                </li>
               </ul>
-            )}
-          </section>
+            </nav>
+          </aside>
 
-          <p className="my-account-back">
-            <Link to="/">← Back to home</Link>
-          </p>
+          <div className="my-account-content">
+            {activeSection === SECTIONS.dashboard && renderDashboard()}
+            {activeSection === SECTIONS.orders && renderOrdersPanel()}
+            {activeSection === SECTIONS.account && renderAccountPanel()}
+          </div>
         </div>
+
+        <p className="my-account-back">
+          <Link to="/">← Back to home</Link>
+        </p>
       </main>
 
       <Footer onScrollToSection={scrollToSection} />
