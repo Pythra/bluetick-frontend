@@ -37,7 +37,7 @@ function Navbar({ onScrollToSection }) {
           </Link>
         </div>
         <div className={`navbar-menu ${isMenuOpen ? 'active' : ''}`}>
-          <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('landing'))}>
+          <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/about'))}>
             About Us
           </button>
           <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('publication-services'))}>

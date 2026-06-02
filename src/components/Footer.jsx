@@ -49,9 +49,7 @@ function Footer({ onScrollToSection }) {
             <h3 className="footer-title">Company</h3>
             <ul className="footer-links">
               <li>
-                <a href="#landing" onClick={(e) => { e.preventDefault(); onScrollToSection('landing'); }}>
-                  About Us
-                </a>
+                <Link to="/about">About Us</Link>
               </li>
               <li>
                 <a href="#website-services" onClick={(e) => { e.preventDefault(); onScrollToSection('website-services'); }}>

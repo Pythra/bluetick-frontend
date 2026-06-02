@@ -6,6 +6,15 @@ import { blogPosts, formatBlogDate } from '../data/blogPosts';
 import { useAuth } from '../contexts/AuthContext';
 import './BlogPage.css';
 
+const handleBlogImageError = (event) => {
+  const fallbackSrc = '/bluelogo.png';
+  if (event.currentTarget.src.endsWith(fallbackSrc)) {
+    return;
+  }
+  event.currentTarget.onerror = null;
+  event.currentTarget.src = fallbackSrc;
+};
+
 function BlogPage() {
   const { apiUrl } = useAuth();
   const [posts, setPosts] = useState(blogPosts);
@@ -56,7 +65,13 @@ function BlogPage() {
             <Link key={post.id} to={`/blog/${post.slug}`} className="blog-card">
               {post.imageUrls?.[0] && (
                 <div className="blog-card-image-wrap">
-                  <img src={post.imageUrls[0]} alt={post.title} className="blog-card-image" />
+                  <img
+                    src={post.imageUrls[0]}
+                    alt={post.title}
+                    className="blog-card-image"
+                    loading="lazy"
+                    onError={handleBlogImageError}
+                  />
                 </div>
               )}
               <span className="blog-card-category">{post.category}</span>

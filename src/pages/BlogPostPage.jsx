@@ -6,6 +6,15 @@ import { formatBlogDate, getBlogPostBySlug } from '../data/blogPosts';
 import { useAuth } from '../contexts/AuthContext';
 import './BlogPage.css';
 
+const handleBlogImageError = (event) => {
+  const fallbackSrc = '/bluelogo.png';
+  if (event.currentTarget.src.endsWith(fallbackSrc)) {
+    return;
+  }
+  event.currentTarget.onerror = null;
+  event.currentTarget.src = fallbackSrc;
+};
+
 function BlogPostPage() {
   const { slug } = useParams();
   const { apiUrl } = useAuth();
@@ -185,7 +194,13 @@ function BlogPostPage() {
           {post.imageUrls?.length > 0 && (
             <div className="blog-article-images">
               {post.imageUrls.map((imageUrl, index) => (
-                <img key={`${imageUrl}-${index}`} src={imageUrl} alt={`${post.title} visual ${index + 1}`} />
+                <img
+                  key={`${imageUrl}-${index}`}
+                  src={imageUrl}
+                  alt={`${post.title} visual ${index + 1}`}
+                  loading="lazy"
+                  onError={handleBlogImageError}
+                />
               ))}
             </div>
           )}
