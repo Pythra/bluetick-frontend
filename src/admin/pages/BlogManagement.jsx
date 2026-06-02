@@ -220,7 +220,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
             value={formData.excerpt}
             onChange={handleChange}
             required
-            placeholder="Short excerpt for blog listing"
+            placeholder="Subtitle summary"
             style={inputStyle}
           />
           <div style={{ display: 'grid', gap: '4px' }}>

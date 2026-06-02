@@ -6,7 +6,7 @@ self.addEventListener('push', (event) => {
     data = {};
   }
 
-  const title = data.title || 'Bluetick';
+  const title = data.title || 'Bluetickgeng';
   const options = {
     body: data.body || 'A new update is available.',
     icon: data.icon || '/favicon.svg',
