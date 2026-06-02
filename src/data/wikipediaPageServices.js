@@ -1,8 +1,8 @@
 export const wikipediaPagePackages = [
   {
     id: 'individual-wiki',
-    title: 'Individual Wikipedia Page Creation',
-    price: 1000000,
+    title: 'Wikipedia Page for Individuals',
+    price: 1250000,
     deliveryTime: '48 hours',
     description:
       'Professional Wikipedia page creation for individuals with comprehensive content development and quality assurance.',
@@ -17,8 +17,8 @@ export const wikipediaPagePackages = [
   },
   {
     id: 'company-wiki',
-    title: 'Company Wikipedia Page Creation',
-    price: 1500000,
+    title: 'Wikipedia Page for Organizations',
+    price: 1800000,
     deliveryTime: '72 hours',
     description:
       'Specialized Wikipedia page creation for businesses and organizations with stricter notability and sourcing requirements.',

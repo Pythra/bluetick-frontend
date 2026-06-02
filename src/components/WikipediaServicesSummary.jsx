@@ -10,8 +10,8 @@ function WikipediaServicesSummary() {
   const navigate = useNavigate();
 
   const wikipediaServices = [
-    'Individual Wikipedia pages',
-    'Company Wikipedia pages',
+    'Wikipedia Page for Individuals — ₦1,250,000',
+    'Wikipedia Page for Organizations — ₦1,800,000',
     'Content review & quality assurance',
   ];
 
