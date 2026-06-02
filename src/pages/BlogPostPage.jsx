@@ -100,12 +100,14 @@ function BlogPostPage() {
     );
   }
 
-  const paragraphs = Array.isArray(post.content)
-    ? post.content
-    : post.content
-      .split(/\n+/)
-      .map((line) => line.trim())
-      .filter(Boolean);
+  const rawContent = Array.isArray(post.content) ? post.content.join('\n') : (post.content || '');
+  const hasHtmlContent = /<[^>]+>/.test(rawContent);
+  const paragraphs = hasHtmlContent
+    ? []
+    : rawContent
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter(Boolean);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -205,9 +207,13 @@ function BlogPostPage() {
             </div>
           )}
           <div className="blog-article-body">
-            {paragraphs.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
+            {hasHtmlContent ? (
+              <div dangerouslySetInnerHTML={{ __html: rawContent }} />
+            ) : (
+              paragraphs.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))
+            )}
           </div>
           <section className="blog-comments" aria-label="Comments">
             <h2>Comments ({comments.length})</h2>

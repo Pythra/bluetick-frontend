@@ -6,6 +6,7 @@ import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
+import RichTextEditor from '../components/RichTextEditor';
 import './ArticleSubmissionPage.css';
 
 function ArticleSubmissionPage() {
@@ -147,15 +148,25 @@ function ArticleSubmissionPage() {
     navigate('/account');
   };
 
+  const getPlainTextFromHtml = (htmlValue = '') =>
+    htmlValue
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const plainPostBody = getPlainTextFromHtml(formData.postBody);
+    const plainArticleContent = getPlainTextFromHtml(formData.articleContent);
 
     if (!formData.postTitle.trim()) {
       setError(isPublication ? 'Please enter a headline for your press release' : 'Please enter a post title');
       return;
     }
 
-    if (!formData.postBody.trim()) {
+    if (!plainPostBody) {
       setError('Please enter the article body');
       return;
     }
@@ -170,7 +181,7 @@ function ArticleSubmissionPage() {
         body: JSON.stringify({
           postTitle: formData.postTitle.trim(),
           postBody: formData.postBody.trim(),
-          articleContent: formData.articleContent.trim(),
+          articleContent: plainArticleContent ? formData.articleContent.trim() : '',
           orderId: resolvedOrderId,
           serviceType: isPublication ? 'publication' : 'other',
           cartItems: displayItems,
@@ -331,19 +342,15 @@ function ArticleSubmissionPage() {
                       <label htmlFor="postBody">
                         {isPublication ? 'Article body *' : 'Post body *'}
                       </label>
-                      <textarea
-                        id="postBody"
-                        name="postBody"
+                      <RichTextEditor
                         value={formData.postBody}
-                        onChange={handleInputChange}
+                        onChange={(value) => setFormData((prev) => ({ ...prev, postBody: value }))}
                         placeholder={
                           isPublication
                             ? 'Write your full press release here. Start with a strong opening paragraph, then add supporting details, quotes, and a boilerplate about your company if needed.'
-                            : 'Enter the main content of your post…'
+                            : 'Enter the main content of your post...'
                         }
-                        rows={12}
-                        className="article-textarea"
-                        required
+                        minHeight={460}
                       />
                       <small className="form-help">
                         {isPublication
@@ -356,14 +363,11 @@ function ArticleSubmissionPage() {
                       <label htmlFor="articleContent">
                         {isPublication ? 'Editorial notes' : 'Additional instructions'}
                       </label>
-                      <textarea
-                        id="articleContent"
-                        name="articleContent"
+                      <RichTextEditor
                         value={formData.articleContent}
-                        onChange={handleInputChange}
-                        placeholder="Preferred outlets, embargo dates, contact details, link preferences…"
-                        rows={4}
-                        className="article-textarea article-textarea-compact"
+                        onChange={(value) => setFormData((prev) => ({ ...prev, articleContent: value }))}
+                        placeholder="Preferred outlets, embargo dates, contact details, link preferences..."
+                        minHeight={140}
                       />
                     </div>
                   </section>
@@ -449,7 +453,7 @@ function ArticleSubmissionPage() {
                       type="submit"
                       disabled={
                         isSubmitting ||
-                        !formData.postBody.trim() ||
+                        !getPlainTextFromHtml(formData.postBody) ||
                         !formData.postTitle.trim()
                       }
                       className="submit-btn"

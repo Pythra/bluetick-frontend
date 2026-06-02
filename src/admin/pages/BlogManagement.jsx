@@ -1,4 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
+import RichTextEditor from '../../components/RichTextEditor'
+import { formatBlogDate } from '../../data/blogPosts'
+import '../components/AdminBlogPostsGrid.css'
+
+const handleAdminCardImageError = (event) => {
+  const fallbackSrc = '/bluelogo.png'
+  if (event.currentTarget.src.endsWith(fallbackSrc)) return
+  event.currentTarget.onerror = null
+  event.currentTarget.src = fallbackSrc
+}
 
 const defaultFormData = {
   title: '',
@@ -20,6 +30,13 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
   const [submitLoading, setSubmitLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  const getPlainTextFromHtml = (htmlValue = '') =>
+    htmlValue
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
 
   const loadPosts = useCallback(async () => {
     if (!adminToken) return
@@ -92,6 +109,11 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
     setSuccess('')
 
     try {
+      const plainContent = getPlainTextFromHtml(formData.content)
+      if (!plainContent) {
+        throw new Error('Post content is required')
+      }
+
       const payload = new FormData()
       payload.append('title', formData.title.trim())
       payload.append('excerpt', formData.excerpt.trim())
@@ -115,6 +137,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
       )
 
       const data = await response.json()
+
       if (!response.ok || !data.success) {
         throw new Error(data.error || `Failed to ${isEditing ? 'update' : 'create'} blog post`)
       }
@@ -236,14 +259,11 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
               style={inputStyle}
             />
           </div>
-          <textarea
-            name="content"
+          <RichTextEditor
             value={formData.content}
-            onChange={handleChange}
-            required
+            onChange={(value) => setFormData((prev) => ({ ...prev, content: value }))}
             placeholder="Write full post content here..."
-            rows={10}
-            style={textareaStyle}
+            minHeight={260}
           />
           <div style={{ display: 'grid', gap: '10px' }}>
             <label style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>Images</label>
@@ -338,10 +358,11 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
         </form>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+      <div className="admin-blog-posts-section" style={{ background: '#fff', borderRadius: '10px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-          <h2 style={{ margin: 0, fontSize: '20px', color: '#121212' }}>Published & draft posts</h2>
+          <h2>Published & draft posts</h2>
           <button
+            type="button"
             onClick={loadPosts}
             disabled={loadingPosts}
             style={{
@@ -360,78 +381,49 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
         </div>
 
         {posts.length === 0 ? (
-          <p style={{ margin: 0, color: '#555' }}>No blog posts yet.</p>
+          <p className="admin-blog-posts-empty">No blog posts yet.</p>
         ) : (
-          <div style={{ display: 'grid', gap: '12px' }}>
+          <div className="admin-blog-grid">
             {posts.map((post) => (
-              <div
-                key={post.id}
-                style={{
-                  border: '1px solid #e5e9f0',
-                  borderRadius: '8px',
-                  padding: '12px',
-                  background: '#fafcff',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', alignItems: 'flex-start' }}>
-                  <div>
-                    <p style={adminPostTitleStyle} title={post.title}>{post.title}</p>
-                    <p style={adminPostExcerptStyle} title={post.excerpt}>{post.excerpt}</p>
-                    <div style={adminMetaWrapStyle}>
-                      <span style={adminCategoryChipStyle} title={post.category}>{post.category}</span>
-                      <span style={adminMetaItemStyle} title={post.author}>{post.author}</span>
-                      <span style={adminMetaItemStyle}>{new Date(post.date).toLocaleString('en-US')}</span>
-                    </div>
+              <article key={post.id} className="admin-blog-card">
+                <span
+                  className={`admin-blog-card-status ${post.isPublished ? 'is-published' : 'is-draft'}`}
+                >
+                  {post.isPublished ? 'Published' : 'Draft'}
+                </span>
+                {post.imageUrls?.[0] ? (
+                  <div className="admin-blog-card-image-wrap">
+                    <img
+                      src={post.imageUrls[0]}
+                      alt={post.title}
+                      loading="lazy"
+                      onError={handleAdminCardImageError}
+                    />
                   </div>
-                  <span
-                    style={{
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      color: post.isPublished ? '#1b5e20' : '#8d6e00',
-                      background: post.isPublished ? '#e8f5e9' : '#fff8e1',
-                      borderRadius: '999px',
-                      padding: '4px 9px',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {post.isPublished ? 'Published' : 'Draft'}
-                  </span>
+                ) : (
+                  <div className="admin-blog-card-image-wrap">
+                    <img src="/bluelogo.png" alt="" style={{ objectFit: 'contain', padding: '1rem', background: '#e2e8f0' }} />
+                  </div>
+                )}
+                <span className="admin-blog-card-category">{post.category}</span>
+                <h3 className="admin-blog-card-title">{post.title}</h3>
+                <p className="admin-blog-card-excerpt">{post.excerpt}</p>
+                <div className="admin-blog-card-meta">
+                  <span>{post.author}</span>
+                  <span>{formatBlogDate(post.date)}</span>
+                  <span>{post.readTime}</span>
+                  <span>{post.likesCount || 0} likes</span>
+                  <span>{post.commentsCount ?? 0} comments</span>
                 </div>
-                <div style={{ marginTop: '12px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    onClick={() => handleEditPost(post)}
-                    style={{
-                      border: '1px solid #bfd4ff',
-                      background: '#eef4ff',
-                      color: '#1d4ed8',
-                      borderRadius: '6px',
-                      padding: '6px 10px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
-                  >
+                <div className="admin-blog-card-actions">
+                  <button type="button" className="btn-edit" onClick={() => handleEditPost(post)}>
                     Edit
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDeletePost(post)}
-                    style={{
-                      border: '1px solid #fecaca',
-                      background: '#fff1f2',
-                      color: '#b91c1c',
-                      borderRadius: '6px',
-                      padding: '6px 10px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
-                  >
+                  <button type="button" className="btn-delete" onClick={() => handleDeletePost(post)}>
                     Delete
                   </button>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
         )}
@@ -483,57 +475,3 @@ const removeImageBtnStyle = {
   cursor: 'pointer',
 }
 
-const adminPostTitleStyle = {
-  margin: '0 0 4px',
-  fontWeight: 700,
-  color: '#121212',
-  maxWidth: 'min(56vw, 540px)',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-}
-
-const adminPostExcerptStyle = {
-  margin: 0,
-  fontSize: '13px',
-  color: '#5f6c80',
-  maxWidth: 'min(56vw, 540px)',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  display: '-webkit-box',
-  WebkitLineClamp: 2,
-  WebkitBoxOrient: 'vertical',
-  lineHeight: 1.4,
-}
-
-const adminMetaWrapStyle = {
-  marginTop: '8px',
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: '6px 8px',
-  alignItems: 'center',
-}
-
-const adminCategoryChipStyle = {
-  display: 'inline-block',
-  maxWidth: '140px',
-  width: 'fit-content',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  fontSize: '11px',
-  fontWeight: 700,
-  color: '#1d4ed8',
-  background: '#e0ecff',
-  borderRadius: '999px',
-  padding: '3px 8px',
-}
-
-const adminMetaItemStyle = {
-  maxWidth: '160px',
-  fontSize: '12px',
-  color: '#667085',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-}
