@@ -4,22 +4,6 @@
   z-index: 30;
 }
 
-.place-order-dropdown-trigger {
-  gap: 0.35rem;
-}
-
-.place-order-dropdown-chevron {
-  display: inline-block;
-  font-size: 0.72rem;
-  line-height: 1;
-  transition: transform 0.2s ease;
-  opacity: 0.92;
-}
-
-.place-order-dropdown-chevron.is-open {
-  transform: rotate(180deg);
-}
-
 .place-order-dropdown-menu {
   margin: 0;
   padding: 6px;

@@ -251,7 +251,9 @@ function MyAccountPage() {
             const paymentStatus = getPaymentStatusLabel(order);
             const orderId = order._id;
             const showPublicationLink =
-              order.paymentStatus === 'paid' && orderHasPublicationItems(order);
+              order.paymentStatus === 'paid' &&
+              orderHasPublicationItems(order) &&
+              !order.publicationSubmissionComplete;
 
             return (
               <li key={orderId} className="my-account-order-card">
@@ -292,7 +294,9 @@ function MyAccountPage() {
                     className="my-account-order-action"
                     onClick={() => navigate(`/article-submission?orderId=${orderId}`)}
                   >
-                    Submit your article
+                    {order.pendingPublicationCount > 1
+                      ? `Submit articles (${order.pendingPublicationCount} remaining)`
+                      : 'Submit your article'}
                   </Button>
                 )}
               </li>

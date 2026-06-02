@@ -32,15 +32,36 @@ function ArticleSubmissionPage() {
   const [orderFromLink, setOrderFromLink] = useState(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [useSameArticleForAll, setUseSameArticleForAll] = useState(true);
+  const [activeTargetItemId, setActiveTargetItemId] = useState('');
+  const [partialSuccessMessage, setPartialSuccessMessage] = useState('');
 
   const orderIdFromQuery = searchParams.get('orderId');
   const orderDetails = location.state || {};
   const resolvedOrderId = orderDetails.orderId || orderIdFromQuery;
   const displayItems =
     cartItems.length > 0 ? cartItems : orderFromLink?.cartItems || [];
-  const isPublication =
-    displayItems.some((item) => item.category === 'publication') ||
-    orderFromLink?.cartItems?.some((item) => item.category === 'publication');
+  const publicationItems =
+    orderFromLink?.publicationItems?.length > 0
+      ? orderFromLink.publicationItems
+      : displayItems
+          .filter((item) => item.category === 'publication')
+          .map((item) => ({
+            itemId: item.itemId,
+            title: item.title,
+            price: item.price,
+            submitted: false,
+          }));
+  const isPublication = publicationItems.length > 0;
+  const multiplePublications = publicationItems.length > 1;
+  const submittedPublicationCount = publicationItems.filter((item) => item.submitted).length;
+  const activePublicationItem =
+    publicationItems.find((item) => item.itemId === activeTargetItemId) ||
+    publicationItems.find((item) => !item.submitted) ||
+    publicationItems[0];
+  const allPublicationsSubmitted =
+    orderFromLink?.publicationSubmissionComplete ||
+    (publicationItems.length > 0 && publicationItems.every((item) => item.submitted));
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -70,6 +91,16 @@ function ArticleSubmissionPage() {
         }
         if (!cancelled) {
           setOrderFromLink(data.order);
+          const pubs = data.order.publicationItems || [];
+          const firstPending = pubs.find((item) => !item.submitted);
+          if (firstPending?.itemId) {
+            setActiveTargetItemId(firstPending.itemId);
+          } else if (pubs[0]?.itemId) {
+            setActiveTargetItemId(pubs[0].itemId);
+          }
+          if (pubs.length === 0 && data.order.hasNonPublicationItems) {
+            setError('This order does not include publication services. Our team will contact you about your other services.');
+          }
         }
       } catch (loadError) {
         if (!cancelled) {
@@ -166,6 +197,18 @@ function ArticleSubmissionPage() {
       .replace(/\s+/g, ' ')
       .trim();
 
+  const resetSubmissionForm = () => {
+    setFormData({
+      postTitle: '',
+      postBody: '',
+      articleContent: '',
+      file: null,
+      fileName: '',
+      images: [],
+      imageFiles: [],
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -182,6 +225,16 @@ function ArticleSubmissionPage() {
       return;
     }
 
+    if (!resolvedOrderId) {
+      setError('Order ID is missing. Open this page from your account or payment confirmation email.');
+      return;
+    }
+
+    if (multiplePublications && !useSameArticleForAll && !activeTargetItemId) {
+      setError('Select which publication package you are writing for.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
     setSubmitStatus('');
@@ -194,9 +247,10 @@ function ArticleSubmissionPage() {
           postBody: formData.postBody.trim(),
           articleContent: plainArticleContent,
           orderId: resolvedOrderId,
-          serviceType: isPublication ? 'publication' : 'other',
-          cartItems: displayItems,
           fileName: formData.fileName,
+          useSameArticleForAll: multiplePublications ? useSameArticleForAll : true,
+          targetItemId:
+            multiplePublications && !useSameArticleForAll ? activeTargetItemId : undefined,
         }),
       });
 
@@ -206,11 +260,33 @@ function ArticleSubmissionPage() {
         throw new Error(data.error || 'Failed to submit article');
       }
 
-      setSubmitStatus('success');
+      if (data.publicationSubmissionComplete) {
+        setSubmitStatus('success');
+        setPartialSuccessMessage('');
+        setTimeout(() => {
+          navigate('/account');
+        }, 3000);
+        return;
+      }
 
-      setTimeout(() => {
-        navigate('/');
-      }, 3000);
+      setPartialSuccessMessage(data.message || 'Article saved. Submit the next platform when ready.');
+      resetSubmissionForm();
+      if (data.publicationItems?.length) {
+        setOrderFromLink((prev) =>
+          prev
+            ? {
+                ...prev,
+                publicationItems: data.publicationItems,
+                pendingPublicationCount: data.pendingPublicationCount,
+                publicationSubmissionComplete: false,
+              }
+            : prev
+        );
+        const nextPending = data.publicationItems.find((item) => !item.submitted);
+        if (nextPending?.itemId) {
+          setActiveTargetItemId(nextPending.itemId);
+        }
+      }
     } catch (submitError) {
       console.error('Article submission error:', submitError);
       setError(submitError.message || 'Failed to submit article. Please try again.');
@@ -230,6 +306,26 @@ function ArticleSubmissionPage() {
         <main className="article-submission-main">
           <div className="article-submission-shell">
             <p className="article-submission-loading">Loading your order…</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (orderFromLink && orderIdFromQuery && !isPublication) {
+    return (
+      <div className="article-submission-page">
+        <Navbar />
+        <main className="article-submission-main">
+          <div className="article-submission-shell">
+            <div className="article-alert article-alert-error" role="alert">
+              {error ||
+                'This order does not require an article submission. Our team will contact you about your services.'}
+            </div>
+            <Button type="button" onClick={() => navigate('/account')}>
+              Back to account
+            </Button>
           </div>
         </main>
         <Footer />
@@ -278,7 +374,20 @@ function ArticleSubmissionPage() {
               <section className="article-panel article-order-panel">
                 <h2>Order summary</h2>
                 <ul className="article-order-list">
-                  {displayItems.length > 0 ? (
+                  {publicationItems.length > 0 ? (
+                    publicationItems.map((item, index) => (
+                      <li
+                        key={`${item.itemId || item.title}-${index}`}
+                        className={item.submitted ? 'article-order-item--done' : ''}
+                      >
+                        <span>
+                          {item.title}
+                          {item.submitted ? ' (submitted)' : ''}
+                        </span>
+                        {item.price ? <strong>{item.price}</strong> : null}
+                      </li>
+                    ))
+                  ) : displayItems.length > 0 ? (
                     displayItems.map((item, index) => (
                       <li key={`${item.title}-${index}`}>
                         <span>{item.title}</span>
@@ -289,6 +398,12 @@ function ArticleSubmissionPage() {
                     <li className="article-order-empty">No items in this order.</li>
                   )}
                 </ul>
+                {multiplePublications && (
+                  <p className="article-order-progress">
+                    {submittedPublicationCount} of {publicationItems.length} platform
+                    {publicationItems.length === 1 ? '' : 's'} submitted
+                  </p>
+                )}
               </section>
 
               <section className="article-panel article-guidelines-panel">
@@ -308,18 +423,81 @@ function ArticleSubmissionPage() {
                 </div>
               )}
 
-              {submitStatus === 'success' ? (
+              {allPublicationsSubmitted && orderFromLink ? (
+                <div className="article-alert article-alert-success">
+                  <h3>All articles submitted</h3>
+                  <p>
+                    Our editorial team will review your press release
+                    {multiplePublications ? 's' : ''} and proceed with placement on your selected
+                    platforms.
+                  </p>
+                  <Button type="button" onClick={() => navigate('/account')}>
+                    Back to account
+                  </Button>
+                </div>
+              ) : submitStatus === 'success' ? (
                 <div className="article-alert article-alert-success">
                   <h3>Submission received</h3>
                   <p>
-                    {isPublication
-                      ? 'Our editorial team will review your press release and proceed with placement on your selected platforms.'
-                      : 'Our team will review your instructions and proceed with your order.'}
+                    Our editorial team will review your press release and proceed with placement on
+                    your selected platforms.
                   </p>
-                  <p className="article-alert-note">Redirecting you to the homepage…</p>
+                  <p className="article-alert-note">Redirecting you to your account…</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="article-form">
+                  {partialSuccessMessage && (
+                    <div className="article-alert article-alert-success" role="status">
+                      {partialSuccessMessage}
+                    </div>
+                  )}
+
+                  {multiplePublications && (
+                    <section className="article-form-section article-multi-pub-section">
+                      <h2 className="article-multi-pub-title">Multiple publications</h2>
+                      <label className="article-same-article-option">
+                        <input
+                          type="checkbox"
+                          checked={useSameArticleForAll}
+                          onChange={(e) => setUseSameArticleForAll(e.target.checked)}
+                        />
+                        <span>
+                          Use the same article for all platforms in this order
+                        </span>
+                      </label>
+                      {!useSameArticleForAll && (
+                        <div className="article-platform-picker">
+                          <p className="article-platform-picker-label">
+                            You are writing for:
+                          </p>
+                          <div className="article-platform-picker-chips">
+                            {publicationItems.map((item) => (
+                              <button
+                                key={item.itemId}
+                                type="button"
+                                className={`article-platform-chip${
+                                  item.itemId === activeTargetItemId
+                                    ? ' article-platform-chip--active'
+                                    : ''
+                                }${item.submitted ? ' article-platform-chip--done' : ''}`}
+                                disabled={item.submitted}
+                                onClick={() => setActiveTargetItemId(item.itemId)}
+                              >
+                                {item.title}
+                                {item.submitted ? ' ✓' : ''}
+                              </button>
+                            ))}
+                          </div>
+                          {activePublicationItem && !activePublicationItem.submitted && (
+                            <p className="article-platform-active-note">
+                              Submitting for: <strong>{activePublicationItem.title}</strong>
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </section>
+                  )}
+
                   <section className="article-form-section">
                     <div className="article-form-section-head">
                       <IoDocumentTextOutline aria-hidden="true" />
@@ -478,9 +656,11 @@ function ArticleSubmissionPage() {
                     >
                       {isSubmitting
                         ? 'Submitting…'
-                        : isPublication
-                          ? 'Submit for publication'
-                          : 'Submit instructions'}
+                        : multiplePublications && !useSameArticleForAll
+                          ? `Submit for ${activePublicationItem?.title || 'platform'}`
+                          : multiplePublications && useSameArticleForAll
+                            ? 'Submit for all platforms'
+                            : 'Submit for publication'}
                     </Button>
                   </div>
                 </form>

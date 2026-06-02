@@ -4,7 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { HOME_SERVICE_MENU_ITEMS } from '../data/serviceRoutes';
 import './PlaceOrderDropdown.css';
 
-function PlaceOrderDropdown() {
+function PlaceOrderDropdown({
+  label = 'Place Order',
+  triggerClassName = 'landing-btn landing-btn-primary place-order-dropdown-trigger',
+  menuId = 'place-order-dropdown-menu',
+}) {
   const navigate = useNavigate();
   const triggerRef = useRef(null);
   const menuRef = useRef(null);
@@ -92,7 +96,7 @@ function PlaceOrderDropdown() {
       ? createPortal(
           <ul
             ref={menuRef}
-            id="place-order-dropdown-menu"
+            id={menuId}
             className="place-order-dropdown-menu place-order-dropdown-menu--portal"
             role="listbox"
             aria-label="Choose a service"
@@ -120,16 +124,13 @@ function PlaceOrderDropdown() {
       <button
         ref={triggerRef}
         type="button"
-        className="landing-btn landing-btn-primary place-order-dropdown-trigger"
+        className={triggerClassName}
         onClick={toggleOpen}
         aria-expanded={open}
         aria-haspopup="listbox"
-        aria-controls="place-order-dropdown-menu"
+        aria-controls={menuId}
       >
-        Place Order
-        <span className={`place-order-dropdown-chevron${open ? ' is-open' : ''}`} aria-hidden="true">
-          ▾
-        </span>
+        {label}
       </button>
       {menu}
     </div>

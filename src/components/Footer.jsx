@@ -12,6 +12,7 @@ import {
 } from 'react-icons/io5';
 import bluegoLogo from '../assets/bluego.png';
 import { companyWhatsappDemoDisplay, companyWhatsappDemoUrl } from '../config/companyContact';
+import PlaceOrderDropdown from './PlaceOrderDropdown';
 import './Footer.css';
 
 function Footer({ onScrollToSection }) {
@@ -39,9 +40,11 @@ function Footer({ onScrollToSection }) {
           <p className="footer-top-subtitle">
             Web, app, social verification, monetization, and digital publication support from one team.
           </p>
-          <Link to="/services/publications" className="footer-top-cta">
-            Choose Package
-          </Link>
+          <PlaceOrderDropdown
+            label="Choose Package"
+            triggerClassName="footer-top-cta place-order-dropdown-trigger"
+            menuId="footer-choose-package-menu"
+          />
         </div>
 
         <div className="footer-content">
