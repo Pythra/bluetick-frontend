@@ -1,5 +1,3 @@
-import { CLIENT_BRANDS } from '../data/clientLogos';
-import ClientLogo from './ClientLogo';
 import './ClientsSection.css';
 
 function ClientsSection({ className = '', title = 'Some of our Clients' }) {
@@ -12,17 +10,14 @@ function ClientsSection({ className = '', title = 'Some of our Clients' }) {
         <h2 id="clients-section-title" className="clients-section-title">
           {title}
         </h2>
-        <div className="clients-section-grid" role="list">
-          {CLIENT_BRANDS.map((client) => (
-            <div
-              key={client.name}
-              className="clients-section-item"
-              role="listitem"
-              title={client.name}
-            >
-              <ClientLogo client={client} />
-            </div>
-          ))}
+        <div className="clients-section-visual">
+          <img
+            src="/client.png"
+            alt="Some of our clients"
+            className="clients-section-image"
+            loading="lazy"
+            decoding="async"
+          />
         </div>
       </div>
     </section>
