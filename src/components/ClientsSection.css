@@ -9,16 +9,6 @@
   margin: 0 auto;
 }
 
-.clients-section-title {
-  margin: 0 0 32px;
-  text-align: center;
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
-  font-size: clamp(1.5rem, 3vw, 2rem);
-  font-weight: 700;
-  color: #0f2546;
-  letter-spacing: -0.02em;
-}
-
 .clients-section-visual {
   display: flex;
   justify-content: center;
@@ -44,9 +34,5 @@
 @media (max-width: 640px) {
   .clients-section {
     padding: 40px 16px 48px;
-  }
-
-  .clients-section-title {
-    margin-bottom: 24px;
   }
 }

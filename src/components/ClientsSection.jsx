@@ -1,16 +1,10 @@
-import clientsImage from '../assets/clients.png';
+import clientsImage from '../assets/ourclients.JPEG';
 import './ClientsSection.css';
 
-function ClientsSection({ className = '', title = 'Some of our Clients' }) {
+function ClientsSection({ className = '' }) {
   return (
-    <section
-      className={`clients-section ${className}`.trim()}
-      aria-labelledby="clients-section-title"
-    >
+    <section className={`clients-section ${className}`.trim()} aria-label="Our clients">
       <div className="clients-section-inner">
-        <h2 id="clients-section-title" className="clients-section-title">
-          {title}
-        </h2>
         <div className="clients-section-visual">
           <img
             src={clientsImage}
