@@ -75,69 +75,30 @@ function positionPickerMenu(label, options) {
   });
 }
 
+function clearPickerMenuStyles(options) {
+  options.removeAttribute('style');
+}
+
 function RichTextEditor({ value, onChange, placeholder, minHeight = 220 }) {
   const wrapperRef = useRef(null);
-  const portalStateRef = useRef({ picker: null, options: null });
   const rafRef = useRef(null);
 
   useEffect(() => {
     const root = wrapperRef.current;
     if (!root) return undefined;
 
-    const releasePortal = () => {
-      const { picker, options } = portalStateRef.current;
-      if (!picker || !options) return;
+    const syncOpenPickers = () => {
+      root.querySelectorAll('.ql-toolbar .ql-picker.ql-expanded').forEach((picker) => {
+        const label = picker.querySelector('.ql-picker-label');
+        const options = picker.querySelector('.ql-picker-options');
+        if (label && options) {
+          positionPickerMenu(label, options);
+        }
+      });
 
-      if (options.parentElement === document.body) {
-        picker.appendChild(options);
-      }
-      options.classList.remove('ql-picker-options--portal');
-      options.removeAttribute('style');
-      portalStateRef.current = { picker: null, options: null };
-    };
-
-    const syncPickerPortal = () => {
-      const expanded = root.querySelector('.ql-toolbar .ql-picker.ql-expanded');
-
-      if (!expanded) {
-        releasePortal();
-        return;
-      }
-
-      const label = expanded.querySelector('.ql-picker-label');
-      if (!label) {
-        releasePortal();
-        return;
-      }
-
-      const { picker: activePicker, options: activeOptions } = portalStateRef.current;
-
-      // Menu already portaled for this picker — only reposition (avoids blink loop)
-      if (
-        activePicker === expanded &&
-        activeOptions &&
-        activeOptions.classList.contains('ql-picker-options--portal') &&
-        activeOptions.parentElement === document.body
-      ) {
-        positionPickerMenu(label, activeOptions);
-        return;
-      }
-
-      let options = expanded.querySelector('.ql-picker-options');
-      if (!options) {
-        return;
-      }
-
-      if (activePicker !== expanded) {
-        releasePortal();
-      }
-
-      options.classList.add('ql-picker-options--portal');
-      if (options.parentElement !== document.body) {
-        document.body.appendChild(options);
-      }
-      portalStateRef.current = { picker: expanded, options };
-      positionPickerMenu(label, options);
+      root.querySelectorAll('.ql-toolbar .ql-picker:not(.ql-expanded) .ql-picker-options').forEach(
+        clearPickerMenuStyles
+      );
     };
 
     const scheduleSync = () => {
@@ -146,7 +107,7 @@ function RichTextEditor({ value, onChange, placeholder, minHeight = 220 }) {
       }
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
-        syncPickerPortal();
+        syncOpenPickers();
       });
     };
 
@@ -170,12 +131,7 @@ function RichTextEditor({ value, onChange, placeholder, minHeight = 220 }) {
       attributeFilter: ['class'],
     });
 
-    const onReposition = () => {
-      const { picker, options } = portalStateRef.current;
-      if (!picker || !options || options.parentElement !== document.body) return;
-      const label = picker.querySelector('.ql-picker-label');
-      if (label) positionPickerMenu(label, options);
-    };
+    const onReposition = () => scheduleSync();
 
     window.addEventListener('resize', onReposition);
     window.addEventListener('scroll', onReposition, true);
@@ -185,7 +141,7 @@ function RichTextEditor({ value, onChange, placeholder, minHeight = 220 }) {
       observer.disconnect();
       window.removeEventListener('resize', onReposition);
       window.removeEventListener('scroll', onReposition, true);
-      releasePortal();
+      root.querySelectorAll('.ql-toolbar .ql-picker-options').forEach(clearPickerMenuStyles);
     };
   }, []);
 

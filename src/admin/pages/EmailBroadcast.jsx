@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import RichTextEditor from '../../components/RichTextEditor'
 import ContentPreviewModal from '../../components/ContentPreviewModal'
+import { parseJsonResponse } from '../../utils/apiResponse'
 
 const inputStyle = {
   width: '100%',
@@ -57,14 +58,19 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
     setExcludedUserIds([])
   }
 
-  const selectAllForExclude = () => {
-    const idsToAdd = filteredUsersForExclude.map((user) => user.id)
-    setExcludedUserIds((prev) => [...new Set([...prev, ...idsToAdd])])
-  }
-
   const allFilteredExcluded =
     filteredUsersForExclude.length > 0 &&
     filteredUsersForExclude.every((user) => excludedSet.has(user.id))
+
+  const toggleAllFilteredForExclude = () => {
+    const filteredIds = filteredUsersForExclude.map((user) => user.id)
+    if (allFilteredExcluded) {
+      const filteredIdSet = new Set(filteredIds)
+      setExcludedUserIds((prev) => prev.filter((id) => !filteredIdSet.has(id)))
+    } else {
+      setExcludedUserIds((prev) => [...new Set([...prev, ...filteredIds])])
+    }
+  }
 
   const actionButtonStyle = {
     padding: '8px 12px',
@@ -116,6 +122,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Accept: 'application/json',
           Authorization: `Bearer ${adminToken}`,
         },
         body: JSON.stringify({
@@ -125,9 +132,9 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
         }),
       })
 
-      const data = await response.json()
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to send broadcast email')
+      const { data } = await parseJsonResponse(response)
+      if (!response.ok || !data?.success) {
+        throw new Error(data?.error || data?.message || 'Failed to send broadcast email')
       }
 
       const failedNote =
@@ -222,7 +229,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
             />
           </div>
 
-          <div style={{ display: 'grid', gap: '4px' }}>
+          <div style={{ display: 'grid', gap: '4px', overflow: 'visible' }}>
             <label style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>Message</label>
             <RichTextEditor
               value={content}
@@ -253,19 +260,20 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
                 {filteredUsersForExclude.length > 0 ? (
                   <button
                     type="button"
-                    onClick={selectAllForExclude}
-                    disabled={allFilteredExcluded}
+                    onClick={toggleAllFilteredForExclude}
                     style={{
                       ...actionButtonStyle,
                       color: '#0066FF',
                       borderColor: '#0066FF',
-                      opacity: allFilteredExcluded ? 0.6 : 1,
-                      cursor: allFilteredExcluded ? 'not-allowed' : 'pointer',
                     }}
                   >
-                    {excludeSearch.trim()
-                      ? `Select all (${filteredUsersForExclude.length})`
-                      : 'Select all'}
+                    {allFilteredExcluded
+                      ? excludeSearch.trim()
+                        ? `Unselect all (${filteredUsersForExclude.length})`
+                        : 'Unselect all'
+                      : excludeSearch.trim()
+                        ? `Select all (${filteredUsersForExclude.length})`
+                        : 'Select all'}
                   </button>
                 ) : null}
                 {excludedUserIds.length > 0 ? (
