@@ -1,3 +1,4 @@
+import clientsImage from '../assets/clients.png';
 import './ClientsSection.css';
 
 function ClientsSection({ className = '', title = 'Some of our Clients' }) {
@@ -12,7 +13,7 @@ function ClientsSection({ className = '', title = 'Some of our Clients' }) {
         </h2>
         <div className="clients-section-visual">
           <img
-            src="/client.png"
+            src={clientsImage}
             alt="Some of our clients"
             className="clients-section-image"
             loading="lazy"
