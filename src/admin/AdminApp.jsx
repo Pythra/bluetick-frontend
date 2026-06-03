@@ -7,6 +7,7 @@ import { CartManagement } from './pages/CartManagement'
 import { OrderManagement } from './pages/OrderManagement'
 import { SubmissionManagement } from './pages/SubmissionManagement'
 import { BlogManagement } from './pages/BlogManagement'
+import { EmailBroadcast } from './pages/EmailBroadcast'
 import { useAuth } from '../contexts/AuthContext'
 
 function AdminApp() {
@@ -306,6 +307,7 @@ function AdminApp() {
       'orders': 'Orders',
       'submissions': 'Article Submissions',
       'blog': 'Blog Management',
+      'broadcast': 'Email Broadcast',
     }
     return titles[activeTab] || 'Dashboard'
   }
@@ -412,6 +414,8 @@ function AdminApp() {
           <SubmissionManagement users={users} />
         ) : activeTab === 'blog' ? (
           <BlogManagement apiUrl={apiUrl} adminToken={adminToken} />
+        ) : activeTab === 'broadcast' ? (
+          <EmailBroadcast apiUrl={apiUrl} adminToken={adminToken} users={users} />
         ) : null}
       </div>
     </div>
