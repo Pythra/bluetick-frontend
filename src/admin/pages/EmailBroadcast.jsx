@@ -57,6 +57,26 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
     setExcludedUserIds([])
   }
 
+  const selectAllForExclude = () => {
+    const idsToAdd = filteredUsersForExclude.map((user) => user.id)
+    setExcludedUserIds((prev) => [...new Set([...prev, ...idsToAdd])])
+  }
+
+  const allFilteredExcluded =
+    filteredUsersForExclude.length > 0 &&
+    filteredUsersForExclude.every((user) => excludedSet.has(user.id))
+
+  const actionButtonStyle = {
+    padding: '8px 12px',
+    backgroundColor: '#fff',
+    color: '#64748b',
+    border: '1px solid #cbd5e1',
+    borderRadius: '8px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
@@ -229,24 +249,35 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
                   Check users who should not receive this broadcast.
                 </p>
               </div>
-              {excludedUserIds.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={clearExclusions}
-                  style={{
-                    padding: '8px 12px',
-                    backgroundColor: '#fff',
-                    color: '#64748b',
-                    border: '1px solid #cbd5e1',
-                    borderRadius: '8px',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Clear exclusions ({excludedUserIds.length})
-                </button>
-              ) : null}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {filteredUsersForExclude.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={selectAllForExclude}
+                    disabled={allFilteredExcluded}
+                    style={{
+                      ...actionButtonStyle,
+                      color: '#0066FF',
+                      borderColor: '#0066FF',
+                      opacity: allFilteredExcluded ? 0.6 : 1,
+                      cursor: allFilteredExcluded ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {excludeSearch.trim()
+                      ? `Select all (${filteredUsersForExclude.length})`
+                      : 'Select all'}
+                  </button>
+                ) : null}
+                {excludedUserIds.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={clearExclusions}
+                    style={actionButtonStyle}
+                  >
+                    Clear exclusions ({excludedUserIds.length})
+                  </button>
+                ) : null}
+              </div>
             </div>
 
             <input
