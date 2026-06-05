@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import RichTextEditor from '../../components/RichTextEditor'
 import ContentPreviewModal from '../../components/ContentPreviewModal'
 import { parseJsonResponse } from '../../utils/apiResponse'
+import { hasMeaningfulHtml } from '../../utils/richHtml'
 
 const inputStyle = {
   width: '100%',
@@ -22,6 +23,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showPreview, setShowPreview] = useState(false)
+  const [scheduleAt, setScheduleAt] = useState('')
 
   const excludedSet = useMemo(() => new Set(excludedUserIds), [excludedUserIds])
 
@@ -96,7 +98,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
       return
     }
 
-    if (!getPlainTextFromHtml(trimmedContent)) {
+    if (!hasMeaningfulHtml(trimmedContent)) {
       setError('Email content is required.')
       return
     }
@@ -111,8 +113,12 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
         ? `\n\n${excludedUserIds.length} user(s) will be excluded.`
         : ''
 
+    const scheduleNote = scheduleAt
+      ? `\n\nThis message will be scheduled for: ${scheduleAt}.`
+      : ''
+
     const shouldSend = window.confirm(
-      `Send this email to ${recipientCount} registered user${recipientCount === 1 ? '' : 's'}?${exclusionNote}\n\nThis cannot be undone.`
+      `Send this email to ${recipientCount} registered user${recipientCount === 1 ? '' : 's'}?${exclusionNote}${scheduleNote}\n\nThis cannot be undone.`
     )
     if (!shouldSend) return
 
@@ -129,6 +135,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
           subject: trimmedSubject,
           contentHtml: trimmedContent,
           excludeUserIds: excludedUserIds,
+          scheduledFor: scheduleAt ? new Date(scheduleAt).toISOString() : undefined,
         }),
       })
 
@@ -137,17 +144,26 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
         throw new Error(data?.error || data?.message || 'Failed to send broadcast email')
       }
 
-      const failedNote =
-        data.failed > 0 ? ` ${data.failed} recipient(s) failed.` : ''
-      const excludedNote =
-        data.excludedCount > 0 ? ` ${data.excludedCount} user(s) were excluded.` : ''
-      setSuccess(
-        `Broadcast sent to ${data.sent} of ${data.totalRecipients} user(s).${excludedNote}${failedNote}`
-      )
+      if (data.scheduled) {
+        const excludedNote =
+          data.excludedCount > 0 ? ` ${data.excludedCount} user(s) will be excluded.` : ''
+        setSuccess(
+          `Broadcast scheduled for ${new Date(data.scheduledFor).toLocaleString()}.${excludedNote}`
+        )
+      } else {
+        const failedNote =
+          data.failed > 0 ? ` ${data.failed} recipient(s) failed.` : ''
+        const excludedNote =
+          data.excludedCount > 0 ? ` ${data.excludedCount} user(s) were excluded.` : ''
+        setSuccess(
+          `Broadcast sent to ${data.sent} of ${data.totalRecipients} user(s).${excludedNote}${failedNote}`
+        )
+      }
       setSubject('')
       setContent('')
       setExcludedUserIds([])
       setExcludeSearch('')
+      setScheduleAt('')
     } catch (submitError) {
       setError(submitError.message || 'Unable to send broadcast email')
     } finally {
@@ -229,7 +245,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
             />
           </div>
 
-          <div style={{ display: 'grid', gap: '4px', overflow: 'visible' }}>
+          <div style={{ display: 'grid', gap: '8px', overflow: 'visible' }}>
             <label style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>Message</label>
             <RichTextEditor
               value={content}
@@ -237,6 +253,30 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
               placeholder="Write your broadcast message here..."
               minHeight={260}
             />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+              <label
+                htmlFor="broadcast-schedule-at"
+                style={{ fontSize: '13px', color: '#475569', fontWeight: 500 }}
+              >
+                Schedule (optional)
+              </label>
+              <input
+                id="broadcast-schedule-at"
+                type="datetime-local"
+                value={scheduleAt}
+                onChange={(event) => setScheduleAt(event.target.value)}
+                style={{
+                  borderRadius: '8px',
+                  border: '1px solid #d6deeb',
+                  padding: '6px 10px',
+                  fontSize: '13px',
+                  fontFamily: 'inherit',
+                }}
+              />
+              <span style={{ fontSize: '12px', color: '#64748b' }}>
+                Leave empty to send immediately.
+              </span>
+            </div>
           </div>
 
           <div
