@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { normalizeEditorHtml } from '../utils/richHtml';
+import { looksLikeRawHtml, needsHtmlConversion, normalizeEditorHtml } from '../utils/richHtml';
 import './RichTextEditor.css';
 
 const toolbarOptions = [
@@ -88,9 +88,30 @@ function RichTextEditor({
   enableHtmlSource = false,
 }) {
   const wrapperRef = useRef(null);
+  const quillRef = useRef(null);
   const rafRef = useRef(null);
   const [mode, setMode] = useState('visual');
   const [htmlDraft, setHtmlDraft] = useState(value || '');
+  const [visualEditorKey, setVisualEditorKey] = useState(0);
+
+  const applyHtmlToVisualEditor = useCallback(
+    (htmlValue) => {
+      const normalized = normalizeEditorHtml(htmlValue);
+      if (!normalized) return false;
+
+      const editor = quillRef.current?.getEditor?.();
+      if (!editor) {
+        onChange(normalized);
+        return true;
+      }
+
+      const delta = editor.clipboard.convert({ html: normalized });
+      editor.setContents(delta, 'user');
+      onChange(editor.root.innerHTML);
+      return true;
+    },
+    [onChange]
+  );
 
   useEffect(() => {
     if (mode === 'html') return;
@@ -157,7 +178,39 @@ function RichTextEditor({
       window.removeEventListener('scroll', onReposition, true);
       root.querySelectorAll('.ql-toolbar .ql-picker-options').forEach(clearPickerMenuStyles);
     };
-  }, [mode]);
+  }, [mode, visualEditorKey]);
+
+  useEffect(() => {
+    if (mode !== 'visual') return undefined;
+
+    const editor = quillRef.current?.getEditor?.();
+    if (!editor) return undefined;
+
+    const handlePaste = (event) => {
+      const plain = event.clipboardData?.getData('text/plain') || '';
+      const richHtml = event.clipboardData?.getData('text/html') || '';
+
+      if (richHtml.trim() || !looksLikeRawHtml(plain)) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      applyHtmlToVisualEditor(plain);
+    };
+
+    editor.root.addEventListener('paste', handlePaste, true);
+    return () => editor.root.removeEventListener('paste', handlePaste, true);
+  }, [mode, visualEditorKey, applyHtmlToVisualEditor]);
+
+  useEffect(() => {
+    if (mode !== 'visual' || !needsHtmlConversion(value)) return;
+
+    const editor = quillRef.current?.getEditor?.();
+    if (!editor) return;
+
+    applyHtmlToVisualEditor(value);
+  }, [mode, value, visualEditorKey, applyHtmlToVisualEditor]);
 
   const switchToHtml = () => {
     setHtmlDraft(value || '');
@@ -167,6 +220,7 @@ function RichTextEditor({
   const switchToVisual = () => {
     const normalized = normalizeEditorHtml(htmlDraft);
     onChange(normalized);
+    setVisualEditorKey((key) => key + 1);
     setMode('visual');
   };
 
@@ -206,7 +260,11 @@ function RichTextEditor({
             <span className="pro-rich-editor-mode-hint">
               Paste or edit raw HTML. Switch to Visual to preview formatting.
             </span>
-          ) : null}
+          ) : (
+            <span className="pro-rich-editor-mode-hint">
+              Paste HTML from a code block? Use the HTML tab, or paste here and it will auto-format.
+            </span>
+          )}
         </div>
       ) : null}
 
@@ -228,6 +286,8 @@ function RichTextEditor({
         />
       ) : (
         <ReactQuill
+          key={visualEditorKey}
+          ref={quillRef}
           theme="snow"
           value={value}
           onChange={onChange}

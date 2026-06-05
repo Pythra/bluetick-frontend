@@ -47,8 +47,53 @@ export function extractEditableHtml(html = '') {
   );
 }
 
+export function decodeHtmlEntities(text = '') {
+  if (!text || typeof text !== 'string') return '';
+  if (typeof document === 'undefined') {
+    return text
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&amp;/gi, '&')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/gi, "'");
+  }
+
+  const el = document.createElement('textarea');
+  el.innerHTML = text;
+  return el.value;
+}
+
+/** True when clipboard/plain text looks like an HTML snippet to parse. */
+export function looksLikeRawHtml(html = '') {
+  const trimmed = (html || '').trim();
+  if (!trimmed) return false;
+
+  if (/&lt;\s*\/?\s*[a-z][^&]*&gt;/i.test(trimmed)) {
+    return true;
+  }
+
+  return /<\s*(h[1-6]|p|div|ul|ol|li|blockquote|table|section|article|a|strong|em|u|span)\b/i.test(
+    trimmed
+  );
+}
+
+/** True when Visual editor content was pasted as raw source and still needs conversion. */
+export function needsHtmlConversion(html = '') {
+  const trimmed = (html || '').trim();
+  if (!trimmed) return false;
+
+  if (/&lt;\s*\/?\s*[a-z]/i.test(trimmed)) {
+    return true;
+  }
+
+  return /^<p>(?:\s|&nbsp;)*<\s*(h[1-6]|ul|ol|blockquote|div|table)\b/i.test(trimmed);
+}
+
 export function normalizeEditorHtml(html = '') {
-  const cleaned = extractEditableHtml(html);
+  const decoded = looksLikeRawHtml(html) && /&lt;/i.test(html)
+    ? decodeHtmlEntities(html)
+    : html;
+  const cleaned = extractEditableHtml(decoded);
   if (!hasMeaningfulHtml(cleaned)) {
     return '';
   }
