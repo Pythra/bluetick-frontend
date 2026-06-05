@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import { normalizeEditorHtml } from '../utils/richHtml';
 import './RichTextEditor.css';
 
 const toolbarOptions = [
@@ -79,13 +80,26 @@ function clearPickerMenuStyles(options) {
   options.removeAttribute('style');
 }
 
-function RichTextEditor({ value, onChange, placeholder, minHeight = 220 }) {
+function RichTextEditor({
+  value,
+  onChange,
+  placeholder,
+  minHeight = 220,
+  enableHtmlSource = false,
+}) {
   const wrapperRef = useRef(null);
   const rafRef = useRef(null);
+  const [mode, setMode] = useState('visual');
+  const [htmlDraft, setHtmlDraft] = useState(value || '');
+
+  useEffect(() => {
+    if (mode === 'html') return;
+    setHtmlDraft(value || '');
+  }, [value, mode]);
 
   useEffect(() => {
     const root = wrapperRef.current;
-    if (!root) return undefined;
+    if (!root || mode !== 'visual') return undefined;
 
     const syncOpenPickers = () => {
       root.querySelectorAll('.ql-toolbar .ql-picker.ql-expanded').forEach((picker) => {
@@ -143,22 +157,85 @@ function RichTextEditor({ value, onChange, placeholder, minHeight = 220 }) {
       window.removeEventListener('scroll', onReposition, true);
       root.querySelectorAll('.ql-toolbar .ql-picker-options').forEach(clearPickerMenuStyles);
     };
-  }, []);
+  }, [mode]);
+
+  const switchToHtml = () => {
+    setHtmlDraft(value || '');
+    setMode('html');
+  };
+
+  const switchToVisual = () => {
+    const normalized = normalizeEditorHtml(htmlDraft);
+    onChange(normalized);
+    setMode('visual');
+  };
+
+  const handleHtmlChange = (event) => {
+    const next = event.target.value;
+    setHtmlDraft(next);
+    onChange(next);
+  };
 
   return (
     <div
       ref={wrapperRef}
-      className="pro-rich-editor"
+      className={`pro-rich-editor${enableHtmlSource ? ' has-html-mode' : ''}`}
       style={{ '--editor-min-height': `${minHeight}px` }}
     >
-      <ReactQuill
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        modules={modules}
-        formats={formats}
-      />
+      {enableHtmlSource ? (
+        <div className="pro-rich-editor-mode-bar">
+          <button
+            type="button"
+            className={`pro-rich-editor-mode-btn${mode === 'visual' ? ' is-active' : ''}`}
+            onClick={() => {
+              if (mode === 'html') switchToVisual();
+            }}
+          >
+            Visual
+          </button>
+          <button
+            type="button"
+            className={`pro-rich-editor-mode-btn${mode === 'html' ? ' is-active' : ''}`}
+            onClick={() => {
+              if (mode === 'visual') switchToHtml();
+            }}
+          >
+            HTML
+          </button>
+          {mode === 'html' ? (
+            <span className="pro-rich-editor-mode-hint">
+              Paste or edit raw HTML. Switch to Visual to preview formatting.
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+
+      {mode === 'html' ? (
+        <textarea
+          className="pro-rich-editor-html-source"
+          value={htmlDraft}
+          onChange={handleHtmlChange}
+          onBlur={() => {
+            const normalized = normalizeEditorHtml(htmlDraft);
+            if (normalized !== htmlDraft) {
+              setHtmlDraft(normalized);
+              onChange(normalized);
+            }
+          }}
+          placeholder={placeholder || 'Paste or write HTML here...'}
+          spellCheck={false}
+          style={{ minHeight: `${minHeight}px` }}
+        />
+      ) : (
+        <ReactQuill
+          theme="snow"
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          modules={modules}
+          formats={formats}
+        />
+      )}
     </div>
   );
 }

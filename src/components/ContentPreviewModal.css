@@ -98,6 +98,22 @@
   white-space: pre-wrap;
 }
 
+.email-preview-body {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.email-preview-body .rich-html-content u {
+  text-decoration: underline;
+}
+
+.email-preview-body .rich-html-content s {
+  text-decoration: line-through;
+}
+
 @media (max-width: 640px) {
   .content-preview-overlay {
     padding: 0.5rem;

@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import '../pages/BlogPage.css';
 import './ContentPreviewModal.css';
+import './RichHtmlContent.css';
+import { hasMeaningfulHtml, normalizeEditorHtml } from '../utils/richHtml';
 
-const hasHtmlContent = (value = '') => /<[^>]+>/.test(value);
+const hasHtmlContent = (value = '') => hasMeaningfulHtml(value) || /<[^>]+>/.test(value);
 
 function ContentPreviewModal({
   isOpen,
@@ -16,7 +18,13 @@ function ContentPreviewModal({
   images = [],
   notes = '',
   notesLabel = 'Additional instructions',
+  emailPreview = false,
 }) {
+  const rawContent = useMemo(
+    () => normalizeEditorHtml(contentHtml) || contentHtml || '',
+    [contentHtml]
+  );
+
   useEffect(() => {
     if (!isOpen) return undefined;
 
@@ -39,8 +47,6 @@ function ContentPreviewModal({
   if (!isOpen) {
     return null;
   }
-
-  const rawContent = contentHtml || '';
   const contentIsHtml = hasHtmlContent(rawContent);
   const plainParagraphs = contentIsHtml
     ? []
@@ -90,9 +96,12 @@ function ContentPreviewModal({
               </div>
             ) : null}
 
-            <div className="blog-article-body">
+            <div className={`blog-article-body${emailPreview ? ' email-preview-body' : ''}`}>
               {contentIsHtml ? (
-                <div dangerouslySetInnerHTML={{ __html: rawContent }} />
+                <div
+                  className="rich-html-content"
+                  dangerouslySetInnerHTML={{ __html: rawContent }}
+                />
               ) : plainParagraphs.length > 0 ? (
                 plainParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)
               ) : (

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import RichTextEditor from '../../components/RichTextEditor'
 import ContentPreviewModal from '../../components/ContentPreviewModal'
 import { parseJsonResponse } from '../../utils/apiResponse'
-import { hasMeaningfulHtml } from '../../utils/richHtml'
+import { hasMeaningfulHtml, normalizeEditorHtml } from '../../utils/richHtml'
 
 const inputStyle = {
   width: '100%',
@@ -42,13 +42,6 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
   }, [users, excludeSearch])
 
   const recipientCount = users.length - excludedUserIds.length
-
-  const getPlainTextFromHtml = (htmlValue = '') =>
-    htmlValue
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&nbsp;/gi, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
 
   const toggleExcludedUser = (userId) => {
     setExcludedUserIds((prev) =>
@@ -91,14 +84,14 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
     setSuccess('')
 
     const trimmedSubject = subject.trim()
-    const trimmedContent = content.trim()
+    const normalizedContent = normalizeEditorHtml(content)
 
     if (!trimmedSubject) {
       setError('Subject is required.')
       return
     }
 
-    if (!hasMeaningfulHtml(trimmedContent)) {
+    if (!hasMeaningfulHtml(normalizedContent)) {
       setError('Email content is required.')
       return
     }
@@ -133,7 +126,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
         },
         body: JSON.stringify({
           subject: trimmedSubject,
-          contentHtml: trimmedContent,
+          contentHtml: normalizedContent,
           excludeUserIds: excludedUserIds,
           scheduledFor: scheduleAt ? new Date(scheduleAt).toISOString() : undefined,
         }),
@@ -179,6 +172,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
         dialogTitle="Email preview"
         title={subject || 'Email subject'}
         contentHtml={content}
+        emailPreview
       />
 
       <div
@@ -252,6 +246,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
               onChange={setContent}
               placeholder="Write your broadcast message here..."
               minHeight={260}
+              enableHtmlSource
             />
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
               <label
@@ -390,7 +385,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
             <button
               type="button"
               onClick={() => setShowPreview(true)}
-              disabled={!subject.trim() && !getPlainTextFromHtml(content)}
+              disabled={!subject.trim() && !hasMeaningfulHtml(content)}
               style={{
                 padding: '10px 16px',
                 backgroundColor: '#fff',
