@@ -100,6 +100,39 @@ export function normalizeEditorHtml(html = '') {
   return cleaned;
 }
 
+const BROADCAST_MERGE_TAG_PATTERN = /\{\{\s*(firstName|lastName|fullName|name|email)\s*\}\}/gi;
+
+export function buildNameFromEmail(email = '') {
+  const localPart = email.split('@')[0] || '';
+  const segments = localPart.split(/[\._-]/).filter(Boolean);
+  const firstName = segments[0] || 'there';
+  const lastName = segments[1] || '';
+  return { firstName, lastName };
+}
+
+export function resolveBroadcastRecipient(user = {}) {
+  const email = (user.email || '').trim().toLowerCase();
+  const fallback = buildNameFromEmail(email);
+  const firstName = (user.firstName || '').trim() || fallback.firstName;
+  const lastName = (user.lastName || '').trim() || fallback.lastName;
+  const fullName = [firstName, lastName].filter(Boolean).join(' ');
+
+  return { email, firstName, lastName, fullName };
+}
+
+export function applyBroadcastMergeTags(content = '', user = {}) {
+  const recipient = resolveBroadcastRecipient(user);
+
+  return (content || '').replace(BROADCAST_MERGE_TAG_PATTERN, (_, key) => {
+    const normalized = String(key || '').toLowerCase();
+    if (normalized === 'firstname') return recipient.firstName;
+    if (normalized === 'lastname') return recipient.lastName;
+    if (normalized === 'fullname' || normalized === 'name') return recipient.fullName;
+    if (normalized === 'email') return recipient.email;
+    return '';
+  });
+}
+
 /** CSS for rendered Quill HTML (preview, blog body, email wrapper). */
 export const RICH_HTML_CONTENT_CSS = `
 .rich-html-content { color: #1e293b; font-size: 15px; line-height: 1.65; word-wrap: break-word; }

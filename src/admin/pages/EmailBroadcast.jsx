@@ -2,7 +2,11 @@ import { useMemo, useState } from 'react'
 import RichTextEditor from '../../components/RichTextEditor'
 import ContentPreviewModal from '../../components/ContentPreviewModal'
 import { parseJsonResponse } from '../../utils/apiResponse'
-import { hasMeaningfulHtml, normalizeEditorHtml } from '../../utils/richHtml'
+import {
+  applyBroadcastMergeTags,
+  hasMeaningfulHtml,
+  normalizeEditorHtml,
+} from '../../utils/richHtml'
 
 const inputStyle = {
   width: '100%',
@@ -42,6 +46,28 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
   }, [users, excludeSearch])
 
   const recipientCount = users.length - excludedUserIds.length
+
+  const previewRecipient = useMemo(() => {
+    const sampleUser = users.find((user) => !excludedSet.has(user.id))
+    if (sampleUser) {
+      return {
+        firstName: sampleUser.firstName,
+        lastName: sampleUser.lastName,
+        email: sampleUser.email,
+      }
+    }
+    return { firstName: 'John', lastName: 'Doe', email: 'john@example.com' }
+  }, [users, excludedSet])
+
+  const previewSubject = useMemo(
+    () => applyBroadcastMergeTags(subject, previewRecipient),
+    [subject, previewRecipient]
+  )
+
+  const previewContent = useMemo(
+    () => applyBroadcastMergeTags(content, previewRecipient),
+    [content, previewRecipient]
+  )
 
   const toggleExcludedUser = (userId) => {
     setExcludedUserIds((prev) =>
@@ -170,8 +196,8 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
         isOpen={showPreview}
         onClose={() => setShowPreview(false)}
         dialogTitle="Email preview"
-        title={subject || 'Email subject'}
-        contentHtml={content}
+        title={previewSubject || 'Email subject'}
+        contentHtml={previewContent}
         emailPreview
       />
 
@@ -241,6 +267,13 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
 
           <div style={{ display: 'grid', gap: '8px', overflow: 'visible' }}>
             <label style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>Message</label>
+            <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>
+              Personalize with{' '}
+              <code>{'{{firstName}}'}</code>, <code>{'{{lastName}}'}</code>,{' '}
+              <code>{'{{fullName}}'}</code>, or <code>{'{{email}}'}</code>.
+              Preview uses the first recipient
+              {previewRecipient.firstName ? ` (${previewRecipient.firstName})` : ''}.
+            </p>
             <RichTextEditor
               value={content}
               onChange={setContent}
