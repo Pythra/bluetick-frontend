@@ -40,6 +40,7 @@ import Footer from './components/Footer';
 import TermsAndConditions from './pages/legal/TermsAndConditions';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import RefundPolicy from './pages/legal/RefundPolicy';
+import LegalDocumentPage from './pages/legal/LegalDocumentPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import AboutPage from './pages/AboutPage';
@@ -163,6 +164,7 @@ function App() {
               <Route path="/terms" element={<TermsAndConditions />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/legal/:slug" element={<LegalDocumentPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />

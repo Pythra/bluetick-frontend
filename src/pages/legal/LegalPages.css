@@ -45,6 +45,21 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
+.legal-subsection-title {
+  color: #374151;
+  font-size: 1.15rem;
+  margin: 1.25rem 0 0.75rem;
+}
+
+.legal-closing {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1rem;
+}
+
+.legal-back-link {
+  margin-top: 0.5rem;
+}
+
 .legal-section p {
   color: #4a5568;
   line-height: 1.6;

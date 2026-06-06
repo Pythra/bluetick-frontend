@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   IoMailOutline, 
@@ -13,7 +13,18 @@ import {
 import bluegoLogo from '../assets/bluego.png';
 import { companyWhatsappDemoDisplay, companyWhatsappDemoUrl } from '../config/companyContact';
 import PlaceOrderDropdown from './PlaceOrderDropdown';
+import { legalDocuments } from '../data/legalDocuments';
 import './Footer.css';
+
+const footerLegalLinks = [
+  { to: '/terms', label: 'Terms & Conditions' },
+  { to: '/privacy', label: 'Privacy Policy' },
+  { to: '/refund-policy', label: 'Refund Policy' },
+  ...legalDocuments.map((document) => ({
+    to: `/legal/${document.slug}`,
+    label: document.shortTitle,
+  })),
+];
 
 function Footer({ onScrollToSection }) {
   const [logoError, setLogoError] = useState(false);
@@ -189,20 +200,15 @@ function Footer({ onScrollToSection }) {
         
         <div className="footer-bottom">
           <div className="footer-legal-links">
-            <Link to="/terms" className="legal-link">
-              <IoDocumentTextOutline className="legal-icon" />
-              Terms & Conditions
-            </Link>
-            <span className="divider">|</span>
-            <Link to="/privacy" className="legal-link">
-              <IoDocumentTextOutline className="legal-icon" />
-              Privacy Policy
-            </Link>
-            <span className="divider">|</span>
-            <Link to="/refund-policy" className="legal-link">
-              <IoDocumentTextOutline className="legal-icon" />
-              Refund Policy
-            </Link>
+            {footerLegalLinks.map((link, index) => (
+              <Fragment key={link.to}>
+                {index > 0 ? <span className="divider">|</span> : null}
+                <Link to={link.to} className="legal-link">
+                  <IoDocumentTextOutline className="legal-icon" />
+                  {link.label}
+                </Link>
+              </Fragment>
+            ))}
           </div>
           <p>&copy; {new Date().getFullYear()} Bluetickgeng Development. All rights reserved.</p>
         </div>
