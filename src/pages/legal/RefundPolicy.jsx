@@ -43,7 +43,7 @@ const RefundPolicy = () => {
           <h2>4. Refund Process</h2>
           <p>To request a refund, please follow these steps:</p>
           <ol>
-            <li>Contact our support team at <a href="mailto:bluetickgeng@gmail.com">bluetickgeng@gmail.com</a> within 7 days of purchase</li>
+            <li>Contact our support team at <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a> within 7 days of purchase</li>
             <li>Provide your order details and reason for the refund request</li>
             <li>Our team will review your request within 5-7 business days</li>
           </ol>
@@ -71,7 +71,7 @@ const RefundPolicy = () => {
 
         <section className="legal-section">
           <h2>9. Contact Us</h2>
-          <p>If you have any questions about our Refund Policy, please contact us at <a href="mailto:bluetickgeng@gmail.com">bluetickgeng@gmail.com</a>.</p>
+          <p>If you have any questions about our Refund Policy, please contact us at <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>.</p>
         </section>
       </div>
       <Footer />

@@ -550,7 +550,7 @@ function CheckoutPage() {
                 <IoShieldCheckmarkOutline aria-hidden="true" />
                 <p>
                   Secured by Paystack. Questions?{' '}
-                  <a href="mailto:bluetickgeng@gmail.com">bluetickgeng@gmail.com</a>
+                  <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>
                 </p>
               </div>
             </aside>

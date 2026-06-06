@@ -78,7 +78,7 @@ const PrivacyPolicy = () => {
 
         <section className="legal-section">
           <h2>9. Contact Us</h2>
-          <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:bluetickgeng@gmail.com">bluetickgeng@gmail.com</a>.</p>
+          <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>.</p>
         </section>
       </div>
       <Footer />

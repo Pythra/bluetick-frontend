@@ -49,7 +49,7 @@ const TermsAndConditions = () => {
 
         <section className="legal-section">
           <h2>8. Contact Us</h2>
-          <p>If you have any questions about these Terms and Conditions, please contact us at <a href="mailto:bluetickgeng@gmail.com">bluetickgeng@gmail.com</a>.</p>
+          <p>If you have any questions about these Terms and Conditions, please contact us at <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>.</p>
         </section>
       </div>
       <Footer />
