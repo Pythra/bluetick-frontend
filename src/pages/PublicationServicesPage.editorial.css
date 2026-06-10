@@ -68,7 +68,7 @@
 
 .publication-steps-badge {
   position: absolute;
-  top: 0;
+  top: 3.5rem;
   right: 1.25rem;
   z-index: 2;
   display: flex;
@@ -268,7 +268,7 @@
 
 .publication-stat-value {
   margin: 0;
-  font-size: clamp(1.35rem, 2.4vw, 2.1rem);
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
   font-weight: 500;
   color: #0f172a;
   line-height: 1;
@@ -1232,7 +1232,7 @@
   }
 
   .publication-stat-value {
-    font-size: clamp(1.15rem, 4.8vw, 1.5rem);
+    font-size: clamp(0.95rem, 4vw, 1.2rem);
   }
 
   .publication-stat-label {

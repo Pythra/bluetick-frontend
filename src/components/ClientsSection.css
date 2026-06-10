@@ -1,11 +1,10 @@
 .clients-section {
-  padding: 56px 20px 64px;
+  padding: 64px 0 80px;
   background: #ffffff;
-  border-top: 1px solid #e8eef5;
 }
 
 .clients-section-inner {
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -18,8 +17,9 @@
 .clients-section-image {
   display: block;
   width: 100%;
-  max-width: 1000px;
+  max-width: 1200px;
   height: auto;
+  max-height: 500px;
   object-fit: contain;
 }
 
@@ -33,6 +33,6 @@
 
 @media (max-width: 640px) {
   .clients-section {
-    padding: 40px 16px 48px;
+    padding: 48px 0 64px;
   }
 }

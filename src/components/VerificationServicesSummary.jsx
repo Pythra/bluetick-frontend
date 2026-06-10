@@ -54,6 +54,9 @@ function VerificationServicesSummary() {
       id="verification-services"
       className="verification-section verification-services-summary services-summary-layout"
     >
+      <div className="verification-services-summary-bg-decoration">
+        <div className="dot-pattern"></div>
+      </div>
       <ServicesSummaryLayout
         copy={(
           <>

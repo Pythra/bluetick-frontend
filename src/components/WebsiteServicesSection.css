@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 .website-services-section {
-  padding: 24px 20px 40px;
+  padding: 48px 20px 80px;
   position: relative;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: #ffffff;
@@ -9,7 +9,7 @@
 }
 
 .website-services-section.website-services-summary {
-  padding: 0 0 40px;
+  padding: 0 0 80px;
 }
 
 @keyframes gradientShift {
@@ -471,11 +471,11 @@
   }
 
   .website-hero-image {
-    height: 430px;
+    height: 400px;
   }
 
   .website-services-summary .website-hero-image {
-    height: 520px;
+    height: 490px;
   }
 
   .website-hero-content {
@@ -539,11 +539,11 @@
   }
 
   .website-hero-image {
-    height: 390px;
+    height: 360px;
   }
 
   .website-services-summary .website-hero-image {
-    height: 480px;
+    height: 450px;
   }
 
   .website-hero-content {

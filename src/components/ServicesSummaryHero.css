@@ -141,7 +141,7 @@
 .instagram-services-section.instagram-services-summary,
 .wikipedia-services-section.wikipedia-services-summary,
 .music-streaming-services-section.music-streaming-services-summary {
-  padding: 0 0 40px;
+  padding: 0 0 80px;
   margin: 0;
   background: #ffffff;
   overflow: visible;
@@ -162,11 +162,11 @@
   .instagram-services-section.instagram-services-summary,
   .wikipedia-services-section.wikipedia-services-summary,
   .music-streaming-services-section.music-streaming-services-summary {
-    padding: 0 0 40px;
+    padding: 0 0 80px;
   }
 
   .services-summary-hero-image {
-    height: 520px;
+    height: 490px;
   }
 
   .services-summary-hero-content {
@@ -190,7 +190,7 @@
 
 @media (max-width: 480px) {
   .services-summary-hero-image {
-    height: 480px;
+    height: 450px;
   }
 
   .services-summary-hero-content {
