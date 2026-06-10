@@ -1,73 +1,70 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  IoBookOutline,
-  IoBusinessOutline,
-  IoInformationCircleOutline,
-  IoNewspaperOutline,
-  IoSearchOutline,
-  IoShieldCheckmarkOutline,
-} from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
-import ServiceDetailCard from '../components/ServiceDetailCard';
+import SectionHeader from '../components/SectionHeader';
+import Button from '../components/Button';
 import Footer from '../components/Footer';
-import ClientsSection from '../components/ClientsSection';
-import wikipediaHeroVideo from '../assets/wiki.mp4';
 import {
-  googleKnowledgePanelPackages,
-  wikipediaPagePackages,
-  wikipediaScopeItems,
-  wikipediaServiceNotice,
-} from '../data/wikipediaPageServices';
-import './ServiceDetailPage.css';
+  IoCheckmarkCircle,
+  IoDocumentText,
+  IoNewspaper,
+  IoRocket,
+  IoTime,
+  IoChevronDown,
+  IoChevronUp,
+} from 'react-icons/io5';
 import './WikipediaServicesPage.css';
 
-function buildPackageDescription(pkg) {
-  const features = pkg.features.join(' · ');
-  return `${pkg.description} Includes: ${features}`;
-}
+const wikipediaPackages = [
+  {
+    id: 'individual-wiki',
+    title: 'Individual Wikipedia Page Creation',
+    price: 1000000,
+    deliveryTime: '48 hours',
+    description: 'Professional Wikipedia page creation for individuals with comprehensive content development and quality assurance.',
+    features: [
+      'Content creation and publication',
+      'Up to 12 news publications',
+      'Content review and compliance',
+      'Quality assurance',
+      'Wikipedia standards compliance',
+      'Professional page layout'
+    ]
+  },
+  {
+    id: 'company-wiki',
+    title: 'Company Wikipedia Page Creation',
+    price: 1500000,
+    deliveryTime: '72 hours',
+    description: 'Specialized Wikipedia page creation for businesses and organizations with stricter notability and sourcing requirements.',
+    features: [
+      'Comprehensive content creation',
+      'Up to 12 high-quality publications',
+      'Detailed business coverage',
+      'Company achievement highlights',
+      'Advanced content review',
+      'Wikipedia compliance verification',
+      'Media sourcing support',
+      'Notability assessment'
+    ]
+  }
+];
 
 function WikipediaServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
-  const wikiVideoRef = useRef(null);
+  const [expandedSections, setExpandedSections] = useState({});
 
-  useEffect(() => {
-    const video = wikiVideoRef.current;
-    if (!video) return undefined;
-
-    const showFirstFrame = () => {
-      try {
-        if (video.readyState >= 1 && video.currentTime < 0.05) {
-          video.currentTime = 0.01;
-        }
-      } catch {
-        // Some browsers block seek until enough data is loaded
-      }
-    };
-
-    video.addEventListener('loadeddata', showFirstFrame);
-    video.addEventListener('loadedmetadata', showFirstFrame);
-
-    if (video.readyState >= 1) {
-      showFirstFrame();
-    }
-
-    return () => {
-      video.removeEventListener('loadeddata', showFirstFrame);
-      video.removeEventListener('loadedmetadata', showFirstFrame);
-    };
-  }, []);
-
-  const handleAddToCart = async (item, category) => {
+  const handleAddToCart = async (package_) => {
     const result = await addToCart({
-      itemId: `${category}-${item.id}-${Date.now()}`,
-      title: item.title,
-      price: item.price,
-      description: item.description || item.deliveryTime || '',
+      itemId: `${package_.id}-${Date.now()}`,
+      title: package_.title,
+      price: package_.price,
+      description: package_.description,
       category: 'wikipedia',
       quantity: 1,
     });
@@ -76,6 +73,13 @@ function WikipediaServicesPage() {
       setShowCartNotification(true);
       setTimeout(() => setShowCartNotification(false), 3000);
     }
+  };
+
+  const toggleSection = (sectionId) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
   };
 
   const scrollToSection = (sectionId) => {
@@ -88,132 +92,187 @@ function WikipediaServicesPage() {
     }, 100);
   };
 
-  const scopeIcons = [IoNewspaperOutline, IoSearchOutline, IoShieldCheckmarkOutline];
-
   return (
-    <div className="service-detail-page">
+    <div className="wikipedia-services-page">
       <Navbar onScrollToSection={scrollToSection} />
+      <div className="page-header">
+        <Button onClick={() => navigate('/')} className="back-button">
+          ← Back to Home
+        </Button>
+        <SectionHeader
+          title="WIKIPEDIA PAGE SERVICES"
+          subtitle="Establish Your Presence on the World's Most Trusted Encyclopedia"
+        />
+      </div>
 
-      <main className="service-detail-main wikipedia-page-main" aria-label="Wikipedia Page Services">
-        <div className="wikipedia-page-shell">
-          <div className="wikipedia-page-split">
-            <aside className="wikipedia-page-video" aria-label="Wikipedia services overview video">
-              <video
-                ref={wikiVideoRef}
-                className="wikipedia-page-video-player"
-                src={wikipediaHeroVideo}
-                controls
-                playsInline
-                preload="auto"
-              />
-            </aside>
-
-            <div className="wikipedia-page-content">
-              <header className="wikipedia-page-intro">
-                <h1 className="wikipedia-page-title">
-                  <span className="services-summary-title-black">WIKIPEDIA PAGE</span>
-                  <span className="services-summary-title-blue">SERVICES</span>
-                </h1>
-                <p className="wikipedia-page-lead">
-                  Establish credibility on the world&apos;s most trusted encyclopedia — professional
-                  content creation, publications, and quality assurance for individuals and companies.
+      <div className="container">
+        {/* Scope of Services */}
+        <section className="services-section">
+          <h2 className="section-title">Scope of Services</h2>
+          
+          <div className="service-detail-item">
+            <div className="service-detail-header" onClick={() => toggleSection('news-pub')}>
+              <div className="service-detail-title">
+                <span className="number">01</span>
+                <h3>News Publications</h3>
+              </div>
+              <span className="toggle-icon">
+                {expandedSections['news-pub'] ? <IoChevronUp /> : <IoChevronDown />}
+              </span>
+            </div>
+            {expandedSections['news-pub'] && (
+              <div className="service-detail-content">
+                <p>
+                  The service includes the creation and publication of up to 12 news publications tailored to meet Wikipedia's stringent requirements. This is crucial because Wikipedia requires content to be notable and supported by reliable sources.
                 </p>
-              </header>
+              </div>
+            )}
+          </div>
 
-              <div className="wikipedia-page-packages-intro">
-                <h2 className="service-detail-section-title">Wikipedia Page Packages</h2>
-                <p className="service-detail-section-lead">
-                  Professional Wikipedia page creation for individuals and companies — comprehensive
-                  content development, quality assurance, and compliance with Wikipedia standards.
-                  Company pages include stricter notability assessment, media sourcing, and detailed
-                  business coverage.
+          <div className="service-detail-item">
+            <div className="service-detail-header" onClick={() => toggleSection('content-review')}>
+              <div className="service-detail-title">
+                <span className="number">02</span>
+                <h3>Content Review</h3>
+              </div>
+              <span className="toggle-icon">
+                {expandedSections['content-review'] ? <IoChevronUp /> : <IoChevronDown />}
+              </span>
+            </div>
+            {expandedSections['content-review'] && (
+              <div className="service-detail-content">
+                <p>
+                  If you have existing publications, these will be reviewed by our team to ensure they align with Wikipedia's guidelines, significantly enhancing the chances of your page's acceptance.
                 </p>
+              </div>
+            )}
+          </div>
+
+          <div className="service-detail-item">
+            <div className="service-detail-header" onClick={() => toggleSection('quality-assurance')}>
+              <div className="service-detail-title">
+                <span className="number">03</span>
+                <h3>Quality Assurance</h3>
+              </div>
+              <span className="toggle-icon">
+                {expandedSections['quality-assurance'] ? <IoChevronUp /> : <IoChevronDown />}
+              </span>
+            </div>
+            {expandedSections['quality-assurance'] && (
+              <div className="service-detail-content">
+                <p>
+                  Any additional articles required will be created with high editorial standards, ensuring the content meets Wikipedia's quality and notability requirements.
+                </p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section className="pricing-section">
+          <h2 className="section-title">Investment Details</h2>
+          <div className="packages-grid">
+            {wikipediaPackages.map((package_) => (
+              <div key={package_.id} className="package-card">
+                <div className="package-header">
+                  <h3 className="package-title">{package_.title}</h3>
+                  <p className="package-description">{package_.description}</p>
+                </div>
+
+                <div className="package-pricing">
+                  <span className="price">{format(package_.price)}</span>
+                  <span className="delivery-time">
+                    <IoTime style={{ marginRight: '8px' }} />
+                    {package_.deliveryTime}
+                  </span>
+                </div>
+
+                <div className="package-features">
+                  <h4>What's Included:</h4>
+                  <ul>
+                    {package_.features.map((feature, index) => (
+                      <li key={index}>
+                        <IoCheckmarkCircle className="check-icon" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <Button
+                  onClick={() => handleAddToCart(package_)}
+                  className="order-button"
+                >
+                  Add to Cart
+                </Button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Summary Section */}
+        <section className="summary-section">
+          <h2 className="section-title">Summary</h2>
+          <div className="summary-content">
+            <p>
+              Our Wikipedia services provide a comprehensive and professional approach to building and establishing credible Wikipedia pages.
+            </p>
+            <div className="summary-list">
+              {wikipediaPackages.map((pkg) => (
+                <div key={pkg.id} className="summary-item">
+                  <span className="summary-item-title">{pkg.title}</span>
+                  <span className="summary-item-details">
+                    {format(pkg.price)} | {pkg.deliveryTime}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="summary-footer">
+              Each service includes content development, publication strategy, review, and quality assurance to maximize approval success.
+            </p>
+          </div>
+        </section>
+
+        {/* Google Knowledge Panel Preview */}
+        <section className="bonus-section">
+          <h2 className="section-title">Bonus: Google Knowledge Panel Services</h2>
+          <div className="bonus-content">
+            <p>
+              Looking to enhance your online credibility further? Our Google Knowledge Panel services work in conjunction with Wikipedia pages to establish strong digital presence.
+            </p>
+            <div className="knowledge-panel-preview">
+              <div className="kp-item">
+                <h4>Individual Google Knowledge Panel</h4>
+                <p className="kp-price">{format(500000)}</p>
+                <p className="kp-time">72 hours delivery</p>
+              </div>
+              <div className="kp-item">
+                <h4>Company Google Knowledge Panel</h4>
+                <p className="kp-price">{format(800000)}</p>
+                <p className="kp-time">72 hours delivery</p>
               </div>
             </div>
           </div>
-
-          <section className="service-detail-section wikipedia-page-packages" aria-label="Wikipedia package options">
-            <div className="service-detail-grid wikipedia-page-packages-grid">
-              {wikipediaPagePackages.map((pkg) => (
-                <ServiceDetailCard
-                  key={pkg.id}
-                  title={pkg.title}
-                  meta={`Delivery: ${pkg.deliveryTime}`}
-                  description={buildPackageDescription(pkg)}
-                  price={formatPrice(pkg.price, '₦')}
-                  pricePrefix=""
-                  icon={pkg.id === 'company-wiki' ? IoBusinessOutline : IoBookOutline}
-                  onAddToCart={() => handleAddToCart(pkg, 'wikipedia-package')}
-                />
-              ))}
-            </div>
-          </section>
-
-          <div className="wikipedia-page-full">
-            <section className="service-detail-section">
-            <h2 className="service-detail-section-title">Scope of Services</h2>
-            <p className="service-detail-section-lead">
-              What we handle as part of every Wikipedia engagement.
-            </p>
-            <div className="service-detail-grid wikipedia-page-scope-grid">
-              {wikipediaScopeItems.map((item, index) => {
-                const Icon = scopeIcons[index] ?? IoInformationCircleOutline;
-                return (
-                  <ServiceDetailCard
-                    key={item.title}
-                    title={item.title}
-                    meta={item.meta}
-                    description={item.description}
-                    price="Included in packages"
-                    pricePrefix=""
-                    icon={Icon}
-                  />
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="service-detail-section">
-            <h2 className="service-detail-section-title">Google Knowledge Panel</h2>
-            <p className="service-detail-section-lead">
-              Optional add-on services to strengthen your search presence alongside Wikipedia.
-            </p>
-            <div className="service-detail-grid service-detail-grid--pair">
-              {googleKnowledgePanelPackages.map((pkg) => (
-                <ServiceDetailCard
-                  key={pkg.id}
-                  title={pkg.title}
-                  meta={`Delivery: ${pkg.deliveryTime}`}
-                  description={pkg.description}
-                  price={formatPrice(pkg.price, '₦')}
-                  pricePrefix=""
-                  icon={pkg.id === 'company-kp' ? IoBusinessOutline : IoBookOutline}
-                  onAddToCart={() => handleAddToCart(pkg, 'google-knowledge-panel')}
-                />
-              ))}
-            </div>
-          </section>
-
-          <ServiceDetailCard
-            title="Important Notice"
-            meta="Before you order"
-            description={`${wikipediaServiceNotice.lead} ${wikipediaServiceNotice.body}`}
-            price="See packages above"
-            icon={IoInformationCircleOutline}
-            feature
-          />
-          </div>
-        </div>
-      </main>
+        </section>
+      </div>
 
       {showCartNotification && (
-        <div className="service-detail-cart-notification" role="status">
+        <div className="cart-notification" style={{
+          position: 'fixed',
+          top: '100px',
+          right: '20px',
+          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+          color: '#ffffff',
+          padding: '16px 24px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)',
+          zIndex: 1000,
+          animation: 'slideIn 0.3s ease'
+        }}>
           Item added to cart!
         </div>
       )}
-
-      <ClientsSection />
-      <Footer onScrollToSection={scrollToSection} />
+      <Footer />
     </div>
   );
 }

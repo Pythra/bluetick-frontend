@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoLogoTiktok, IoMusicalNoteOutline, IoPeopleOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
@@ -26,6 +26,7 @@ function buildSongClaimDescription(service) {
 function TikTokArtistServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
@@ -89,7 +90,7 @@ function TikTokArtistServicesPage() {
                 title={tiktokSongClaimService.title}
                 meta={tiktokSongClaimService.meta}
                 description={buildSongClaimDescription(tiktokSongClaimService)}
-                price={formatPrice(tiktokSongClaimService.price, '₦')}
+                price={format(tiktokSongClaimService.price)}
                 pricePrefix=""
                 icon={IoMusicalNoteOutline}
                 ctaLabel="Order now"
@@ -114,7 +115,7 @@ function TikTokArtistServicesPage() {
                   title={pkg.title}
                   meta={pkg.meta}
                   description={pkg.description}
-                  price={formatPrice(pkg.price, '₦')}
+                  price={format(pkg.price)}
                   pricePrefix=""
                   icon={IoPeopleOutline}
                   ctaLabel="Order now"

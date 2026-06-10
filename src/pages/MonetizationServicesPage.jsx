@@ -12,7 +12,7 @@ import {
   IoWalletOutline,
 } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
@@ -63,6 +63,7 @@ function getMonetizationIcon(title) {
 function MonetizationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service, tier) => {
@@ -101,7 +102,7 @@ function MonetizationServicesPage() {
           monetizationDescriptions[service.title] ||
           'End-to-end monetization support from eligibility through approval and payout setup.'
         }
-        price={formatPrice(service.price, '₦')}
+        price={format(service.price)}
         pricePrefix=""
         icon={getMonetizationIcon(service.title)}
         onAddToCart={() => handleAddToCart(service, tier)}

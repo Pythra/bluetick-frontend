@@ -17,7 +17,6 @@ import {
   IoEye,
   IoTime,
   IoLayersOutline,
-  IoChevronDown,
   IoChevronUp,
   IoChatbubbleEllipses,
   IoCalendarOutline,
@@ -25,6 +24,7 @@ import {
   IoTrashOutline,
 } from 'react-icons/io5';
 import Navbar from '../components/Navbar';
+import { useCurrency } from '../contexts/CurrencyContext.jsx';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
@@ -67,173 +67,182 @@ import { getPublicationPlatformLogo } from '../utils/publicationPlatformLogos';
 import './PublicationServicesPage.css';
 import './PublicationServicesPage.editorial.css';
 
+// Helper function to parse price strings to numeric values
+const parsePriceToNumber = (priceStr) => {
+  if (typeof priceStr === 'number') return priceStr;
+  const cleaned = String(priceStr)
+    .replace(/[^\d]/g, '')
+    .replace(/,/g, '');
+  return parseInt(cleaned) || 0;
+};
+
 // African News Platforms
 const africanPlatforms = [
-  { name: 'Punch', price: '\u20a680000', logo: punchLogo },
-  { name: 'BusinessDay', price: '\u20a680000', logo: businessDayLogo },
-  { name: 'Legit', price: 'NGN300,000', logo: legitLogo },
-  { name: 'The Nation', price: '\u20a660000', logo: theNationLogo },
-  { name: 'Independent', price: '\u20a620000', logo: independentLogo },
-  { name: 'Vanguard', price: '\u20a630000', logo: vanguardLogo },
-  { name: 'ThisDay', price: '\u20a630000', logo: thisDayLogo },
-  { name: 'SunOnline', price: '\u20a630000', logo: sunOnlineLogo },
-  { name: 'Daily Telegraph', price: '\u20a620000', logo: telegraphLogo },
-  { name: 'Daily Trust', price: '\u20a630000', logo: dailyTrustLogo },
-  { name: 'Daily Post', price: '\u20a630000', logo: dailyPostLogo },
-  { name: 'Nairametrics', price: '\u20a630000', logo: nairametricsLogo },
-  { name: 'Nairaland', price: '\u20a650000', logo: forbesLogo },
-  { name: 'The Cable', price: '\u20a6300000', logo: cableLogo },
-  { name: 'Guardian', price: '\u20a670000', logo: guardianLogo },
-  { name: 'Leadership', price: '\u20a660000', logo: leadershipLogo },
-  { name: 'Tribune', price: '\u20a630000', logo: tribuneLogo },
-  { name: 'Champion', price: '\u20a620000', logo: championLogo },
-  { name: "People's Daily", price: '\u20a620000', logo: peoplesDailyLogo },
-  { name: 'Blueprint', price: '\u20a630000', logo: blueprintLogo },
-  { name: 'GhanaWeb', price: 'NGN100,000', logo: ghanaWebLogo },
-  { name: 'Pulse', price: '\u20a6300000', logo: pulseLogo },
-  { name: 'OkayAfrican', price: '\u20a62500000', logo: null },
-  { name: 'PeaceFm Online', price: '\u20a6800000', logo: null },
-  { name: 'B&FT Online', price: '\u20a6800000', logo: null },
-  { name: 'Nollywire', price: '\u20a6300000', logo: null },
-  { name: 'The Nollywood Reporter', price: '\u20a6400000', logo: null },
-  { name: 'WKMup', price: '\u20a6300000', logo: null },
-  { name: 'Nolly Critic', price: '\u20a6300000', logo: null },
-  { name: 'Nigerian Movies Review', price: '\u20a6500000', logo: null },
+  { name: 'Punch', priceValue: 80000, logo: punchLogo },
+  { name: 'BusinessDay', priceValue: 80000, logo: businessDayLogo },
+  { name: 'Legit', priceValue: 300000, logo: legitLogo },
+  { name: 'The Nation', priceValue: 60000, logo: theNationLogo },
+  { name: 'Independent', priceValue: 20000, logo: independentLogo },
+  { name: 'Vanguard', priceValue: 30000, logo: vanguardLogo },
+  { name: 'ThisDay', priceValue: 30000, logo: thisDayLogo },
+  { name: 'SunOnline', priceValue: 30000, logo: sunOnlineLogo },
+  { name: 'Daily Telegraph', priceValue: 20000, logo: telegraphLogo },
+  { name: 'Daily Trust', priceValue: 30000, logo: dailyTrustLogo },
+  { name: 'Daily Post', priceValue: 30000, logo: dailyPostLogo },
+  { name: 'Nairametrics', priceValue: 30000, logo: nairametricsLogo },
+  { name: 'Nairaland', priceValue: 50000, logo: forbesLogo },
+  { name: 'The Cable', priceValue: 300000, logo: cableLogo },
+  { name: 'Guardian', priceValue: 70000, logo: guardianLogo },
+  { name: 'Leadership', priceValue: 60000, logo: leadershipLogo },
+  { name: 'Tribune', priceValue: 30000, logo: tribuneLogo },
+  { name: 'Champion', priceValue: 20000, logo: championLogo },
+  { name: "People's Daily", priceValue: 20000, logo: peoplesDailyLogo },
+  { name: 'Blueprint', priceValue: 30000, logo: blueprintLogo },
+  { name: 'GhanaWeb', priceValue: 100000, logo: ghanaWebLogo },
+  { name: 'Pulse', priceValue: 300000, logo: pulseLogo },
+  { name: 'OkayAfrican', priceValue: 2500000, logo: null },
+  { name: 'PeaceFm Online', priceValue: 800000, logo: null },
+  { name: 'B&FT Online', priceValue: 800000, logo: null },
+  { name: 'Nollywire', priceValue: 300000, logo: null },
+  { name: 'The Nollywood Reporter', priceValue: 400000, logo: null },
+  { name: 'WKMup', priceValue: 300000, logo: null },
+  { name: 'Nolly Critic', priceValue: 300000, logo: null },
+  { name: 'Nigerian Movies Review', priceValue: 500000, logo: null },
 ];
 
 // International Platforms
 const internationalPlatforms = [
-  { name: 'Forbes', price: 'NGN 9,730,000', logo: forbesLogo },
-  { name: 'Fox News', price: 'NGN 5,250,000', logo: foxLogo },
-  { name: 'BBC News', price: 'NGN 7,950,000', logo: bbcNewsLogo },
-  { name: 'Bloomberg', price: 'NGN 3,525,000', logo: bloombergNewsLogo },
-  { name: 'Hardcore News', price: 'NGN 1,890,000', logo: hardcoreLogo },
-  { name: 'GQ', price: 'NGN 2,500,000', logo: null },
-  { name: 'NewYork Weekly', price: 'NGN 1,000,000', logo: null },
-  { name: 'USA Wire', price: 'NGN 900,000', logo: null },
-  { name: 'AsiaOne', price: 'NGN 700,000', logo: null },
-  { name: 'AP', price: 'NGN 700,000', logo: null },
-  { name: 'Benzinga', price: 'NGN 700,000', logo: null },
-  { name: 'Joy Online', price: 'NGN 700,000', logo: null },
-  { name: 'The Open News', price: 'NGN 600,000', logo: null },
-  { name: 'Verna Magazine', price: 'NGN 600,000', logo: null },
-  { name: 'AllNewsBuzz', price: 'NGN 600,000', logo: null },
-  { name: 'Entertainment Paper', price: 'NGN 600,000', logo: null },
-  { name: 'FabWorldToday', price: 'NGN 600,000', logo: null },
-  { name: 'Resident Weekly', price: 'NGN 600,000', logo: null },
-  { name: 'Sportz Weekly', price: 'NGN 600,000', logo: null },
-  { name: 'Data Source Hub', price: 'NGN 600,000', logo: null },
-  { name: 'GlobeStats', price: 'NGN 600,000', logo: null },
-  { name: 'Stats Globe', price: 'NGN 600,000', logo: null },
-  { name: 'Apsters Media', price: 'NGN 600,000', logo: null },
-  { name: 'Coverage Log', price: 'NGN 600,000', logo: null },
-  { name: 'Time Bulletin', price: 'NGN 600,000', logo: null },
-  { name: 'Tech News Vision', price: 'NGN 600,000', logo: null },
-  { name: 'The Nashville Post', price: 'NGN 600,000', logo: null },
-  { name: 'Industry Today', price: 'NGN 600,000', logo: null },
-  { name: 'California Times', price: 'NGN 600,000', logo: null },
-  { name: 'Feature Weekly', price: 'NGN 600,000', logo: null },
-  { name: 'Infuse News', price: 'NGN 600,000', logo: null },
+  { name: 'Forbes', priceValue: 9730000, logo: forbesLogo },
+  { name: 'Fox News', priceValue: 5250000, logo: foxLogo },
+  { name: 'BBC News', priceValue: 7950000, logo: bbcNewsLogo },
+  { name: 'Bloomberg', priceValue: 3525000, logo: bloombergNewsLogo },
+  { name: 'Hardcore News', priceValue: 1890000, logo: hardcoreLogo },
+  { name: 'GQ', priceValue: 2500000, logo: null },
+  { name: 'NewYork Weekly', priceValue: 1000000, logo: null },
+  { name: 'USA Wire', priceValue: 900000, logo: null },
+  { name: 'AsiaOne', priceValue: 700000, logo: null },
+  { name: 'AP', priceValue: 700000, logo: null },
+  { name: 'Benzinga', priceValue: 700000, logo: null },
+  { name: 'Joy Online', priceValue: 700000, logo: null },
+  { name: 'The Open News', priceValue: 600000, logo: null },
+  { name: 'Verna Magazine', priceValue: 600000, logo: null },
+  { name: 'AllNewsBuzz', priceValue: 600000, logo: null },
+  { name: 'Entertainment Paper', priceValue: 600000, logo: null },
+  { name: 'FabWorldToday', priceValue: 600000, logo: null },
+  { name: 'Resident Weekly', priceValue: 600000, logo: null },
+  { name: 'Sportz Weekly', priceValue: 600000, logo: null },
+  { name: 'Data Source Hub', priceValue: 600000, logo: null },
+  { name: 'GlobeStats', priceValue: 600000, logo: null },
+  { name: 'Stats Globe', priceValue: 600000, logo: null },
+  { name: 'Apsters Media', priceValue: 600000, logo: null },
+  { name: 'Coverage Log', priceValue: 600000, logo: null },
+  { name: 'Time Bulletin', priceValue: 600000, logo: null },
+  { name: 'Tech News Vision', priceValue: 600000, logo: null },
+  { name: 'The Nashville Post', priceValue: 600000, logo: null },
+  { name: 'Industry Today', priceValue: 600000, logo: null },
+  { name: 'California Times', priceValue: 600000, logo: null },
+  { name: 'Feature Weekly', priceValue: 600000, logo: null },
+  { name: 'Infuse News', priceValue: 600000, logo: null },
 ];
 
 // Google News Platforms
 const googleNewsPlatforms = [
-  { name: 'The Open News', price: '\u20a6600000', logo: null },
-  { name: 'Verna Magazine', price: '\u20a6600000', logo: null },
-  { name: 'AllNewsBuzz', price: '\u20a6600000', logo: null },
-  { name: 'Entertainment Paper', price: '\u20a6600000', logo: null },
-  { name: 'FabWorldToday', price: '\u20a6600000', logo: null },
-  { name: 'Resident Weekly', price: '\u20a6600000', logo: null },
-  { name: 'Sportz Weekly', price: '\u20a6600000', logo: null },
-  { name: 'Data Source Hub', price: '\u20a6600000', logo: null },
-  { name: 'GlobeStats', price: '\u20a6600000', logo: null },
-  { name: 'Stats Globe', price: '\u20a6600000', logo: null },
-  { name: 'Apsters Media', price: '\u20a6600000', logo: null },
-  { name: 'Coverage Log', price: '\u20a6600000', logo: null },
-  { name: 'Time Bulletin', price: '\u20a6600000', logo: null },
-  { name: 'Tech News Vision', price: '\u20a6600000', logo: null },
-  { name: 'The Nashville Post', price: '\u20a6600000', logo: null },
-  { name: 'Industry Today', price: '\u20a6600000', logo: null },
-  { name: 'California Times', price: '\u20a6600000', logo: null },
-  { name: 'Feature Weekly', price: '\u20a6600000', logo: null },
-  { name: 'Infuse News', price: '\u20a6600000', logo: null },
+  { name: 'The Open News', priceValue: 600000, logo: null },
+  { name: 'Verna Magazine', priceValue: 600000, logo: null },
+  { name: 'AllNewsBuzz', priceValue: 600000, logo: null },
+  { name: 'Entertainment Paper', priceValue: 600000, logo: null },
+  { name: 'FabWorldToday', priceValue: 600000, logo: null },
+  { name: 'Resident Weekly', priceValue: 600000, logo: null },
+  { name: 'Sportz Weekly', priceValue: 600000, logo: null },
+  { name: 'Data Source Hub', priceValue: 600000, logo: null },
+  { name: 'GlobeStats', priceValue: 600000, logo: null },
+  { name: 'Stats Globe', priceValue: 600000, logo: null },
+  { name: 'Apsters Media', priceValue: 600000, logo: null },
+  { name: 'Coverage Log', priceValue: 600000, logo: null },
+  { name: 'Time Bulletin', priceValue: 600000, logo: null },
+  { name: 'Tech News Vision', priceValue: 600000, logo: null },
+  { name: 'The Nashville Post', priceValue: 600000, logo: null },
+  { name: 'Industry Today', priceValue: 600000, logo: null },
+  { name: 'California Times', priceValue: 600000, logo: null },
+  { name: 'Feature Weekly', priceValue: 600000, logo: null },
+  { name: 'Infuse News', priceValue: 600000, logo: null },
 ];
 
 // UK News Platforms
 const ukPlatforms = [
-  { name: 'LondonJournal', price: '\u20a6200000', logo: null },
-  { name: 'Glasgow Report', price: '\u20a6200000', logo: null },
-  { name: 'Manchester Times', price: '\u20a6200000', logo: null },
-  { name: 'UkHerald', price: '\u20a6200000', logo: null },
-  { name: 'Birmingham Times', price: '\u20a6200000', logo: null },
-  { name: 'UkReporter', price: '\u20a6200000', logo: null },
-  { name: 'The Bristol Press', price: '\u20a6200000', logo: null },
-  { name: 'Uk Wire', price: '\u20a6200000', logo: null },
-  { name: 'Influence', price: '\u20a6700000', logo: null },
-  { name: 'Cybersecurity Insiders', price: '\u20a6700000', logo: null },
-  { name: 'MSN', price: '\u20a6800000', logo: null },
-  { name: 'Investing.com', price: '\u20a61200000', logo: null },
-  { name: 'StreetInsiders.com', price: '\u20a6400000', logo: null },
-  { name: 'CyberNews', price: '\u20a61600000', logo: null },
-  { name: 'BusinessMole', price: '\u20a6400000', logo: null },
-  { name: 'International Business Times', price: '\u20a61500000', logo: null },
-  { name: 'Business Cheshire', price: '\u20a6500000', logo: null },
-  { name: 'Business Lancashire', price: '\u20a6400000', logo: null },
-  { name: 'Business Manchester', price: '\u20a6400000', logo: null },
-  { name: 'Business Live', price: '\u20a63800000', logo: null },
-  { name: 'Echo', price: '\u20a63800000', logo: null },
-  { name: 'Calculator UK Business News', price: '\u20a6500000', logo: null },
-  { name: 'Talk Business', price: '\u20a61100000', logo: null },
-  { name: 'Investment Guide', price: '\u20a6600000', logo: null },
-  { name: 'Manchester Evening News', price: '\u20a63800000', logo: null },
-  { name: 'Wales Online', price: '\u20a63800000', logo: null },
-  { name: 'MyLondon', price: '\u20a63800000', logo: null },
-  { name: 'Football.London', price: '\u20a63800000', logo: null },
-  { name: 'Luxury Adviser', price: '\u20a6500000', logo: null },
-  { name: 'Financial News', price: '\u20a6500000', logo: null },
-  { name: 'Wealth Tribune', price: '\u20a6500000', logo: null },
-  { name: 'Trading Herald', price: '\u20a6500000', logo: null },
-  { name: 'TechRound', price: '\u20a61600000', logo: null },
-  { name: 'Startup Observer', price: '\u20a6500000', logo: null },
-  { name: 'Palm Bay Herald', price: '\u20a6600000', logo: null },
-  { name: 'Property Development', price: '\u20a6600000', logo: null },
-  { name: 'Online World News', price: '\u20a6600000', logo: null },
-  { name: 'International Releases', price: '\u20a6600000', logo: null },
-  { name: 'Coin Journal', price: '\u20a61000000', logo: null },
-  { name: 'Tech Bullion', price: '\u20a6600000', logo: null },
-  { name: 'Crypto Daily', price: '\u20a61800000', logo: null },
-  { name: 'IGB', price: '\u20a64600000', logo: null },
-  { name: 'Esports News UK', price: '\u20a61000000', logo: null },
-  { name: 'The Sporting News', price: '\u20a63100000', logo: null },
-  { name: 'Casino Life', price: '\u20a63100000', logo: null },
-  { name: 'Economy Standard', price: '\u20a6600000', logo: null },
-  { name: 'Funeral Notices', price: '\u20a63800000', logo: null },
-  { name: 'Daily Records', price: '\u20a64500000', logo: null },
-  { name: 'InYourArea', price: '\u20a63800000', logo: null },
-  { name: 'DeadLine', price: '\u20a6900000', logo: null },
-  { name: 'Female First', price: '\u20a61400000', logo: null },
-  { name: 'Chronicle Live', price: '\u20a63800000', logo: null },
-  { name: 'Edinburgh Live', price: '\u20a63800000', logo: null },
-  { name: 'Galway Beo', price: '\u20a63800000', logo: null },
-  { name: 'Finsmes', price: '\u20a61000000', logo: null },
-  { name: 'Brands Journal', price: '\u20a6600000', logo: null },
-  { name: 'Business Matters', price: '\u20a61400000', logo: null },
-  { name: 'Technology Dispatch', price: '\u20a61000000', logo: null },
-  { name: 'Finance Digest', price: '\u20a6600000', logo: null },
+  { name: 'LondonJournal', priceValue: 200000, logo: null },
+  { name: 'Glasgow Report', priceValue: 200000, logo: null },
+  { name: 'Manchester Times', priceValue: 200000, logo: null },
+  { name: 'UkHerald', priceValue: 200000, logo: null },
+  { name: 'Birmingham Times', priceValue: 200000, logo: null },
+  { name: 'UkReporter', priceValue: 200000, logo: null },
+  { name: 'The Bristol Press', priceValue: 200000, logo: null },
+  { name: 'Uk Wire', priceValue: 200000, logo: null },
+  { name: 'Influence', priceValue: 700000, logo: null },
+  { name: 'Cybersecurity Insiders', priceValue: 700000, logo: null },
+  { name: 'MSN', priceValue: 800000, logo: null },
+  { name: 'Investing.com', priceValue: 1200000, logo: null },
+  { name: 'StreetInsiders.com', priceValue: 400000, logo: null },
+  { name: 'CyberNews', priceValue: 1600000, logo: null },
+  { name: 'BusinessMole', priceValue: 400000, logo: null },
+  { name: 'International Business Times', priceValue: 1500000, logo: null },
+  { name: 'Business Cheshire', priceValue: 500000, logo: null },
+  { name: 'Business Lancashire', priceValue: 400000, logo: null },
+  { name: 'Business Manchester', priceValue: 400000, logo: null },
+  { name: 'Business Live', priceValue: 3800000, logo: null },
+  { name: 'Echo', priceValue: 3800000, logo: null },
+  { name: 'Calculator UK Business News', priceValue: 500000, logo: null },
+  { name: 'Talk Business', priceValue: 1100000, logo: null },
+  { name: 'Investment Guide', priceValue: 600000, logo: null },
+  { name: 'Manchester Evening News', priceValue: 3800000, logo: null },
+  { name: 'Wales Online', priceValue: 3800000, logo: null },
+  { name: 'MyLondon', priceValue: 3800000, logo: null },
+  { name: 'Football.London', priceValue: 3800000, logo: null },
+  { name: 'Luxury Adviser', priceValue: 500000, logo: null },
+  { name: 'Financial News', priceValue: 500000, logo: null },
+  { name: 'Wealth Tribune', priceValue: 500000, logo: null },
+  { name: 'Trading Herald', priceValue: 500000, logo: null },
+  { name: 'TechRound', priceValue: 1600000, logo: null },
+  { name: 'Startup Observer', priceValue: 500000, logo: null },
+  { name: 'Palm Bay Herald', priceValue: 600000, logo: null },
+  { name: 'Property Development', priceValue: 600000, logo: null },
+  { name: 'Online World News', priceValue: 600000, logo: null },
+  { name: 'International Releases', priceValue: 600000, logo: null },
+  { name: 'Coin Journal', priceValue: 1000000, logo: null },
+  { name: 'Tech Bullion', priceValue: 600000, logo: null },
+  { name: 'Crypto Daily', priceValue: 1800000, logo: null },
+  { name: 'IGB', priceValue: 4600000, logo: null },
+  { name: 'Esports News UK', priceValue: 1000000, logo: null },
+  { name: 'The Sporting News', priceValue: 3100000, logo: null },
+  { name: 'Casino Life', priceValue: 3100000, logo: null },
+  { name: 'Economy Standard', priceValue: 600000, logo: null },
+  { name: 'Funeral Notices', priceValue: 3800000, logo: null },
+  { name: 'Daily Records', priceValue: 4500000, logo: null },
+  { name: 'InYourArea', priceValue: 3800000, logo: null },
+  { name: 'DeadLine', priceValue: 900000, logo: null },
+  { name: 'Female First', priceValue: 1400000, logo: null },
+  { name: 'Chronicle Live', priceValue: 3800000, logo: null },
+  { name: 'Edinburgh Live', priceValue: 3800000, logo: null },
+  { name: 'Galway Beo', priceValue: 3800000, logo: null },
+  { name: 'Finsmes', priceValue: 1000000, logo: null },
+  { name: 'Brands Journal', priceValue: 600000, logo: null },
+  { name: 'Business Matters', priceValue: 1400000, logo: null },
+  { name: 'Technology Dispatch', priceValue: 1000000, logo: null },
+  { name: 'Finance Digest', priceValue: 600000, logo: null },
 ];
 
 // Tech & Startup Platforms
 const techPlatforms = [
-  { name: 'Techpoint', price: '\u20a6300000', logo: techpointLogo },
-  { name: 'TechCabal', price: '\u20a6300000', logo: techCabalLogo },
-  { name: 'Cybersecurity Insiders', price: '\u20a6700000', logo: null },
-  { name: 'TechRound', price: '\u20a61600000', logo: null },
-  { name: 'Startup Observer', price: '\u20a6500000', logo: null },
-  { name: 'Coin Journal', price: '\u20a61000000', logo: null },
-  { name: 'Tech Bullion', price: '\u20a6600000', logo: null },
-  { name: 'Crypto Daily', price: '\u20a61800000', logo: null },
-  { name: 'Esports News UK', price: '\u20a61000000', logo: null },
-  { name: 'Technology Dispatch', price: '\u20a61000000', logo: null },
+  { name: 'Techpoint', priceValue: 300000, logo: techpointLogo },
+  { name: 'TechCabal', priceValue: 300000, logo: techCabalLogo },
+  { name: 'Cybersecurity Insiders', priceValue: 700000, logo: null },
+  { name: 'TechRound', priceValue: 1600000, logo: null },
+  { name: 'Startup Observer', priceValue: 500000, logo: null },
+  { name: 'Coin Journal', priceValue: 1000000, logo: null },
+  { name: 'Tech Bullion', priceValue: 600000, logo: null },
+  { name: 'Crypto Daily', priceValue: 1800000, logo: null },
+  { name: 'Esports News UK', priceValue: 1000000, logo: null },
+  { name: 'Technology Dispatch', priceValue: 1000000, logo: null },
 ];
 
 // Global/International Platforms (to be added to internationalPlatforms)
@@ -487,12 +496,17 @@ function PublicationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [showCartNotification, setShowCartNotification] = useState(false);
+  const { format } = useCurrency();
 
   const handleAddToCart = async (item) => {
+    const priceValue = item.priceValue || parsePriceToNumber(item.price);
+    const formattedPrice = format(priceValue);
+    
     const result = await addToCart({
       itemId: item.id || `${item.title}-${Date.now()}`,
       title: item.title || item.name,
-      price: item.price,
+      price: formattedPrice,
+      priceValue: priceValue,
       description: item.description || item.delivery || '',
       category: 'publication',
       quantity: 1,
@@ -542,6 +556,10 @@ function PublicationServicesPage() {
 
       <section className="publication-masthead">
         <div className="publication-masthead-grid container">
+          <span className="publication-steps-badge" aria-hidden="true">
+            <span className="publication-steps-badge-num">4</span>
+            <span className="publication-steps-badge-label">steps</span>
+          </span>
           <div className="publication-masthead-copy">
             <p className="publication-eyebrow">Bluetickgeng · Press &amp; Media Distribution</p>
             <h1 className="publication-masthead-title">
@@ -558,21 +576,10 @@ function PublicationServicesPage() {
               </button>
               <button
                 type="button"
-                className="publication-btn publication-btn-journey"
+                className="publication-btn publication-btn-ghost"
                 onClick={scrollToHowItWorks}
               >
-                <span className="publication-btn-journey-pips" aria-hidden="true">
-                  {[1, 2, 3, 4].map((stepNum, index) => (
-                    <span key={stepNum} className="publication-btn-journey-pip-wrap">
-                      {index > 0 && <span className="publication-btn-journey-dash" />}
-                      <span className="publication-btn-journey-pip">{stepNum}</span>
-                    </span>
-                  ))}
-                </span>
-                <span className="publication-btn-journey-label">
-                  How it works
-                  <IoChevronDown aria-hidden="true" />
-                </span>
+                How it works
               </button>
             </div>
             <div className="publication-masthead-stats" role="list" aria-label="Publication highlights">
@@ -727,7 +734,7 @@ function PublicationServicesPage() {
                   </div>
                   <footer className="publication-addon-card-footer">
                     <div className="publication-addon-card-pricing">
-                      <span className="publication-addon-price">{service.price}</span>
+                      <span className="publication-addon-price">{service.priceValue ? format(service.priceValue) : service.price}</span>
                       <span className="publication-addon-unit">{service.unit}</span>
                     </div>
                     <Button
@@ -737,7 +744,7 @@ function PublicationServicesPage() {
                         handleAddToCart({
                           id: `publication-addon-${service.id}`,
                           title: service.title,
-                          price: service.priceValue,
+                          price: service.priceValue || service.price,
                           description: service.description,
                         })
                       }

@@ -1,37 +1,53 @@
 /**
- * Formats a price string to a human-readable format
- * @param {string|number} price - The price to format (can be a number or string with currency symbol)
- * @param {string} [currency='₦'] - The currency symbol to use (defaults to '₦' for Naira)
- * @returns {string} Formatted price string with thousands separators
+ * Locale-aware price formatting utility.
+ * Accepts numeric values or numeric strings and formats using Intl.NumberFormat.
+ * @param {string|number} value - Numeric value or string containing a number
+ * @param {string} [currency='NGN'] - Currency code (e.g. 'NGN', 'USD') or symbol ('$','₦')
+ * @param {string} [locale] - Optional locale (e.g. 'en-US'). If omitted the browser default is used.
+ * @returns {string} Formatted currency string (e.g. ₦1,200,000 or $3,200.00)
  */
-const formatPrice = (price, currency = '₦') => {
-  if (price === undefined || price === null) return '';
-  
-  // If price is a string, extract the numeric part
-  if (typeof price === 'string') {
-    // Remove any existing formatting and extract the number
-    const numericValue = price.replace(/[^0-9.]/g, '');
-    
-    // If we don't have a valid number, return the original string
-    if (!numericValue) return price;
-    
-    // Format the number with thousands separators
-    const formattedNumber = parseFloat(numericValue).toLocaleString('en-US');
-    
-    // Check if the original string had 'k' or other shorthand
-    if (price.toLowerCase().includes('k') && !price.includes('000')) {
-      return `${currency}${formattedNumber}K`;
-    }
-    
-    return `${currency}${formattedNumber}`;
+const SYMBOL_TO_CODE = {
+  '₦': 'NGN',
+  'N': 'NGN',
+  '₤': 'GBP',
+  '$': 'USD',
+  '€': 'EUR',
+};
+
+const formatPrice = (value, currency = 'NGN', locale) => {
+  if (value === undefined || value === null || value === '') return '';
+
+  // Normalize currency input: allow symbol or three-letter code
+  let currencyCode = String(currency || 'NGN');
+  if (currencyCode.length === 1 && SYMBOL_TO_CODE[currencyCode]) {
+    currencyCode = SYMBOL_TO_CODE[currencyCode];
   }
-  
-  // If price is a number, format it directly
-  if (typeof price === 'number') {
-    return `${currency}${price.toLocaleString('en-US')}`;
+  if (currencyCode.length === 3) {
+    currencyCode = currencyCode.toUpperCase();
   }
-  
-  return '';
+
+  // Extract numeric value
+  let numeric = 0;
+  if (typeof value === 'number' && !Number.isNaN(value)) {
+    numeric = value;
+  } else if (typeof value === 'string') {
+    const cleaned = value.replace(/[^0-9.]/g, '');
+    numeric = cleaned ? parseFloat(cleaned) : 0;
+  }
+
+  try {
+    const formatter = new Intl.NumberFormat(locale || undefined, {
+      style: 'currency',
+      currency: currencyCode,
+      maximumFractionDigits: 0,
+    });
+    return formatter.format(numeric);
+  } catch (e) {
+    // Fallback: simple symbol + localized number
+    const formatted = numeric.toLocaleString();
+    const symbol = currencyCode === 'NGN' ? '₦' : currencyCode;
+    return `${symbol}${formatted}`;
+  }
 };
 
 /**
@@ -41,8 +57,7 @@ const formatPrice = (price, currency = '₦') => {
  */
 const convertKToFullNumber = (price) => {
   if (!price) return '';
-  
-  // Check if the price contains 'k' or 'K'
+
   if (typeof price === 'string' && /\d+[kK]/.test(price)) {
     const numericPart = parseFloat(price.replace(/[^0-9.]/g, ''));
     if (!isNaN(numericPart)) {
@@ -50,7 +65,7 @@ const convertKToFullNumber = (price) => {
       return formatPrice(fullAmount);
     }
   }
-  
+
   return price;
 };
 
@@ -65,7 +80,7 @@ const parsePriceToNumber = (price) => {
   }
   if (typeof price === 'string') {
     const numericValue = price.replace(/[^0-9.]/g, '');
-    return numericValue ? parseInt(numericValue, 10) : 0;
+    return numericValue ? parseFloat(numericValue) : 0;
   }
   return 0;
 };

@@ -1,15 +1,18 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { IoCardOutline, IoBusinessOutline, IoShieldCheckmarkOutline } from 'react-icons/io5';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { IoCardOutline, IoBusinessOutline, IoShieldCheckmarkOutline, IoGlobeOutline } from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import './CheckoutPage.css';
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated, apiUrl, authFetch } = useAuth();
+  const { currency, convert, format } = useCurrency();
   const {
     cartItems,
     cartItemCount,
@@ -19,15 +22,28 @@ function CheckoutPage() {
     fetchCart,
   } = useCart();
 
-  const [paymentMethod, setPaymentMethod] = useState('paystack');
+  const isInternationalCheckout = currency !== 'NGN';
+
+  const [paymentMethod, setPaymentMethod] = useState(
+    isInternationalCheckout ? 'flutterwave' : 'paystack'
+  );
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
   const [isClaimingPayment, setIsClaimingPayment] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState('');
   const [paymentReference, setPaymentReference] = useState('');
+  const [paymentTransactionId, setPaymentTransactionId] = useState('');
   const [paymentStatus, setPaymentStatus] = useState('');
   const [paymentError, setPaymentError] = useState('');
   const [bankSuccessMessage, setBankSuccessMessage] = useState('');
+
+  useEffect(() => {
+    setPaymentMethod(isInternationalCheckout ? 'flutterwave' : 'paystack');
+    setPaymentError('');
+    setPaymentUrl('');
+    setPaymentReference('');
+    setPaymentTransactionId('');
+  }, [isInternationalCheckout]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -38,12 +54,6 @@ function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, navigate]);
 
-  const detectCurrencyFromPrice = (price = '') => {
-    const normalized = price.toString().toLowerCase();
-    if (normalized.includes('usd') || normalized.includes('$')) return 'USD';
-    return 'NGN';
-  };
-
   const extractNumericPrice = (price) => {
     if (price === undefined || price === null) return null;
     if (typeof price === 'number') return price;
@@ -53,24 +63,8 @@ function CheckoutPage() {
     return parseFloat(match[0]);
   };
 
-  const formatCurrency = (amount, currency) => {
-    if (!amount) return '—';
-    const locale = currency === 'USD' ? 'en-US' : 'en-NG';
-    try {
-      return new Intl.NumberFormat(locale, {
-        style: 'currency',
-        currency: currency || 'NGN',
-        minimumFractionDigits: 0,
-      }).format(amount);
-    } catch {
-      return `${currency || 'NGN'} ${amount.toLocaleString()}`;
-    }
-  };
-
   const priceSummary = useMemo(() => {
     let total = 0;
-    let currency = null;
-    let hasMixedCurrencies = false;
     const invalidItems = [];
 
     cartItems.forEach((item) => {
@@ -80,31 +74,47 @@ function CheckoutPage() {
         return;
       }
 
-      const itemCurrency = detectCurrencyFromPrice(item.price);
-      if (!currency) {
-        currency = itemCurrency;
-      } else if (currency !== itemCurrency) {
-        hasMixedCurrencies = true;
-      }
-
       total += numericPrice * (item.quantity || 1);
     });
 
     return {
       total,
-      currency: currency || 'NGN',
-      hasMixedCurrencies,
+      currency: 'NGN',
       invalidItems,
     };
   }, [cartItems]);
 
+  const checkoutCurrency = isInternationalCheckout ? currency : 'NGN';
+  const checkoutAmount = isInternationalCheckout
+    ? convert(priceSummary.total)
+    : priceSummary.total;
+
+  const formatCheckoutAmount = useCallback(
+    (amount) => {
+      if (!amount) return '—';
+      if (isInternationalCheckout) {
+        return format(amount);
+      }
+      try {
+        return new Intl.NumberFormat('en-NG', {
+          style: 'currency',
+          currency: 'NGN',
+          maximumFractionDigits: 0,
+        }).format(amount);
+      } catch {
+        return `₦${amount.toLocaleString()}`;
+      }
+    },
+    [format, isInternationalCheckout]
+  );
+
   const canCheckout =
     cartItems.length > 0 &&
     priceSummary.total > 0 &&
-    !priceSummary.hasMixedCurrencies &&
-    priceSummary.invalidItems.length === 0;
+    priceSummary.invalidItems.length === 0 &&
+    (!isInternationalCheckout || checkoutAmount > 0);
 
-  const redirectAfterPaystackSuccess = useCallback(
+  const redirectAfterPaymentSuccess = useCallback(
     (orderId) => {
       navigate(`/project-onboarding?orderId=${orderId}`, {
         state: { orderId, paymentSuccess: true },
@@ -121,8 +131,8 @@ function CheckoutPage() {
     }
   };
 
-  const handleInitializePayment = async () => {
-    if (!canCheckout || isInitializingPayment) return;
+  const handleInitializePaystack = async () => {
+    if (!canCheckout || isInitializingPayment || isInternationalCheckout) return;
 
     setPaymentError('');
     setPaymentStatus('');
@@ -131,7 +141,7 @@ function CheckoutPage() {
     try {
       const response = await authFetch(`${apiUrl}/api/paystack/init`, {
         method: 'POST',
-        body: JSON.stringify({ currency: priceSummary.currency }),
+        body: JSON.stringify({ currency: 'NGN' }),
       });
 
       const data = await response.json();
@@ -153,7 +163,40 @@ function CheckoutPage() {
     }
   };
 
-  const verifyPayment = useCallback(
+  const handleInitializeFlutterwave = async () => {
+    if (!canCheckout || isInitializingPayment || !isInternationalCheckout) return;
+
+    setPaymentError('');
+    setPaymentStatus('');
+    setIsInitializingPayment(true);
+
+    try {
+      const response = await authFetch(`${apiUrl}/api/flutterwave/init`, {
+        method: 'POST',
+        body: JSON.stringify({ currency: checkoutCurrency }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.error || 'Unable to connect to Flutterwave. Check your cart and try again.'
+        );
+      }
+
+      setPaymentUrl(data.payment_url);
+      setPaymentReference(data.reference);
+      setPaymentTransactionId('');
+      setPaymentStatus('pending');
+      handleOpenPaymentWindow(data.payment_url);
+    } catch (error) {
+      setPaymentError(error.message || 'Payment initialization failed.');
+    } finally {
+      setIsInitializingPayment(false);
+    }
+  };
+
+  const verifyPaystackPayment = useCallback(
     async (referenceOverride, isAutomatic = false) => {
       const reference = (referenceOverride || paymentReference || '').trim();
 
@@ -183,7 +226,7 @@ function CheckoutPage() {
         }
 
         if (data.verified) {
-          setPaymentStatus('paystack-success');
+          setPaymentStatus('payment-success');
           setPaymentReference('');
           setPaymentUrl('');
 
@@ -194,7 +237,7 @@ function CheckoutPage() {
           }
 
           setTimeout(() => {
-            redirectAfterPaystackSuccess(data.orderId, cartSnapshot);
+            redirectAfterPaymentSuccess(data.orderId, cartSnapshot);
           }, 1200);
         } else if (!isAutomatic) {
           setPaymentError('Payment not confirmed yet. Complete checkout in Paystack and try again.');
@@ -207,23 +250,122 @@ function CheckoutPage() {
         setIsVerifyingPayment(false);
       }
     },
-    [apiUrl, authFetch, cartItems, fetchCart, isVerifyingPayment, paymentReference, redirectAfterPaystackSuccess]
+    [
+      apiUrl,
+      authFetch,
+      cartItems,
+      fetchCart,
+      isVerifyingPayment,
+      paymentReference,
+      redirectAfterPaymentSuccess,
+    ]
+  );
+
+  const verifyFlutterwavePayment = useCallback(
+    async (referenceOverride, transactionIdOverride, isAutomatic = false) => {
+      const reference = (referenceOverride || paymentReference || '').trim();
+      const transactionId = (transactionIdOverride || paymentTransactionId || '').trim();
+
+      if (!reference) {
+        if (!isAutomatic) {
+          setPaymentError('A valid Flutterwave reference is required to verify.');
+        }
+        return;
+      }
+
+      if (isVerifyingPayment) return;
+
+      const cartSnapshot = [...cartItems];
+      setIsVerifyingPayment(true);
+      setPaymentError('');
+
+      try {
+        const response = await authFetch(`${apiUrl}/api/flutterwave/verify`, {
+          method: 'POST',
+          body: JSON.stringify({
+            reference,
+            transactionId: transactionId || undefined,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Verification failed. Please try again.');
+        }
+
+        if (data.verified) {
+          setPaymentStatus('payment-success');
+          setPaymentReference('');
+          setPaymentTransactionId('');
+          setPaymentUrl('');
+
+          try {
+            await fetchCart();
+          } catch (cartError) {
+            console.error('Error updating cart after payment:', cartError);
+          }
+
+          setTimeout(() => {
+            redirectAfterPaymentSuccess(data.orderId, cartSnapshot);
+          }, 1200);
+        } else if (!isAutomatic) {
+          setPaymentError('Payment not confirmed yet. Complete checkout in Flutterwave and try again.');
+        }
+      } catch (error) {
+        if (!isAutomatic) {
+          setPaymentError(error.message || 'Verification failed.');
+        }
+      } finally {
+        setIsVerifyingPayment(false);
+      }
+    },
+    [
+      apiUrl,
+      authFetch,
+      cartItems,
+      fetchCart,
+      isVerifyingPayment,
+      paymentReference,
+      paymentTransactionId,
+      redirectAfterPaymentSuccess,
+    ]
   );
 
   useEffect(() => {
-    if (!paymentReference || paymentMethod !== 'paystack') {
+    const status = searchParams.get('status');
+    const txRef = searchParams.get('tx_ref');
+    const transactionId = searchParams.get('transaction_id');
+
+    if (status === 'successful' && txRef) {
+      setPaymentMethod('flutterwave');
+      setPaymentReference(txRef);
+      if (transactionId) {
+        setPaymentTransactionId(transactionId);
+      }
+      verifyFlutterwavePayment(txRef, transactionId, true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, verifyFlutterwavePayment]);
+
+  useEffect(() => {
+    if (!paymentReference) {
       return undefined;
     }
 
     const pollId = setInterval(() => {
-      verifyPayment(undefined, true);
+      if (paymentMethod === 'paystack') {
+        verifyPaystackPayment(undefined, true);
+      } else if (paymentMethod === 'flutterwave') {
+        verifyFlutterwavePayment(undefined, undefined, true);
+      }
     }, 5000);
 
     return () => clearInterval(pollId);
-  }, [paymentReference, paymentMethod, verifyPayment]);
+  }, [paymentReference, paymentMethod, verifyPaystackPayment, verifyFlutterwavePayment]);
 
   const handleClaimBankTransfer = async () => {
-    if (!canCheckout || isClaimingPayment) return;
+    if (!canCheckout || isClaimingPayment || isInternationalCheckout) return;
 
     setPaymentError('');
     setPaymentStatus('');
@@ -303,7 +445,9 @@ function CheckoutPage() {
           <p className="checkout-kicker">Secure checkout</p>
           <h1 className="checkout-title">Review &amp; pay</h1>
           <p className="checkout-lead">
-            Complete your order with Paystack or bank transfer. All payments are processed securely.
+            {isInternationalCheckout
+              ? `International checkout in ${checkoutCurrency}. Pay securely with Flutterwave.`
+              : 'Complete your order with Paystack or bank transfer. All payments are processed securely.'}
           </p>
         </header>
 
@@ -340,49 +484,56 @@ function CheckoutPage() {
               </h2>
 
               <ul className="checkout-item-list">
-                {cartItems.map((item) => (
-                  <li key={item._id} className="checkout-item">
-                    <div className="checkout-item-main">
-                      <h3 className="checkout-item-title">{item.title}</h3>
-                      {item.category ? (
-                        <span className="checkout-item-category">{item.category}</span>
-                      ) : null}
-                      {item.description ? (
-                        <p className="checkout-item-desc">{item.description}</p>
-                      ) : null}
-                    </div>
-                    <div className="checkout-item-aside">
-                      <div className="checkout-qty" aria-label="Quantity">
+                {cartItems.map((item) => {
+                  const numericPrice = extractNumericPrice(item.price);
+                  const lineTotal = numericPrice ? numericPrice * (item.quantity || 1) : null;
+
+                  return (
+                    <li key={item._id} className="checkout-item">
+                      <div className="checkout-item-main">
+                        <h3 className="checkout-item-title">{item.title}</h3>
+                        {item.category ? (
+                          <span className="checkout-item-category">{item.category}</span>
+                        ) : null}
+                        {item.description ? (
+                          <p className="checkout-item-desc">{item.description}</p>
+                        ) : null}
+                      </div>
+                      <div className="checkout-item-aside">
+                        <div className="checkout-qty" aria-label="Quantity">
+                          <button
+                            type="button"
+                            className="checkout-qty-btn"
+                            onClick={() => handleQuantityChange(item._id, (item.quantity || 1) - 1)}
+                            aria-label="Decrease quantity"
+                          >
+                            −
+                          </button>
+                          <span>{item.quantity || 1}</span>
+                          <button
+                            type="button"
+                            className="checkout-qty-btn"
+                            onClick={() => handleQuantityChange(item._id, (item.quantity || 1) + 1)}
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="checkout-item-price">
+                          {lineTotal ? formatCheckoutAmount(lineTotal) : item.price}
+                        </p>
                         <button
                           type="button"
-                          className="checkout-qty-btn"
-                          onClick={() => handleQuantityChange(item._id, (item.quantity || 1) - 1)}
-                          aria-label="Decrease quantity"
+                          className="checkout-remove"
+                          onClick={() => handleRemove(item._id)}
+                          aria-label="Remove item"
                         >
-                          −
-                        </button>
-                        <span>{item.quantity || 1}</span>
-                        <button
-                          type="button"
-                          className="checkout-qty-btn"
-                          onClick={() => handleQuantityChange(item._id, (item.quantity || 1) + 1)}
-                          aria-label="Increase quantity"
-                        >
-                          +
+                          Remove
                         </button>
                       </div>
-                      <p className="checkout-item-price">{item.price}</p>
-                      <button
-                        type="button"
-                        className="checkout-remove"
-                        onClick={() => handleRemove(item._id)}
-                        aria-label="Remove item"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </li>
-                ))}
+                    </li>
+                  );
+                })}
               </ul>
             </section>
 
@@ -392,32 +543,90 @@ function CheckoutPage() {
               <div className="checkout-summary">
                 <div className="checkout-summary-row">
                   <span>Subtotal</span>
-                  <span>{formatCurrency(priceSummary.total, priceSummary.currency)}</span>
+                  <span>{formatCheckoutAmount(priceSummary.total)}</span>
                 </div>
+                {isInternationalCheckout ? (
+                  <div className="checkout-summary-row checkout-summary-row--muted">
+                    <span>Charged in</span>
+                    <span>{checkoutCurrency}</span>
+                  </div>
+                ) : null}
                 <div className="checkout-summary-row checkout-summary-row--total">
                   <strong>Total</strong>
-                  <strong>{formatCurrency(priceSummary.total, priceSummary.currency)}</strong>
+                  <strong>{formatCheckoutAmount(priceSummary.total)}</strong>
                 </div>
               </div>
 
-              {(priceSummary.invalidItems.length > 0 || priceSummary.hasMixedCurrencies) && (
+              {priceSummary.invalidItems.length > 0 && (
                 <div className="checkout-alert checkout-alert--warn" role="alert">
-                  {priceSummary.invalidItems.length > 0 && (
-                    <ul>
-                      {priceSummary.invalidItems.map((item, idx) => (
-                        <li key={idx}>{item} — needs a numeric price to pay online.</li>
-                      ))}
-                    </ul>
-                  )}
-                  {priceSummary.hasMixedCurrencies && (
-                    <p>Checkout NGN and USD items separately.</p>
-                  )}
+                  <ul>
+                    {priceSummary.invalidItems.map((item, idx) => (
+                      <li key={idx}>{item} — needs a numeric price to pay online.</li>
+                    ))}
+                  </ul>
                 </div>
               )}
 
-              {paymentStatus === 'paystack-success' ? (
+              {paymentStatus === 'payment-success' ? (
                 <div className="checkout-alert checkout-alert--success" role="status">
                   <p>Payment confirmed! Taking you to the next step…</p>
+                </div>
+              ) : isInternationalCheckout ? (
+                <div className="checkout-pay-body">
+                  <div className="checkout-pay-methods checkout-pay-methods--single">
+                    <div className="checkout-pay-option is-active checkout-pay-option--static">
+                      <span className="checkout-pay-option-icon" aria-hidden="true">
+                        <IoGlobeOutline />
+                      </span>
+                      <span className="checkout-pay-option-text">
+                        <span className="checkout-pay-option-title">Flutterwave</span>
+                        <span className="checkout-pay-option-desc">
+                          Card and local payment methods in {checkoutCurrency}
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="checkout-btn checkout-btn--primary"
+                    onClick={handleInitializeFlutterwave}
+                    disabled={!canCheckout || isInitializingPayment}
+                  >
+                    {isInitializingPayment ? 'Connecting to Flutterwave…' : `Pay with Flutterwave (${checkoutCurrency})`}
+                  </button>
+
+                  {paymentReference ? (
+                    <div className="checkout-paystack-pending">
+                      <p>
+                        Flutterwave opened in a new tab. When finished, return here — we&apos;ll verify
+                        automatically.
+                      </p>
+                      <div className="checkout-paystack-actions">
+                        <button
+                          type="button"
+                          className="checkout-btn checkout-btn--outline"
+                          onClick={() => handleOpenPaymentWindow(paymentUrl)}
+                        >
+                          Open Flutterwave again
+                        </button>
+                        <button
+                          type="button"
+                          className="checkout-btn checkout-btn--primary"
+                          onClick={() => verifyFlutterwavePayment(undefined, undefined, false)}
+                          disabled={isVerifyingPayment}
+                        >
+                          {isVerifyingPayment ? 'Verifying…' : "I've paid"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {paymentError ? (
+                    <div className="checkout-alert checkout-alert--error" role="alert">
+                      {paymentError}
+                    </div>
+                  ) : null}
                 </div>
               ) : (
                 <>
@@ -479,7 +688,7 @@ function CheckoutPage() {
                       <button
                         type="button"
                         className="checkout-btn checkout-btn--primary"
-                        onClick={handleInitializePayment}
+                        onClick={handleInitializePaystack}
                         disabled={!canCheckout || isInitializingPayment}
                       >
                         {isInitializingPayment ? 'Connecting to Paystack…' : 'Pay with Paystack'}
@@ -502,7 +711,7 @@ function CheckoutPage() {
                             <button
                               type="button"
                               className="checkout-btn checkout-btn--primary"
-                              onClick={() => verifyPayment(undefined, false)}
+                              onClick={() => verifyPaystackPayment(undefined, false)}
                               disabled={isVerifyingPayment}
                             >
                               {isVerifyingPayment ? 'Verifying…' : "I've paid"}
@@ -518,7 +727,7 @@ function CheckoutPage() {
                         <p><strong>Account name:</strong> BLUETICKGENG DEVELOPMENT</p>
                         <p><strong>Account number:</strong> 9069439149</p>
                         <p className="checkout-bank-note">
-                          Transfer the exact total ({formatCurrency(priceSummary.total, priceSummary.currency)}),
+                          Transfer the exact total ({formatCheckoutAmount(priceSummary.total)}),
                           then tap below.
                         </p>
                       </div>
@@ -526,15 +735,10 @@ function CheckoutPage() {
                         type="button"
                         className="checkout-btn checkout-btn--primary"
                         onClick={handleClaimBankTransfer}
-                        disabled={!canCheckout || isClaimingPayment || priceSummary.currency !== 'NGN'}
+                        disabled={!canCheckout || isClaimingPayment}
                       >
                         {isClaimingPayment ? 'Submitting…' : 'I have paid'}
                       </button>
-                      {priceSummary.currency !== 'NGN' && (
-                        <p className="checkout-bank-note checkout-bank-note--muted">
-                          Bank transfer is available for NGN orders only. Use Paystack for USD.
-                        </p>
-                      )}
                     </div>
                   )}
 
@@ -549,7 +753,7 @@ function CheckoutPage() {
               <div className="checkout-trust">
                 <IoShieldCheckmarkOutline aria-hidden="true" />
                 <p>
-                  Secured by Paystack. Questions?{' '}
+                  Secured by {isInternationalCheckout ? 'Flutterwave' : 'Paystack'}. Questions?{' '}
                   <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>
                 </p>
               </div>

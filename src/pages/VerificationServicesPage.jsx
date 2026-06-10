@@ -13,7 +13,7 @@ import {
   IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
@@ -61,6 +61,7 @@ function getVerificationIcon(title) {
 function VerificationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service, tier) => {
@@ -99,7 +100,7 @@ function VerificationServicesPage() {
           verificationDescriptions[service.title] ||
           'Full verification workflow from eligibility review through platform approval.'
         }
-        price={formatPrice(service.price, '₦')}
+        price={format(service.price)}
         pricePrefix=""
         icon={getVerificationIcon(service.title)}
         onAddToCart={() => handleAddToCart(service, tier)}
@@ -153,7 +154,7 @@ function VerificationServicesPage() {
               title={metaSubscriptionService.title}
               meta="Monthly subscription"
               description={metaSubscriptionService.description}
-              price={`${formatPrice(metaSubscriptionService.price, '₦')}/month`}
+              price={`${format(metaSubscriptionService.price)}/month`}
               pricePrefix=""
               icon={IoShieldCheckmarkOutline}
               onAddToCart={() =>

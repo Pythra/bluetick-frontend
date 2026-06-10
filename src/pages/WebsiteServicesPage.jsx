@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoCodeSlashOutline, IoGlobeOutline, IoRocketOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
@@ -46,6 +46,7 @@ const startupConsultation = {
 function WebsiteServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
@@ -101,7 +102,7 @@ function WebsiteServicesPage() {
                 title={service.title}
                 meta="Website package"
                 description={service.description}
-                price={formatPrice(service.price, '₦')}
+                price={format(service.price)}
                 icon={service.icon}
                 onAddToCart={() => handleAddToCart(service)}
               />

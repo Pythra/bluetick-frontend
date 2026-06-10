@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import CurrencySelector from './CurrencySelector';
 import blueLogo from '../assets/bluelogo.png';
 import './Navbar.css';
 
@@ -40,9 +41,6 @@ function Navbar({ onScrollToSection }) {
           <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/about'))}>
             About Us
           </button>
-          <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('publication-services'))}>
-            Publication Services
-          </button>
           <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('website-services'))}>
             Services
           </button>
@@ -57,6 +55,9 @@ function Navbar({ onScrollToSection }) {
           >
             My Account
           </button>
+          <div className="navbar-currency-selector">
+            <CurrencySelector />
+          </div>
           {isAuthenticated ? (
             <button type="button" className="navbar-logout" onClick={handleLogout}>
               Logout

@@ -13,7 +13,7 @@ import {
   IoWalletOutline,
 } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
@@ -97,6 +97,7 @@ const customAppInfo = {
 function AppServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
@@ -161,18 +162,18 @@ function AppServicesPage() {
                 title={service.title}
                 meta="Mobile app"
                 description={service.description}
-                price={formatPrice(service.price, '₦')}
+                price={format(service.price)}
                 icon={service.icon}
                 onAddToCart={() => handleAddToCart(service)}
               />
             ))}
           </div>
 
-          <ServiceDetailCard
+            <ServiceDetailCard
             title={customAppInfo.title}
             meta={customAppInfo.meta}
             description={customAppInfo.description}
-            price={formatPrice(customAppInfo.startingPrice, '₦')}
+            price={format(customAppInfo.startingPrice)}
             icon={customAppInfo.icon}
             feature
           />

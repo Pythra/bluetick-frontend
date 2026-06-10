@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoLogoInstagram } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
@@ -24,6 +24,7 @@ const wizkidDescription =
 function InstagramServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (item, section) => {
@@ -59,7 +60,7 @@ function InstagramServicesPage() {
         title={item.title}
         meta={item.note ? `${sectionLabel} · ${item.note}` : sectionLabel}
         description={description}
-        price={formatPrice(item.price, '₦')}
+        price={format(item.price)}
         pricePrefix=""
         icon={IoLogoInstagram}
         onAddToCart={() => handleAddToCart(item, sectionLabel)}

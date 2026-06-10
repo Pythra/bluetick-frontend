@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import CountryFlag from '../components/CountryFlag';
 import ServiceDetailCard from '../components/ServiceDetailCard';
@@ -20,6 +20,7 @@ function buildTrendDescription(pkg) {
 function TwitterTrendServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (pkg) => {
@@ -81,7 +82,7 @@ function TwitterTrendServicesPage() {
                   title={pkg.title}
                   meta={`Delivery: ${pkg.delivery}`}
                   description={buildTrendDescription(pkg)}
-                  price={formatPrice(pkg.price, '₦')}
+                  price={format(pkg.price)}
                   pricePrefix=""
                   iconNode={<CountryFlag code={pkg.countryCode} alt={`${pkg.title} flag`} />}
                   onAddToCart={() => handleAddToCart(pkg)}

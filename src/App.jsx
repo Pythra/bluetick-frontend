@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { createBrowserHistory } from 'history';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import { useAuth } from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import LandingPage from './components/LandingPage';
@@ -133,8 +134,9 @@ function App() {
 
   return (
     <AuthProvider>
-      <CartProvider>
-        <Router history={history}>
+      <CurrencyProvider>
+        <CartProvider>
+          <Router history={history}>
           <PushSubscriptionBootstrap />
           <ScrollToTop />
           <div className="App">
@@ -171,8 +173,9 @@ function App() {
             </Routes>
             <CartIcon />
           </div>
-        </Router>
-      </CartProvider>
+          </Router>
+        </CartProvider>
+      </CurrencyProvider>
     </AuthProvider>
   );
 }

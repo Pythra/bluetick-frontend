@@ -316,5 +316,15 @@
     border-bottom: none;
   }
 
+  .navbar-currency-selector {
+    width: 100%;
+  }
+
 }
+
+.navbar-currency-selector {
+  display: flex;
+  align-items: center;
+}
+
 

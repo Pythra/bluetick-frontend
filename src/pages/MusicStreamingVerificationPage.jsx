@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { getStreamingPlatformLogo } from '../utils/streamingPlatformSlug';
 import Navbar from '../components/Navbar';
 import StreamingPlatformLogo from '../components/StreamingPlatformLogo';
@@ -73,6 +73,7 @@ function renderPlatformIcon(title) {
 function MusicStreamingVerificationPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service, tier) => {
@@ -112,7 +113,7 @@ function MusicStreamingVerificationPage() {
           verificationDescriptions[service.title] ||
           'Full verification workflow from eligibility review through platform approval.'
         }
-        price={formatPrice(service.price, '₦')}
+        price={format(service.price)}
         pricePrefix=""
         iconNode={renderPlatformIcon(service.title)}
         iconVariant="platform"
@@ -157,7 +158,7 @@ function MusicStreamingVerificationPage() {
                   title={service.title}
                   meta="Profile placement"
                   description="Strategic placement and optimization so your music profile reaches the right audience on platform discovery surfaces."
-                  price={formatPrice(service.price, '₦')}
+                  price={<Price value={service.price} currencyHint="NGN" />}
                   pricePrefix=""
                   iconNode={renderPlatformIcon(service.title)}
                   iconVariant="platform"

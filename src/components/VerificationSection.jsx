@@ -1,28 +1,30 @@
 import SectionHeader from './SectionHeader';
 import ServiceCard from './ServiceCard';
 import './VerificationSection.css';
+import { useCurrency } from '../contexts/CurrencyContext.jsx';
 
 const nonNotablePrices = [
-  { title: 'Instagram Verification', price: '₦800,000' },
-  { title: 'Facebook Verification', price: '₦850,000' },
-  { title: 'TikTok Verification', price: '₦900,000' },
-  { title: 'YouTube Verification', price: '₦950,000' },
-  { title: 'Telegram Verification', price: '₦150,000' },
-  { title: 'WhatsApp Business Verification', price: '₦400,000' },
-  { title: 'WhatsApp Channel Verification', price: '₦300,000' },
+  { title: 'Instagram Verification', price: 800000 },
+  { title: 'Facebook Verification', price: 850000 },
+  { title: 'TikTok Verification', price: 900000 },
+  { title: 'YouTube Verification', price: 950000 },
+  { title: 'Telegram Verification', price: 150000 },
+  { title: 'WhatsApp Business Verification', price: 400000 },
+  { title: 'WhatsApp Channel Verification', price: 300000 },
 ];
 
 const notablePrices = [
-  { title: 'Instagram Verification', price: '₦200,000' },
-  { title: 'Facebook Verification', price: '₦350,000' },
-  { title: 'TikTok Verification', price: '₦250,000' },
-  { title: 'YouTube Verification', price: '₦400,000' },
-  { title: 'Telegram Verification', price: '₦100,000' },
-  { title: 'WhatsApp Business Verification', price: '₦180,000' },
-  { title: 'WhatsApp Channel Verification', price: '₦150,000' },
+  { title: 'Instagram Verification', price: 200000 },
+  { title: 'Facebook Verification', price: 350000 },
+  { title: 'TikTok Verification', price: 250000 },
+  { title: 'YouTube Verification', price: 400000 },
+  { title: 'Telegram Verification', price: 100000 },
+  { title: 'WhatsApp Business Verification', price: 180000 },
+  { title: 'WhatsApp Channel Verification', price: 150000 },
 ];
 
 function VerificationSection() {
+  const { format } = useCurrency();
   return (
     <section id="verification-services" className="verification-section">
       <div className="container">
@@ -98,7 +100,7 @@ function VerificationSection() {
               </p>
               <div className="meta-price-card">
                 <p className="meta-platforms">Facebook, Instagram, X (Twitter), WhatsApp Business</p>
-                <p className="meta-price">₦100,000/month (Each)</p>
+                <p className="meta-price">{format(100000)}/month (Each)</p>
               </div>
               <p className="meta-note">
                 This package includes the Meta Verified subscription and a valid driver's license 

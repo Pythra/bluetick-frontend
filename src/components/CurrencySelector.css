@@ -1,0 +1,188 @@
+.currency-selector {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.currency-selector-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.72rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  color: #1d4ed8;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow:
+    0 2px 4px rgba(37, 99, 235, 0.12),
+    0 4px 10px rgba(147, 197, 253, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.currency-selector-trigger:hover,
+.currency-selector-trigger:focus-visible {
+  outline: none;
+  background: linear-gradient(180deg, #f8fbff 0%, #cfe4ff 100%);
+  transform: translateY(-1px);
+  box-shadow:
+    0 3px 6px rgba(37, 99, 235, 0.16),
+    0 6px 14px rgba(147, 197, 253, 0.45);
+}
+
+.currency-selector-flag {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.currency-selector-symbol {
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.currency-selector-chevron {
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-left: 0.05rem;
+  border-right: 2px solid #2563eb;
+  border-bottom: 2px solid #2563eb;
+  transform: rotate(45deg) translateY(-1px);
+  opacity: 0.85;
+}
+
+.currency-selector-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 60;
+  width: min(320px, 82vw);
+  padding: 0.55rem;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #eff6ff 0%, #e4efff 100%);
+  box-shadow:
+    0 10px 28px rgba(29, 78, 216, 0.14),
+    0 4px 12px rgba(59, 130, 246, 0.1);
+  animation: currency-panel-in 0.18s ease;
+}
+
+@keyframes currency-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.currency-selector-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #93c5fd transparent;
+}
+
+.currency-selector-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.currency-selector-list::-webkit-scrollbar-thumb {
+  background: #93c5fd;
+  border-radius: 999px;
+}
+
+.currency-selector-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.62rem 0.7rem;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #1e3a8a;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.currency-selector-option:hover,
+.currency-selector-option:focus-visible {
+  outline: none;
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.currency-selector-option.is-active {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.currency-selector-option-leading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+
+.currency-selector-option-flag {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.currency-selector-option-name {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #1e3a8a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.currency-selector-option-code {
+  flex-shrink: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #3b82f6;
+}
+
+.currency-selector-loading {
+  margin: 0.35rem 0.45rem 0.2rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #60a5fa;
+}
+
+@media (max-width: 768px) {
+  .currency-selector {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .currency-selector-trigger {
+    width: 100%;
+    justify-content: center;
+    padding: 0.55rem 0.85rem;
+  }
+
+  .currency-selector-panel {
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
+}
