@@ -300,6 +300,10 @@
     min-height: 85vh;
   }
   
+  .partner-bg-overlay {
+    background: url('../assets/portraitpartner.png') center/cover no-repeat;
+  }
+  
   .partner-stat-divider {
     display: none;
   }
