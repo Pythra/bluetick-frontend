@@ -496,6 +496,8 @@ function PublicationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const [showCartNotification, setShowCartNotification] = useState(false);
+  const [statsVisible, setStatsVisible] = useState(false);
+  const statsRef = useRef(null);
   const { format } = useCurrency();
 
   const handleAddToCart = async (item) => {
@@ -538,11 +540,33 @@ function PublicationServicesPage() {
     document.getElementById('publication-how-it-works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setStatsVisible(true);
+          }
+        });
+      },
+      { threshold: 0.35 }
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+
+    return () => {
+      if (statsRef.current) {
+        observer.unobserve(statsRef.current);
+      }
+    };
+  }, []);
+
   const mastheadStats = [
-    { value: '20,000+', label: 'Media outlets', icon: IoNewspaperOutline, iconTone: 'mint' },
+    { value: '500+', label: 'Media outlets', icon: IoNewspaperOutline, iconTone: 'mint' },
     { value: '6–24 hrs', label: 'Fast placements', icon: IoTime, iconTone: 'sky' },
-    { value: '5', label: 'Curated packages', icon: IoLayersOutline, iconTone: 'amber' },
-    { value: 'Global', label: 'Africa · UK · Tech', icon: IoGlobe, iconTone: 'mint' },
+    { value: '98%', label: 'Success rate', icon: IoCheckmarkCircle, iconTone: 'amber' },
   ];
 
   return (
@@ -556,10 +580,6 @@ function PublicationServicesPage() {
 
       <section className="publication-masthead">
         <div className="publication-masthead-grid container">
-          <span className="publication-steps-badge" aria-hidden="true">
-            <span className="publication-steps-badge-num">4</span>
-            <span className="publication-steps-badge-label">steps</span>
-          </span>
           <div className="publication-masthead-copy">
             <p className="publication-eyebrow">Bluetickgeng · Press &amp; Media Distribution</p>
             <h1 className="publication-masthead-title">
@@ -570,19 +590,7 @@ function PublicationServicesPage() {
               From Punch and Vanguard to Forbes and BBC — we place your story on trusted news platforms with
               editorial review, live links, and campaign reports you can share with clients and investors.
             </p>
-            <div className="publication-masthead-actions">
-              <button type="button" className="publication-btn publication-btn-primary" onClick={scrollToPackages}>
-                Browse packages
-              </button>
-              <button
-                type="button"
-                className="publication-btn publication-btn-ghost"
-                onClick={scrollToHowItWorks}
-              >
-                How it works
-              </button>
-            </div>
-            <div className="publication-masthead-stats" role="list" aria-label="Publication highlights">
+            <div className="publication-masthead-stats" role="list" aria-label="Publication highlights" ref={statsRef}>
               {mastheadStats.map((stat) => {
                 const StatIcon = stat.icon;
                 return (
@@ -594,7 +602,9 @@ function PublicationServicesPage() {
                       >
                         <StatIcon />
                       </div>
-                      <p className="publication-stat-value">{stat.value}</p>
+                      <p className="publication-stat-value">
+                        <AnimatedNumber value={stat.value} isActive={statsVisible} />
+                      </p>
                     </div>
                     <p className="publication-stat-label">{stat.label}</p>
                   </article>
@@ -606,6 +616,24 @@ function PublicationServicesPage() {
             <img src={newsImage} alt="" className="publication-masthead-image" />
             <div className="publication-masthead-visual-overlay" />
             <p className="publication-masthead-visual-tag">As seen on leading outlets</p>
+            <div className="publication-masthead-actions">
+              <button type="button" className="publication-btn publication-btn-primary" onClick={scrollToPackages}>
+                Browse packages
+              </button>
+              <div className="publication-how-it-works-wrapper">
+                <span className="publication-steps-badge" aria-hidden="true">
+                  <span className="publication-steps-badge-num">4</span>
+                  <span className="publication-steps-badge-label">steps</span>
+                </span>
+                <button
+                  type="button"
+                  className="publication-btn publication-btn-ghost"
+                  onClick={scrollToHowItWorks}
+                >
+                  How it works
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -851,6 +879,55 @@ function PublicationServicesPage() {
       <Footer onScrollToSection={scrollToSection} />
     </div>
   );
+}
+
+function AnimatedNumber({ value, isActive }) {
+  const [displayValue, setDisplayValue] = useState(value);
+
+  useEffect(() => {
+    if (!isActive) {
+      setDisplayValue(value);
+      return;
+    }
+
+    // Parse the value to extract number and suffix
+    const match = String(value).match(/^([\d,]+)(.*)$/);
+    if (!match) {
+      setDisplayValue(value);
+      return;
+    }
+
+    const [, numStr, suffix] = match;
+    const targetNum = parseInt(numStr.replace(/,/g, ''), 10);
+    const currentNum = parseInt(String(displayValue).replace(/,/g, '').replace(/[^\d]/g, ''), 10) || 0;
+
+    if (isNaN(targetNum) || targetNum === currentNum) {
+      setDisplayValue(value);
+      return;
+    }
+
+    const duration = 1800;
+    const totalSteps = 60;
+    const stepDuration = duration / totalSteps;
+    const increment = (targetNum - currentNum) / totalSteps;
+    let step = 0;
+    let current = currentNum;
+
+    const timer = setInterval(() => {
+      step += 1;
+      current = Math.min(Math.floor(current + increment), targetNum);
+      setDisplayValue(current.toLocaleString() + suffix);
+
+      if (step >= totalSteps || current >= targetNum) {
+        setDisplayValue(targetNum.toLocaleString() + suffix);
+        clearInterval(timer);
+      }
+    }, stepDuration);
+
+    return () => clearInterval(timer);
+  }, [value, isActive]);
+
+  return displayValue;
 }
 
 // Per-card sliding outlet logos (no wrapper box — sits on card background)

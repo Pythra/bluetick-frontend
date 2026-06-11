@@ -9,6 +9,7 @@ import Navbar from './Navbar';
 import PlaceOrderDropdown from './PlaceOrderDropdown';
 import { useAuth } from '../contexts/AuthContext';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
+import { useCurrency } from '../contexts/CurrencyContext';
 import heroVideo from '../assets/vid.mp4';
 import { companyWhatsappDemoUrl } from '../config/companyContact';
 import './LandingPage.css';
@@ -55,8 +56,11 @@ const impactStats = [
 function LandingPage({ onScrollToSection }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { currency, setCurrency, currencies } = useCurrency();
   const [activeSlide, setActiveSlide] = useState(0);
   const [statsVisible, setStatsVisible] = useState(false);
+  const [isCurrencyDropdownOpen, setIsCurrencyDropdownOpen] = useState(false);
+  const currencyDropdownRef = useRef(null);
   const statsRef = useRef(null);
 
   useEffect(() => {
@@ -90,6 +94,29 @@ function LandingPage({ onScrollToSection }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isCurrencyDropdownOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (currencyDropdownRef.current && !currencyDropdownRef.current.contains(event.target)) {
+        setIsCurrencyDropdownOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsCurrencyDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isCurrencyDropdownOpen]);
+
   return (
     <section id="landing" className="landing-page">
       <Navbar onScrollToSection={onScrollToSection} />
@@ -120,14 +147,40 @@ function LandingPage({ onScrollToSection }) {
                   Get Started
                 </button>
               )}
-              <a
-                href={companyWhatsappDemoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="landing-btn landing-btn-tertiary"
-              >
-                Book a Demo
-              </a>
+              <div className="landing-currency-selector" ref={currencyDropdownRef}>
+                <button
+                  type="button"
+                  className="landing-btn landing-btn-primary"
+                  onClick={() => setIsCurrencyDropdownOpen((open) => !open)}
+                >
+                  Change Currency
+                </button>
+                {isCurrencyDropdownOpen && (
+                  <div className="landing-currency-dropdown">
+                    <ul className="landing-currency-list">
+                      {currencies.map((item) => {
+                        const isActive = item.code === currency;
+                        return (
+                          <li key={item.code}>
+                            <button
+                              type="button"
+                              className={`landing-currency-option${isActive ? ' is-active' : ''}`}
+                              onClick={() => {
+                                setCurrency(item.code);
+                                setIsCurrencyDropdownOpen(false);
+                              }}
+                            >
+                              <span className="landing-currency-option-flag">{item.flag}</span>
+                              <span className="landing-currency-option-name">{item.name}</span>
+                              <span className="landing-currency-option-code">{item.code}</span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
