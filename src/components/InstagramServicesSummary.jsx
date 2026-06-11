@@ -22,6 +22,7 @@ function InstagramServicesSummary() {
         copy={(
           <>
             <SectionHeader
+              eyebrow="Influence & Reach"
               title={(
                 <>
                   <span className="services-summary-title-black">INSTAGRAM BLOG</span>{' '}

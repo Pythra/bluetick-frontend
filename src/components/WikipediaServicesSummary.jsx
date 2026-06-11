@@ -21,6 +21,7 @@ function WikipediaServicesSummary() {
         copy={(
           <>
             <SectionHeader
+              eyebrow="Authority & Legacy"
               title={(
                 <>
                   <span className="services-summary-title-black">WIKIPEDIA PAGE</span>{' '}

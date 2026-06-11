@@ -1,11 +1,14 @@
 .clients-section {
-  padding: 80px 0 100px;
+  padding: 24px 0 40px;
   background: #ffffff;
 }
 
 .clients-section-inner {
   width: 100%;
+  max-width: 1240px;
   margin: 0 auto;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
 }
 
 .clients-section-visual {
@@ -13,6 +16,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  overflow: hidden;
 }
 
 .clients-section-image {
@@ -20,6 +24,9 @@
   width: 100%;
   height: auto;
   object-fit: cover;
+  /* Crop whitespace baked into the JPEG (top/bottom margins) */
+  margin-top: -16%;
+  margin-bottom: -9%;
 }
 
 .service-detail-page .clients-section {

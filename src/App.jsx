@@ -16,6 +16,7 @@ import PublicationServicesSummary from './components/PublicationServicesSummary'
 import InstagramServicesSummary from './components/InstagramServicesSummary';
 import WikipediaServicesSummary from './components/WikipediaServicesSummary';
 import CelebritiesSection from './components/CelebritiesSection';
+import PartnerWithUsSection from './components/PartnerWithUsSection';
 import TestimonialsSection from './components/TestimonialsSection';
 import CartIcon from './components/CartIcon';
 import AppServicesPage from './pages/AppServicesPage';
@@ -45,6 +46,8 @@ import LegalDocumentPage from './pages/legal/LegalDocumentPage';
 import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import AboutPage from './pages/AboutPage';
+import PartnerPage from './pages/PartnerPage';
+import PartnerApplicationPage from './pages/PartnerApplicationPage';
 import FAQ from './components/FAQ';
 import ClientsSection from './components/ClientsSection';
 import { subscribeToPushNotifications } from './utils/pushNotifications';
@@ -84,6 +87,7 @@ function HomePage() {
   return (
     <>
       <LandingPage onScrollToSection={scrollToSection} />
+      <div className="scroll-pop"><PartnerWithUsSection /></div>
       <div className="scroll-pop"><AppServicesSummary /></div>
       <div className="scroll-pop"><WebsiteServicesSummary /></div>
       <div className="scroll-pop"><VerificationServicesSummary /></div>
@@ -168,6 +172,8 @@ function App() {
               <Route path="/refund-policy" element={<RefundPolicy />} />
               <Route path="/legal/:slug" element={<LegalDocumentPage />} />
               <Route path="/about" element={<AboutPage />} />
+              <Route path="/partner" element={<PartnerPage />} />
+              <Route path="/partner/apply" element={<PartnerApplicationPage />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
             </Routes>

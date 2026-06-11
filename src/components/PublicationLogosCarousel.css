@@ -7,6 +7,13 @@
   padding-top: 0;
 }
 
+/* Summary variant with reduced padding for dark luxe background */
+.publication-logos-section.publication-logos-carousel--summary {
+  padding: 1.5rem 0 2rem;
+  background: transparent;
+  margin-top: 0;
+}
+
 .publication-logos-container {
   max-width: 1200px;
   margin: 0 auto;

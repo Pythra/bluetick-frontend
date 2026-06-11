@@ -24,6 +24,7 @@ function MusicStreamingVerificationSummary() {
         copy={(
           <>
             <SectionHeader
+              eyebrow="For Artists"
               title={(
                 <>
                   <span className="services-summary-title-black">MUSIC ARTIST</span>

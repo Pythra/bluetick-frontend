@@ -35,8 +35,15 @@
 }
 
 .currency-selector-flag {
-  font-size: 1rem;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.currency-selector-flag img {
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .currency-selector-symbol {
@@ -136,8 +143,14 @@
 
 .currency-selector-option-flag {
   flex-shrink: 0;
-  font-size: 1.05rem;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.currency-selector-option-flag img {
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .currency-selector-option-name {

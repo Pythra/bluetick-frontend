@@ -20,6 +20,7 @@ function AppServicesSummary() {
         copy={(
           <>
             <SectionHeader
+              eyebrow="Build & Launch"
               title={(
                 <>
                   <span className="services-summary-title-black">APP DEVELOPMENT</span>{' '}

@@ -1,0 +1,10 @@
+.country-flag {
+  display: inline-block;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+.country-flag-rounded {
+  border-radius: 50%;
+  object-fit: cover;
+}

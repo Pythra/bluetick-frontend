@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { getCurrencyByCode } from '../data/flutterwaveCurrencies';
+import CountryFlag from './CountryFlag';
 import './CurrencySelector.css';
 
 function CurrencySelector() {
@@ -44,7 +45,7 @@ function CurrencySelector() {
         title={selected.code}
       >
         <span className="currency-selector-flag" aria-hidden="true">
-          {selected.flag}
+          <CountryFlag code={selected.countryCode} size="sm" rounded />
         </span>
         <span className="currency-selector-symbol" aria-hidden="true">
           {selected.symbol}
@@ -71,7 +72,7 @@ function CurrencySelector() {
                   >
                     <span className="currency-selector-option-leading">
                       <span className="currency-selector-option-flag" aria-hidden="true">
-                        {item.flag}
+                        <CountryFlag code={item.countryCode} size="sm" rounded />
                       </span>
                       <span className="currency-selector-option-name">{item.name}</span>
                     </span>

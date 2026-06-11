@@ -152,6 +152,30 @@
   position: relative;
 }
 
+.landing-currency-btn {
+  gap: 0.5rem;
+}
+
+.landing-currency-btn-flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.landing-currency-btn-flag img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.landing-currency-btn-symbol {
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  background: rgba(37, 99, 235, 0.12);
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
 .landing-currency-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -200,8 +224,19 @@
 }
 
 .landing-currency-option-flag {
-  font-size: 1.25rem;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 3px;
+}
+
+.landing-currency-option-flag img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .landing-currency-option-name {

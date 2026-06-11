@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
+import PublicationLogosCarousel from './PublicationLogosCarousel';
 import publicationHeroImage from '../assets/news.jpg';
 import './PublicationSection.css';
 import './ServicesSummaryHero.css';
@@ -60,13 +61,11 @@ function PublicationServicesSummary() {
 
   return (
     <section id="publication-services" className="publication-section publication-services-summary services-summary-layout">
-      <div className="publication-services-summary-bg-decoration">
-        <div className="dot-pattern"></div>
-      </div>
       <ServicesSummaryLayout
         copy={(
           <>
             <SectionHeader
+              eyebrow="Press & Media"
               title={(
                 <>
                   <span className="services-summary-title-black">PUBLICATION</span>{' '}
@@ -107,8 +106,10 @@ function PublicationServicesSummary() {
           </div>
         )}
         below={(
-          <div className="publication-category-grid">
-            {publicationCategories.map((category) => (
+          <>
+            <PublicationLogosCarousel title="" className="publication-logos-carousel--summary" />
+            <div className="publication-category-grid">
+              {publicationCategories.map((category) => (
               <article key={category.title} className="publication-category-card">
                 <div className="publication-card-head">
                   {getIcon(category.icon)}
@@ -126,8 +127,9 @@ function PublicationServicesSummary() {
                   Order now
                 </Button>
               </article>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       />
     </section>

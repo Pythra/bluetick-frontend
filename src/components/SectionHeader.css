@@ -82,6 +82,35 @@
   }
 }
 
+/* Per-section accent colors (alternating rhythm) */
+.app-services-summary { --section-accent: #2563eb; --section-accent-soft: rgba(37, 99, 235, 0.1); }
+.website-services-summary { --section-accent: #6366f1; --section-accent-soft: rgba(99, 102, 241, 0.1); }
+.verification-services-summary { --section-accent: #10b981; --section-accent-soft: rgba(16, 185, 129, 0.1); }
+.music-streaming-services-summary { --section-accent: #8b5cf6; --section-accent-soft: rgba(139, 92, 246, 0.1); }
+#tiktok-artist-services.music-streaming-services-summary { --section-accent: #f43f5e; --section-accent-soft: rgba(244, 63, 94, 0.1); }
+.publication-services-summary { --section-accent: #b8902b; --section-accent-soft: rgba(184, 144, 43, 0.1); }
+.instagram-services-summary { --section-accent: #ec4899; --section-accent-soft: rgba(236, 72, 153, 0.1); }
+.wikipedia-services-summary { --section-accent: #475569; --section-accent-soft: rgba(71, 85, 105, 0.08); }
+
+/* Eyebrow badge */
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  margin-bottom: 0.9rem;
+  border-radius: 999px;
+  background: var(--section-accent-soft, rgba(37, 99, 235, 0.1));
+  border: 1px solid color-mix(in srgb, var(--section-accent, #2563eb) 30%, transparent);
+  color: var(--section-accent, #2563eb);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 /* Homepage summary sections (app → wikipedia) */
 .app-services-summary .section-header,
 .website-services-summary .section-header,
@@ -135,11 +164,11 @@
 .home-impact-section .section-title {
   font-family: 'Poppins', 'Inter', sans-serif;
   font-size: 3rem;
-  font-weight: 500;
-  color: #94a3b8;
-  -webkit-text-fill-color: #94a3b8;
+  font-weight: 600;
+  color: #64748b;
+  -webkit-text-fill-color: #64748b;
   background: none;
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   line-height: 1.15;
 }
 
@@ -219,8 +248,8 @@
 }
 
 .services-summary-title-black {
-  color: #94a3b8;
-  -webkit-text-fill-color: #94a3b8;
+  color: #64748b;
+  -webkit-text-fill-color: #64748b;
 }
 
 .services-summary-title-blue {

@@ -61,6 +61,7 @@ function VerificationServicesSummary() {
         copy={(
           <>
             <SectionHeader
+              eyebrow="Trust & Growth"
               title={(
                 <>
                   <span className="services-summary-title-black">SOCIAL MEDIA</span>{' '}

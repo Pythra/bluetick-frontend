@@ -23,6 +23,7 @@ function TikTokArtistServicesSummary() {
         copy={(
           <>
             <SectionHeader
+              eyebrow="Go Viral"
               title={(
                 <>
                   <span className="services-summary-title-black">TIKTOK FOR</span>

@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
+.instagram-services-section.instagram-services-summary {
+  background: #ffffff;
+}
+
 .instagram-services-section:not(.instagram-services-summary) {
   padding: 40px 20px;
   position: relative;

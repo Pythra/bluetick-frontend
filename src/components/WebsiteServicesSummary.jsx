@@ -21,6 +21,7 @@ function WebsiteServicesSummary() {
         copy={(
           <>
             <SectionHeader
+              eyebrow="Web Experiences"
               title={(
                 <>
                   <span className="services-summary-title-black">WEBSITE DEVELOPMENT</span>{' '}

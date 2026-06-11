@@ -9,7 +9,9 @@ import Navbar from './Navbar';
 import PlaceOrderDropdown from './PlaceOrderDropdown';
 import { useAuth } from '../contexts/AuthContext';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
+import CountryFlag from './CountryFlag';
 import { useCurrency } from '../contexts/CurrencyContext';
+import { getCurrencyByCode } from '../data/flutterwaveCurrencies';
 import heroVideo from '../assets/vid.mp4';
 import { companyWhatsappDemoUrl } from '../config/companyContact';
 import './LandingPage.css';
@@ -57,6 +59,7 @@ function LandingPage({ onScrollToSection }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { currency, setCurrency, currencies } = useCurrency();
+  const selectedCurrency = getCurrencyByCode(currency);
   const [activeSlide, setActiveSlide] = useState(0);
   const [statsVisible, setStatsVisible] = useState(false);
   const [isCurrencyDropdownOpen, setIsCurrencyDropdownOpen] = useState(false);
@@ -150,10 +153,14 @@ function LandingPage({ onScrollToSection }) {
               <div className="landing-currency-selector" ref={currencyDropdownRef}>
                 <button
                   type="button"
-                  className="landing-btn landing-btn-primary"
+                  className="landing-btn landing-btn-secondary landing-currency-btn"
                   onClick={() => setIsCurrencyDropdownOpen((open) => !open)}
                 >
-                  Change Currency
+                  <span className="landing-currency-btn-flag">
+                    <CountryFlag code={selectedCurrency.countryCode} size="sm" rounded />
+                  </span>
+                  <span>Change Currency</span>
+                  <span className="landing-currency-btn-symbol">{selectedCurrency.symbol}</span>
                 </button>
                 {isCurrencyDropdownOpen && (
                   <div className="landing-currency-dropdown">
@@ -170,7 +177,9 @@ function LandingPage({ onScrollToSection }) {
                                 setIsCurrencyDropdownOpen(false);
                               }}
                             >
-                              <span className="landing-currency-option-flag">{item.flag}</span>
+                              <span className="landing-currency-option-flag">
+                                <CountryFlag code={item.countryCode} size="sm" />
+                              </span>
                               <span className="landing-currency-option-name">{item.name}</span>
                               <span className="landing-currency-option-code">{item.code}</span>
                             </button>

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import bluego from '../assets/bluego.png';
 import './AuthPage.css';
 
 function SignUpPage() {
@@ -88,26 +89,31 @@ function SignUpPage() {
   return (
     <div className="auth-page">
       <Navbar onScrollToSection={scrollToSection} />
-      <div className="auth-container">
-        <section className="auth-hero-panel" aria-label="Why create an account">
-          <h1 className="auth-hero-title">Create your account and launch faster.</h1>
-          <p className="auth-hero-description">
-            Manage orders, submit publication content, and track updates from one professional dashboard,
-            all designed with the same premium experience as our homepage.
-          </p>
-          <ul className="auth-feature-list">
-            <li>Checkout and service progress in one place</li>
-            <li>Faster support and publication coordination</li>
-            <li>Secure access to your account and order history</li>
-          </ul>
-        </section>
-        <div className="auth-card">
-          <h1 className="auth-title">Sign Up</h1>
-          <p className="auth-subtitle">Join Bluetick and get started in less than a minute.</p>
+      <main className="auth-main">
+        <div className="auth-shell">
+          <aside className="auth-aside">
+            <div className="auth-aside-inner">
+              <img src={bluego} alt="Bluetick" className="auth-aside-logo" />
+              <h1>
+                Create your<span> account</span>
+              </h1>
+              <p>
+                Manage orders, submit publication content, and track updates from one professional dashboard.
+              </p>
+              <ul className="auth-perks">
+                <li>Checkout and service progress in one place</li>
+                <li>Faster support and publication coordination</li>
+                <li>Secure access to your account and order history</li>
+              </ul>
+            </div>
+          </aside>
+          <section className="auth-form-panel">
+            <h1>Sign Up</h1>
+            <p className="auth-form-sub">Join Bluetick and get started in less than a minute.</p>
 
-          {error && <div className="auth-error">{error}</div>}
+            {error && <div className="auth-error">{error}</div>}
 
-          <form onSubmit={handleSubmit} className="auth-form">
+            <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="firstName">First name</label>
               <input
@@ -196,8 +202,9 @@ function SignUpPage() {
           <p className="auth-link">
             Already have an account? <Link to="/login">Login</Link>
           </p>
+          </section>
         </div>
-      </div>
+      </main>
       <Footer onScrollToSection={scrollToSection} />
     </div>
   );
