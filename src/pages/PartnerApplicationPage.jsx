@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaHandshake,
@@ -43,10 +43,17 @@ function PartnerApplicationPage() {
   const [loading, setLoading] = useState(false);
   const [paymentInitialized, setPaymentInitialized] = useState(false);
   const [applicationId, setApplicationId] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('paystack');
+  const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const PARTNER_FEE_NGN = 50000; // ₦50,000 partner fee in Naira
   
+  const isInternational = currency !== 'NGN';
   const partnerFee = convert(PARTNER_FEE_NGN);
   const formattedFee = format(partnerFee);
+
+  useEffect(() => {
+    setPaymentMethod(isInternational ? 'flutterwave' : 'paystack');
+  }, [isInternational]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -91,11 +98,15 @@ function PartnerApplicationPage() {
   };
 
   const handlePayment = async () => {
-    setLoading(true);
+    setIsInitializingPayment(true);
     setError('');
 
     try {
-      const response = await fetch(`${apiUrl}/api/partner-application/${applicationId}/initialize-payment`, {
+      const endpoint = paymentMethod === 'flutterwave'
+        ? `${apiUrl}/api/partner-application/${applicationId}/initialize-flutterwave-payment`
+        : `${apiUrl}/api/partner-application/${applicationId}/initialize-payment`;
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: partnerFee, currency }),
@@ -114,7 +125,7 @@ function PartnerApplicationPage() {
       console.error('Payment error:', err);
       setError(err.message || 'Failed to initialize payment. Please try again.');
     } finally {
-      setLoading(false);
+      setIsInitializingPayment(false);
     }
   };
 
@@ -347,17 +358,67 @@ function PartnerApplicationPage() {
                         One-time fee to activate your partner account and receive your white-label site credentials.
                       </p>
                     </div>
+                    
+                    {!isInternational && (
+                      <div className="partner-apply-payment-methods">
+                        <label className={`partner-apply-pay-option ${paymentMethod === 'paystack' ? 'is-active' : ''}`}>
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="paystack"
+                            checked={paymentMethod === 'paystack'}
+                            onChange={() => setPaymentMethod('paystack')}
+                          />
+                          <span className="partner-apply-pay-option-text">
+                            <span className="partner-apply-pay-option-title">Paystack</span>
+                            <span className="partner-apply-pay-option-desc">Card, bank transfer, USSD</span>
+                          </span>
+                        </label>
+                        <label className={`partner-apply-pay-option ${paymentMethod === 'bank' ? 'is-active' : ''}`}>
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="bank"
+                            checked={paymentMethod === 'bank'}
+                            onChange={() => setPaymentMethod('bank')}
+                          />
+                          <span className="partner-apply-pay-option-text">
+                            <span className="partner-apply-pay-option-title">Bank Transfer</span>
+                            <span className="partner-apply-pay-option-desc">Pay manually, then confirm</span>
+                          </span>
+                        </label>
+                      </div>
+                    )}
+                    
+                    {isInternational && (
+                      <div className="partner-apply-payment-methods">
+                        <label className={`partner-apply-pay-option ${paymentMethod === 'flutterwave' ? 'is-active' : ''}`}>
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="flutterwave"
+                            checked={paymentMethod === 'flutterwave'}
+                            onChange={() => setPaymentMethod('flutterwave')}
+                          />
+                          <span className="partner-apply-pay-option-text">
+                            <span className="partner-apply-pay-option-title">Flutterwave</span>
+                            <span className="partner-apply-pay-option-desc">Card, mobile money, bank transfer</span>
+                          </span>
+                        </label>
+                      </div>
+                    )}
+                    
                     <button
                       type="button"
                       className="partner-apply-submit"
                       onClick={handlePayment}
-                      disabled={loading}
+                      disabled={isInitializingPayment}
                     >
-                      <span>{loading ? 'Processing...' : 'Pay Now'}</span>
+                      <span>{isInitializingPayment ? 'Processing...' : `Pay with ${paymentMethod === 'flutterwave' ? 'Flutterwave' : paymentMethod === 'bank' ? 'Bank Transfer' : 'Paystack'}`}</span>
                       <FaArrowRight />
                     </button>
                     <p className="partner-apply-disclaimer">
-                      Secure payment via Paystack. You'll receive your site details via email after payment confirmation.
+                      Secure payment. You'll receive your site details via email after payment confirmation.
                     </p>
                   </div>
                 )}

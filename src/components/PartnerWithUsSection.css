@@ -291,4 +291,8 @@
     width: 100%;
     justify-content: center;
   }
+  
+  .partner-visual {
+    display: none;
+  }
 }
