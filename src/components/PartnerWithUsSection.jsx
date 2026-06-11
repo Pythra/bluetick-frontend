@@ -47,7 +47,7 @@ function PartnerWithUsSection() {
             className="partner-cta-btn"
             onClick={() => navigate('/partner')}
           >
-            <span>Explore Partnership</span>
+            <span>Partner with Us</span>
             <FaArrowRight className="partner-cta-icon" />
           </button>
         </div>
