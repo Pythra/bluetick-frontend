@@ -7,7 +7,7 @@
   background:
     radial-gradient(ellipse 80% 60% at 10% 0%, rgba(59, 130, 246, 0.22) 0%, transparent 55%),
     radial-gradient(ellipse 70% 50% at 95% 100%, rgba(99, 102, 241, 0.18) 0%, transparent 50%),
-    linear-gradient(165deg, #0f172a 0%, #1e293b 48%, #0f172a 100%);
+    linear-gradient(165deg, #0a1628 0%, #0f2546 42%, #1e3a8a 100%);
   margin-top: 0;
 }
 
@@ -15,8 +15,8 @@
   padding: 0 0 80px;
   background:
     radial-gradient(ellipse 80% 60% at 10% 0%, rgba(59, 130, 246, 0.22) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 50% at 95% 100%, rgba(99, 102, 241, 0.18) 0%, transparent 50%),
-    linear-gradient(165deg, #0f172a 0%, #1e293b 48%, #0f172a 100%);
+    radial-gradient(ellipse 70% 50% at 95% 100%, rgba(37, 99, 235, 0.2) 0%, transparent 50%),
+    linear-gradient(165deg, #0a1628 0%, #0f2546 42%, #1e3a8a 100%);
   position: relative;
   overflow: hidden;
 }
@@ -398,7 +398,7 @@
 .verification-carousel-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, rgba(15, 23, 42, 0.54) 20%, rgba(30, 64, 175, 0.22) 70%, rgba(15, 23, 42, 0.5) 100%);
+  background: linear-gradient(120deg, rgba(10, 22, 40, 0.54) 20%, rgba(30, 64, 175, 0.28) 70%, rgba(10, 22, 40, 0.5) 100%);
 }
 
 .verification-carousel-content {
