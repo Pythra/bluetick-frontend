@@ -157,7 +157,7 @@ function LandingPage({ onScrollToSection }) {
                   onClick={() => setIsCurrencyDropdownOpen((open) => !open)}
                 >
                   <span className="landing-currency-btn-flag">
-                    <CountryFlag code={selectedCurrency.countryCode} size="sm" rounded />
+                    <CountryFlag code={selectedCurrency.countryCode} size="sm" />
                   </span>
                   <span>Change Currency</span>
                   <span className="landing-currency-btn-symbol">{selectedCurrency.symbol}</span>

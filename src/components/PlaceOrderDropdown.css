@@ -86,12 +86,12 @@
   border-radius: 999px;
 }
 
-@media (max-width: 480px) {
-  .place-order-dropdown {
+@media (max-width: 768px) {
+  .landing-actions .place-order-dropdown {
     width: 100%;
   }
 
-  .place-order-dropdown-trigger {
+  .landing-actions .place-order-dropdown-trigger {
     width: 100%;
     justify-content: center;
   }

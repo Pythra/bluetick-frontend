@@ -1,17 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaHandshake,
   FaArrowRight,
   FaCheckCircle,
   FaCrown,
-  FaWhatsapp,
-  FaLock,
 } from 'react-icons/fa';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../contexts/AuthContext';
-import { useCurrency } from '../contexts/CurrencyContext';
 import bluego from '../assets/bluego.png';
 import './PartnerApplicationPage.css';
 
@@ -36,24 +33,11 @@ const initialForm = {
 function PartnerApplicationPage() {
   const navigate = useNavigate();
   const { apiUrl } = useAuth();
-  const { currency, convert, format } = useCurrency();
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [paymentInitialized, setPaymentInitialized] = useState(false);
-  const [applicationId, setApplicationId] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState('paystack');
-  const [isInitializingPayment, setIsInitializingPayment] = useState(false);
-  const PARTNER_FEE_NGN = 50000; // ₦50,000 partner fee in Naira
-  
-  const isInternational = currency !== 'NGN';
-  const partnerFee = convert(PARTNER_FEE_NGN);
-  const formattedFee = format(partnerFee);
-
-  useEffect(() => {
-    setPaymentMethod(isInternational ? 'flutterwave' : 'paystack');
-  }, [isInternational]);
+  const [reservedSiteUrl, setReservedSiteUrl] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,45 +71,13 @@ function PartnerApplicationPage() {
         throw new Error(data.error || 'Failed to submit application');
       }
 
-      setApplicationId(data.applicationId);
-      setPaymentInitialized(true);
+      setReservedSiteUrl(data.siteUrl || '');
+      setSubmitted(true);
     } catch (err) {
       console.error('Submit error:', err);
       setError(err.message || 'Failed to submit application. Please try again.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePayment = async () => {
-    setIsInitializingPayment(true);
-    setError('');
-
-    try {
-      const endpoint = paymentMethod === 'flutterwave'
-        ? `${apiUrl}/api/partner-application/${applicationId}/initialize-flutterwave-payment`
-        : `${apiUrl}/api/partner-application/${applicationId}/initialize-payment`;
-      
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: partnerFee, currency }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to initialize payment');
-      }
-
-      if (data.paymentUrl) {
-        window.location.href = data.paymentUrl;
-      }
-    } catch (err) {
-      console.error('Payment error:', err);
-      setError(err.message || 'Failed to initialize payment. Please try again.');
-    } finally {
-      setIsInitializingPayment(false);
     }
   };
 
@@ -135,7 +87,6 @@ function PartnerApplicationPage() {
 
       <main className="partner-apply-main">
         <div className="partner-apply-shell">
-          {/* Left panel */}
           <aside className="partner-apply-aside">
             <div className="partner-apply-aside-inner">
               <img src={bluego} alt="Bluetick" className="partner-apply-aside-logo" />
@@ -175,19 +126,26 @@ function PartnerApplicationPage() {
             </div>
           </aside>
 
-          {/* Form panel */}
           <section className="partner-apply-form-panel">
             {submitted ? (
               <div className="partner-apply-success">
                 <div className="partner-apply-success-icon">
-                  <FaWhatsapp />
+                  <FaCheckCircle />
                 </div>
-                <h2>Application Sent</h2>
+                <h2>Application Submitted</h2>
                 <p>
-                  Your application has been opened in WhatsApp. Send the message to
-                  complete your submission — our partnerships team will get back to
-                  you within 48 hours.
+                  Thank you, {form.fullName.split(' ')[0] || 'there'}! We have received your
+                  partner application. A confirmation email has been sent to{' '}
+                  <strong>{form.email}</strong>.
                 </p>
+                {reservedSiteUrl ? (
+                  <p>
+                    Your reserved white-label site address is{' '}
+                    <strong>{reservedSiteUrl}</strong>. We will notify you when your site is
+                    ready.
+                  </p>
+                ) : null}
+                <p>Our partnerships team will review your application and get back to you within 48 hours.</p>
                 <div className="partner-apply-success-actions">
                   <button
                     type="button"
@@ -201,6 +159,7 @@ function PartnerApplicationPage() {
                     className="partner-apply-ghost"
                     onClick={() => {
                       setForm(initialForm);
+                      setReservedSiteUrl('');
                       setSubmitted(false);
                     }}
                   >
@@ -297,7 +256,7 @@ function PartnerApplicationPage() {
                       id="website"
                       name="website"
                       type="text"
-                      placeholder="https:// or @handle"
+                      placeholder="e.g. mybrand.com or @mybrand"
                       value={form.website}
                       onChange={handleChange}
                     />
@@ -332,96 +291,20 @@ function PartnerApplicationPage() {
                   <p className="partner-apply-error" role="alert">{error}</p>
                 ) : null}
 
-                {!paymentInitialized ? (
-                  <>
-                    <button type="submit" className="partner-apply-submit" disabled={loading}>
-                      <span>{loading ? 'Submitting...' : 'Submit Application'}</span>
-                      <FaArrowRight />
-                    </button>
-                    <p className="partner-apply-disclaimer">
-                      By applying you agree to our{' '}
-                      <button
-                        type="button"
-                        className="partner-apply-link"
-                        onClick={() => navigate('/legal/partner-commission-payout-policy')}
-                      >
-                        Partner Commission &amp; Payout Policy
-                      </button>.
-                    </p>
-                  </>
-                ) : (
-                  <div className="partner-apply-payment-step">
-                    <div className="partner-apply-payment-summary">
-                      <h3><FaLock /> Partner Program Fee</h3>
-                      <p className="partner-apply-fee">{formattedFee}</p>
-                      <p className="partner-apply-fee-note">
-                        One-time fee to activate your partner account and receive your white-label site credentials.
-                      </p>
-                    </div>
-                    
-                    {!isInternational && (
-                      <div className="partner-apply-payment-methods">
-                        <label className={`partner-apply-pay-option ${paymentMethod === 'paystack' ? 'is-active' : ''}`}>
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="paystack"
-                            checked={paymentMethod === 'paystack'}
-                            onChange={() => setPaymentMethod('paystack')}
-                          />
-                          <span className="partner-apply-pay-option-text">
-                            <span className="partner-apply-pay-option-title">Paystack</span>
-                            <span className="partner-apply-pay-option-desc">Card, bank transfer, USSD</span>
-                          </span>
-                        </label>
-                        <label className={`partner-apply-pay-option ${paymentMethod === 'bank' ? 'is-active' : ''}`}>
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="bank"
-                            checked={paymentMethod === 'bank'}
-                            onChange={() => setPaymentMethod('bank')}
-                          />
-                          <span className="partner-apply-pay-option-text">
-                            <span className="partner-apply-pay-option-title">Bank Transfer</span>
-                            <span className="partner-apply-pay-option-desc">Pay manually, then confirm</span>
-                          </span>
-                        </label>
-                      </div>
-                    )}
-                    
-                    {isInternational && (
-                      <div className="partner-apply-payment-methods">
-                        <label className={`partner-apply-pay-option ${paymentMethod === 'flutterwave' ? 'is-active' : ''}`}>
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            value="flutterwave"
-                            checked={paymentMethod === 'flutterwave'}
-                            onChange={() => setPaymentMethod('flutterwave')}
-                          />
-                          <span className="partner-apply-pay-option-text">
-                            <span className="partner-apply-pay-option-title">Flutterwave</span>
-                            <span className="partner-apply-pay-option-desc">Card, mobile money, bank transfer</span>
-                          </span>
-                        </label>
-                      </div>
-                    )}
-                    
-                    <button
-                      type="button"
-                      className="partner-apply-submit"
-                      onClick={handlePayment}
-                      disabled={isInitializingPayment}
-                    >
-                      <span>{isInitializingPayment ? 'Processing...' : `Pay with ${paymentMethod === 'flutterwave' ? 'Flutterwave' : paymentMethod === 'bank' ? 'Bank Transfer' : 'Paystack'}`}</span>
-                      <FaArrowRight />
-                    </button>
-                    <p className="partner-apply-disclaimer">
-                      Secure payment. You'll receive your site details via email after payment confirmation.
-                    </p>
-                  </div>
-                )}
+                <button type="submit" className="partner-apply-submit" disabled={loading}>
+                  <span>{loading ? 'Submitting...' : 'Submit Application'}</span>
+                  <FaArrowRight />
+                </button>
+                <p className="partner-apply-disclaimer">
+                  By applying you agree to our{' '}
+                  <button
+                    type="button"
+                    className="partner-apply-link"
+                    onClick={() => navigate('/legal/partner-commission-payout-policy')}
+                  >
+                    Partner Commission &amp; Payout Policy
+                  </button>.
+                </p>
               </form>
             )}
           </section>
