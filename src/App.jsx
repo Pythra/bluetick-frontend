@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { createBrowserHistory } from 'history';
 import { AuthProvider } from './contexts/AuthContext';
+import { PartnerBrandingProvider } from './contexts/PartnerBrandingContext';
 import { CartProvider } from './contexts/CartContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { useAuth } from './contexts/AuthContext';
@@ -51,9 +52,12 @@ import PartnerApplicationPage from './pages/PartnerApplicationPage';
 import FAQ from './components/FAQ';
 import ClientsSection from './components/ClientsSection';
 import { subscribeToPushNotifications } from './utils/pushNotifications';
+import { getPartnerSubdomainFromHost } from './utils/partnerSubdomain';
 import './App.css';
 
 function HomePage() {
+  const isMainSite = useMemo(() => !getPartnerSubdomainFromHost(), []);
+
   useEffect(() => {
     const sections = document.querySelectorAll('.scroll-pop');
     if (!sections.length) return undefined;
@@ -87,7 +91,9 @@ function HomePage() {
   return (
     <>
       <LandingPage onScrollToSection={scrollToSection} />
-      <div className="scroll-pop"><PartnerWithUsSection /></div>
+      {isMainSite ? (
+        <div className="scroll-pop"><PartnerWithUsSection /></div>
+      ) : null}
       <div className="scroll-pop"><AppServicesSummary /></div>
       <div className="scroll-pop"><WebsiteServicesSummary /></div>
       <div className="scroll-pop"><VerificationServicesSummary /></div>
@@ -138,6 +144,7 @@ function App() {
 
   return (
     <AuthProvider>
+      <PartnerBrandingProvider>
       <CurrencyProvider>
         <CartProvider>
           <Router history={history}>
@@ -182,6 +189,7 @@ function App() {
           </Router>
         </CartProvider>
       </CurrencyProvider>
+      </PartnerBrandingProvider>
     </AuthProvider>
   );
 }

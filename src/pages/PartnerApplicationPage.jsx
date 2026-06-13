@@ -9,6 +9,7 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../contexts/AuthContext';
+import { previewPartnerSiteUrl } from '../utils/partnerSubdomain';
 import bluego from '../assets/bluego.png';
 import './PartnerApplicationPage.css';
 
@@ -38,6 +39,8 @@ function PartnerApplicationPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reservedSiteUrl, setReservedSiteUrl] = useState('');
+
+  const previewSiteUrl = previewPartnerSiteUrl(form.company);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -229,10 +232,15 @@ function PartnerApplicationPage() {
                       id="company"
                       name="company"
                       type="text"
-                      placeholder="Optional"
+                      placeholder="e.g. Acme Media"
                       value={form.company}
                       onChange={handleChange}
                     />
+                    {previewSiteUrl ? (
+                      <p className="partner-apply-site-preview">
+                        Your site will be hosted at <strong>{previewSiteUrl}</strong>
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="partner-apply-field">

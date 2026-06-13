@@ -37,6 +37,19 @@
   display: block;
 }
 
+.navbar-brand-text {
+  display: inline-block;
+  max-width: min(42vw, 280px);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--brand-primary-dark, #1d4ed8);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .navbar-menu {
   display: flex;
   align-items: center;
@@ -60,7 +73,7 @@
 
 .navbar-link:hover {
   background: #eaf3ff;
-  color: #1d4ed8;
+  color: var(--brand-primary-dark, #1d4ed8);
 }
 
 .navbar-logout,
@@ -97,7 +110,7 @@
 .navbar-signup {
   background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
   border: 1px solid #93c5fd;
-  color: #1d4ed8;
+  color: var(--brand-primary-dark, #1d4ed8);
   box-shadow:
     0 2px 4px rgba(37, 99, 235, 0.14),
     0 4px 10px rgba(147, 197, 253, 0.4);

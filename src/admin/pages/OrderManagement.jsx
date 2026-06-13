@@ -1,5 +1,13 @@
-import React, { useState } from 'react'
-import { MdExpandMore, MdCheckCircle, MdAccessTime, MdCancel } from 'react-icons/md'
+import { useState } from 'react'
+import { MdCheckCircle, MdAccessTime, MdCancel } from 'react-icons/md'
+import '../styles/admin.css'
+
+const STATUS_CONFIG = {
+  completed: { icon: MdCheckCircle, label: 'Completed' },
+  in_progress: { icon: MdAccessTime, label: 'In Progress' },
+  pending: { icon: MdAccessTime, label: 'Pending' },
+  cancelled: { icon: MdCancel, label: 'Cancelled' },
+}
 
 export const OrderManagement = ({ users, onUpdateOrder }) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -18,7 +26,11 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
     })
   }
 
-  // Collect all orders from all users
+  const orderServices = (order) =>
+    order.cartItems && order.cartItems.length > 0
+      ? order.cartItems.map((item) => item.title).join(', ')
+      : order.productName
+
   const allOrders = users.flatMap(user =>
     (user.orders || []).map(order => ({
       ...order,
@@ -29,9 +41,8 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
     }))
   ).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
-  // Filter and search
   const filteredOrders = allOrders.filter(order => {
-    const matchesSearch = 
+    const matchesSearch =
       order.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.productName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -41,67 +52,28 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
     return matchesSearch && matchesStatus
   })
 
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      'completed': { bg: '#D4EDDA', color: '#155724', icon: MdCheckCircle, label: 'Completed' },
-      'in_progress': { bg: '#D1ECF1', color: '#0C5460', icon: MdAccessTime, label: 'In Progress' },
-      'pending': { bg: '#FFF3CD', color: '#856404', icon: MdAccessTime, label: 'Pending' },
-      'cancelled': { bg: '#F8D7DA', color: '#721C24', icon: MdCancel, label: 'Cancelled' }
-    }
-    return statusConfig[status] || statusConfig['pending']
-  }
-
   const toggleOrder = (orderId) => {
-    setExpandedOrders(prev => ({
-      ...prev,
-      [orderId]: !prev[orderId]
-    }))
+    setExpandedOrders(prev => ({ ...prev, [orderId]: !prev[orderId] }))
   }
 
   const handleStatusUpdate = (orderId, newStatus) => {
     setUpdatingOrderId(orderId)
-    if (onUpdateOrder) {
-      onUpdateOrder(orderId, newStatus)
-    }
+    onUpdateOrder?.(orderId, newStatus)
     setTimeout(() => setUpdatingOrderId(null), 500)
   }
 
   return (
     <div>
-      <div style={{
-        display: 'flex',
-        gap: '16px',
-        marginBottom: '24px',
-        flexWrap: 'wrap'
-      }}>
+      <div className="adm-toolbar">
         <input
           type="text"
-          placeholder="Search by customer name, email or product..."
+          className="adm-input"
+          placeholder="Search by customer name, email or service..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            flex: '1',
-            minWidth: '250px',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: '1px solid #ddd',
-            fontSize: '14px',
-            fontFamily: 'inherit'
-          }}
         />
 
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          style={{
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: '1px solid #ddd',
-            fontSize: '14px',
-            fontFamily: 'inherit',
-            cursor: 'pointer'
-          }}
-        >
+        <select className="adm-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="all">All Statuses</option>
           <option value="pending">Pending</option>
           <option value="in_progress">In Progress</option>
@@ -111,213 +83,77 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
       </div>
 
       {filteredOrders.length === 0 ? (
-        <div style={{
-          backgroundColor: 'white',
-          padding: '48px 24px',
-          borderRadius: '8px',
-          textAlign: 'center',
-          color: '#666'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '12px' }}>📦</div>
+        <div className="adm-empty">
+          <div className="adm-empty-emoji">📦</div>
           <p>No orders found</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {filteredOrders.map((order, index) => {
-            const statusConfig = getStatusBadge(order.status)
+        <div className="adm-card-grid">
+          {filteredOrders.map((order) => {
+            const statusConfig = STATUS_CONFIG[order.status] || STATUS_CONFIG.pending
             const isExpanded = expandedOrders[order.id]
             const StatusIcon = statusConfig.icon
 
             return (
-              <div
-                key={order.id}
-                style={{
-                  backgroundColor: 'white',
-                  borderRadius: '8px',
-                  boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                  overflow: 'hidden',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 4px 12px 0 rgba(0, 102, 255, 0.15)'
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-                  e.currentTarget.style.transform = 'translateY(0)'
-                }}
-              >
-                <div
-                  onClick={() => toggleOrder(order.id)}
-                  style={{
-                    padding: '20px',
-                    cursor: 'pointer',
-                    display: 'grid',
-                    gridTemplateColumns: 'auto auto 1fr auto auto auto',
-                    gap: '16px',
-                    alignItems: 'center',
-                    backgroundColor: '#f9f9f9',
-                  }}
-                >
-                  <StatusIcon size={24} style={{ color: statusConfig.color }} />
-                  
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#0066FF', minWidth: '30px' }}>
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-                  
-                  <div style={{ flex: '1', minWidth: 0 }}>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#666' }}>
-                      {order.userName}
-                    </p>
-                    <p style={{ margin: '0 0 4px 0', fontSize: '13px', color: '#666' }}>
-                      📱 {order.userPhone}
-                    </p>
-                    <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#666' }}>
-                      ✉️ {order.userEmail}
-                    </p>
-                    <p style={{ margin: '0', fontSize: '14px', color: '#0066FF', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {order.cartItems && order.cartItems.length > 0 
-                        ? order.cartItems.map(item => item.title).join(', ')
-                        : order.productName}
-                    </p>
-                  </div>
+              <div key={order.id} className={`adm-card${isExpanded ? ' expanded' : ''}`}>
+                <div className="adm-card-top">
+                  <h3 className="adm-card-title">{order.userName}</h3>
+                  <span className={`adm-badge ${order.status}`}>
+                    <StatusIcon size={13} />
+                    {statusConfig.label}
+                  </span>
+                </div>
 
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{
-                      fontSize: '12px',
-                      color: '#999',
-                      marginBottom: '8px',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {formatDate(order.createdAt)}
-                    </div>
-                    <div style={{
-                      fontSize: '16px',
-                      fontWeight: '700',
-                      color: '#0066FF',
-                    }}>
+                <p className="adm-card-meta"><span>{order.userEmail}</span></p>
+                <p className="adm-card-meta"><span>{order.userPhone}</span></p>
+                <div className="adm-card-services">{orderServices(order)}</div>
+
+                <div className="adm-card-foot">
+                  <div>
+                    <div className="adm-card-amount">
                       ₦{order.totalAmount?.toLocaleString() || order.productPrice}
                     </div>
+                    <div className="adm-card-date">{formatDate(order.createdAt)}</div>
                   </div>
-
-                  <div style={{
-                    padding: '6px 12px',
-                    borderRadius: '4px',
-                    backgroundColor: statusConfig.bg,
-                    color: statusConfig.color,
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    {statusConfig.label}
-                  </div>
-
-                  <button
-                    onClick={() => toggleOrder(order.id)}
-                    style={{
-                      padding: '6px 12px',
-                      backgroundColor: '#0066FF',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
+                  <button type="button" className="adm-btn adm-btn-ghost" onClick={() => toggleOrder(order.id)}>
                     {isExpanded ? 'See Less' : 'See More'}
                   </button>
                 </div>
 
                 {isExpanded && (
-                  <div style={{
-                    padding: '20px',
-                    borderTop: '1px solid #eee',
-                    backgroundColor: '#fafafa'
-                  }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+                  <div className="adm-detail">
+                    <div className="adm-detail-grid">
                       <div>
-                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Service</div>
-                        <div style={{ fontSize: '14px', color: '#121212', fontWeight: '500' }}>
-                          {order.cartItems && order.cartItems.length > 0 
-                            ? order.cartItems.map(item => item.title).join(', ')
-                            : order.productName}
-                        </div>
+                        <div className="adm-detail-label">Service</div>
+                        <div className="adm-detail-value">{orderServices(order)}</div>
                       </div>
-
                       <div>
-                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Price</div>
-                        <div style={{ fontSize: '14px', color: '#121212', fontWeight: '500' }}>{order.productPrice}</div>
+                        <div className="adm-detail-label">Price</div>
+                        <div className="adm-detail-value">{order.productPrice}</div>
                       </div>
-
                       <div>
-                        <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px', fontWeight: '600' }}>Total Amount</div>
-                        <div style={{ fontSize: '14px', color: '#0066FF', fontWeight: '700' }}>
+                        <div className="adm-detail-label">Total Amount</div>
+                        <div className="adm-detail-value" style={{ color: 'var(--adm-primary)' }}>
                           ₦{order.totalAmount?.toLocaleString() || 'N/A'}
                         </div>
                       </div>
                     </div>
 
-                    {/* Cart Items */}
                     {order.cartItems && order.cartItems.length > 0 && (
-                      <div style={{
-                        marginBottom: '20px',
-                        paddingTop: '20px',
-                        borderTop: '1px solid #eee'
-                      }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
+                      <div>
+                        <div className="adm-detail-label" style={{ marginBottom: 10 }}>
                           Ordered Items ({order.cartItems.length})
                         </div>
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                          gap: '12px'
-                        }}>
+                        <div className="adm-item-grid">
                           {order.cartItems.map((item, idx) => (
-                            <div
-                              key={idx}
-                              style={{
-                                backgroundColor: '#f9f9f9',
-                                padding: '12px',
-                                borderRadius: '6px',
-                                border: '1px solid #eee'
-                              }}
-                            >
-                              <div style={{
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: '#121212',
-                                marginBottom: '4px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                              }}>
-                                {item.title}
-                              </div>
-                              {item.category && (
-                                <div style={{
-                                  fontSize: '13px',
-                                  color: '#666',
-                                  marginBottom: '8px'
-                                }}>
-                                  {item.category}
-                                </div>
-                              )}
-                              <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                fontSize: '12px'
-                              }}>
-                                <span style={{ color: '#0066FF', fontWeight: '600' }}>
+                            <div key={idx} className="adm-item-card">
+                              <div className="adm-item-card-title">{item.title}</div>
+                              {item.category && <div className="adm-item-card-cat">{item.category}</div>}
+                              <div className="adm-item-card-row">
+                                <span className="adm-item-card-price">
                                   ₦{item.price?.toLocaleString ? item.price.toLocaleString() : item.price || 'N/A'}
                                 </span>
-                                {item.quantity && (
-                                  <span style={{ color: '#999' }}>
-                                    Qty: {item.quantity}
-                                  </span>
-                                )}
+                                {item.quantity && <span className="adm-item-card-qty">Qty: {item.quantity}</span>}
                               </div>
                             </div>
                           ))}
@@ -325,63 +161,21 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                       </div>
                     )}
 
-                    {/* Services/Items */}
                     {order.services && order.services.length > 0 && (
-                      <div style={{
-                        marginBottom: '20px',
-                        paddingTop: '20px',
-                        borderTop: '1px solid #eee'
-                      }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
+                      <div>
+                        <div className="adm-detail-label" style={{ marginBottom: 10 }}>
                           Services ({order.services.length})
                         </div>
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                          gap: '12px'
-                        }}>
+                        <div className="adm-item-grid">
                           {order.services.map((service, idx) => (
-                            <div
-                              key={idx}
-                              style={{
-                                backgroundColor: '#f9f9f9',
-                                padding: '12px',
-                                borderRadius: '6px',
-                                border: '1px solid #eee'
-                              }}
-                            >
-                              <div style={{
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                color: '#121212',
-                                marginBottom: '4px',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                              }}>
-                                {service.title || service.name}
-                              </div>
-                              <div style={{
-                                fontSize: '13px',
-                                color: '#666',
-                                marginBottom: '8px'
-                              }}>
-                                {service.category}
-                              </div>
-                              <div style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                fontSize: '12px'
-                              }}>
-                                <span style={{ color: '#0066FF', fontWeight: '600' }}>
+                            <div key={idx} className="adm-item-card">
+                              <div className="adm-item-card-title">{service.title || service.name}</div>
+                              {service.category && <div className="adm-item-card-cat">{service.category}</div>}
+                              <div className="adm-item-card-row">
+                                <span className="adm-item-card-price">
                                   ₦{service.price?.toLocaleString() || service.amount?.toLocaleString() || 'N/A'}
                                 </span>
-                                {service.quantity && (
-                                  <span style={{ color: '#999' }}>
-                                    Qty: {service.quantity}
-                                  </span>
-                                )}
+                                {service.quantity && <span className="adm-item-card-qty">Qty: {service.quantity}</span>}
                               </div>
                             </div>
                           ))}
@@ -390,86 +184,55 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                     )}
 
                     {(order.clientProfile || order.metadata?.clientProfile) && (
-                      <div style={{
-                        padding: '16px',
-                        backgroundColor: 'white',
-                        borderRadius: '6px',
-                        marginBottom: '20px',
-                        border: '1px solid #eee',
-                      }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
-                          Client profile
-                        </div>
-                        <pre style={{ fontSize: '12px', whiteSpace: 'pre-wrap', margin: 0 }}>
+                      <div>
+                        <div className="adm-detail-label" style={{ marginBottom: 10 }}>Client profile</div>
+                        <pre className="adm-pre">
                           {JSON.stringify(order.clientProfile || order.metadata?.clientProfile, null, 2)}
                         </pre>
                       </div>
                     )}
 
                     {((order.projectSubmissions || order.metadata?.projectSubmissions || []).length > 0) && (
-                      <div style={{
-                        padding: '16px',
-                        backgroundColor: 'white',
-                        borderRadius: '6px',
-                        marginBottom: '20px',
-                        border: '1px solid #eee',
-                      }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
+                      <div>
+                        <div className="adm-detail-label" style={{ marginBottom: 10 }}>
                           Project onboarding submissions
                         </div>
                         {(order.projectSubmissions || order.metadata?.projectSubmissions || []).map((entry, idx) => (
-                          <div key={idx} style={{ marginBottom: '12px', padding: '10px', background: '#f5f5f5', borderRadius: '6px' }}>
-                            <div style={{ fontWeight: 600, marginBottom: '6px' }}>
+                          <div key={idx} style={{ marginBottom: 12 }}>
+                            <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 6 }}>
                               {entry.formType} — {entry.title || 'Service'}
                             </div>
-                            <pre style={{ fontSize: '12px', whiteSpace: 'pre-wrap', margin: 0 }}>
-                              {JSON.stringify(entry.formData || entry, null, 2)}
-                            </pre>
+                            <pre className="adm-pre">{JSON.stringify(entry.formData || entry, null, 2)}</pre>
                           </div>
                         ))}
                       </div>
                     )}
 
-                    {/* Submission Details */}
                     {(order.postTitle || order.postBody || order.articleContent || order.fileName) && (
-                      <div style={{
-                        padding: '16px',
-                        backgroundColor: 'white',
-                        borderRadius: '6px',
-                        marginBottom: '20px',
-                        border: '1px solid #eee'
-                      }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
-                          📝 Submission Details
-                        </div>
+                      <div>
+                        <div className="adm-detail-label" style={{ marginBottom: 10 }}>Submission Details</div>
                         {order.postTitle && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Title</div>
-                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
-                              {order.postTitle}
-                            </div>
+                          <div style={{ marginBottom: 10 }}>
+                            <div className="adm-detail-label">Post Title</div>
+                            <div className="adm-detail-value">{order.postTitle}</div>
                           </div>
                         )}
                         {order.postBody && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Post Body</div>
-                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto' }}>
-                              {order.postBody}
-                            </div>
+                          <div style={{ marginBottom: 10 }}>
+                            <div className="adm-detail-label">Post Body</div>
+                            <pre className="adm-pre">{order.postBody}</pre>
                           </div>
                         )}
                         {order.articleContent && (
-                          <div style={{ marginBottom: '12px' }}>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Content / Notes</div>
-                            <div style={{ fontSize: '13px', color: '#333', lineHeight: '1.5', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '120px', overflow: 'auto' }}>
-                              {order.articleContent}
-                            </div>
+                          <div style={{ marginBottom: 10 }}>
+                            <div className="adm-detail-label">Content / Notes</div>
+                            <pre className="adm-pre">{order.articleContent}</pre>
                           </div>
                         )}
                         {order.fileName && (
                           <div>
-                            <div style={{ fontSize: '12px', color: '#999', marginBottom: '4px' }}>Uploaded File</div>
-                            <div style={{ fontSize: '13px', color: '#0066FF', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', wordBreak: 'break-all' }}>
+                            <div className="adm-detail-label">Uploaded File</div>
+                            <div className="adm-detail-value" style={{ color: 'var(--adm-primary)' }}>
                               📎 {order.fileName}
                             </div>
                           </div>
@@ -477,90 +240,44 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                       </div>
                     )}
 
-                    {/* Additional Metadata */}
                     {order.metadata && Object.keys(order.metadata).length > 0 && (
-                      <div style={{
-                        padding: '16px',
-                        backgroundColor: 'white',
-                        borderRadius: '6px',
-                        marginBottom: '20px',
-                        border: '1px solid #eee'
-                      }}>
-                        <div style={{ fontSize: '14px', fontWeight: '600', color: '#121212', marginBottom: '12px' }}>
-                          Additional Information
-                        </div>
+                      <div>
+                        <div className="adm-detail-label" style={{ marginBottom: 10 }}>Additional Information</div>
                         {Object.entries(order.metadata).map(([key, value]) => (
-                          <div key={key} style={{ marginBottom: '8px', fontSize: '13px' }}>
-                            <strong style={{ color: '#666' }}>{key}:</strong>
-                            <div style={{ color: '#333', marginTop: '4px', padding: '8px', backgroundColor: '#f5f5f5', borderRadius: '4px', maxHeight: '100px', overflow: 'auto' }}>
-                              {String(value)}
-                            </div>
+                          <div key={key} style={{ marginBottom: 8, fontSize: 13 }}>
+                            <strong style={{ color: 'var(--adm-text-soft)' }}>{key}:</strong>
+                            <pre className="adm-pre" style={{ marginTop: 4 }}>{String(value)}</pre>
                           </div>
                         ))}
                       </div>
                     )}
 
-                    {/* Status Update Buttons */}
                     {order.status !== 'completed' && (
-                      <div style={{
-                        display: 'flex',
-                        gap: '8px',
-                        flexWrap: 'wrap'
-                      }}>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                         {order.status !== 'in_progress' && (
                           <button
-                            onClick={() => handleStatusUpdate(order.id, 'in_progress')}
+                            type="button"
+                            className="adm-btn adm-btn-warn"
                             disabled={updatingOrderId === order.id}
-                            style={{
-                              padding: '10px 16px',
-                              backgroundColor: '#D1ECF1',
-                              color: '#0C5460',
-                              border: '1px solid #0C5460',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              fontWeight: '600',
-                              fontSize: '13px',
-                              transition: 'all 0.2s',
-                              opacity: updatingOrderId === order.id ? 0.6 : 1
-                            }}
+                            onClick={() => handleStatusUpdate(order.id, 'in_progress')}
                           >
                             Mark In Progress
                           </button>
                         )}
                         <button
-                          onClick={() => handleStatusUpdate(order.id, 'completed')}
+                          type="button"
+                          className="adm-btn adm-btn-success"
                           disabled={updatingOrderId === order.id}
-                          style={{
-                            padding: '10px 16px',
-                            backgroundColor: '#D4EDDA',
-                            color: '#155724',
-                            border: '1px solid #155724',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontWeight: '600',
-                            fontSize: '13px',
-                            transition: 'all 0.2s',
-                            opacity: updatingOrderId === order.id ? 0.6 : 1
-                          }}
+                          onClick={() => handleStatusUpdate(order.id, 'completed')}
                         >
                           Mark Completed
                         </button>
                         {order.status !== 'cancelled' && (
                           <button
-                            onClick={() => handleStatusUpdate(order.id, 'cancelled')}
+                            type="button"
+                            className="adm-btn adm-btn-danger"
                             disabled={updatingOrderId === order.id}
-                            style={{
-                              padding: '10px 16px',
-                              backgroundColor: '#F8D7DA',
-                              color: '#721C24',
-                              border: '1px solid #721C24',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              fontWeight: '600',
-                              fontSize: '13px',
-                              transition: 'all 0.2s',
-                              opacity: updatingOrderId === order.id ? 0.6 : 1
-                            }}
+                            onClick={() => handleStatusUpdate(order.id, 'cancelled')}
                           >
                             Cancel
                           </button>
@@ -575,14 +292,7 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
         </div>
       )}
 
-      <div style={{
-        marginTop: '24px',
-        padding: '16px',
-        backgroundColor: '#0066FF10',
-        borderRadius: '8px',
-        fontSize: '14px',
-        color: '#666'
-      }}>
+      <div className="adm-count-note">
         Showing {filteredOrders.length} of {allOrders.length} orders
       </div>
     </div>

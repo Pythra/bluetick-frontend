@@ -14,6 +14,7 @@ import bluegoLogo from '../assets/bluego.png';
 import { companyWhatsappDemoDisplay, companyWhatsappDemoUrl } from '../config/companyContact';
 import PlaceOrderDropdown from './PlaceOrderDropdown';
 import { legalDocuments } from '../data/legalDocuments';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import './Footer.css';
 
 const footerLegalLinks = [
@@ -28,13 +29,15 @@ const footerLegalLinks = [
 
 function Footer({ onScrollToSection }) {
   const [logoError, setLogoError] = useState(false);
+  const { isPartnerSite, brandName, shortName, contactEmail, tagline } = usePartnerBranding();
+  const displayName = shortName || brandName;
 
   return (
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-top">
           <div className="logo-container">
-            {!logoError ? (
+            {!logoError && !isPartnerSite ? (
               <img
                 src={bluegoLogo}
                 alt="Bluetickgeng"
@@ -42,14 +45,18 @@ function Footer({ onScrollToSection }) {
                 onError={() => setLogoError(true)}
               />
             ) : (
-              <h2 className="logo-text">Bluetickgeng</h2>
+              <h2 className="logo-text">{displayName}</h2>
             )}
           </div>
           <p className="footer-top-title">
-            Your Brand Across Top Local and International Media Platforms
+            {isPartnerSite
+              ? `${displayName} — Your Brand Across Top Local and International Media Platforms`
+              : 'Your Brand Across Top Local and International Media Platforms'}
           </p>
           <p className="footer-top-subtitle">
-            Web, app, social verification, monetization, and digital publication support from one team.
+            {isPartnerSite
+              ? tagline
+              : 'Web, app, social verification, monetization, and digital publication support from one team.'}
           </p>
           <PlaceOrderDropdown
             label="Choose Package"
@@ -128,7 +135,7 @@ function Footer({ onScrollToSection }) {
                 </a>
               </li>
               <li>
-                <a href="mailto:info@bluetickgeng.com">Contact Support</a>
+                <a href={`mailto:${contactEmail}`}>Contact Support</a>
               </li>
               <li>
                 <Link to="/refund-policy">Refund Policy</Link>
@@ -139,9 +146,9 @@ function Footer({ onScrollToSection }) {
           <div className="footer-section">
             <h3 className="footer-title">Contact Us</h3>
             <div className="contact-info">
-              <a href="mailto:info@bluetickgeng.com" className="contact-link">
+              <a href={`mailto:${contactEmail}`} className="contact-link">
                 <IoMailOutline className="contact-icon" />
-                <span>info@bluetickgeng.com</span>
+                <span>{contactEmail}</span>
               </a>
               <a href="tel:+2349069431949" className="contact-link">
                 <IoCallOutline className="contact-icon" />

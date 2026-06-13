@@ -1,13 +1,33 @@
 import { useNavigate } from 'react-router-dom';
-import { FaHandshake, FaArrowRight } from 'react-icons/fa';
+import { FaHandshake, FaArrowRight, FaCheckCircle } from 'react-icons/fa';
+import partnerImage from '../assets/partner.png';
+import portraitPartnerImage from '../assets/potraitpartner.png';
 import './PartnerWithUsSection.css';
+
+const partnerHighlights = [
+  'Set your own prices above our base rate — you keep the profit on every sale',
+  'Launch a white-label website and sell Bluetick services under your brand',
+  'Earn referral commissions with flexible payouts via bank, Wise, PayPal, or USDT',
+];
 
 function PartnerWithUsSection() {
   const navigate = useNavigate();
 
   return (
     <section className="partner-section" aria-label="Partner with us">
-      <div className="partner-bg-overlay" />
+      <div className="partner-bg-overlay" aria-hidden="true">
+        <picture className="partner-bg-picture">
+          <source media="(max-width: 640px)" srcSet={portraitPartnerImage} />
+          <img
+            src={partnerImage}
+            alt=""
+            className="partner-bg-image"
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+        <div className="partner-bg-tint" />
+      </div>
       <div className="partner-content-wrapper">
         <div className="partner-content">
           <div className="partner-badge">
@@ -41,6 +61,15 @@ function PartnerWithUsSection() {
               <span className="partner-stat-label">Countries</span>
             </div>
           </div>
+
+          <ul className="partner-mobile-highlights" aria-label="Partner program benefits">
+            {partnerHighlights.map((highlight) => (
+              <li key={highlight}>
+                <FaCheckCircle className="partner-mobile-highlights-icon" aria-hidden="true" />
+                <span>{highlight}</span>
+              </li>
+            ))}
+          </ul>
           
           <button
             type="button"

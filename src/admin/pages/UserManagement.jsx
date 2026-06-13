@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import '../styles/admin.css'
 
 export const UserManagement = ({ users }) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -35,40 +36,16 @@ export const UserManagement = ({ users }) => {
 
   return (
     <div>
-      <div style={{
-        display: 'flex',
-        gap: '16px',
-        marginBottom: '24px',
-        flexWrap: 'wrap'
-      }}>
+      <div className="adm-toolbar">
         <input
           type="text"
+          className="adm-input"
           placeholder="Search users by name, email or phone..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            flex: '1',
-            minWidth: '250px',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: '1px solid #ddd',
-            fontSize: '14px',
-            fontFamily: 'inherit'
-          }}
         />
-        
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          style={{
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: '1px solid #ddd',
-            fontSize: '14px',
-            fontFamily: 'inherit',
-            cursor: 'pointer'
-          }}
-        >
+
+        <select className="adm-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
           <option value="name">Name (A-Z)</option>
@@ -76,99 +53,30 @@ export const UserManagement = ({ users }) => {
       </div>
 
       {sortedUsers.length === 0 ? (
-        <div style={{
-          backgroundColor: 'white',
-          padding: '48px 24px',
-          borderRadius: '8px',
-          textAlign: 'center',
-          color: '#666'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '12px' }}>👥</div>
+        <div className="adm-empty">
+          <div className="adm-empty-emoji">👥</div>
           <p>No users found</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="adm-card-grid">
           {sortedUsers.map((user) => (
-            <div
-              key={user.id}
-              style={{
-                backgroundColor: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                transition: 'all 0.2s ease',
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = '0 4px 12px 0 rgba(0, 102, 255, 0.15)'
-                e.currentTarget.style.transform = 'translateX(4px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              <div style={{ flex: '1' }}>
-                <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600', color: '#121212' }}>
-                  {user.firstName} {user.lastName}
-                </h3>
-                <p style={{ margin: '4px 0', fontSize: '14px', color: '#666' }}>
-                  📧 {user.email}
-                </p>
-                <p style={{ margin: '4px 0', fontSize: '14px', color: '#666' }}>
-                  📱 {user.phone}
-                </p>
-                <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#999' }}>
-                  Joined {formatDate(user.createdAt)}
-                </p>
+            <div key={user.id} className="adm-card">
+              <div className="adm-card-top">
+                <h3 className="adm-card-title">{user.firstName} {user.lastName}</h3>
+                <span className="adm-badge live">Active</span>
               </div>
-
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '0 0 0 24px',
-                borderLeft: '1px solid #eee'
-              }}>
-                <div style={{
-                  textAlign: 'right'
-                }}>
-                  <div style={{
-                    fontSize: '12px',
-                    color: '#666',
-                    marginBottom: '4px'
-                  }}>
-                    ID: {user.id.slice(-8)}
-                  </div>
-                  <div style={{
-                    display: 'inline-block',
-                    padding: '4px 12px',
-                    backgroundColor: '#0066FF20',
-                    color: '#0066FF',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    fontWeight: '600'
-                  }}>
-                    Active
-                  </div>
-                </div>
+              <p className="adm-card-meta"><span>{user.email}</span></p>
+              <p className="adm-card-meta"><span>{user.phone}</span></p>
+              <div className="adm-card-foot">
+                <span className="adm-card-date">Joined {formatDate(user.createdAt)}</span>
+                <span className="adm-card-date">ID: {user.id.slice(-8)}</span>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <div style={{
-        marginTop: '24px',
-        padding: '16px',
-        backgroundColor: '#0066FF10',
-        borderRadius: '8px',
-        fontSize: '14px',
-        color: '#666'
-      }}>
+      <div className="adm-count-note">
         Showing {sortedUsers.length} of {users.length} users
       </div>
     </div>

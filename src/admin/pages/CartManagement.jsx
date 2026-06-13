@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
+import '../styles/admin.css'
 
 export const CartManagement = ({ users }) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -14,8 +15,7 @@ export const CartManagement = ({ users }) => {
     })
   }
 
-  // Get users with active carts
-  const usersWithCarts = users.filter(user => 
+  const usersWithCarts = users.filter(user =>
     user.cart?.items && user.cart.items.length > 0
   )
 
@@ -35,178 +35,63 @@ export const CartManagement = ({ users }) => {
 
   return (
     <div>
-      <div style={{
-        display: 'flex',
-        gap: '16px',
-        marginBottom: '24px',
-        flexWrap: 'wrap'
-      }}>
+      <div className="adm-toolbar">
         <input
           type="text"
+          className="adm-input"
           placeholder="Search by user name or email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            flex: '1',
-            minWidth: '250px',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            border: '1px solid #ddd',
-            fontSize: 'clamp(12px, 2vw, 14px)',
-            fontFamily: 'inherit'
-          }}
         />
       </div>
 
       {filteredUsers.length === 0 ? (
-        <div style={{
-          backgroundColor: 'white',
-          padding: '48px 24px',
-          borderRadius: '8px',
-          textAlign: 'center',
-          color: '#666'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '12px' }}>🛒</div>
+        <div className="adm-empty">
+          <div className="adm-empty-emoji">🛒</div>
           <p>{searchTerm ? 'No matching carts found' : 'No active carts'}</p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="adm-card-grid">
           {filteredUsers.map((user) => {
             const cartTotal = calculateCartTotal(user.cart.items)
             return (
-              <div
-                key={user.id}
-                style={{
-                  backgroundColor: 'white',
-                  padding: '20px',
-                  borderRadius: '8px',
-                  boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 4px 12px 0 rgba(0, 102, 255, 0.15)'
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-                  e.currentTarget.style.transform = 'translateY(0)'
-                }}
-              >
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  marginBottom: '16px',
-                  paddingBottom: '16px',
-                  borderBottom: '1px solid #eee',
-                  flexWrap: 'wrap',
-                  gap: '16px'
-                }}>
-                  <div style={{ minWidth: '200px' }}>
-                    <h3 style={{ margin: '0 0 4px 0', fontSize: '16px', fontWeight: '600', color: '#121212' }}>
-                      {user.firstName} {user.lastName}
-                    </h3>
-                    <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
-                      {user.email}
-                    </p>
-                  </div>
-
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-end',
-                    gap: '8px'
-                  }}>
-                    <div style={{
-                      fontSize: '18px',
-                      fontWeight: '700',
-                      color: '#0066FF'
-                    }}>
-                      ₦{cartTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-                    </div>
-                    <div style={{
-                      fontSize: '12px',
-                      color: '#666'
-                    }}>
-                      {user.cart.items.length} item{user.cart.items.length !== 1 ? 's' : ''}
-                    </div>
-                  </div>
+              <div key={user.id} className="adm-card">
+                <div className="adm-card-top">
+                  <h3 className="adm-card-title">{user.firstName} {user.lastName}</h3>
+                  <span className="adm-badge neutral">
+                    {user.cart.items.length} item{user.cart.items.length !== 1 ? 's' : ''}
+                  </span>
                 </div>
+                <p className="adm-card-meta"><span>{user.email}</span></p>
 
-                {/* Cart Items */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-                  gap: '12px'
-                }}>
+                <div className="adm-item-grid">
                   {user.cart.items.map((item, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        backgroundColor: '#f9f9f9',
-                        padding: '12px',
-                        borderRadius: '6px',
-                        border: '1px solid #eee'
-                      }}
-                    >
-                      <div style={{
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#121212',
-                        marginBottom: '4px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}>
-                        {item.title}
-                      </div>
-                      <div style={{
-                        fontSize: '13px',
-                        color: '#666',
-                        marginBottom: '8px'
-                      }}>
-                        {item.category}
-                      </div>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        fontSize: '12px'
-                      }}>
-                        <span style={{ color: '#0066FF', fontWeight: '600' }}>
-                          {item.price}
-                        </span>
-                        <span style={{ color: '#999' }}>
-                          Qty: {item.quantity}
-                        </span>
+                    <div key={idx} className="adm-item-card">
+                      <div className="adm-item-card-title">{item.title}</div>
+                      {item.category && <div className="adm-item-card-cat">{item.category}</div>}
+                      <div className="adm-item-card-row">
+                        <span className="adm-item-card-price">{item.price}</span>
+                        <span className="adm-item-card-qty">Qty: {item.quantity}</span>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {user.cart.updatedAt && (
-                  <div style={{
-                    marginTop: '12px',
-                    fontSize: '12px',
-                    color: '#999'
-                  }}>
-                    Last updated: {formatDate(user.cart.updatedAt)}
+                <div className="adm-card-foot">
+                  <div className="adm-card-amount">
+                    ₦{cartTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}
                   </div>
-                )}
+                  {user.cart.updatedAt && (
+                    <span className="adm-card-date">Updated {formatDate(user.cart.updatedAt)}</span>
+                  )}
+                </div>
               </div>
             )
           })}
         </div>
       )}
 
-      <div style={{
-        marginTop: '24px',
-        padding: '16px',
-        backgroundColor: '#0066FF10',
-        borderRadius: '8px',
-        fontSize: '14px',
-        color: '#666'
-      }}>
+      <div className="adm-count-note">
         {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''} with active carts out of {users.length} total users
       </div>
     </div>

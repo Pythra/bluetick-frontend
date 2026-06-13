@@ -8,6 +8,7 @@ import {
 import Navbar from './Navbar';
 import PlaceOrderDropdown from './PlaceOrderDropdown';
 import { useAuth } from '../contexts/AuthContext';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
 import CountryFlag from './CountryFlag';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -58,6 +59,8 @@ const impactStats = [
 function LandingPage({ onScrollToSection }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { isPartnerSite, brandName, shortName, tagline } = usePartnerBranding();
+  const displayName = shortName || brandName;
   const { currency, setCurrency, currencies } = useCurrency();
   const selectedCurrency = getCurrencyByCode(currency);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -127,14 +130,16 @@ function LandingPage({ onScrollToSection }) {
       <div className="landing-hero-shell">
         <div className="landing-hero-grid">
           <div className="landing-copy">
-            <p className="landing-kicker">Digital Growth Services for Brands</p>
+            <p className="landing-kicker">
+              {isPartnerSite ? `${displayName} — Digital Growth Services` : 'Digital Growth Services for Brands'}
+            </p>
             <h1 className="landing-title">
               Build, Verify, Monetize, and Feature Your Brand Across Top Platforms
             </h1>
             <p className="landing-description">
-              From websites and mobile apps to social verification, monetization, PR distribution,
-              Instagram promotions, and Wikipedia pages, we deliver end-to-end services designed
-              for business growth and credibility.
+              {isPartnerSite
+                ? tagline
+                : 'From websites and mobile apps to social verification, monetization, PR distribution, Instagram promotions, and Wikipedia pages, we deliver end-to-end services designed for business growth and credibility.'}
             </p>
 
             <div
@@ -211,7 +216,9 @@ function LandingPage({ onScrollToSection }) {
                     className={`landing-media-slide ${index === activeSlide ? 'active' : ''}`}
                     aria-hidden={index !== activeSlide}
                   >
-                    <p className="landing-media-kicker">Bluetick Services</p>
+                    <p className="landing-media-kicker">
+                      {isPartnerSite ? `${displayName} Services` : 'Bluetick Services'}
+                    </p>
                     <h2>{slide.title}</h2>
                     <p className="landing-media-description">{slide.description}</p>
                   </div>
