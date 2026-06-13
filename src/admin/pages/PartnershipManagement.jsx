@@ -181,7 +181,16 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
             return (
               <div key={app.id} className={`adm-card${isExpanded ? ' expanded' : ''}`}>
                 <div className="adm-card-top">
-                  <h3 className="adm-card-title">{brandName}</h3>
+                  <h3 className="adm-card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {app.logoUrl ? (
+                      <img
+                        src={app.logoUrl}
+                        alt=""
+                        style={{ width: 26, height: 26, objectFit: 'contain', borderRadius: 6, flexShrink: 0 }}
+                      />
+                    ) : null}
+                    {brandName}
+                  </h3>
                   <span className={`adm-badge ${app.status}`}>{STATUS_LABELS[app.status] || app.status}</span>
                 </div>
 
