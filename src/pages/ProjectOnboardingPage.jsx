@@ -7,10 +7,12 @@ import Footer from '../components/Footer';
 import Button from '../components/Button';
 import DynamicProjectForm from '../components/DynamicProjectForm';
 import { FORM_TYPES } from '../data/projectOnboardingForms';
+import { usePartnerText } from '../utils/partnerText';
 import './ProjectOnboardingPage.css';
 
 function ProjectOnboardingPage() {
   const navigate = useNavigate();
+  const { supportEmail } = usePartnerText();
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
   const { isAuthenticated, apiUrl, authFetch, user } = useAuth();
@@ -181,7 +183,7 @@ function ProjectOnboardingPage() {
 
           <p className="project-onboarding-help">
             Need help? Email{' '}
-            <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a> or{' '}
+            <a href={`mailto:${supportEmail}`}>{supportEmail}</a> or{' '}
             <Link to="/account">view your account</Link>.
           </p>
         </div>

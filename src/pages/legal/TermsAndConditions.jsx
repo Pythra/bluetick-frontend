@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import { usePartnerText } from '../../utils/partnerText';
 import './LegalPages.css';
 
 const TermsAndConditions = () => {
+  const { brandName, supportEmail } = usePartnerText();
   return (
     <div className="legal-page">
       <Navbar />
@@ -14,7 +16,7 @@ const TermsAndConditions = () => {
         
         <section className="legal-section">
           <h2>1. Introduction</h2>
-          <p>Welcome to Bluetickgeng Development. These Terms and Conditions govern your use of our website and services. By accessing or using our services, you agree to be bound by these terms.</p>
+          <p>Welcome to {brandName}. These Terms and Conditions govern your use of our website and services. By accessing or using our services, you agree to be bound by these terms.</p>
         </section>
 
         <section className="legal-section">
@@ -29,12 +31,12 @@ const TermsAndConditions = () => {
 
         <section className="legal-section">
           <h2>4. Intellectual Property</h2>
-          <p>All content, including text, graphics, logos, and software, is the property of Bluetickgeng Development or its content suppliers and is protected by intellectual property laws.</p>
+          <p>All content, including text, graphics, logos, and software, is the property of {brandName} or its content suppliers and is protected by intellectual property laws.</p>
         </section>
 
         <section className="legal-section">
           <h2>5. Limitation of Liability</h2>
-          <p>Bluetickgeng Development shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use or inability to use our services.</p>
+          <p>{brandName} shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use or inability to use our services.</p>
         </section>
 
         <section className="legal-section">
@@ -49,7 +51,7 @@ const TermsAndConditions = () => {
 
         <section className="legal-section">
           <h2>8. Contact Us</h2>
-          <p>If you have any questions about these Terms and Conditions, please contact us at <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>.</p>
+          <p>If you have any questions about these Terms and Conditions, please contact us at <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.</p>
         </section>
       </div>
       <Footer />

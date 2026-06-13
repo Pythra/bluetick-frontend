@@ -6,10 +6,12 @@ import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { usePartnerText } from '../utils/partnerText';
 import './CheckoutPage.css';
 
 function CheckoutPage() {
   const navigate = useNavigate();
+  const { supportEmail } = usePartnerText();
   const [searchParams, setSearchParams] = useSearchParams();
   const { isAuthenticated, apiUrl, authFetch } = useAuth();
   const { currency, convert, format } = useCurrency();
@@ -754,7 +756,7 @@ function CheckoutPage() {
                 <IoShieldCheckmarkOutline aria-hidden="true" />
                 <p>
                   Secured by {isInternationalCheckout ? 'Flutterwave' : 'Paystack'}. Questions?{' '}
-                  <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>
+                  <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
                 </p>
               </div>
             </aside>

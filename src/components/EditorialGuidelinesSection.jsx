@@ -1,13 +1,15 @@
+import { usePartnerText } from '../utils/partnerText';
 import './EditorialGuidelinesSection.css';
 
 function EditorialGuidelinesSection() {
+  const { shortBrandName } = usePartnerText();
   return (
     <section className="editorial-guidelines-section" id="editorial-guidelines">
       <div className="editorial-guidelines-inner">
         <h2 className="editorial-guidelines-title">Editorial Guidelines</h2>
 
         <p className="editorial-guidelines-lead">
-          At Bluetickgeng, we prioritize legitimate news and timely announcements. All press releases
+          At {shortBrandName}, we prioritize legitimate news and timely announcements. All press releases
           must be newsworthy, covering company events, expansions, milestones, financial reports,
           competitions, or other significant developments.
         </p>
@@ -48,7 +50,7 @@ function EditorialGuidelinesSection() {
         <ul className="editorial-guidelines-list">
           <li>Press releases must be properly formatted, with each paragraph separated by a line break.</li>
           <li>
-            All submissions must be free of spelling and grammatical errors. Bluetickgeng does not
+            All submissions must be free of spelling and grammatical errors. {shortBrandName} does not
             proofread or edit content submitted for publication.
           </li>
           <li>
@@ -79,13 +81,13 @@ function EditorialGuidelinesSection() {
 
         <h3 className="editorial-guidelines-heading">Editorial and Compliance Policies</h3>
         <p className="editorial-guidelines-text">
-          Bluetickgeng reserves the right to reject, modify, or delete any content deemed offensive,
+          {shortBrandName} reserves the right to reject, modify, or delete any content deemed offensive,
           slanderous, racist, inflammatory, sexually explicit, or promoting violence or terrorism.
         </p>
         <ul className="editorial-guidelines-list">
           <li>
             If a press release contains grandiose claims (e.g., endorsements, partnerships, or
-            extraordinary achievements), Bluetickgeng may request additional proof before publication.
+            extraordinary achievements), {shortBrandName} may request additional proof before publication.
           </li>
           <li>
             All submissions must be sent from a valid business email address. If authenticity is
@@ -93,7 +95,7 @@ function EditorialGuidelinesSection() {
           </li>
           <li>
             If a press release does not meet our editorial standards, clients may opt for
-            Bluetickgeng&apos;s Editorial Service, starting at ₦20,000 (+VAT), to refine and optimize
+            {shortBrandName}&apos;s Editorial Service, starting at ₦20,000 (+VAT), to refine and optimize
             the content.
           </li>
         </ul>
@@ -102,7 +104,7 @@ function EditorialGuidelinesSection() {
 
         <h3 className="editorial-guidelines-heading">Reasons for Refusal of Distribution</h3>
         <p className="editorial-guidelines-text">
-          Bluetickgeng may refuse to distribute a press release for the following reasons:
+          {shortBrandName} may refuse to distribute a press release for the following reasons:
         </p>
         <ul className="editorial-guidelines-list">
           <li>Poor headline — The headline lacks a clear news angle and/or attribution to the issuer.</li>
@@ -150,7 +152,7 @@ function EditorialGuidelinesSection() {
 
         <h3 className="editorial-guidelines-heading">Agreement</h3>
         <p className="editorial-guidelines-text">
-          By submitting a press release to Bluetickgeng, you acknowledge and agree to comply with these
+          By submitting a press release to {shortBrandName}, you acknowledge and agree to comply with these
           editorial guidelines. Failure to meet these standards may result in rejection or removal of
           the submission.
         </p>

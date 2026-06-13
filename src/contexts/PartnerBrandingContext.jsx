@@ -6,6 +6,7 @@ const DEFAULT_BRANDING = {
   isPartnerSite: false,
   brandName: 'Bluetickgeng Development',
   shortName: 'Bluetickgeng',
+  logoUrl: null,
   subdomain: null,
   siteUrl: null,
   contactEmail: 'info@bluetickgeng.com',

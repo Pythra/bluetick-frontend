@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import { usePartnerText } from '../../utils/partnerText';
 import './LegalPages.css';
 
 const PrivacyPolicy = () => {
+  const { brandName, supportEmail } = usePartnerText();
   return (
     <div className="legal-page">
       <Navbar />
@@ -14,7 +16,7 @@ const PrivacyPolicy = () => {
         
         <section className="legal-section">
           <h2>1. Introduction</h2>
-          <p>At Bluetickgeng Development, we respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you use our services.</p>
+          <p>At {brandName}, we respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you use our services.</p>
         </section>
 
         <section className="legal-section">
@@ -78,7 +80,7 @@ const PrivacyPolicy = () => {
 
         <section className="legal-section">
           <h2>9. Contact Us</h2>
-          <p>If you have any questions about this Privacy Policy, please contact us at <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>.</p>
+          <p>If you have any questions about this Privacy Policy, please contact us at <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.</p>
         </section>
       </div>
       <Footer />

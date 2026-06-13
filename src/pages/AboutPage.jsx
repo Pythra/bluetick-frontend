@@ -8,6 +8,7 @@ import punchLogo from '../assets/punch.png';
 import businessDayLogo from '../assets/platforms/buisnessday.png';
 import vanguardLogo from '../assets/platforms/Vanguard.png';
 import PlatformLogo from '../components/PlatformLogo';
+import { usePartnerText } from '../utils/partnerText';
 import './AboutPage.css';
 
 const serviceGroups = [
@@ -78,6 +79,8 @@ const whyChoose = [
 
 function AboutPage() {
   const navigate = useNavigate();
+  const { branding, brandName, supportEmail } = usePartnerText();
+  const isPartnerSite = branding.isPartnerSite;
 
   return (
     <div className="about-page">
@@ -87,9 +90,9 @@ function AboutPage() {
         <div className="about-hero-inner">
           <div className="about-hero-text">
             <span className="about-eyebrow">About Us</span>
-            <h1>BluetickGeng Development</h1>
+            <h1>{brandName}</h1>
             <p>
-              Bluetickgeng Development is an international technology and digital solutions company
+              {brandName} is a technology and digital solutions company
               providing end-to-end services in mobile application development for iOS and Android,
               website and web application development, e-commerce solutions, digital marketing,
               branding, and online reputation management. With operations spanning Africa and the
@@ -103,13 +106,14 @@ function AboutPage() {
             </p>
           </div>
           <div className="about-hero-image">
-            <img src={teamMain} alt="The BluetickGeng Development team" />
+            <img src={teamMain} alt={`The ${brandName} team`} />
           </div>
         </div>
       </section>
 
       <section className="about-story">
         <div className="about-section-inner">
+          {!isPartnerSite && (
           <p>
             Founded in 2023 by entrepreneur and technology innovator Praise Davis, BluetickGeng
             Development was established with a vision to bridge the gap between technology, branding,
@@ -117,6 +121,7 @@ function AboutPage() {
             software development startup into a multidisciplinary digital solutions provider serving
             clients across multiple industries and international markets.
           </p>
+          )}
           <p>
             We believe that modern businesses need more than just a website or social media presence.
             They need powerful technology, strategic branding, media visibility, digital authority, and
@@ -156,7 +161,7 @@ function AboutPage() {
           <div className="about-split-text">
             <h2>Innovation Beyond Technology</h2>
             <p>
-              At BluetickGeng Development, we understand that visibility and credibility are just as
+              At {brandName}, we understand that visibility and credibility are just as
               important as technology. This understanding inspired our approach to combining software
               development with public relations, media exposure, and digital branding services.
             </p>
@@ -168,11 +173,12 @@ function AboutPage() {
             </p>
           </div>
           <div className="about-split-image">
-            <img src={teamCrew} alt="BluetickGeng Development crew" />
+            <img src={teamCrew} alt={`${brandName} crew`} />
           </div>
         </div>
       </section>
 
+      {!isPartnerSite && (
       <section className="about-recognition">
         <div className="about-section-inner">
           <div className="about-section-head">
@@ -209,7 +215,9 @@ function AboutPage() {
           </div>
         </div>
       </section>
+      )}
 
+      {!isPartnerSite && (
       <section className="about-expansion">
         <div className="about-section-inner">
           <h2>Global Expansion</h2>
@@ -226,6 +234,7 @@ function AboutPage() {
           </p>
         </div>
       </section>
+      )}
 
       <section className="about-mv">
         <div className="about-section-inner about-mv-grid">
@@ -250,7 +259,7 @@ function AboutPage() {
 
       <section className="about-why">
         <div className="about-section-inner">
-          <h2>Why Choose BluetickGeng Development?</h2>
+          <h2>Why Choose {brandName}?</h2>
           <p className="about-why-lead">We don&apos;t simply build websites or mobile apps.</p>
           <ul className="about-why-list">
             {whyChoose.map((line) => (
@@ -260,7 +269,7 @@ function AboutPage() {
           <p>
             Whether you&apos;re launching a startup, growing an established business, building a personal
             brand, seeking media exposure, obtaining social media verification, creating a Wikipedia
-            page, or developing a custom software solution, BluetickGeng Development provides the
+            page, or developing a custom software solution, {brandName} provides the
             expertise, innovation, and strategic support needed to achieve your goals.
           </p>
           <p>
@@ -276,13 +285,17 @@ function AboutPage() {
             <h2>Connect With Us Today</h2>
             <p>Let&apos;s build, grow, and scale your digital presence together.</p>
             <div className="about-contact-details">
-              <a href="https://www.bluetickgeng.com" target="_blank" rel="noopener noreferrer">
-                www.bluetickgeng.com
-              </a>
-              <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>
-              <a href="https://wa.me/2349138832111" target="_blank" rel="noopener noreferrer">
-                WhatsApp: +234 913 883 2111
-              </a>
+              {!isPartnerSite && (
+                <a href="https://www.bluetickgeng.com" target="_blank" rel="noopener noreferrer">
+                  www.bluetickgeng.com
+                </a>
+              )}
+              <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
+              {!isPartnerSite && (
+                <a href="https://wa.me/2349138832111" target="_blank" rel="noopener noreferrer">
+                  WhatsApp: +234 913 883 2111
+                </a>
+              )}
             </div>
             <button type="button" className="about-cta-button" onClick={() => navigate('/signup')}>
               Get Started

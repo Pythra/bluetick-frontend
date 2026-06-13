@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import { usePartnerText } from '../../utils/partnerText';
 import './LegalPages.css';
 
 const RefundPolicy = () => {
+  const { brandName, supportEmail } = usePartnerText();
   return (
     <div className="legal-page">
       <Navbar />
@@ -14,7 +16,7 @@ const RefundPolicy = () => {
         
         <section className="legal-section">
           <h2>1. General Refund Policy</h2>
-          <p>At Bluetickgeng Development, we strive to ensure complete customer satisfaction with our services. This Refund Policy outlines the terms and conditions for requesting refunds for our digital services.</p>
+          <p>At {brandName}, we strive to ensure complete customer satisfaction with our services. This Refund Policy outlines the terms and conditions for requesting refunds for our digital services.</p>
         </section>
 
         <section className="legal-section">
@@ -43,7 +45,7 @@ const RefundPolicy = () => {
           <h2>4. Refund Process</h2>
           <p>To request a refund, please follow these steps:</p>
           <ol>
-            <li>Contact our support team at <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a> within 7 days of purchase</li>
+            <li>Contact our support team at <a href={`mailto:${supportEmail}`}>{supportEmail}</a> within 7 days of purchase</li>
             <li>Provide your order details and reason for the refund request</li>
             <li>Our team will review your request within 5-7 business days</li>
           </ol>
@@ -71,7 +73,7 @@ const RefundPolicy = () => {
 
         <section className="legal-section">
           <h2>9. Contact Us</h2>
-          <p>If you have any questions about our Refund Policy, please contact us at <a href="mailto:info@bluetickgeng.com">info@bluetickgeng.com</a>.</p>
+          <p>If you have any questions about our Refund Policy, please contact us at <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.</p>
         </section>
       </div>
       <Footer />

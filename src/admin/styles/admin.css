@@ -266,6 +266,15 @@
   .adm-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  /* Parent cards that contain a service list stay one per row */
+  .adm-card-grid--with-items {
+    grid-template-columns: 1fr;
+  }
+
+  .adm-card-grid--with-items .adm-item-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .adm-card {

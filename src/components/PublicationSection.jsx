@@ -1,5 +1,6 @@
 import SectionHeader from './SectionHeader';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
+import { usePartnerText } from '../utils/partnerText';
 import './PublicationSection.css';
 
 const packages = [
@@ -150,6 +151,7 @@ const publicationTypes = [
 ];
 
 function PublicationSection() {
+  const { shortBrandName } = usePartnerText();
   return (
     <section id="publication-services" className="publication-section">
       <div className="container">
@@ -217,7 +219,7 @@ function PublicationSection() {
           <div className="policy-card">
             <h4 className="policy-card-title">Refund Policy</h4>
             <ul className="policy-list">
-              <li>Bluetickgeng's responsibility is to refund fees only if services are not delivered as promised</li>
+              <li>{shortBrandName}'s responsibility is to refund fees only if services are not delivered as promised</li>
               <li>Payments may not be refundable but can be converted for other services</li>
               <li>Refunds issued only if services cannot be provided</li>
               <li>Refund processing takes up to 14 working days</li>

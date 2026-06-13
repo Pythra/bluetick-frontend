@@ -24,6 +24,7 @@ import {
   IoTrashOutline,
 } from 'react-icons/io5';
 import Navbar from '../components/Navbar';
+import { usePartnerText } from '../utils/partnerText';
 import { useCurrency } from '../contexts/CurrencyContext.jsx';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
@@ -495,6 +496,7 @@ const howItWorks = [
 function PublicationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { shortBrandName } = usePartnerText();
   const [showCartNotification, setShowCartNotification] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef(null);
@@ -581,7 +583,7 @@ function PublicationServicesPage() {
       <section className="publication-masthead">
         <div className="publication-masthead-grid container">
           <div className="publication-masthead-copy">
-            <p className="publication-eyebrow">Bluetickgeng · Press &amp; Media Distribution</p>
+            <p className="publication-eyebrow">{shortBrandName} · Press &amp; Media Distribution</p>
             <h1 className="publication-masthead-title">
               <span className="publication-masthead-title-line">Press release distribution</span>
               <span className="publication-masthead-title-accent">across Nigeria, Africa &amp; the world</span>

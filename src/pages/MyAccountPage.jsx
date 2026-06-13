@@ -14,6 +14,7 @@ import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
+import { usePartnerText } from '../utils/partnerText';
 import './MyAccountPage.css';
 
 const SECTIONS = {
@@ -81,6 +82,7 @@ function getDisplayName(user) {
 
 function MyAccountPage() {
   const navigate = useNavigate();
+  const { shortBrandName, supportEmail } = usePartnerText();
   const { user, isAuthenticated, loading, logout, apiUrl, authFetch } = useAuth();
   const { cartItemCount, fetchCart } = useCart();
   const [activeSection, setActiveSection] = useState(SECTIONS.dashboard);
@@ -307,7 +309,7 @@ function MyAccountPage() {
         <h2 id="my-account-profile-heading" className="my-account-panel-title">
           Account info
         </h2>
-        <p className="my-account-panel-lead">Your profile details on file with BlueTick.</p>
+        <p className="my-account-panel-lead">Your profile details on file with {shortBrandName}.</p>
       </header>
       <dl className="my-account-details">
         {profileRows.map((row) => (
@@ -319,7 +321,7 @@ function MyAccountPage() {
       </dl>
       <p className="my-account-help">
         Need to update your details? Contact us at{' '}
-        <a href="mailto:Info@bluetickgeng.com">Info@bluetickgeng.com</a>.
+        <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.
       </p>
     </section>
   );

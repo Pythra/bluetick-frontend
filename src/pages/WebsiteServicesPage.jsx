@@ -9,6 +9,7 @@ import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import websiteHeroImage from '../assets/tech.jpg';
 import { companyWhatsappSessionUrl } from '../config/companyContact';
+import { usePartnerText } from '../utils/partnerText';
 import './ServiceDetailPage.css';
 
 const websiteServices = [
@@ -47,6 +48,7 @@ function WebsiteServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { format } = useCurrency();
+  const { t } = usePartnerText();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
@@ -112,7 +114,7 @@ function WebsiteServicesPage() {
           <ServiceDetailCard
             title={startupConsultation.title}
             meta={startupConsultation.meta}
-            description={startupConsultation.description}
+            description={t(startupConsultation.description)}
             price="On request"
             icon={startupConsultation.icon}
             feature

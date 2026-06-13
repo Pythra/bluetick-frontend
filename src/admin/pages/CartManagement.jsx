@@ -51,7 +51,7 @@ export const CartManagement = ({ users }) => {
           <p>{searchTerm ? 'No matching carts found' : 'No active carts'}</p>
         </div>
       ) : (
-        <div className="adm-card-grid">
+        <div className="adm-card-grid adm-card-grid--with-items">
           {filteredUsers.map((user) => {
             const cartTotal = calculateCartTotal(user.cart.items)
             return (
@@ -63,9 +63,6 @@ export const CartManagement = ({ users }) => {
                   </span>
                 </div>
                 <p className="adm-card-meta"><span>{user.email}</span></p>
-                <div className="adm-card-services">
-                  {user.cart.items.map((item) => item.title).join(', ')}
-                </div>
 
                 <div className="adm-item-grid">
                   {user.cart.items.map((item, idx) => (

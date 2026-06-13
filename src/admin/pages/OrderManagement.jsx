@@ -29,6 +29,10 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
 
   const orderServices = (order) => getOrderServiceLabel(order)
 
+  const orderHasItemCards = (order) =>
+    (order.cartItems && order.cartItems.length > 0) ||
+    (order.services && order.services.length > 0)
+
   const allOrders = users.flatMap(user =>
     (user.orders || []).map(order => ({
       ...order,
@@ -104,7 +108,9 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
 
                 <p className="adm-card-meta"><span>{order.userEmail}</span></p>
                 <p className="adm-card-meta"><span>{order.userPhone}</span></p>
-                <div className="adm-card-services">{orderServices(order)}</div>
+                {(!isExpanded || !orderHasItemCards(order)) && (
+                  <div className="adm-card-services">{orderServices(order)}</div>
+                )}
 
                 <div className="adm-card-foot">
                   <div>
@@ -121,10 +127,12 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                 {isExpanded && (
                   <div className="adm-detail">
                     <div className="adm-detail-grid">
-                      <div>
-                        <div className="adm-detail-label">Service</div>
-                        <div className="adm-detail-value">{orderServices(order)}</div>
-                      </div>
+                      {!orderHasItemCards(order) && (
+                        <div>
+                          <div className="adm-detail-label">Service</div>
+                          <div className="adm-detail-value">{orderServices(order)}</div>
+                        </div>
+                      )}
                       <div>
                         <div className="adm-detail-label">Price</div>
                         <div className="adm-detail-value">{order.productPrice}</div>

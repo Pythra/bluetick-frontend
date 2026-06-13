@@ -29,18 +29,19 @@ const footerLegalLinks = [
 
 function Footer({ onScrollToSection }) {
   const [logoError, setLogoError] = useState(false);
-  const { isPartnerSite, brandName, shortName, contactEmail, tagline } = usePartnerBranding();
+  const { isPartnerSite, brandName, shortName, contactEmail, tagline, logoUrl } = usePartnerBranding();
   const displayName = shortName || brandName;
+  const footerLogoSrc = isPartnerSite ? logoUrl : bluegoLogo;
 
   return (
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-top">
           <div className="logo-container">
-            {!logoError && !isPartnerSite ? (
+            {!logoError && footerLogoSrc ? (
               <img
-                src={bluegoLogo}
-                alt="Bluetickgeng"
+                src={footerLogoSrc}
+                alt={isPartnerSite ? displayName : 'Bluetickgeng'}
                 className="footer-logo"
                 onError={() => setLogoError(true)}
               />
@@ -163,6 +164,7 @@ function Footer({ onScrollToSection }) {
                 <IoLogoWhatsapp className="contact-icon" />
                 <span>{companyWhatsappDemoDisplay}</span>
               </a>
+              {!isPartnerSite && (
               <div className="social-links">
                 <a
                   href="https://www.instagram.com/bluetickgengs?igsh=OGY2dWU3a3lsZzR5&utm_source=qr"
@@ -201,6 +203,7 @@ function Footer({ onScrollToSection }) {
                   <IoLogoTwitter className="social-icon" />
                 </a>
               </div>
+              )}
             </div>
           </div>
         </div>
@@ -217,7 +220,10 @@ function Footer({ onScrollToSection }) {
               </Fragment>
             ))}
           </div>
-          <p>&copy; {new Date().getFullYear()} Bluetickgeng Development. All rights reserved.</p>
+          <p>
+            &copy; {new Date().getFullYear()}{' '}
+            {isPartnerSite ? brandName : 'Bluetickgeng Development'}. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

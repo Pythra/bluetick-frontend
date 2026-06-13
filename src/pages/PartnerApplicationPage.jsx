@@ -31,6 +31,8 @@ const initialForm = {
   message: '',
 };
 
+const MAX_LOGO_BYTES = 2 * 1024 * 1024;
+
 function PartnerApplicationPage() {
   const navigate = useNavigate();
   const { apiUrl } = useAuth();
@@ -39,12 +41,45 @@ function PartnerApplicationPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [reservedSiteUrl, setReservedSiteUrl] = useState('');
+  const [logoDataUrl, setLogoDataUrl] = useState('');
+  const [logoFileName, setLogoFileName] = useState('');
 
   const previewSiteUrl = previewPartnerSiteUrl(form.company);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setError('Logo must be an image file (PNG, JPG, WEBP or SVG).');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > MAX_LOGO_BYTES) {
+      setError('Logo file is too large. Please upload an image under 2MB.');
+      e.target.value = '';
+      return;
+    }
+
+    setError('');
+    const reader = new FileReader();
+    reader.onload = () => {
+      setLogoDataUrl(reader.result);
+      setLogoFileName(file.name);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleLogoRemove = () => {
+    setLogoDataUrl('');
+    setLogoFileName('');
   };
 
   const handleSubmit = async (e) => {
@@ -65,7 +100,7 @@ function PartnerApplicationPage() {
       const response = await fetch(`${apiUrl}/api/partner-application`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, logo: logoDataUrl || undefined }),
       });
 
       const data = await response.json();
@@ -256,6 +291,31 @@ function PartnerApplicationPage() {
                         <option key={t.value} value={t.value}>{t.label}</option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="partner-apply-field partner-apply-field--full">
+                    <label htmlFor="brandLogo">Brand Logo (optional)</label>
+                    <input
+                      id="brandLogo"
+                      name="brandLogo"
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                      onChange={handleLogoChange}
+                    />
+                    {logoDataUrl ? (
+                      <div className="partner-apply-logo-preview">
+                        <img src={logoDataUrl} alt="Brand logo preview" />
+                        <span>{logoFileName}</span>
+                        <button type="button" className="partner-apply-link" onClick={handleLogoRemove}>
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="partner-apply-site-preview">
+                        If you upload a logo, your white-label site will use it everywhere instead of
+                        the Bluetickgeng logo. No logo? We&apos;ll display your brand name as text.
+                      </p>
+                    )}
                   </div>
 
                   <div className="partner-apply-field partner-apply-field--full">

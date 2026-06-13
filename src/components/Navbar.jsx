@@ -9,7 +9,7 @@ import './Navbar.css';
 function Navbar({ onScrollToSection }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, logout, user } = useAuth();
-  const { isPartnerSite, brandName } = usePartnerBranding();
+  const { isPartnerSite, brandName, logoUrl } = usePartnerBranding();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -36,7 +36,9 @@ function Navbar({ onScrollToSection }) {
       <div className="navbar-container">
         <div className="navbar-logo">
           <Link to="/">
-            {isPartnerSite ? (
+            {isPartnerSite && logoUrl ? (
+              <img src={logoUrl} alt={brandName} className="logo-img" />
+            ) : isPartnerSite ? (
               <span className="navbar-brand-text">{brandName}</span>
             ) : (
               <img src={blueLogo} alt="Bluetickgeng Development" className="logo-img" />
