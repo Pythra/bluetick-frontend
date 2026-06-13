@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MdCheckCircle, MdAccessTime, MdCancel } from 'react-icons/md'
+import { getOrderServiceLabel, orderMatchesServiceSearch } from '../utils/orderServices'
 import '../styles/admin.css'
 
 const STATUS_CONFIG = {
@@ -26,10 +27,7 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
     })
   }
 
-  const orderServices = (order) =>
-    order.cartItems && order.cartItems.length > 0
-      ? order.cartItems.map((item) => item.title).join(', ')
-      : order.productName
+  const orderServices = (order) => getOrderServiceLabel(order)
 
   const allOrders = users.flatMap(user =>
     (user.orders || []).map(order => ({
@@ -45,7 +43,7 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
     const matchesSearch =
       order.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.productName.toLowerCase().includes(searchTerm.toLowerCase())
+      orderMatchesServiceSearch(order, searchTerm)
 
     const matchesStatus = statusFilter === 'all' || order.status === statusFilter
 

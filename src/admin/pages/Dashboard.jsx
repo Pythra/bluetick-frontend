@@ -1,4 +1,5 @@
 import { MdPeople, MdShoppingCart, MdInventory2, MdArticle } from 'react-icons/md'
+import { getOrderServiceLabel } from '../utils/orderServices'
 import '../styles/admin.css'
 
 export const Dashboard = ({ users, carts, orders, submissions, onNavigateToTab }) => {
@@ -20,10 +21,7 @@ export const Dashboard = ({ users, carts, orders, submissions, onNavigateToTab }
     })
   }
 
-  const orderServices = (order) =>
-    order.cartItems && order.cartItems.length > 0
-      ? order.cartItems.map((item) => item.title).join(', ')
-      : order.productName
+  const orderServices = (order) => getOrderServiceLabel(order)
 
   const pendingOrders = users
     .flatMap(user =>

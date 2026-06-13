@@ -1,5 +1,13 @@
 import { useState } from 'react'
+import { getOrderServiceLabel } from '../utils/orderServices'
 import '../styles/admin.css'
+
+const STATUS_LABELS = {
+  pending: 'Pending',
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+}
 
 export const SubmissionManagement = ({ users }) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -71,11 +79,14 @@ export const SubmissionManagement = ({ users }) => {
                   <h3 className="adm-card-title">
                     {submission.postTitle || submission.articleContent?.substring(0, 50) || 'Submission'}
                   </h3>
-                  <span className="adm-badge neutral">{submission.productName || 'Article'}</span>
+                  <span className={`adm-badge ${submission.status || 'pending'}`}>
+                    {STATUS_LABELS[submission.status] || submission.status || 'Pending'}
+                  </span>
                 </div>
 
                 <p className="adm-card-meta"><span>{submission.userName}</span></p>
                 <p className="adm-card-meta"><span>{submission.userEmail}</span></p>
+                <div className="adm-card-services">{getOrderServiceLabel(submission)}</div>
 
                 <div className="adm-card-foot">
                   <span className="adm-card-date">{formatDate(submission.submittedAt)}</span>
@@ -101,7 +112,7 @@ export const SubmissionManagement = ({ users }) => {
                       </div>
                       <div>
                         <div className="adm-detail-label">Service Type</div>
-                        <div className="adm-detail-value">{submission.productName || 'N/A'}</div>
+                        <div className="adm-detail-value">{getOrderServiceLabel(submission)}</div>
                       </div>
                       <div>
                         <div className="adm-detail-label">Status</div>

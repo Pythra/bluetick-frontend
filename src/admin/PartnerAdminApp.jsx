@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { MdInventory2, MdAccessTime, MdCheckCircle, MdPayments, MdLogout, MdLanguage } from 'react-icons/md'
 import { useAuth } from '../contexts/AuthContext'
+import { getOrderServiceLabel } from './utils/orderServices'
 import './styles/admin.css'
 
 const STATUS_LABELS = {
@@ -238,11 +239,7 @@ function PartnerAdminApp({ subdomain }) {
                           {STATUS_LABELS[order.status] || order.status}
                         </span>
                       </div>
-                      <div className="adm-card-services">
-                        {order.cartItems && order.cartItems.length > 0
-                          ? order.cartItems.map((item) => item.title).join(', ')
-                          : order.productName}
-                      </div>
+                      <div className="adm-card-services">{getOrderServiceLabel(order)}</div>
                       <div className="adm-card-foot">
                         <div>
                           <div className="adm-card-amount">

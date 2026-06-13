@@ -63,6 +63,9 @@ export const CartManagement = ({ users }) => {
                   </span>
                 </div>
                 <p className="adm-card-meta"><span>{user.email}</span></p>
+                <div className="adm-card-services">
+                  {user.cart.items.map((item) => item.title).join(', ')}
+                </div>
 
                 <div className="adm-item-grid">
                   {user.cart.items.map((item, idx) => (
