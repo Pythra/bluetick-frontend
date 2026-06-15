@@ -264,7 +264,7 @@ export const CurrencyProvider = ({ children }) => {
         return new Intl.NumberFormat(locale, {
           style: 'currency',
           currency: targetCurrency,
-          minimumFractionDigits: ['USD', 'EUR', 'GBP', 'CAD'].includes(targetCurrency) ? 2 : 0,
+v           minimumFractionDigits: ['USD', 'EUR', 'GBP', 'CAD'].includes(targetCurrency) ? 2 : 0,
           maximumFractionDigits: ['USD', 'EUR', 'GBP', 'CAD'].includes(targetCurrency) ? 2 : 0,
         }).format(converted);
       } catch {

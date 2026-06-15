@@ -31,7 +31,9 @@ function PartnerAdminApp({ subdomain }) {
   const { apiUrl } = useAuth()
   const tokenKey = `partnerAdminToken:${subdomain}`
 
-  const [token, setToken] = useState(() => localStorage.getItem(tokenKey))
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem(tokenKey) || localStorage.getItem('adminToken')
+  })
   const [loginData, setLoginData] = useState({ username: '', password: '' })
   const [loginLoading, setLoginLoading] = useState(false)
   const [loginError, setLoginError] = useState(null)
@@ -41,10 +43,14 @@ function PartnerAdminApp({ subdomain }) {
   const [error, setError] = useState(null)
 
   const handleLogout = useCallback(() => {
+    const activeToken = token
     localStorage.removeItem(tokenKey)
+    if (activeToken && activeToken === localStorage.getItem('adminToken')) {
+      localStorage.removeItem('adminToken')
+    }
     setToken(null)
     setOverview(null)
-  }, [tokenKey])
+  }, [token, tokenKey])
 
   const fetchOverview = useCallback(async () => {
     if (!token) return
@@ -53,9 +59,12 @@ function PartnerAdminApp({ subdomain }) {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`${apiUrl}/api/partner-admin/overview`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const response = await fetch(
+        `${apiUrl}/api/partner-admin/overview?subdomain=${encodeURIComponent(subdomain)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       const data = await response.json()
 
       if (!response.ok) {
@@ -73,7 +82,7 @@ function PartnerAdminApp({ subdomain }) {
     } finally {
       setLoading(false)
     }
-  }, [apiUrl, token, handleLogout])
+  }, [apiUrl, token, handleLogout, subdomain])
 
   useEffect(() => {
     fetchOverview()
@@ -85,15 +94,33 @@ function PartnerAdminApp({ subdomain }) {
     setLoginError(null)
 
     try {
-      const response = await fetch(`${apiUrl}/api/partner-admin/login`, {
+      let response = await fetch(`${apiUrl}/api/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subdomain, ...loginData }),
+        body: JSON.stringify({
+          username: loginData.username.trim(),
+          password: loginData.password,
+        }),
       })
-      const data = await response.json()
+      let data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed')
+        response = await fetch(`${apiUrl}/api/partner-admin/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subdomain, ...loginData }),
+        })
+        data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed')
+        }
+
+        if (data.isMainAdmin) {
+          localStorage.setItem('adminToken', data.token)
+        }
+      } else {
+        localStorage.setItem('adminToken', data.token)
       }
 
       localStorage.setItem(tokenKey, data.token)
@@ -151,7 +178,7 @@ function PartnerAdminApp({ subdomain }) {
           </form>
 
           <p className="adm-login-sub" style={{ marginTop: 18, marginBottom: 0 }}>
-            Your credentials were emailed to you when your partner application was received.
+            Use your partner dashboard credentials, or your main Bluetick admin login.
           </p>
         </div>
       </div>

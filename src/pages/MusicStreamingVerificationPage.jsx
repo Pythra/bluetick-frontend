@@ -158,7 +158,7 @@ function MusicStreamingVerificationPage() {
                   title={service.title}
                   meta="Profile placement"
                   description="Strategic placement and optimization so your music profile reaches the right audience on platform discovery surfaces."
-                  price={<Price value={service.price} currencyHint="NGN" />}
+                  price={format(service.price)}
                   pricePrefix=""
                   iconNode={renderPlatformIcon(service.title)}
                   iconVariant="platform"

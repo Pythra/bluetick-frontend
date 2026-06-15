@@ -333,6 +333,126 @@
   text-decoration: underline;
 }
 
+.my-account-danger-zone {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #fee2e2;
+}
+
+.my-account-danger-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+.my-account-danger-lead {
+  margin: 0 0 0.9rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #64748b;
+}
+
+.my-account-delete-toggle,
+.my-account-delete-cancel,
+.my-account-delete-submit {
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.my-account-delete-toggle {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background: #fff;
+  color: #b91c1c;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.my-account-delete-toggle:hover {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.my-account-delete-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-width: 28rem;
+}
+
+.my-account-delete-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.my-account-delete-input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-family: inherit;
+}
+
+.my-account-delete-input:focus {
+  outline: none;
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.15);
+}
+
+.my-account-delete-error {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: #b91c1c;
+}
+
+.my-account-delete-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+}
+
+.my-account-delete-cancel {
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #475569;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.my-account-delete-cancel:hover:not(:disabled) {
+  background: #f8fafc;
+}
+
+.my-account-delete-submit {
+  padding: 0.55rem 0.9rem;
+  border: none;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.my-account-delete-submit:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.my-account-delete-cancel:disabled,
+.my-account-delete-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .my-account-back {
   max-width: 1120px;
   margin: 1.5rem auto 0;

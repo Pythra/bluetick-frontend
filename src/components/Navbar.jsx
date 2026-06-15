@@ -57,7 +57,7 @@ function Navbar({ onScrollToSection }) {
           </button>
           <button
             type="button"
-            className="navbar-link"
+            className={`navbar-link navbar-account-auth${isAuthenticated ? '' : ' navbar-account-auth--guest'}`}
             onClick={() => handleAction(() => navigate(isAuthenticated ? '/account' : '/login'))}
             title={isAuthenticated ? user?.email || 'My Account' : 'My Account'}
           >
@@ -71,13 +71,31 @@ function Navbar({ onScrollToSection }) {
               Logout
             </button>
           ) : (
-            <button
-              type="button"
-              className="navbar-signup"
-              onClick={() => handleAction(() => navigate('/signup'))}
-            >
-              Sign Up
-            </button>
+            <>
+              <div className="navbar-mobile-auth">
+                <button
+                  type="button"
+                  className="navbar-login"
+                  onClick={() => handleAction(() => navigate('/login'))}
+                >
+                  Log In
+                </button>
+                <button
+                  type="button"
+                  className="navbar-signup"
+                  onClick={() => handleAction(() => navigate('/signup'))}
+                >
+                  Sign Up
+                </button>
+              </div>
+              <button
+                type="button"
+                className="navbar-signup navbar-signup-desktop"
+                onClick={() => handleAction(() => navigate('/signup'))}
+              >
+                Sign Up
+              </button>
+            </>
           )}
         </div>
         <button className="navbar-toggle" onClick={() => setIsMenuOpen(!isMenuOpen)}>

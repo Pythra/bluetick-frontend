@@ -89,6 +89,11 @@ function MyAccountPage() {
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [ordersError, setOrdersError] = useState('');
+  const [showDeleteForm, setShowDeleteForm] = useState(false);
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('');
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -153,6 +158,50 @@ function MyAccountPage() {
     }
     logout();
     navigate('/');
+  };
+
+  const requiresPasswordToDelete = Boolean(user?.phone?.trim());
+
+  const resetDeleteForm = () => {
+    setShowDeleteForm(false);
+    setDeleteConfirmEmail('');
+    setDeletePassword('');
+    setDeleteError('');
+  };
+
+  const handleDeleteAccount = async (event) => {
+    event.preventDefault();
+    setDeleteError('');
+
+    const confirmed = window.confirm(
+      'This will permanently delete your account and sign you out. Your order history will be kept for our records, but you will lose access to it. This cannot be undone.'
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    setDeleteLoading(true);
+    try {
+      const response = await authFetch(`${apiUrl}/api/auth/account`, {
+        method: 'DELETE',
+        body: JSON.stringify({
+          confirmEmail: deleteConfirmEmail.trim(),
+          password: deletePassword,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Unable to delete your account');
+      }
+
+      logout();
+      navigate('/', { replace: true });
+    } catch (err) {
+      setDeleteError(err.message || 'Unable to delete your account');
+    } finally {
+      setDeleteLoading(false);
+    }
   };
 
   const goToSection = (sectionId) => {
@@ -323,6 +372,79 @@ function MyAccountPage() {
         Need to update your details? Contact us at{' '}
         <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.
       </p>
+
+      <section className="my-account-danger-zone" aria-labelledby="my-account-delete-heading">
+        <h3 id="my-account-delete-heading" className="my-account-danger-title">
+          Delete account
+        </h3>
+        <p className="my-account-danger-lead">
+          Permanently remove your account and sign out. Your cart and saved profile details will be
+          deleted. Order records may be retained for business and legal purposes.
+        </p>
+
+        {!showDeleteForm ? (
+          <button
+            type="button"
+            className="my-account-delete-toggle"
+            onClick={() => setShowDeleteForm(true)}
+          >
+            Delete my account
+          </button>
+        ) : (
+          <form className="my-account-delete-form" onSubmit={handleDeleteAccount}>
+            <label className="my-account-delete-label" htmlFor="delete-confirm-email">
+              Type your email to confirm
+            </label>
+            <input
+              id="delete-confirm-email"
+              type="email"
+              className="my-account-delete-input"
+              value={deleteConfirmEmail}
+              onChange={(event) => setDeleteConfirmEmail(event.target.value)}
+              placeholder={user.email}
+              autoComplete="off"
+              required
+            />
+
+            {requiresPasswordToDelete ? (
+              <>
+                <label className="my-account-delete-label" htmlFor="delete-password">
+                  Password
+                </label>
+                <input
+                  id="delete-password"
+                  type="password"
+                  className="my-account-delete-input"
+                  value={deletePassword}
+                  onChange={(event) => setDeletePassword(event.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+              </>
+            ) : null}
+
+            {deleteError ? (
+              <p className="my-account-delete-error" role="alert">
+                {deleteError}
+              </p>
+            ) : null}
+
+            <div className="my-account-delete-actions">
+              <button
+                type="button"
+                className="my-account-delete-cancel"
+                onClick={resetDeleteForm}
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="my-account-delete-submit" disabled={deleteLoading}>
+                {deleteLoading ? 'Deleting…' : 'Permanently delete account'}
+              </button>
+            </div>
+          </form>
+        )}
+      </section>
     </section>
   );
 
