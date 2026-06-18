@@ -137,7 +137,13 @@
 
 /* Transparent glass CTA — see Button.css `.services-summary-hero-cta.btn` */
 
-.publication-section.publication-services-summary,
+.publication-section.publication-services-summary .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
 .instagram-services-section.instagram-services-summary,
 .wikipedia-services-section.wikipedia-services-summary,
 .music-streaming-services-section.music-streaming-services-summary {
@@ -147,7 +153,6 @@
   overflow: visible;
 }
 
-.publication-section.publication-services-summary .container,
 .instagram-services-section.instagram-services-summary .container,
 .wikipedia-services-section.wikipedia-services-summary .container,
 .music-streaming-services-section.music-streaming-services-summary .container {
@@ -158,7 +163,6 @@
 }
 
 @media (max-width: 768px) {
-  .publication-section.publication-services-summary,
   .instagram-services-section.instagram-services-summary,
   .wikipedia-services-section.wikipedia-services-summary,
   .music-streaming-services-section.music-streaming-services-summary {

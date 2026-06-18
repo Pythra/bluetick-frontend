@@ -12,16 +12,21 @@
 .publication-section.publication-services-summary {
   padding: 0 0 80px;
   background:
-    radial-gradient(ellipse at 80% 10%, rgba(212, 175, 55, 0.12) 0%, transparent 55%),
-    radial-gradient(ellipse at 10% 90%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
-    linear-gradient(160deg, #0a1628 0%, #0f2546 55%, #1e3a8a 100%);
+    radial-gradient(ellipse at 80% 10%, var(--brand-section-glow-soft) 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 90%, var(--brand-section-glow-soft) 0%, transparent 50%),
+    linear-gradient(
+      160deg,
+      var(--brand-section-deep-start) 0%,
+      var(--brand-section-deep-mid) 55%,
+      var(--brand-section-deep-end) 100%
+    );
   position: relative;
   overflow: hidden;
 }
 
 /* Title styling for dark luxe background */
 .publication-section.publication-services-summary .section-subtitle {
-  color: #d4af37;
+  color: var(--brand-primary-light);
 }
 
 /* Background decorations removed for clean white background */

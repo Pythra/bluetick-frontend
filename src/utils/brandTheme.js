@@ -92,6 +92,21 @@ function getSectionDarkColor(primary, amount, fallback = '#0f172a') {
   return getRelativeLuminance(r, g, b) > 0.28 ? fallback : candidate;
 }
 
+function mixWithBlack(hex, blackRatio = 0.75) {
+  const { r, g, b } = hexToRgb(hex);
+  const colorRatio = 1 - blackRatio;
+  return rgbToHex(r * colorRatio, g * colorRatio, b * colorRatio);
+}
+
+function getDeepSectionColors(primary) {
+  const base = normalizeHex(primary) || '#2563eb';
+  return {
+    start: mixWithBlack(darkenHex(base, 0.18), 0.9),
+    mid: mixWithBlack(darkenHex(base, 0.1), 0.84),
+    end: mixWithBlack(base, 0.76),
+  };
+}
+
 export function buildBrandCssVariables(primaryColor, primaryColorDark) {
   const primary = normalizeHex(primaryColor) || '#2563eb';
   const dark = normalizeHex(primaryColorDark) || darkenHex(primary, 0.14);
@@ -102,6 +117,7 @@ export function buildBrandCssVariables(primaryColor, primaryColorDark) {
   const textAccent = isLightBrandColor(primary) ? getReadableAccentOnLight(primary) : dark;
   const onPrimary = getOnPrimaryText(primary);
   const headingColor = isLightBrandColor(primary) ? '#0f2546' : getSectionDarkColor(primary, 0.55, '#0f2546');
+  const deepSection = getDeepSectionColors(primary);
 
   return {
     '--brand-primary': primary,
@@ -133,6 +149,9 @@ export function buildBrandCssVariables(primaryColor, primaryColorDark) {
     '--brand-section-dark-start': getSectionDarkColor(primary, 0.72),
     '--brand-section-dark-mid': getSectionDarkColor(primary, 0.55),
     '--brand-section-dark-end': getSectionDarkColor(primary, 0.38),
+    '--brand-section-deep-start': deepSection.start,
+    '--brand-section-deep-mid': deepSection.mid,
+    '--brand-section-deep-end': deepSection.end,
     '--brand-section-glow': hexToRgba(primary, 0.22),
     '--brand-section-glow-soft': hexToRgba(primary, 0.12),
     '--brand-link': textAccent,

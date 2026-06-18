@@ -189,6 +189,46 @@ html[data-partner-site='true'] .verification-section.verification-services-summa
     );
 }
 
+html[data-partner-site='true'] .publication-section.publication-services-summary {
+  background:
+    radial-gradient(ellipse at 80% 10%, var(--brand-section-glow-soft) 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 90%, var(--brand-section-glow-soft) 0%, transparent 50%),
+    linear-gradient(
+      160deg,
+      var(--brand-section-deep-start) 0%,
+      var(--brand-section-deep-mid) 55%,
+      var(--brand-section-deep-end) 100%
+    );
+}
+
+html[data-partner-site='true'] .publication-section.publication-services-summary .section-subtitle {
+  color: var(--brand-primary-lighter);
+}
+
+html[data-partner-site='true'] .publication-services-summary .publication-category-card {
+  border-color: var(--brand-primary-medium);
+}
+
+html[data-partner-site='true'] .publication-services-summary .publication-category-card:hover {
+  border-color: var(--brand-primary-strong);
+  box-shadow: 0 8px 24px var(--brand-shadow-soft);
+}
+
+html[data-partner-site='true'] .publication-services-summary .publication-card-head {
+  color: var(--brand-primary-lighter);
+  background: var(--brand-primary-medium);
+}
+
+html[data-partner-site='true'] .publication-services-summary .publication-category-cta.btn {
+  border-color: var(--brand-primary-strong);
+  background: var(--brand-primary-medium);
+}
+
+html[data-partner-site='true'] .publication-services-summary .publication-category-cta.btn:hover {
+  background: var(--brand-primary-strong);
+  border-color: var(--brand-primary);
+}
+
 html[data-partner-site='true'] .verification-services-summary-bg-decoration::before {
   background: radial-gradient(circle, var(--brand-section-glow-soft) 0%, transparent 70%);
 }
@@ -244,18 +284,6 @@ html[data-partner-site='true'] .service-detail-page .service-detail-card-cta.btn
 html[data-partner-site='true'] .bounce-btn:hover {
   background: var(--brand-button-secondary-hover);
   color: var(--brand-text-accent, var(--brand-primary-dark));
-}
-
-html[data-partner-site='true'] .about-eyebrow {
-  color: var(--brand-primary);
-}
-
-html[data-partner-site='true'] .about-cta-button {
-  color: var(--brand-text-accent, var(--brand-primary-dark));
-}
-
-html[data-partner-site='true'] .about-mv-card h3 {
-  color: var(--brand-primary);
 }
 
 html[data-partner-site='true'] .partner-media-placeholder-icon {

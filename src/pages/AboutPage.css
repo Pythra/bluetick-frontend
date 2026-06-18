@@ -1,6 +1,6 @@
 .about-page {
-  background: #f5f9ff;
-  color: #0f2546;
+  background: linear-gradient(180deg, var(--brand-surface-bg, #f5f9ff) 0%, #f5f9ff 100%);
+  color: var(--brand-heading-color, #0f2546);
 }
 
 .about-section-inner {
@@ -11,7 +11,7 @@
 
 .about-page h2 {
   font-size: clamp(26px, 4vw, 38px);
-  color: #0f2546;
+  color: var(--brand-heading-color, #0f2546);
   margin: 0 0 16px;
 }
 
@@ -23,7 +23,11 @@
 
 /* Hero */
 .about-hero {
-  background: linear-gradient(160deg, #eaf2ff 0%, #f5f9ff 60%);
+  background: linear-gradient(
+    160deg,
+    var(--brand-primary-soft) 0%,
+    var(--brand-surface-bg, #f5f9ff) 60%
+  );
   padding: 56px 0 64px;
 }
 
@@ -43,8 +47,8 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #2563eb;
-  background: #e0ecff;
+  color: var(--brand-text-accent, var(--brand-primary));
+  background: var(--brand-primary-soft);
   padding: 6px 14px;
   border-radius: 999px;
   margin-bottom: 16px;
@@ -54,14 +58,14 @@
   font-size: clamp(32px, 5vw, 52px);
   line-height: 1.1;
   margin: 0 0 20px;
-  color: #0b1f3a;
+  color: var(--brand-heading-color, #0b1f3a);
 }
 
 .about-hero-image img {
   width: 100%;
   height: auto;
   border-radius: 18px;
-  box-shadow: 0 24px 60px rgba(29, 78, 216, 0.22);
+  box-shadow: 0 24px 60px var(--brand-shadow);
   display: block;
 }
 
@@ -93,8 +97,8 @@
 }
 
 .about-service-card {
-  background: #f7faff;
-  border: 1px solid #e3ecf8;
+  background: var(--brand-surface-bg, #f7faff);
+  border: 1px solid rgba(var(--brand-primary-rgb), 0.12);
   border-radius: 14px;
   padding: 26px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -102,13 +106,13 @@
 
 .about-service-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(29, 78, 216, 0.12);
+  box-shadow: 0 16px 36px var(--brand-shadow-soft);
 }
 
 .about-service-card h3 {
   margin: 0 0 16px;
   font-size: 19px;
-  color: #1d4ed8;
+  color: var(--brand-text-accent, var(--brand-primary-dark));
 }
 
 .about-service-card ul {
@@ -135,7 +139,11 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #4f8ef7, #1d4ed8);
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--brand-gradient-start),
+    var(--brand-primary-dark)
+  );
 }
 
 /* Innovation split */
@@ -154,7 +162,7 @@
   width: 100%;
   height: auto;
   border-radius: 18px;
-  box-shadow: 0 24px 60px rgba(29, 78, 216, 0.2);
+  box-shadow: 0 24px 60px var(--brand-shadow);
   display: block;
 }
 
@@ -167,7 +175,7 @@
 .about-features-label {
   text-align: center;
   font-weight: 600;
-  color: #0f2546;
+  color: var(--brand-heading-color, #0f2546);
   margin: 0 0 18px;
 }
 
@@ -222,8 +230,12 @@
 }
 
 .about-mv-card {
-  background: linear-gradient(160deg, #1d4ed8 0%, #2563eb 100%);
-  color: #fff;
+  background: linear-gradient(
+    160deg,
+    var(--brand-primary-dark) 0%,
+    var(--brand-primary) 100%
+  );
+  color: var(--brand-on-primary, #fff);
   border-radius: 16px;
   padding: 32px;
 }
@@ -231,10 +243,11 @@
 .about-mv-card h3 {
   margin: 0 0 14px;
   font-size: 22px;
+  color: var(--brand-on-primary, #fff);
 }
 
 .about-mv-card p {
-  color: #e6efff;
+  color: color-mix(in srgb, var(--brand-on-primary, #fff) 88%, transparent);
   margin: 0;
 }
 
@@ -247,7 +260,7 @@
 .about-why-lead {
   font-size: 18px;
   font-weight: 600;
-  color: #0f2546;
+  color: var(--brand-heading-color, #0f2546);
   margin-bottom: 16px;
 }
 
@@ -265,7 +278,7 @@
   padding-left: 32px;
   font-size: 17px;
   font-weight: 600;
-  color: #1d4ed8;
+  color: var(--brand-text-accent, var(--brand-primary-dark));
 }
 
 .about-why-list li::before {
@@ -276,8 +289,8 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #1d4ed8;
-  color: #fff;
+  background: var(--brand-primary-dark);
+  color: var(--brand-on-primary, #fff);
   font-size: 13px;
   display: flex;
   align-items: center;
@@ -292,11 +305,15 @@
 .about-contact {
   background-size: cover;
   background-position: center;
-  background-color: #0b1f3a;
+  background-color: var(--brand-section-dark-mid, #0b1f3a);
 }
 
 .about-contact-overlay {
-  background: linear-gradient(120deg, rgba(8, 24, 56, 0.92) 0%, rgba(29, 78, 216, 0.78) 100%);
+  background: linear-gradient(
+    120deg,
+    var(--brand-section-dark-start) 0%,
+    color-mix(in srgb, var(--brand-primary) 78%, transparent) 100%
+  );
   padding: 72px 0;
   text-align: center;
 }
@@ -333,7 +350,7 @@
 .about-cta-button {
   border: none;
   background: #fff;
-  color: #1d4ed8;
+  color: var(--brand-text-accent, var(--brand-primary-dark));
   font-weight: 700;
   font-size: 16px;
   padding: 14px 34px;
