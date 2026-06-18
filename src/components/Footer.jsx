@@ -153,7 +153,7 @@ function Footer({ onScrollToSection }) {
               </a>
               <a href="tel:+2349069431949" className="contact-link">
                 <IoCallOutline className="contact-icon" />
-                <span>+234 906 943 1949</span>
+                <span>+234 906 943 9149</span>
               </a>
               <a
                 href={companyWhatsappDemoUrl}
