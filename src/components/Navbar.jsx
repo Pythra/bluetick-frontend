@@ -9,7 +9,7 @@ import './Navbar.css';
 function Navbar({ onScrollToSection }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, logout, user } = useAuth();
-  const { isPartnerSite, brandName, logoUrl } = usePartnerBranding();
+  const { isPartnerSite, brandName, logoUrl, features } = usePartnerBranding();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -52,9 +52,11 @@ function Navbar({ onScrollToSection }) {
           <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('website-services'))}>
             Services
           </button>
+          {(!isPartnerSite || features?.showBlog) ? (
           <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/blog'))}>
             Blog
           </button>
+          ) : null}
           <button
             type="button"
             className={`navbar-link navbar-account-auth${isAuthenticated ? '' : ' navbar-account-auth--guest'}`}

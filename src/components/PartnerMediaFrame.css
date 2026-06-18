@@ -1,0 +1,105 @@
+.partner-media-frame,
+.partner-media-placeholder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.partner-media-image,
+.partner-media-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.partner-media-placeholder {
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(15, 23, 42, 0.06) 100%),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(148, 163, 184, 0.12),
+      rgba(148, 163, 184, 0.12) 10px,
+      rgba(148, 163, 184, 0.04) 10px,
+      rgba(148, 163, 184, 0.04) 20px
+    );
+}
+
+.partner-media-placeholder-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+  color: #64748b;
+}
+
+.partner-media-placeholder-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--brand-primary, #2563eb);
+  font-size: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.partner-media-placeholder-inner p {
+  margin: 0;
+  max-width: 260px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.app-hero-image-frame,
+.app-hero-image-frame .partner-media-image,
+.app-hero-image-frame .partner-media-placeholder,
+.app-hero-image-frame .partner-media-video,
+.website-hero-image-frame,
+.website-hero-image-frame .partner-media-image,
+.website-hero-image-frame .partner-media-placeholder,
+.website-hero-image-frame .partner-media-video {
+  width: 100%;
+  height: 480px;
+  display: block;
+}
+
+.about-hero-image-frame,
+.about-hero-image-frame .partner-media-image,
+.about-hero-image-frame .partner-media-placeholder,
+.about-split-image-frame,
+.about-split-image-frame .partner-media-image,
+.about-split-image-frame .partner-media-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  display: block;
+}
+
+.service-detail-hero-image-frame,
+.service-detail-hero-image-frame .partner-media-image,
+.service-detail-hero-image-frame .partner-media-placeholder {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.landing-media-video-wrap,
+.landing-media-video-wrap .partner-media-video,
+.landing-media-video-wrap .partner-media-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  display: block;
+}

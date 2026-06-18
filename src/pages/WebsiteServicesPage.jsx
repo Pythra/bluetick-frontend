@@ -7,7 +7,10 @@ import Navbar from '../components/Navbar';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import websiteHeroImage from '../assets/tech.jpg';
+import { usePartnerAsset } from '../utils/partnerMedia';
+import PartnerMediaFrame from '../components/PartnerMediaFrame';
 import { companyWhatsappSessionUrl } from '../config/companyContact';
 import { usePartnerText } from '../utils/partnerText';
 import './ServiceDetailPage.css';
@@ -49,6 +52,8 @@ function WebsiteServicesPage() {
   const { addToCart } = useCart();
   const { format } = useCurrency();
   const { t } = usePartnerText();
+  const { isPartnerSite } = usePartnerBranding();
+  const { src: heroImageSrc } = usePartnerAsset('websiteServicesImage', websiteHeroImage);
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
@@ -83,7 +88,11 @@ function WebsiteServicesPage() {
 
       <div className="service-detail-shell">
         <header className="service-detail-hero">
-          <img src={websiteHeroImage} alt="" className="service-detail-hero-image" />
+          <PartnerMediaFrame
+            src={heroImageSrc}
+            alt=""
+            className="service-detail-hero-image-frame"
+          />
           <div className="service-detail-hero-overlay" aria-hidden="true" />
           <div className="service-detail-hero-content">
             <h1 className="service-detail-title">
@@ -130,7 +139,7 @@ function WebsiteServicesPage() {
         </div>
       )}
 
-      <ClientsSection />
+      {!isPartnerSite ? <ClientsSection /> : null}
       <Footer />
     </div>
   );

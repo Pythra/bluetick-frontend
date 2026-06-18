@@ -9,6 +9,10 @@ import businessDayLogo from '../assets/platforms/buisnessday.png';
 import vanguardLogo from '../assets/platforms/Vanguard.png';
 import PlatformLogo from '../components/PlatformLogo';
 import { usePartnerText } from '../utils/partnerText';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { buildWhatsappUrl, formatPhoneHref } from '../utils/partnerMedia';
+import { usePartnerAsset } from '../utils/partnerMedia';
+import PartnerMediaFrame from '../components/PartnerMediaFrame';
 import './AboutPage.css';
 
 const serviceGroups = [
@@ -80,7 +84,11 @@ const whyChoose = [
 function AboutPage() {
   const navigate = useNavigate();
   const { branding, brandName, supportEmail } = usePartnerText();
+  const { content, contactPhone, contactWhatsapp, contactWebsite } = usePartnerBranding();
   const isPartnerSite = branding.isPartnerSite;
+  const { src: aboutHeroSrc } = usePartnerAsset('aboutHero', teamMain);
+  const { src: aboutTeamSrc } = usePartnerAsset('aboutTeam', teamCrew);
+  const { src: contactBgSrc } = usePartnerAsset('contactBackground', connectDm);
 
   return (
     <div className="about-page">
@@ -92,21 +100,22 @@ function AboutPage() {
             <span className="about-eyebrow">About Us</span>
             <h1>{brandName}</h1>
             <p>
-              {brandName} is a technology and digital solutions company
-              providing end-to-end services in mobile application development for iOS and Android,
-              website and web application development, e-commerce solutions, digital marketing,
-              branding, and online reputation management. With operations spanning Africa and the
-              United States, the company serves a diverse global client base across multiple
-              industries.
+              {isPartnerSite && content?.aboutIntro
+                ? content.aboutIntro
+                : `${brandName} is a technology and digital solutions company providing end-to-end services in mobile application development for iOS and Android, website and web application development, e-commerce solutions, digital marketing, branding, and online reputation management. With operations spanning Africa and the United States, the company serves a diverse global client base across multiple industries.`}
             </p>
             <p>
-              We combine software engineering with digital visibility and media strategies to enable
-              businesses, entrepreneurs, creators, and public figures to build scalable digital
-              products while strengthening their online credibility, authority, and search presence.
+              {isPartnerSite && content?.aboutStory
+                ? content.aboutStory
+                : 'We combine software engineering with digital visibility and media strategies to enable businesses, entrepreneurs, creators, and public figures to build scalable digital products while strengthening their online credibility, authority, and search presence.'}
             </p>
           </div>
           <div className="about-hero-image">
-            <img src={teamMain} alt={`The ${brandName} team`} />
+            <PartnerMediaFrame
+              src={isPartnerSite ? aboutHeroSrc : teamMain}
+              alt={`The ${brandName} team`}
+              className="about-hero-image-frame"
+            />
           </div>
         </div>
       </section>
@@ -173,7 +182,11 @@ function AboutPage() {
             </p>
           </div>
           <div className="about-split-image">
-            <img src={teamCrew} alt={`${brandName} crew`} />
+            <PartnerMediaFrame
+              src={isPartnerSite ? aboutTeamSrc : teamCrew}
+              alt={`${brandName} crew`}
+              className="about-split-image-frame"
+            />
           </div>
         </div>
       </section>
@@ -241,17 +254,17 @@ function AboutPage() {
           <div className="about-mv-card">
             <h3>Our Mission</h3>
             <p>
-              To empower businesses, brands, and individuals with innovative technology, strategic media
-              visibility, and digital growth solutions that create lasting impact and measurable
-              success.
+              {isPartnerSite && content?.aboutMission
+                ? content.aboutMission
+                : 'To empower businesses, brands, and individuals with innovative technology, strategic media visibility, and digital growth solutions that create lasting impact and measurable success.'}
             </p>
           </div>
           <div className="about-mv-card">
             <h3>Our Vision</h3>
             <p>
-              To become one of Africa&apos;s most influential technology and digital growth companies,
-              helping businesses and individuals compete successfully on a global scale through
-              innovation, visibility, and digital transformation.
+              {isPartnerSite && content?.aboutVision
+                ? content.aboutVision
+                : 'To become one of Africa&apos;s most influential technology and digital growth companies, helping businesses and individuals compete successfully on a global scale through innovation, visibility, and digital transformation.'}
             </p>
           </div>
         </div>
@@ -279,23 +292,39 @@ function AboutPage() {
         </div>
       </section>
 
-      <section className="about-contact" style={{ backgroundImage: `url(${connectDm})` }}>
+      <section
+        className="about-contact"
+        style={contactBgSrc ? { backgroundImage: `url(${contactBgSrc})` } : undefined}
+      >
         <div className="about-contact-overlay">
           <div className="about-section-inner">
             <h2>Connect With Us Today</h2>
             <p>Let&apos;s build, grow, and scale your digital presence together.</p>
             <div className="about-contact-details">
+              {isPartnerSite && contactWebsite ? (
+                <a href={contactWebsite.startsWith('http') ? contactWebsite : `https://${contactWebsite}`} target="_blank" rel="noopener noreferrer">
+                  {contactWebsite.replace(/^https?:\/\//, '')}
+                </a>
+              ) : null}
               {!isPartnerSite && (
                 <a href="https://www.bluetickgeng.com" target="_blank" rel="noopener noreferrer">
                   www.bluetickgeng.com
                 </a>
               )}
               <a href={`mailto:${supportEmail}`}>{supportEmail}</a>
+              {isPartnerSite && formatPhoneHref(contactPhone) ? (
+                <a href={formatPhoneHref(contactPhone)}>{contactPhone}</a>
+              ) : null}
               {!isPartnerSite && (
                 <a href="https://wa.me/2349138832111" target="_blank" rel="noopener noreferrer">
                   WhatsApp: +234 913 883 2111
                 </a>
               )}
+              {isPartnerSite && buildWhatsappUrl(contactWhatsapp) ? (
+                <a href={buildWhatsappUrl(contactWhatsapp)} target="_blank" rel="noopener noreferrer">
+                  WhatsApp: {contactWhatsapp}
+                </a>
+              ) : null}
             </div>
             <button type="button" className="about-cta-button" onClick={() => navigate('/signup')}>
               Get Started

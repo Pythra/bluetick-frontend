@@ -10,11 +10,12 @@ import PlaceOrderDropdown from './PlaceOrderDropdown';
 import { useAuth } from '../contexts/AuthContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
+import PartnerMediaFrame from './PartnerMediaFrame';
 import CountryFlag from './CountryFlag';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { getCurrencyByCode } from '../data/flutterwaveCurrencies';
 import heroVideo from '../assets/vid.mp4';
-import { companyWhatsappDemoUrl } from '../config/companyContact';
+import { usePartnerAsset } from '../utils/partnerMedia';
 import './LandingPage.css';
 
 const heroSlides = [
@@ -59,7 +60,9 @@ const impactStats = [
 function LandingPage({ onScrollToSection }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { isPartnerSite, brandName, shortName, tagline } = usePartnerBranding();
+  const { isPartnerSite, brandName, shortName, tagline, heroTitle, heroDescription, features } = usePartnerBranding();
+  const { src: partnerHeroVideo, isPartnerSite: onPartnerSite } = usePartnerAsset('heroVideo', heroVideo);
+  const { src: heroPoster } = usePartnerAsset('heroPoster', null);
   const displayName = shortName || brandName;
   const { currency, setCurrency, currencies } = useCurrency();
   const selectedCurrency = getCurrencyByCode(currency);
@@ -134,11 +137,13 @@ function LandingPage({ onScrollToSection }) {
               {isPartnerSite ? `${displayName} — Digital Growth Services` : 'Digital Growth Services for Brands'}
             </p>
             <h1 className="landing-title">
-              Build, Verify, Monetize, and Feature Your Brand Across Top Platforms
+              {isPartnerSite && heroTitle
+                ? heroTitle
+                : 'Build, Verify, Monetize, and Feature Your Brand Across Top Platforms'}
             </h1>
             <p className="landing-description">
               {isPartnerSite
-                ? tagline
+                ? heroDescription || tagline
                 : 'From websites and mobile apps to social verification, monetization, PR distribution, Instagram promotions, and Wikipedia pages, we deliver end-to-end services designed for business growth and credibility.'}
             </p>
 
@@ -199,15 +204,13 @@ function LandingPage({ onScrollToSection }) {
           </div>
 
           <div className="landing-media-card">
-            <video
-              className="landing-media-video"
-              src={heroVideo}
-              autoPlay
-              muted
-              loop
-              playsInline
+            <PartnerMediaFrame
+              src={onPartnerSite ? partnerHeroVideo : heroVideo}
+              type="video"
+              poster={heroPoster}
+              className="landing-media-video-wrap"
+              overlayClassName="landing-media-overlay"
             />
-            <div className="landing-media-overlay"></div>
             <div className="landing-media-content">
               <div className="landing-media-carousel" aria-live="polite">
                 {heroSlides.map((slide, index) => (
@@ -228,6 +231,7 @@ function LandingPage({ onScrollToSection }) {
           </div>
         </div>
 
+        {(!isPartnerSite || features?.showPublicationLogos) ? (
         <div className="landing-logos-strip" aria-label="Featured media logos">
           <PublicationLogosCarousel
             title=""
@@ -235,6 +239,7 @@ function LandingPage({ onScrollToSection }) {
             includePlatformBadges
           />
         </div>
+        ) : null}
 
         <section ref={statsRef} className="landing-impact-strip" aria-label="Business impact metrics">
           <div className="landing-impact-inner">

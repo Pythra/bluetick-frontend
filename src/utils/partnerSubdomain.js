@@ -41,6 +41,16 @@ export function getPartnerSubdomainFromHost(hostname = window.location.hostname)
   return subdomain;
 }
 
+export function isBluetickMainHost(hostname = window.location.hostname) {
+  const normalizedHost = hostname.trim().toLowerCase();
+  const baseDomain = PARTNER_BASE_DOMAIN.toLowerCase();
+  return normalizedHost === baseDomain || normalizedHost === `www.${baseDomain}`;
+}
+
+export function isPartnerHost(hostname = window.location.hostname) {
+  return !isBluetickMainHost(hostname);
+}
+
 export function previewPartnerSiteUrl(brandName) {
   const slug = String(brandName || '')
     .trim()

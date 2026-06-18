@@ -15,6 +15,7 @@ import { companyWhatsappDemoDisplay, companyWhatsappDemoUrl } from '../config/co
 import PlaceOrderDropdown from './PlaceOrderDropdown';
 import { legalDocuments } from '../data/legalDocuments';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { buildWhatsappUrl, formatPhoneHref } from '../utils/partnerMedia';
 import './Footer.css';
 
 const footerLegalLinks = [
@@ -29,9 +30,27 @@ const footerLegalLinks = [
 
 function Footer({ onScrollToSection }) {
   const [logoError, setLogoError] = useState(false);
-  const { isPartnerSite, brandName, shortName, contactEmail, tagline, logoUrl } = usePartnerBranding();
+  const {
+    isPartnerSite,
+    brandName,
+    shortName,
+    contactEmail,
+    contactPhone,
+    contactWhatsapp,
+    contactWebsite,
+    tagline,
+    content,
+    logoUrl,
+    features,
+  } = usePartnerBranding();
   const displayName = shortName || brandName;
   const footerLogoSrc = isPartnerSite ? logoUrl : bluegoLogo;
+  const phoneHref = isPartnerSite ? formatPhoneHref(contactPhone) : 'tel:+2349069439149';
+  const phoneDisplay = isPartnerSite ? contactPhone : '+234 906 943 9149';
+  const whatsappUrl = isPartnerSite
+    ? buildWhatsappUrl(contactWhatsapp, "Hi, I'd like to get in touch.")
+    : companyWhatsappDemoUrl;
+  const whatsappDisplay = isPartnerSite ? contactWhatsapp : companyWhatsappDemoDisplay;
 
   return (
     <footer className="footer">
@@ -51,12 +70,12 @@ function Footer({ onScrollToSection }) {
           </div>
           <p className="footer-top-title">
             {isPartnerSite
-              ? `${displayName} — Your Brand Across Top Local and International Media Platforms`
+              ? content?.footerTagline || `${displayName} — Your Brand Across Top Local and International Media Platforms`
               : 'Your Brand Across Top Local and International Media Platforms'}
           </p>
           <p className="footer-top-subtitle">
             {isPartnerSite
-              ? tagline
+              ? content?.footerSubtitle || tagline
               : 'Web, app, social verification, monetization, and digital publication support from one team.'}
           </p>
           <PlaceOrderDropdown
@@ -84,9 +103,11 @@ function Footer({ onScrollToSection }) {
               <li>
                 <Link to="/blog">Blog</Link>
               </li>
+              {(!isPartnerSite || features?.showAffiliateProgram) ? (
               <li>
                 <Link to="/signup">Affiliate Program</Link>
               </li>
+              ) : null}
               <li>
                 <Link to="/account">My Account</Link>
               </li>
@@ -151,19 +172,23 @@ function Footer({ onScrollToSection }) {
                 <IoMailOutline className="contact-icon" />
                 <span>{contactEmail}</span>
               </a>
-              <a href="tel:+2349069431949" className="contact-link">
+              {phoneHref && phoneDisplay ? (
+              <a href={phoneHref} className="contact-link">
                 <IoCallOutline className="contact-icon" />
-                <span>+234 906 943 9149</span>
+                <span>{phoneDisplay}</span>
               </a>
+              ) : null}
+              {whatsappUrl && whatsappDisplay ? (
               <a
-                href={companyWhatsappDemoUrl}
+                href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-link"
               >
                 <IoLogoWhatsapp className="contact-icon" />
-                <span>{companyWhatsappDemoDisplay}</span>
+                <span>{whatsappDisplay}</span>
               </a>
+              ) : null}
               {!isPartnerSite && (
               <div className="social-links">
                 <a

@@ -3,10 +3,13 @@ import Button from './Button';
 import SectionHeader from './SectionHeader';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import websiteHeroImage from '../assets/tech.jpg';
+import { usePartnerAsset } from '../utils/partnerMedia';
+import PartnerMediaFrame from './PartnerMediaFrame';
 import './WebsiteServicesSection.css';
 
 function WebsiteServicesSummary() {
   const navigate = useNavigate();
+  const { src: websiteImageSrc } = usePartnerAsset('websiteServicesImage', websiteHeroImage);
 
   const websiteServices = [
     { name: 'BASIC INFORMATIONAL WEBSITES' },
@@ -37,10 +40,10 @@ function WebsiteServicesSummary() {
         )}
         media={(
           <div className="website-hero-shell">
-            <img
-              src={websiteHeroImage}
+            <PartnerMediaFrame
+              src={websiteImageSrc}
               alt="Website development services"
-              className="website-hero-image"
+              className="website-hero-image-frame"
             />
             <div className="website-hero-overlay"></div>
             <div className="website-hero-content">

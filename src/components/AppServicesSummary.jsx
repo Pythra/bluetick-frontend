@@ -3,10 +3,13 @@ import Button from './Button';
 import SectionHeader from './SectionHeader';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import appHeroImage from '../assets/app.png';
+import { usePartnerAsset } from '../utils/partnerMedia';
+import PartnerMediaFrame from './PartnerMediaFrame';
 import './AppServicesSection.css';
 
 function AppServicesSummary() {
   const navigate = useNavigate();
+  const { src: appImageSrc } = usePartnerAsset('appDevelopmentImage', appHeroImage);
 
   const appServices = [
     { name: 'IOS AND ANDROID APPS' },
@@ -38,10 +41,10 @@ function AppServicesSummary() {
         )}
         media={(
           <div className="app-hero-shell">
-            <img
-              src={appHeroImage}
+            <PartnerMediaFrame
+              src={appImageSrc}
               alt="App development services"
-              className="app-hero-image"
+              className="app-hero-image-frame"
             />
             <div className="app-hero-overlay"></div>
             <div className="app-hero-content">

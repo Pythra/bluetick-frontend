@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, unstable_HistoryRouter as HistoryRouter } from 'react-router-dom';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 import { createBrowserHistory } from 'history';
 import { AuthProvider } from './contexts/AuthContext';
-import { PartnerBrandingProvider } from './contexts/PartnerBrandingContext';
+import { PartnerBrandingProvider, usePartnerBranding } from './contexts/PartnerBrandingContext';
 import { CartProvider } from './contexts/CartContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { useAuth } from './contexts/AuthContext';
@@ -52,11 +52,11 @@ import PartnerApplicationPage from './pages/PartnerApplicationPage';
 import FAQ from './components/FAQ';
 import ClientsSection from './components/ClientsSection';
 import { subscribeToPushNotifications } from './utils/pushNotifications';
-import { getPartnerSubdomainFromHost } from './utils/partnerSubdomain';
 import './App.css';
+import './styles/partnerTemplates.css';
 
 function HomePage() {
-  const isMainSite = useMemo(() => !getPartnerSubdomainFromHost(), []);
+  const { isPartnerSite, features } = usePartnerBranding();
 
   useEffect(() => {
     const sections = document.querySelectorAll('.scroll-pop');
@@ -91,7 +91,7 @@ function HomePage() {
   return (
     <>
       <LandingPage onScrollToSection={scrollToSection} />
-      {isMainSite ? (
+      {!isPartnerSite ? (
         <div className="scroll-pop"><PartnerWithUsSection /></div>
       ) : null}
       <div className="scroll-pop"><AppServicesSummary /></div>
@@ -102,10 +102,14 @@ function HomePage() {
       <div className="scroll-pop"><PublicationServicesSummary /></div>
       <div className="scroll-pop"><InstagramServicesSummary /></div>
       <div className="scroll-pop"><WikipediaServicesSummary /></div>
-      <div className="scroll-pop"><CelebritiesSection /></div>
-      <div className="scroll-pop"><TestimonialsSection /></div>
+      {(!isPartnerSite || features?.showCelebrities) ? (
+        <div className="scroll-pop"><CelebritiesSection /></div>
+      ) : null}
+      {(!isPartnerSite || features?.showTestimonials) ? (
+        <div className="scroll-pop"><TestimonialsSection /></div>
+      ) : null}
       <div className="scroll-pop"><FAQ /></div>
-      <ClientsSection className="landing-page" />
+      {!isPartnerSite ? <ClientsSection className="landing-page" /> : null}
       <Footer onScrollToSection={scrollToSection} />
     </>
   );
