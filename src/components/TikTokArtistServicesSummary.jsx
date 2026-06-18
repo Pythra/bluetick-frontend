@@ -3,7 +3,7 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import tiktokArtistHeroImage from '../assets/social/tiktok-artist.jpg';
-import ServiceSectionTitle from './ServiceSectionTitle';
+import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './ServicesSummaryHero.css';
 

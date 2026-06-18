@@ -5,7 +5,7 @@ import ServicesSummaryLayout from './ServicesSummaryLayout';
 import appHeroImage from '../assets/app.png';
 import { usePartnerAsset } from '../utils/partnerMedia';
 import PartnerMediaFrame from './PartnerMediaFrame';
-import ServiceSectionTitle from './ServiceSectionTitle';
+import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './AppServicesSection.css';
 

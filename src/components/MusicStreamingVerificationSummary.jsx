@@ -3,7 +3,7 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import musicHeroImage from '../assets/mayorkun.jpg';
-import ServiceSectionTitle from './ServiceSectionTitle';
+import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './ServicesSummaryHero.css';
 
