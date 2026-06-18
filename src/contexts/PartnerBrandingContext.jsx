@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext';
 import { getPartnerSubdomainFromHost, isBluetickMainHost } from '../utils/partnerSubdomain';
 import { applyBrandCssVariables } from '../utils/brandTheme';
 import { getDefaultEnabledServices } from '../config/partnerSiteConfig';
+import { normalizeMediaUrl } from '../utils/partnerMedia';
 
 const DEFAULT_BRANDING = {
   isPartnerSite: false,
@@ -91,8 +92,11 @@ export function PartnerBrandingProvider({ children }) {
           setBranding({
             ...DEFAULT_BRANDING,
             ...data,
+            logoUrl: normalizeMediaUrl(data.logoUrl),
             content: data.content || {},
-            assets: data.assets || {},
+            assets: Object.fromEntries(
+              Object.entries(data.assets || {}).map(([key, value]) => [key, normalizeMediaUrl(value)])
+            ),
             features: {
               ...DEFAULT_BRANDING.features,
               ...(data.features || {}),

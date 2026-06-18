@@ -29,6 +29,7 @@ import {
   getDefaultEnabledServices,
 } from '../config/partnerSiteConfig';
 import { applyBrandCssVariables } from '../utils/brandTheme';
+import { normalizeMediaUrl } from '../utils/partnerMedia';
 import './styles/admin.css';
 import './styles/partnerDashboard.css';
 
@@ -88,7 +89,9 @@ function buildEmptyDraft(siteConfig = {}) {
       ...getDefaultEnabledServices(),
       ...(siteConfig.enabledServices || {}),
     },
-    assets: { ...(siteConfig.assets || {}) },
+    assets: Object.fromEntries(
+      Object.entries(siteConfig.assets || {}).map(([key, value]) => [key, normalizeMediaUrl(value)])
+    ),
     sectionContent: { ...(siteConfig.sectionContent || {}) },
   };
 }
@@ -195,7 +198,7 @@ function PartnerAdminApp({ subdomain }) {
 
     setSiteSettings(data);
     setDraft(buildEmptyDraft(data.siteConfig));
-    setLogoPreview(data.logoUrl || null);
+    setLogoPreview(normalizeMediaUrl(data.logoUrl) || null);
     setPendingLogo(null);
     setPendingAssets({});
     return data;
@@ -420,7 +423,7 @@ function PartnerAdminApp({ subdomain }) {
 
       setSiteSettings(data);
       setDraft(buildEmptyDraft(data.siteConfig));
-      setLogoPreview(data.logoUrl || null);
+      setLogoPreview(normalizeMediaUrl(data.logoUrl) || null);
       setPendingLogo(null);
       setPendingAssets({});
       setSaveMessage({ type: 'success', text: 'Your site settings were saved successfully.' });

@@ -1,5 +1,30 @@
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 
+export function normalizeMediaUrl(url) {
+  if (!url || typeof url !== 'string') {
+    return null;
+  }
+
+  const trimmed = url.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (trimmed.startsWith('data:') || /^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (
+    trimmed.includes('.cloudfront.net/') ||
+    trimmed.includes('amazonaws.com/') ||
+    /^[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(trimmed)
+  ) {
+    return `https://${trimmed.replace(/^\/+/, '')}`;
+  }
+
+  return trimmed;
+}
+
 /**
  * Resolves partner-owned media for a slot. On partner sites, never falls back
  * to Bluetick bundled assets — returns null so callers can show a placeholder.
@@ -15,7 +40,7 @@ export function usePartnerAsset(slot, mainSiteAsset = null) {
     };
   }
 
-  const partnerSrc = branding.assets?.[slot] || null;
+  const partnerSrc = normalizeMediaUrl(branding.assets?.[slot] || null);
   return {
     src: partnerSrc,
     isPartnerSite: true,
