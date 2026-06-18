@@ -354,7 +354,7 @@ function PartnerAdminApp({ subdomain }) {
         }
       );
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
         throw new Error(data.error || 'Failed to save settings');
       }
@@ -369,7 +369,11 @@ function PartnerAdminApp({ subdomain }) {
       document.documentElement.style.setProperty('--brand-primary', data.siteConfig.primaryColor);
       document.documentElement.style.setProperty('--brand-primary-dark', data.siteConfig.primaryColorDark);
     } catch (err) {
-      setSaveMessage({ type: 'error', text: err.message });
+      const message =
+        err?.message === 'Failed to fetch'
+          ? 'Could not reach the server. Check your connection and try again. If this keeps happening, the API may need to be redeployed.'
+          : err.message;
+      setSaveMessage({ type: 'error', text: message });
     } finally {
       setSaving(false);
     }
@@ -465,7 +469,11 @@ function PartnerAdminApp({ subdomain }) {
 
             {loginError && <div className="adm-login-error">{loginError}</div>}
 
-            <button type="submit" className="pdash-btn pdash-btn-primary" style={{ width: '100%' }} disabled={loginLoading}>
+            <button
+              type="submit"
+              className="pdash-btn pdash-btn-primary pdash-login-submit"
+              disabled={loginLoading}
+            >
               {loginLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>

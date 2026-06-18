@@ -110,7 +110,7 @@
 
 .navbar-signup {
   background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
-  border: 1px solid #93c5fd;
+  border: none;
   color: var(--brand-primary-dark, #1d4ed8);
   box-shadow:
     0 2px 4px rgba(37, 99, 235, 0.14),
