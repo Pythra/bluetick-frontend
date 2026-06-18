@@ -204,5 +204,21 @@ export const PARTNER_SECTION_TOGGLES = [
   },
 ];
 
+/** Maps homepage section toggles to editable content keys. */
+export const PARTNER_TOGGLE_EDITOR_MAP = {
+  showHero: { key: 'hero', editorType: 'hero', label: 'Homepage hero' },
+  showImpactStats: { key: 'impactStats', editorType: 'impactStats', label: 'Impact statistics' },
+  showTestimonials: { key: 'testimonials', editorType: 'testimonials', label: 'Testimonials' },
+  showFaq: { key: 'faq', editorType: 'faq', label: 'FAQ section' },
+};
+
+export function getServiceEditorMeta(service) {
+  return {
+    key: service.id,
+    editorType: 'service',
+    label: service.label,
+  };
+}
+
 /** @deprecated Use PARTNER_SECTION_TOGGLES */
 export const PARTNER_FEATURE_TOGGLES = PARTNER_SECTION_TOGGLES;

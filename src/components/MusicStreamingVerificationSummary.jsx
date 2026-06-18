@@ -3,16 +3,12 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import musicHeroImage from '../assets/mayorkun.jpg';
+import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './ServicesSummaryHero.css';
 
 function MusicStreamingVerificationSummary() {
   const navigate = useNavigate();
-
-  const highlightServices = [
-    'Spotify & Apple Music verification',
-    'Boomplay, Audiomack & Deezer verification',
-    'YouTube Official Artist Channel (OAC)',
-  ];
+  const section = usePartnerSectionContent('musicStreaming');
 
   return (
     <section
@@ -24,22 +20,10 @@ function MusicStreamingVerificationSummary() {
         copy={(
           <>
             <SectionHeader
-              eyebrow="For Artists"
-              title={(
-                <>
-                  <span className="services-summary-title-black">MUSIC ARTIST</span>
-                  <span className="services-summary-title-row">
-                    <span className="services-summary-title-black">STREAMING </span>
-                    <span className="services-summary-title-blue">VERIFICATION</span>
-                  </span>
-                </>
-              )}
+              eyebrow={section.eyebrow}
+              title={<ServiceSectionTitle section={section} />}
             />
-            <p className="services-summary-intro">
-              Get verified artist profiles on Spotify, Apple Music, Boomplay, YouTube OAC, and every
-              major streaming platform. We handle eligibility, profile setup, and platform approval from
-              start to finish.
-            </p>
+            <p className="services-summary-intro">{section.intro}</p>
           </>
         )}
         media={(
@@ -51,10 +35,10 @@ function MusicStreamingVerificationSummary() {
             />
             <div className="services-summary-hero-overlay"></div>
             <div className="services-summary-hero-content">
-              <p className="services-summary-hero-kicker">What We Verify</p>
-              <h3>Official Artist Profiles on Top Platforms</h3>
+              <p className="services-summary-hero-kicker">{section.heroKicker}</p>
+              <h3>{section.heroTitle}</h3>
               <ul className="services-summary-hero-types">
-                {highlightServices.map((service) => (
+                {(section.bullets || []).map((service) => (
                   <li key={service}>{service}</li>
                 ))}
               </ul>

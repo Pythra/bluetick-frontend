@@ -426,8 +426,123 @@
   border: 1px solid var(--pdash-border);
   border-radius: 12px;
   background: #fff;
-  cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.pdash-service-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.pdash-service-edit,
+.pdash-toggle-edit {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.pdash-toggle-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.pdash-editor-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 1200;
+}
+
+.pdash-editor-modal {
+  width: min(760px, 100%);
+  max-height: min(88vh, 900px);
+  overflow: auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  border: 1px solid var(--pdash-border);
+}
+
+.pdash-editor-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px 12px;
+  border-bottom: 1px solid var(--pdash-border);
+}
+
+.pdash-editor-head h3 {
+  margin: 0 0 6px;
+}
+
+.pdash-editor-head p {
+  margin: 0;
+  color: var(--pdash-soft);
+  font-size: 13px;
+}
+
+.pdash-editor-close {
+  border: none;
+  background: #f8fafc;
+  color: var(--pdash-text);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.pdash-editor-form {
+  padding: 18px 24px 24px;
+}
+
+.pdash-editor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pdash-editor-list-item {
+  border: 1px solid var(--pdash-border);
+  border-radius: 12px;
+  padding: 14px;
+  background: #f8fafc;
+}
+
+.pdash-editor-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.pdash-editor-add {
+  margin-top: 8px;
+}
+
+.pdash-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--pdash-border);
 }
 
 .pdash-service-item:hover {

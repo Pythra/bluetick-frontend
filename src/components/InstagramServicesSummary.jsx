@@ -3,17 +3,13 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import instagramHeroImage from '../assets/online.jpg';
+import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './InstagramServicesSummary.css';
 import './ServicesSummaryHero.css';
 
 function InstagramServicesSummary() {
   const navigate = useNavigate();
-
-  const instagramServices = [
-    'Instagram blogs promotions',
-    'Entertainment & celebrity pages',
-    'Music & lifestyle promotion',
-  ];
+  const section = usePartnerSectionContent('instagram');
 
   return (
     <section id="instagram-services" className="instagram-services-section instagram-services-summary services-summary-layout">
@@ -22,19 +18,10 @@ function InstagramServicesSummary() {
         copy={(
           <>
             <SectionHeader
-              eyebrow="Influence & Reach"
-              title={(
-                <>
-                  <span className="services-summary-title-black">INSTAGRAM BLOG</span>{' '}
-                  <span className="services-summary-title-blue">PROMOTION</span>
-                </>
-              )}
+              eyebrow={section.eyebrow}
+              title={<ServiceSectionTitle section={section} />}
             />
-            <p className="services-summary-intro">
-              Get your content featured on top Instagram pages and reach millions of followers. Promote
-              your brand, music, or content on Nigeria&apos;s most popular Instagram pages — from
-              entertainment blogs to celebrity news platforms.
-            </p>
+            <p className="services-summary-intro">{section.intro}</p>
           </>
         )}
         media={(
@@ -46,10 +33,10 @@ function InstagramServicesSummary() {
             />
             <div className="services-summary-hero-overlay"></div>
             <div className="services-summary-hero-content">
-              <p className="services-summary-hero-kicker">What We Promote</p>
-              <h3>Reach Millions on Top Instagram Pages</h3>
+              <p className="services-summary-hero-kicker">{section.heroKicker}</p>
+              <h3>{section.heroTitle}</h3>
               <ul className="services-summary-hero-types">
-                {instagramServices.map((service) => (
+                {(section.bullets || []).map((service) => (
                   <li key={service}>{service}</li>
                 ))}
               </ul>

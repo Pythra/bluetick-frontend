@@ -16,6 +16,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { getCurrencyByCode } from '../data/flutterwaveCurrencies';
 import heroVideo from '../assets/vid.mp4';
 import { usePartnerAsset } from '../utils/partnerMedia';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './LandingPage.css';
 
 const heroSlides = [
@@ -57,10 +58,14 @@ const impactStats = [
   },
 ];
 
+const impactStatIcons = [IoNewspaperOutline, IoPeopleOutline, IoRocketOutline];
+const impactStatTones = ['mint', 'sky', 'amber'];
+
 function LandingPage({ onScrollToSection }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isPartnerSite, brandName, shortName, tagline, heroTitle, heroDescription, features } = usePartnerBranding();
+  const impactSection = usePartnerSectionContent('impactStats');
   const { src: partnerHeroVideo, isPartnerSite: onPartnerSite } = usePartnerAsset('heroVideo', heroVideo);
   const { src: heroPoster } = usePartnerAsset('heroPoster', null);
   const displayName = shortName || brandName;
@@ -250,24 +255,26 @@ function LandingPage({ onScrollToSection }) {
         {showImpactStats ? (
         <section ref={statsRef} className="landing-impact-strip" aria-label="Business impact metrics">
           <div className="landing-impact-inner">
-            {impactStats.map((stat) => {
-              const Icon = stat.icon;
+            {(impactSection.items || impactStats).map((stat, index) => {
+              const Icon = impactStatIcons[index] || IoRocketOutline;
+              const iconTone = impactStatTones[index] || 'sky';
+              const numericValue = Number.parseInt(String(stat.value).replace(/\D/g, ''), 10) || 0;
               return (
                 <article
-                  key={stat.label}
+                  key={`${stat.label}-${index}`}
                   className="landing-impact-item landing-impact-item--card"
                 >
                   <div className="landing-impact-top">
                     <div
-                      className={`landing-impact-icon landing-impact-icon--${stat.iconTone}`}
+                      className={`landing-impact-icon landing-impact-icon--${iconTone}`}
                       aria-hidden="true"
                     >
                       <Icon />
                     </div>
                     <p className="landing-impact-value">
                       <AnimatedNumber
-                        value={stat.value}
-                        suffix={stat.suffix}
+                        value={numericValue}
+                        suffix={stat.suffix || ''}
                         isActive={statsVisible}
                       />
                     </p>

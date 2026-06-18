@@ -5,17 +5,13 @@ import ServicesSummaryLayout from './ServicesSummaryLayout';
 import appHeroImage from '../assets/app.png';
 import { usePartnerAsset } from '../utils/partnerMedia';
 import PartnerMediaFrame from './PartnerMediaFrame';
+import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './AppServicesSection.css';
 
 function AppServicesSummary() {
   const navigate = useNavigate();
+  const section = usePartnerSectionContent('appDevelopment');
   const { src: appImageSrc } = usePartnerAsset('appDevelopmentImage', appHeroImage);
-
-  const appServices = [
-    { name: 'IOS AND ANDROID APPS' },
-    { name: 'FINTECH AND COMMERCE APPS' },
-    { name: 'CUSTOM PRODUCT APPS' },
-  ];
 
   return (
     <section id="app-services" className="app-services-section app-services-summary services-summary-layout">
@@ -23,20 +19,10 @@ function AppServicesSummary() {
         copy={(
           <>
             <SectionHeader
-              eyebrow="Build & Launch"
-              title={(
-                <>
-                  <span className="services-summary-title-black">APP DEVELOPMENT</span>{' '}
-                  <span className="services-summary-title-blue">SERVICES</span>
-                </>
-              )}
+              eyebrow={section.eyebrow}
+              title={<ServiceSectionTitle section={section} />}
             />
-            <p className="services-summary-intro">
-              We craft fast, scalable, and{' '}
-              <span>user-focused apps</span> with one streamlined{' '}
-              <span>product strategy</span> from{' '}
-              <span>planning to launch</span>.
-            </p>
+            <p className="services-summary-intro">{section.intro}</p>
           </>
         )}
         media={(
@@ -48,11 +34,11 @@ function AppServicesSummary() {
             />
             <div className="app-hero-overlay"></div>
             <div className="app-hero-content">
-              <p className="app-hero-kicker">What We Build</p>
-              <h3>Modern Mobile Apps That Perform</h3>
+              <p className="app-hero-kicker">{section.heroKicker}</p>
+              <h3>{section.heroTitle}</h3>
               <ul className="app-hero-types">
-                {appServices.map((app) => (
-                  <li key={app.name}>{app.name}</li>
+                {(section.bullets || []).map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
               <Button onClick={() => navigate('/services/apps')} className="bounce-btn app-hero-cta">

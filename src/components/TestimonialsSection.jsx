@@ -1,29 +1,7 @@
 import { useEffect, useState } from 'react';
 import SectionHeader from './SectionHeader';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './TestimonialsSection.css';
-
-const testimonials = [
-  {
-    name: 'Michael Adebayo',
-    role: 'Founder, FinTech startup',
-    content: 'Our release went live on Punch and Vanguard the next day. Simple checkout and no back-and-forth.',
-  },
-  {
-    name: 'Chiamaka Okafor',
-    role: 'Marketing lead',
-    content: 'They sent every publication link in one report. Made it easy to share proof with our client.',
-  },
-  {
-    name: 'David Thompson',
-    role: 'Brand manager',
-    content: 'Second campaign with them. Same quick turnaround and the outlets matched what we picked.',
-  },
-  {
-    name: 'Amina Hassan',
-    role: 'PR consultant',
-    content: 'Responsive on WhatsApp and clear about timelines. Placements landed as promised.',
-  },
-];
 
 function TestimonialCard({ name, role, content }) {
   return (
@@ -39,11 +17,13 @@ function TestimonialCard({ name, role, content }) {
 }
 
 function TestimonialsSection() {
+  const section = usePartnerSectionContent('testimonials');
+  const testimonials = section.items || [];
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 768px)');
-    if (!mediaQuery.matches) {
+    if (!mediaQuery.matches || !testimonials.length) {
       return undefined;
     }
 
@@ -52,7 +32,11 @@ function TestimonialsSection() {
     }, 5500);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [testimonials.length]);
+
+  if (!testimonials.length) {
+    return null;
+  }
 
   return (
     <section id="testimonials" className="testimonials-section" aria-labelledby="testimonials-title">
@@ -60,15 +44,15 @@ function TestimonialsSection() {
         <SectionHeader
           title={(
             <>
-              <span id="testimonials-title" className="services-summary-title-black">HEAR FROM OUR</span>
-              <span className="services-summary-title-blue">CLIENTS</span>
+              <span id="testimonials-title" className="services-summary-title-black">{section.titleBlack}</span>
+              <span className="services-summary-title-blue">{section.titleBlue}</span>
             </>
           )}
         />
 
         <div className="testimonials-desktop" aria-label="Client testimonials">
           {testimonials.map((item) => (
-            <TestimonialCard key={item.name} {...item} />
+            <TestimonialCard key={`${item.name}-${item.content}`} {...item} />
           ))}
         </div>
 
@@ -83,7 +67,7 @@ function TestimonialsSection() {
               style={{ transform: `translateX(-${activeIndex * 100}%)` }}
             >
               {testimonials.map((item) => (
-                <div key={item.name} className="testimonials-mobile-slide">
+                <div key={`${item.name}-mobile`} className="testimonials-mobile-slide">
                   <TestimonialCard {...item} />
                 </div>
               ))}
@@ -92,12 +76,11 @@ function TestimonialsSection() {
           <div className="testimonials-dots" role="tablist" aria-label="Choose testimonial">
             {testimonials.map((item, index) => (
               <button
-                key={item.name}
+                key={`${item.name}-dot`}
                 type="button"
                 role="tab"
-                className={`testimonials-dot ${index === activeIndex ? 'is-active' : ''}`}
                 aria-selected={index === activeIndex}
-                aria-label={`Testimonial ${index + 1}: ${item.name}`}
+                className={`testimonials-dot ${index === activeIndex ? 'is-active' : ''}`}
                 onClick={() => setActiveIndex(index)}
               />
             ))}

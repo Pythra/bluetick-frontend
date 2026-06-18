@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import SectionHeader from './SectionHeader';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import '../styles/FAQ.css';
 
-// FAQ Item Component
 function FAQItem({ question, answer }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="faq-item">
-      <button 
+      <button
         className={`faq-question ${isOpen ? 'active' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
@@ -25,35 +25,13 @@ function FAQItem({ question, answer }) {
   );
 }
 
-// FAQ Component
 function FAQ() {
-  // FAQ Data
-  const faqs = [
-    {
-      question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards, PayPal, and bank transfers. All payments are processed securely through our payment gateway."
-    },
-    {
-      question: "How long does it take to complete a project?",
-      answer: "Project timelines vary depending on the scope and complexity. A standard website typically takes 4-6 weeks, while mobile apps can take 8-12 weeks. We'll provide a detailed timeline after discussing your specific requirements."
-    },
-    {
-      question: "Do you offer maintenance services?",
-      answer: "Yes, we offer various maintenance packages to keep your website or application running smoothly. Our maintenance services include security updates, performance optimization, and content updates."
-    },
-    {
-      question: "Can you help with domain and hosting setup?",
-      answer: "Absolutely! We can assist you with domain registration, hosting setup, and email configuration. We can recommend reliable hosting providers based on your specific needs."
-    },
-    {
-      question: "What is your refund policy?",
-      answer: "We offer a 30-day money-back guarantee on our services. If you're not satisfied with our work within the first 30 days, we'll issue a full refund, no questions asked."
-    },
-    {
-      question: "Do you provide ongoing support?",
-      answer: "Yes, we offer various support packages to meet your needs. Our support includes bug fixes, updates, and technical assistance. Contact us to learn more about our support plans."
-    }
-  ];
+  const section = usePartnerSectionContent('faq');
+  const faqs = section.items || [];
+
+  if (!faqs.length) {
+    return null;
+  }
 
   return (
     <section id="faq" className="faq-section">
@@ -61,16 +39,16 @@ function FAQ() {
         <SectionHeader
           title={(
             <>
-              <span className="services-summary-title-black">FREQUENTLY ASKED</span>
-              <span className="services-summary-title-blue">QUESTIONS</span>
+              <span className="services-summary-title-black">{section.titleBlack}</span>
+              <span className="services-summary-title-blue">{section.titleBlue}</span>
             </>
           )}
         />
 
         <div className="faq-container">
-          {faqs.map((faq, index) => (
-            <FAQItem 
-              key={index}
+          {faqs.map((faq) => (
+            <FAQItem
+              key={`${faq.question}-${faq.answer}`}
               question={faq.question}
               answer={faq.answer}
             />

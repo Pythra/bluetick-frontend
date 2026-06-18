@@ -35,6 +35,7 @@ const DEFAULT_BRANDING = {
     showPartnerProgram: true,
   },
   enabledServices: getDefaultEnabledServices(),
+  sectionContent: {},
   customDomain: '',
   customDomainVerified: false,
   showPartnerProgram: true,
@@ -100,6 +101,7 @@ export function PartnerBrandingProvider({ children }) {
               ...DEFAULT_BRANDING.enabledServices,
               ...(data.enabledServices || {}),
             },
+            sectionContent: data.sectionContent || {},
             loading: false,
           });
           return;

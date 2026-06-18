@@ -8,6 +8,8 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import socialVerificationImage from '../assets/social/verification.jpg';
+import { usePartnerAsset } from '../utils/partnerMedia';
+import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './VerificationSection.css';
 
 const socialServiceCategories = [
@@ -48,6 +50,7 @@ const socialServiceCategories = [
 
 function VerificationServicesSummary() {
   const navigate = useNavigate();
+  const section = usePartnerSectionContent('socialMedia');
 
   return (
     <section
@@ -61,18 +64,10 @@ function VerificationServicesSummary() {
         copy={(
           <>
             <SectionHeader
-              eyebrow="Trust & Growth"
-              title={(
-                <>
-                  <span className="services-summary-title-black">SOCIAL MEDIA</span>{' '}
-                  <span className="services-summary-title-blue">SERVICES</span>
-                </>
-              )}
+              eyebrow={section.eyebrow}
+              title={<ServiceSectionTitle section={section} />}
             />
-            <p className="services-summary-intro">
-              We offer three core social media service categories to help brands build trust, grow reach,
-              and convert visibility into measurable business outcomes.
-            </p>
+            <p className="services-summary-intro">{section.intro}</p>
           </>
         )}
         media={(
@@ -86,8 +81,8 @@ function VerificationServicesSummary() {
                 />
                 <div className="verification-carousel-overlay"></div>
                 <div className="verification-carousel-content verification-overview-content">
-                  <p className="verification-carousel-kicker">Service Overview</p>
-                  <h3>We Offer:</h3>
+                  <p className="verification-carousel-kicker">{section.heroKicker}</p>
+                  <h3>{section.heroTitle}</h3>
                   <ul className="verification-carousel-types verification-carousel-types--bulleted">
                     <li>Social Media Verification</li>
                     <li>Social Media Monetization</li>

@@ -13,7 +13,9 @@ import {
   MdAccessTime,
   MdPayments,
   MdVerified,
+  MdEdit,
 } from 'react-icons/md';
+import SectionContentEditor from './components/SectionContentEditor';
 import { useAuth } from '../contexts/AuthContext';
 import { getOrderServiceLabel } from './utils/orderServices';
 import {
@@ -22,6 +24,8 @@ import {
   PARTNER_CONTENT_FIELDS,
   PARTNER_SECTION_TOGGLES,
   PARTNER_HOMEPAGE_SERVICES,
+  PARTNER_TOGGLE_EDITOR_MAP,
+  getServiceEditorMeta,
   getDefaultEnabledServices,
 } from '../config/partnerSiteConfig';
 import { applyBrandCssVariables } from '../utils/brandTheme';
@@ -85,6 +89,7 @@ function buildEmptyDraft(siteConfig = {}) {
       ...(siteConfig.enabledServices || {}),
     },
     assets: { ...(siteConfig.assets || {}) },
+    sectionContent: { ...(siteConfig.sectionContent || {}) },
   };
 }
 
@@ -111,6 +116,7 @@ function PartnerAdminApp({ subdomain }) {
   const [error, setError] = useState(null);
   const [saveMessage, setSaveMessage] = useState(null);
   const [domainMessage, setDomainMessage] = useState(null);
+  const [activeEditor, setActiveEditor] = useState(null);
 
   const authHeaders = useMemo(
     () => ({
@@ -273,6 +279,30 @@ function PartnerAdminApp({ subdomain }) {
     }));
   };
 
+  const openSectionEditor = (editorMeta) => {
+    setActiveEditor(editorMeta);
+  };
+
+  const handleSectionEditorSave = ({ contentPatch, sectionPatch }) => {
+    setDraft((prev) => ({
+      ...prev,
+      content: contentPatch ? { ...prev.content, ...contentPatch } : prev.content,
+      sectionContent: sectionPatch
+        ? {
+            ...prev.sectionContent,
+            [activeEditor.key]: {
+              ...(prev.sectionContent?.[activeEditor.key] || {}),
+              ...sectionPatch,
+            },
+          }
+        : prev.sectionContent,
+    }));
+    setSaveMessage({
+      type: 'success',
+      text: 'Section content updated. Click Save Changes to publish it on your site.',
+    });
+  };
+
   const enabledServiceCount = useMemo(() => {
     if (!draft?.enabledServices) return 0;
     return PARTNER_HOMEPAGE_SERVICES.filter((service) => draft.enabledServices[service.id]).length;
@@ -376,6 +406,7 @@ function PartnerAdminApp({ subdomain }) {
             content: draft.content,
             features: draft.features,
             enabledServices: draft.enabledServices,
+            sectionContent: draft.sectionContent,
             logo: pendingLogo || undefined,
             assetUploads: Object.keys(assetUploads).length ? assetUploads : undefined,
           }),
@@ -700,19 +731,29 @@ function PartnerAdminApp({ subdomain }) {
           <div className="pdash-service-list">
             {PARTNER_HOMEPAGE_SERVICES.map((service, index) => {
               const isEnabled = Boolean(draft.enabledServices?.[service.id]);
+              const editorMeta = getServiceEditorMeta(service);
               return (
-                <label key={service.id} className={`pdash-service-item${isEnabled ? ' is-enabled' : ''}`}>
-                  <input
-                    type="checkbox"
-                    checked={isEnabled}
-                    onChange={(e) => updateDraftService(service.id, e.target.checked)}
-                  />
-                  <span className="pdash-service-order">{index + 1}</span>
-                  <span className="pdash-service-copy">
-                    <strong>{service.label}</strong>
-                    <span>{service.description}</span>
-                  </span>
-                </label>
+                <div key={service.id} className={`pdash-service-item${isEnabled ? ' is-enabled' : ''}`}>
+                  <label className="pdash-service-item-main">
+                    <input
+                      type="checkbox"
+                      checked={isEnabled}
+                      onChange={(e) => updateDraftService(service.id, e.target.checked)}
+                    />
+                    <span className="pdash-service-order">{index + 1}</span>
+                    <span className="pdash-service-copy">
+                      <strong>{service.label}</strong>
+                      <span>{service.description}</span>
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    className="pdash-btn pdash-btn-ghost pdash-service-edit"
+                    onClick={() => openSectionEditor(editorMeta)}
+                  >
+                    <MdEdit /> Edit content
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -721,27 +762,52 @@ function PartnerAdminApp({ subdomain }) {
         <div className="pdash-panel">
           <h2>Homepage Sections</h2>
           <p className="pdash-panel-lead">Control hero, logos, testimonials, FAQ, and other non-service blocks on your site.</p>
-          {PARTNER_SECTION_TOGGLES.map((toggle) => (
+          {PARTNER_SECTION_TOGGLES.map((toggle) => {
+            const editorMeta = PARTNER_TOGGLE_EDITOR_MAP[toggle.key];
+            return (
             <div key={toggle.key} className="pdash-toggle">
               <div>
                 <strong>{toggle.label}</strong>
                 <span>{toggle.description}</span>
               </div>
-              <label className="pdash-switch">
-                <input
-                  type="checkbox"
-                  checked={
-                    draft.features?.[toggle.key] ??
-                    toggle.defaultEnabled ??
-                    false
-                  }
-                  onChange={(e) => updateDraftFeature(toggle.key, e.target.checked)}
-                />
-                <span className="pdash-switch-slider" />
-              </label>
+              <div className="pdash-toggle-actions">
+                {editorMeta ? (
+                  <button
+                    type="button"
+                    className="pdash-btn pdash-btn-ghost pdash-toggle-edit"
+                    onClick={() => openSectionEditor(editorMeta)}
+                  >
+                    <MdEdit /> Edit
+                  </button>
+                ) : null}
+                <label className="pdash-switch">
+                  <input
+                    type="checkbox"
+                    checked={
+                      draft.features?.[toggle.key] ??
+                      toggle.defaultEnabled ??
+                      false
+                    }
+                    onChange={(e) => updateDraftFeature(toggle.key, e.target.checked)}
+                  />
+                  <span className="pdash-switch-slider" />
+                </label>
+              </div>
             </div>
-          ))}
+          );
+          })}
         </div>
+
+        <SectionContentEditor
+          isOpen={Boolean(activeEditor)}
+          sectionKey={activeEditor?.key}
+          editorType={activeEditor?.editorType}
+          title={activeEditor ? `Edit ${activeEditor.label}` : ''}
+          sectionContent={draft.sectionContent}
+          siteContent={draft.content}
+          onClose={() => setActiveEditor(null)}
+          onSave={handleSectionEditorSave}
+        />
       </>
     );
   };

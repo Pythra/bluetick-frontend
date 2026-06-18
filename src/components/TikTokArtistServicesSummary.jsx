@@ -3,18 +3,12 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import tiktokArtistHeroImage from '../assets/social/tiktok-artist.jpg';
-import { usePartnerText } from '../utils/partnerText';
+import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './ServicesSummaryHero.css';
 
 function TikTokArtistServicesSummary() {
   const navigate = useNavigate();
-  const { shortBrandName } = usePartnerText();
-
-  const highlightServices = [
-    'TikTok song claim under your artist profile',
-    'Micro influencer campaigns using your sound',
-    'Packages from 25 to 1,000 influencers',
-  ];
+  const section = usePartnerSectionContent('tiktokArtist');
 
   return (
     <section
@@ -25,21 +19,10 @@ function TikTokArtistServicesSummary() {
         copy={(
           <>
             <SectionHeader
-              eyebrow="Go Viral"
-              title={(
-                <>
-                  <span className="services-summary-title-black">TIKTOK FOR</span>
-                  <span className="services-summary-title-row">
-                    <span className="services-summary-title-black">ARTIST </span>
-                    <span className="services-summary-title-blue">SERVICES</span>
-                  </span>
-                </>
-              )}
+              eyebrow={section.eyebrow}
+              title={<ServiceSectionTitle section={section} />}
             />
-            <p className="services-summary-intro">
-              Promotional packages for artists and labels — from song claiming and analytics setup to
-              influencer sound campaigns that drive reach on TikTok.
-            </p>
+            <p className="services-summary-intro">{section.intro}</p>
           </>
         )}
         media={(
@@ -51,10 +34,10 @@ function TikTokArtistServicesSummary() {
             />
             <div className="services-summary-hero-overlay"></div>
             <div className="services-summary-hero-content">
-              <p className="services-summary-hero-kicker">{shortBrandName.toUpperCase()} · TikTok</p>
-              <h3>Services &amp; Promotional Packages</h3>
+              <p className="services-summary-hero-kicker">{section.heroKicker}</p>
+              <h3>{section.heroTitle}</h3>
               <ul className="services-summary-hero-types">
-                {highlightServices.map((service) => (
+                {(section.bullets || []).map((service) => (
                   <li key={service}>{service}</li>
                 ))}
               </ul>

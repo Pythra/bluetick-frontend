@@ -4,17 +4,13 @@ import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
 import publicationHeroImage from '../assets/news.jpg';
+import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './PublicationSection.css';
 import './ServicesSummaryHero.css';
 
 function PublicationServicesSummary() {
   const navigate = useNavigate();
-
-  const publicationServices = [
-    'Major platforms package',
-    'International platforms',
-    'National dailies & newswire',
-  ];
+  const section = usePartnerSectionContent('publication');
 
   const publicationCategories = [
     {
@@ -65,19 +61,10 @@ function PublicationServicesSummary() {
         copy={(
           <>
             <SectionHeader
-              eyebrow="Press & Media"
-              title={(
-                <>
-                  <span className="services-summary-title-black">PUBLICATION</span>{' '}
-                  <span className="services-summary-title-blue">PACKAGES</span>
-                </>
-              )}
+              eyebrow={section.eyebrow}
+              title={<ServiceSectionTitle section={section} />}
             />
-            <p className="services-summary-intro">
-              Get your content published on major news platforms, international sites, and specialized
-              publications. From quick 6-hour publications to comprehensive multi-platform packages, we
-              deliver solutions that amplify your message globally.
-            </p>
+            <p className="services-summary-intro">{section.intro}</p>
           </>
         )}
         media={(
@@ -89,10 +76,10 @@ function PublicationServicesSummary() {
             />
             <div className="services-summary-hero-overlay"></div>
             <div className="services-summary-hero-content">
-              <p className="services-summary-hero-kicker">What We Publish</p>
-              <h3>Your Story on Major Media Platforms</h3>
+              <p className="services-summary-hero-kicker">{section.heroKicker}</p>
+              <h3>{section.heroTitle}</h3>
               <ul className="services-summary-hero-types">
-                {publicationServices.map((service) => (
+                {(section.bullets || []).map((service) => (
                   <li key={service}>{service}</li>
                 ))}
               </ul>

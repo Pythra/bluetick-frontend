@@ -5,17 +5,13 @@ import ServicesSummaryLayout from './ServicesSummaryLayout';
 import websiteHeroImage from '../assets/tech.jpg';
 import { usePartnerAsset } from '../utils/partnerMedia';
 import PartnerMediaFrame from './PartnerMediaFrame';
+import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './WebsiteServicesSection.css';
 
 function WebsiteServicesSummary() {
   const navigate = useNavigate();
+  const section = usePartnerSectionContent('websiteDevelopment');
   const { src: websiteImageSrc } = usePartnerAsset('websiteServicesImage', websiteHeroImage);
-
-  const websiteServices = [
-    { name: 'BASIC INFORMATIONAL WEBSITES' },
-    { name: 'CUSTOM WEB APPLICATIONS' },
-    { name: 'E-COMMERCE WEBSITES' },
-  ];
 
   return (
     <section id="website-services" className="website-services-section website-services-summary services-summary-layout">
@@ -24,18 +20,10 @@ function WebsiteServicesSummary() {
         copy={(
           <>
             <SectionHeader
-              eyebrow="Web Experiences"
-              title={(
-                <>
-                  <span className="services-summary-title-black">WEBSITE DEVELOPMENT</span>{' '}
-                  <span className="services-summary-title-blue">SERVICES</span>
-                </>
-              )}
+              eyebrow={section.eyebrow}
+              title={<ServiceSectionTitle section={section} />}
             />
-            <p className="services-summary-intro">
-              We design <span>responsive, conversion-focused websites</span> that combine{' '}
-              <span>premium visuals</span> with a <span>seamless user experience</span>.
-            </p>
+            <p className="services-summary-intro">{section.intro}</p>
           </>
         )}
         media={(
@@ -47,11 +35,11 @@ function WebsiteServicesSummary() {
             />
             <div className="website-hero-overlay"></div>
             <div className="website-hero-content">
-              <p className="website-hero-kicker">What We Build</p>
-              <h3>Modern Websites That Perform</h3>
+              <p className="website-hero-kicker">{section.heroKicker}</p>
+              <h3>{section.heroTitle}</h3>
               <ul className="website-hero-types">
-                {websiteServices.map((website) => (
-                  <li key={website.name}>{website.name}</li>
+                {(section.bullets || []).map((item) => (
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
               <Button onClick={() => navigate('/services/websites')} className="bounce-btn website-hero-cta">
