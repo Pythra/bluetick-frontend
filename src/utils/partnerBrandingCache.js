@@ -55,6 +55,7 @@ export function writeCachedPartnerBranding(branding, hostname = window.location.
       customDomain: branding.customDomain,
       customDomainVerified: branding.customDomainVerified,
       showPartnerProgram: branding.showPartnerProgram,
+      isVideoFirstPartnerSite: branding.isVideoFirstPartnerSite,
       cssVars,
       cachedAt: Date.now(),
     };

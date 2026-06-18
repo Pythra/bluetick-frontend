@@ -1,0 +1,132 @@
+.partner-video-service {
+  padding: 0 0 32px;
+  background: #ffffff;
+}
+
+.partner-video-service-shell {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background: #0b1220;
+  aspect-ratio: 16 / 9;
+  min-height: min(72vh, 820px);
+}
+
+.partner-video-service-player {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: #000;
+}
+
+.partner-video-service-controls {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.partner-video-service-controls--modal {
+  position: static;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.partner-video-service-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.partner-video-service-btn:hover {
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.partner-video-service-btn svg {
+  font-size: 1.1rem;
+}
+
+.partner-video-service--empty {
+  padding: 32px 24px 48px;
+}
+
+.partner-video-service-placeholder {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px;
+  border: 1px dashed rgba(15, 23, 42, 0.16);
+  border-radius: 16px;
+  text-align: center;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+.partner-video-service-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(2, 6, 23, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.partner-video-service-modal-inner {
+  width: min(1200px, 100%);
+}
+
+.partner-video-service-modal-player {
+  width: 100%;
+  max-height: calc(100vh - 120px);
+  border-radius: 16px;
+  background: #000;
+  object-fit: contain;
+}
+
+.partner-video-service-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.partner-video-service-shell:fullscreen .partner-video-service-player {
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .partner-video-service-shell {
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .partner-video-service-btn span {
+    display: none;
+  }
+}

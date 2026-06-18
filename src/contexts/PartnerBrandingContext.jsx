@@ -46,6 +46,7 @@ const DEFAULT_BRANDING = {
   customDomain: '',
   customDomainVerified: false,
   showPartnerProgram: true,
+  isVideoFirstPartnerSite: false,
   loading: false,
 };
 

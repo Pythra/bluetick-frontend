@@ -34,6 +34,8 @@ import {
   createCustomServiceDefinition,
   countEnabledHomepageServices,
   getHomepageServiceOptions,
+  isVideoFirstPartnerSite,
+  MAX_SERVICE_VIDEO_BYTES,
 } from '../config/partnerSiteConfig';
 import { PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS } from '../data/partnerSectionDefaults';
 import { applyBrandCssVariables } from '../utils/brandTheme';
@@ -123,6 +125,7 @@ function PartnerAdminApp({ subdomain }) {
   const [pendingAssets, setPendingAssets] = useState({});
   const [pendingPromoUploads, setPendingPromoUploads] = useState({});
   const [pendingCustomServiceUploads, setPendingCustomServiceUploads] = useState({});
+  const [pendingServiceVideoUploads, setPendingServiceVideoUploads] = useState({});
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -333,6 +336,15 @@ function PartnerAdminApp({ subdomain }) {
     [draft?.sectionContent?.customServices?.items]
   );
 
+  const videoFirstSite = useMemo(
+    () => isVideoFirstPartnerSite({
+      ...draft,
+      contactEmail: overview?.branding?.contactEmail || siteSettings?.contactEmail,
+      isVideoFirstPartnerSite: overview?.branding?.isVideoFirstPartnerSite,
+    }),
+    [draft, overview?.branding, siteSettings?.contactEmail]
+  );
+
   const handleLogoChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -526,6 +538,57 @@ function PartnerAdminApp({ subdomain }) {
     handleUpdateCustomService(serviceId, { imageUrl: dataUrl });
   };
 
+  const updateServiceVideoDraft = (serviceId, videoUrl) => {
+    setDraft((prev) => ({
+      ...prev,
+      sectionContent: {
+        ...prev.sectionContent,
+        serviceVideos: {
+          ...(prev.sectionContent?.serviceVideos || {}),
+          [serviceId]: {
+            ...(prev.sectionContent?.serviceVideos?.[serviceId] || {}),
+            videoUrl,
+          },
+        },
+      },
+    }));
+  };
+
+  const handleServiceVideoChange = async (serviceId, event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('video/')) {
+      setSaveMessage({ type: 'error', text: 'Service media must be a video file (MP4, WEBM, or MOV).' });
+      return;
+    }
+    if (file.size > MAX_SERVICE_VIDEO_BYTES) {
+      setSaveMessage({ type: 'error', text: 'Service video must be under 100MB.' });
+      return;
+    }
+
+    const dataUrl = await readFileAsDataUrl(file);
+    setPendingServiceVideoUploads((prev) => ({ ...prev, [serviceId]: dataUrl }));
+    updateServiceVideoDraft(serviceId, dataUrl);
+  };
+
+  const handleRemoveServiceVideo = (serviceId) => {
+    updateServiceVideoDraft(serviceId, '');
+    setPendingServiceVideoUploads((prev) => {
+      const next = { ...prev };
+      delete next[serviceId];
+      return next;
+    });
+  };
+
+  const getServiceVideoPreview = (serviceId) => {
+    return (
+      pendingServiceVideoUploads[serviceId] ||
+      draft?.sectionContent?.serviceVideos?.[serviceId]?.videoUrl ||
+      ''
+    );
+  };
+
   const handleSaveSettings = async () => {
     if (!draft) return;
 
@@ -565,6 +628,13 @@ function PartnerAdminApp({ subdomain }) {
         }
       });
 
+      const serviceVideoUploads = {};
+      Object.entries(pendingServiceVideoUploads).forEach(([serviceId, value]) => {
+        if (typeof value === 'string' && value.startsWith('data:')) {
+          serviceVideoUploads[serviceId] = value;
+        }
+      });
+
       const response = await fetch(
         `${apiUrl}/api/partner-admin/site-settings?subdomain=${encodeURIComponent(subdomain)}`,
         {
@@ -585,6 +655,7 @@ function PartnerAdminApp({ subdomain }) {
             assetUploads: Object.keys(assetUploads).length ? assetUploads : undefined,
             promoUploads: Object.keys(promoUploads).length ? promoUploads : undefined,
             customServiceUploads: Object.keys(customServiceUploads).length ? customServiceUploads : undefined,
+            serviceVideoUploads: Object.keys(serviceVideoUploads).length ? serviceVideoUploads : undefined,
           }),
         }
       );
@@ -601,6 +672,7 @@ function PartnerAdminApp({ subdomain }) {
       setPendingAssets({});
       setPendingPromoUploads({});
       setPendingCustomServiceUploads({});
+      setPendingServiceVideoUploads({});
       setSaveMessage({ type: 'success', text: 'Your site settings were saved successfully.' });
 
       applyBrandCssVariables(
@@ -917,15 +989,18 @@ function PartnerAdminApp({ subdomain }) {
         <div className="pdash-panel">
           <h2>Homepage Services</h2>
           <p className="pdash-panel-lead">
-            Choose which services appear on your homepage. This list matches the main Bluetick site — from App Development through Wikipedia Page Services.
+            {videoFirstSite
+              ? 'Upload a large video for each enabled homepage service. Videos display full-width with no text overlay — visitors can expand them and toggle sound.'
+              : 'Choose which services appear on your homepage. This list matches the main Bluetick site — from App Development through Wikipedia Page Services.'}
             <strong> {enabledServiceCount} service{enabledServiceCount === 1 ? '' : 's'} enabled.</strong>
           </p>
           <div className="pdash-service-list">
             {PARTNER_HOMEPAGE_SERVICES.map((service, index) => {
               const isEnabled = Boolean(draft.enabledServices?.[service.id]);
               const editorMeta = getServiceEditorMeta(service);
+              const videoPreview = getServiceVideoPreview(service.id);
               return (
-                <div key={service.id} className={`pdash-service-item${isEnabled ? ' is-enabled' : ''}`}>
+                <div key={service.id} className={`pdash-service-item${isEnabled ? ' is-enabled' : ''}${videoFirstSite && isEnabled ? ' is-video-mode' : ''}`}>
                   <label className="pdash-service-item-main">
                     <input
                       type="checkbox"
@@ -935,16 +1010,42 @@ function PartnerAdminApp({ subdomain }) {
                     <span className="pdash-service-order">{index + 1}</span>
                     <span className="pdash-service-copy">
                       <strong>{service.label}</strong>
-                      <span>{service.description}</span>
+                      <span>{videoFirstSite ? 'Homepage video section' : service.description}</span>
                     </span>
                   </label>
-                  <button
-                    type="button"
-                    className="pdash-btn pdash-btn-ghost pdash-service-edit"
-                    onClick={() => openSectionEditor(editorMeta)}
-                  >
-                    <MdEdit /> Edit content
-                  </button>
+                  {videoFirstSite && isEnabled ? (
+                    <div className="pdash-service-video-upload">
+                      {videoPreview ? (
+                        <video
+                          src={videoPreview}
+                          controls
+                          muted
+                          playsInline
+                          style={{ width: '100%', maxHeight: 180, borderRadius: 12, background: '#000' }}
+                        />
+                      ) : null}
+                      <input type="file" accept="video/*" onChange={(e) => handleServiceVideoChange(service.id, e)} />
+                      {videoPreview ? (
+                        <button
+                          type="button"
+                          className="pdash-btn pdash-btn-ghost"
+                          onClick={() => handleRemoveServiceVideo(service.id)}
+                        >
+                          Remove video
+                        </button>
+                      ) : null}
+                      <small>MP4, WEBM or MOV up to 100MB.</small>
+                    </div>
+                  ) : null}
+                  {!videoFirstSite ? (
+                    <button
+                      type="button"
+                      className="pdash-btn pdash-btn-ghost pdash-service-edit"
+                      onClick={() => openSectionEditor(editorMeta)}
+                    >
+                      <MdEdit /> Edit content
+                    </button>
+                  ) : null}
                 </div>
               );
             })}
@@ -954,7 +1055,11 @@ function PartnerAdminApp({ subdomain }) {
             <div className="pdash-custom-services-head">
               <div>
                 <strong>Custom Services</strong>
-                <span>Add your own service sections with a name, image, and write-up.</span>
+                <span>
+                  {videoFirstSite
+                    ? 'Add extra homepage video sections. Only the service name and video are shown on the site.'
+                    : 'Add your own service sections with a name, image, and write-up.'}
+                </span>
               </div>
               <button
                 type="button"
@@ -968,7 +1073,9 @@ function PartnerAdminApp({ subdomain }) {
             {customServiceItems.length ? (
               <div className="pdash-editor-list">
                 {customServiceItems.map((service, index) => {
-                  const previewSrc = pendingCustomServiceUploads[service.id] || service.imageUrl;
+                  const previewSrc = videoFirstSite
+                    ? getServiceVideoPreview(service.id)
+                    : pendingCustomServiceUploads[service.id] || service.imageUrl;
                   const isEnabled = draft.enabledServices?.[service.id] !== false;
                   const editorMeta = getServiceEditorMeta(service);
                   return (
@@ -1015,17 +1122,47 @@ function PartnerAdminApp({ subdomain }) {
                       </div>
 
                       <div className="pdash-field">
-                        <label>Section image</label>
+                        <label>{videoFirstSite ? 'Section video' : 'Section image'}</label>
                         {previewSrc ? (
-                          <img
-                            src={previewSrc}
-                            alt={service.label || 'Service preview'}
-                            style={{ maxWidth: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 12 }}
-                          />
+                          videoFirstSite ? (
+                            <video
+                              src={previewSrc}
+                              controls
+                              muted
+                              playsInline
+                              style={{ width: '100%', maxHeight: 160, borderRadius: 12, background: '#000' }}
+                            />
+                          ) : (
+                            <img
+                              src={previewSrc}
+                              alt={service.label || 'Service preview'}
+                              style={{ maxWidth: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 12 }}
+                            />
+                          )
                         ) : null}
-                        <input type="file" accept="image/*" onChange={(e) => handleCustomServiceImageChange(service.id, e)} />
+                        <input
+                          type="file"
+                          accept={videoFirstSite ? 'video/*' : 'image/*'}
+                          onChange={(e) =>
+                            videoFirstSite
+                              ? handleServiceVideoChange(service.id, e)
+                              : handleCustomServiceImageChange(service.id, e)
+                          }
+                        />
+                        {videoFirstSite && previewSrc ? (
+                          <button
+                            type="button"
+                            className="pdash-btn pdash-btn-ghost"
+                            onClick={() => handleRemoveServiceVideo(service.id)}
+                          >
+                            Remove video
+                          </button>
+                        ) : null}
+                        {videoFirstSite ? <small>MP4, WEBM or MOV up to 100MB.</small> : null}
                       </div>
 
+                      {!videoFirstSite ? (
+                        <>
                       <div className="pdash-grid-2">
                         <div className="pdash-field">
                           <label>Button label</label>
@@ -1052,6 +1189,8 @@ function PartnerAdminApp({ subdomain }) {
                       >
                         <MdEdit /> Edit section content
                       </button>
+                        </>
+                      ) : null}
                     </div>
                   );
                 })}

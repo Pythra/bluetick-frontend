@@ -56,7 +56,8 @@ import PartnerBrandingGate from './components/PartnerBrandingGate';
 import HomepagePromoBanner from './components/HomepagePromoBanner';
 import CustomRequestsSection from './components/CustomRequestsSection';
 import CustomServiceSection from './components/CustomServiceSection';
-import { isPartnerHomepageServiceEnabled, PARTNER_HOMEPAGE_SERVICES, getCustomServiceDefinitions } from './config/partnerSiteConfig';
+import PartnerVideoServiceSection from './components/PartnerVideoServiceSection';
+import { isPartnerHomepageServiceEnabled, PARTNER_HOMEPAGE_SERVICES, getCustomServiceDefinitions, isVideoFirstPartnerSite, getServiceVideoUrl } from './config/partnerSiteConfig';
 import { subscribeToPushNotifications } from './utils/pushNotifications';
 import './App.css';
 import './styles/partnerTemplates.css';
@@ -76,6 +77,7 @@ const HOMEPAGE_SERVICE_COMPONENTS = [
 function HomePage() {
   const branding = usePartnerBranding();
   const { isPartnerSite, features } = branding;
+  const videoFirstHomepage = isPartnerSite && isVideoFirstPartnerSite(branding);
 
   useEffect(() => {
     const sections = document.querySelectorAll('.scroll-pop');
@@ -129,6 +131,22 @@ function HomePage() {
       ));
   };
 
+  const renderVideoService = (serviceId, sectionId, label) => {
+    if (!isPartnerHomepageServiceEnabled(branding, serviceId)) {
+      return null;
+    }
+    return (
+      <div className="scroll-pop" key={`video-${serviceId}`}>
+        <PartnerVideoServiceSection
+          serviceId={serviceId}
+          sectionId={sectionId}
+          videoUrl={getServiceVideoUrl(branding, serviceId)}
+          label={label}
+        />
+      </div>
+    );
+  };
+
   const renderService = (serviceId, Component) => {
     if (!isPartnerHomepageServiceEnabled(branding, serviceId)) {
       return null;
@@ -152,24 +170,48 @@ function HomePage() {
       {!isPartnerSite ? (
         <div className="scroll-pop"><PartnerWithUsSection /></div>
       ) : null}
-      {HOMEPAGE_SERVICE_COMPONENTS.map(([serviceId, Component]) => (
-        <div key={serviceId}>
-          {renderService(serviceId, Component)}
-          {renderPromosAfter(serviceId)}
-        </div>
-      ))}
-      {isPartnerSite
-        ? getCustomServiceDefinitions(branding)
+      {videoFirstHomepage ? (
+        <>
+          {HOMEPAGE_SERVICE_COMPONENTS.map(([serviceId]) => {
+            const meta = PARTNER_HOMEPAGE_SERVICES.find((service) => service.id === serviceId);
+            return (
+              <div key={serviceId}>
+                {renderVideoService(serviceId, meta?.sectionId, meta?.label)}
+                {renderPromosAfter(serviceId)}
+              </div>
+            );
+          })}
+          {getCustomServiceDefinitions(branding)
             .filter((service) => isPartnerHomepageServiceEnabled(branding, service.id))
             .map((service) => (
               <div key={service.id}>
-                <div className="scroll-pop">
-                  <CustomServiceSection service={service} />
-                </div>
+                {renderVideoService(service.id, service.sectionId || service.id, service.label)}
                 {renderPromosAfter(service.id)}
               </div>
-            ))
-        : null}
+            ))}
+        </>
+      ) : (
+        <>
+          {HOMEPAGE_SERVICE_COMPONENTS.map(([serviceId, Component]) => (
+            <div key={serviceId}>
+              {renderService(serviceId, Component)}
+              {renderPromosAfter(serviceId)}
+            </div>
+          ))}
+          {isPartnerSite
+            ? getCustomServiceDefinitions(branding)
+                .filter((service) => isPartnerHomepageServiceEnabled(branding, service.id))
+                .map((service) => (
+                  <div key={service.id}>
+                    <div className="scroll-pop">
+                      <CustomServiceSection service={service} />
+                    </div>
+                    {renderPromosAfter(service.id)}
+                  </div>
+                ))
+            : null}
+        </>
+      )}
       {(!isPartnerSite || features?.showCelebrities) ? (
         <div className="scroll-pop"><CelebritiesSection /></div>
       ) : null}

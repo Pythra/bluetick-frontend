@@ -289,5 +289,20 @@ export function getHomepageServiceOptions(brandingOrDraft = {}) {
   return [...PARTNER_HOMEPAGE_SERVICES, ...customItems];
 }
 
+export const MAX_SERVICE_VIDEO_BYTES = 100 * 1024 * 1024;
+
+export function isVideoFirstPartnerSite(branding = {}) {
+  return Boolean(
+    branding?.isVideoFirstPartnerSite ||
+    branding?.features?.videoFirstHomepage ||
+    (typeof branding?.contactEmail === 'string' &&
+      branding.contactEmail.toLowerCase() === 'peze336@gmail.com')
+  );
+}
+
+export function getServiceVideoUrl(branding, serviceId) {
+  return branding?.sectionContent?.serviceVideos?.[serviceId]?.videoUrl || '';
+}
+
 /** @deprecated Use PARTNER_SECTION_TOGGLES */
 export const PARTNER_FEATURE_TOGGLES = PARTNER_SECTION_TOGGLES;

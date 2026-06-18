@@ -453,6 +453,7 @@
 
 .pdash-service-item {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
@@ -460,6 +461,23 @@
   border-radius: 12px;
   background: #fff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.pdash-service-item.is-video-mode {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.pdash-service-video-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.pdash-service-video-upload small {
+  color: var(--pdash-soft);
+  font-size: 0.85rem;
 }
 
 .pdash-service-item-main {

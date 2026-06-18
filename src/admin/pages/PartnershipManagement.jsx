@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { MdExpandMore, MdLanguage, MdEmail, MdPhone } from 'react-icons/md'
+import { MdDelete, MdExpandMore, MdLanguage, MdEmail, MdPhone } from 'react-icons/md'
 import '../styles/admin.css'
 
 const STATUS_LABELS = {
@@ -33,6 +33,7 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
   const [statusFilter, setStatusFilter] = useState('all')
   const [expandedId, setExpandedId] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   const loadApplications = useCallback(async () => {
     if (!adminToken) return
@@ -87,6 +88,51 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
       setError(updateError.message || 'Failed to update application')
     } finally {
       setUpdatingId(null)
+    }
+  }
+
+  const handleDelete = async (app) => {
+    const subdomain = app.siteDetails?.subdomain
+    const customDomain = app.siteConfig?.customDomain
+    const domainLines = [
+      subdomain ? `Subdomain: ${subdomain}` : null,
+      customDomain ? `Custom domain: ${customDomain}` : null,
+    ].filter(Boolean)
+
+    const domainNote = domainLines.length
+      ? `\n\nThis will release:\n${domainLines.join('\n')}\n\nThose names can be used again for a new partnership application.`
+      : '\n\nAny assigned subdomain or custom domain will be released for reuse.'
+
+    const confirmed = window.confirm(
+      `Permanently delete the partnership application for ${app.company || app.fullName}?${domainNote}\n\nThis cannot be undone.`
+    )
+
+    if (!confirmed) {
+      return
+    }
+
+    setDeletingId(app.id)
+    setError('')
+
+    try {
+      const response = await fetch(`${apiUrl}/api/admin/partnerships/${app.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to delete application')
+      }
+
+      setApplications((prev) => prev.filter((item) => item.id !== app.id))
+      if (expandedId === app.id) {
+        setExpandedId(null)
+      }
+    } catch (deleteError) {
+      setError(deleteError.message || 'Failed to delete application')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -291,7 +337,7 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                         <button
                           type="button"
                           className="adm-btn adm-btn-warn"
-                          disabled={updatingId === app.id}
+                          disabled={updatingId === app.id || deletingId === app.id}
                           onClick={() => handleStatusUpdate(app.id, 'under_review')}
                         >
                           Mark Under Review
@@ -301,7 +347,7 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                         <button
                           type="button"
                           className="adm-btn adm-btn-success"
-                          disabled={updatingId === app.id}
+                          disabled={updatingId === app.id || deletingId === app.id}
                           onClick={() => handleStatusUpdate(app.id, 'approved')}
                         >
                           Approve
@@ -311,12 +357,21 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                         <button
                           type="button"
                           className="adm-btn adm-btn-danger"
-                          disabled={updatingId === app.id}
+                          disabled={updatingId === app.id || deletingId === app.id}
                           onClick={() => handleStatusUpdate(app.id, 'rejected')}
                         >
                           Reject
                         </button>
                       )}
+                      <button
+                        type="button"
+                        className="adm-btn adm-btn-danger"
+                        disabled={updatingId === app.id || deletingId === app.id}
+                        onClick={() => handleDelete(app)}
+                      >
+                        <MdDelete size={16} />
+                        {deletingId === app.id ? 'Deleting...' : 'Delete'}
+                      </button>
                     </div>
                   </div>
                 )}
