@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { MdAdd, MdClose, MdDelete } from 'react-icons/md';
 import {
   PARTNER_FAQ_DEFAULTS,
@@ -138,9 +139,24 @@ function SectionContentEditor({
     }
   }, [initialState, isOpen]);
 
-  if (!isOpen) {
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  if (!isOpen || !editorType) {
     return null;
   }
+
+  const listItems = Array.isArray(form.items) ? form.items : [];
 
   const updateField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -149,7 +165,7 @@ function SectionContentEditor({
   const updateListItem = (index, key, value) => {
     setForm((prev) => ({
       ...prev,
-      items: prev.items.map((item, itemIndex) =>
+      items: (Array.isArray(prev.items) ? prev.items : []).map((item, itemIndex) =>
         itemIndex === index ? { ...item, [key]: value } : item
       ),
     }));
@@ -165,7 +181,7 @@ function SectionContentEditor({
   const removeListItem = (index) => {
     setForm((prev) => ({
       ...prev,
-      items: prev.items.filter((_, itemIndex) => itemIndex !== index),
+      items: (Array.isArray(prev.items) ? prev.items : []).filter((_, itemIndex) => itemIndex !== index),
     }));
   };
 
@@ -175,7 +191,7 @@ function SectionContentEditor({
     onClose();
   };
 
-  return (
+  const editorBody = (
     <div className="pdash-editor-backdrop" role="presentation" onClick={onClose}>
       <div
         className="pdash-editor-modal"
@@ -199,15 +215,15 @@ function SectionContentEditor({
             <>
               <div className="pdash-field">
                 <label>Brand tagline</label>
-                <textarea rows={2} value={form.tagline} onChange={(e) => updateField('tagline', e.target.value)} />
+                <textarea rows={2} value={form.tagline || ''} onChange={(e) => updateField('tagline', e.target.value)} />
               </div>
               <div className="pdash-field">
                 <label>Hero title</label>
-                <textarea rows={2} value={form.heroTitle} onChange={(e) => updateField('heroTitle', e.target.value)} />
+                <textarea rows={2} value={form.heroTitle || ''} onChange={(e) => updateField('heroTitle', e.target.value)} />
               </div>
               <div className="pdash-field">
                 <label>Hero description</label>
-                <textarea rows={4} value={form.heroDescription} onChange={(e) => updateField('heroDescription', e.target.value)} />
+                <textarea rows={2} value={form.heroDescription || ''} onChange={(e) => updateField('heroDescription', e.target.value)} />
               </div>
             </>
           ) : null}
@@ -217,34 +233,34 @@ function SectionContentEditor({
               <div className="pdash-grid-2">
                 <div className="pdash-field">
                   <label>Eyebrow label</label>
-                  <input value={form.eyebrow} onChange={(e) => updateField('eyebrow', e.target.value)} />
+                  <input value={form.eyebrow || ''} onChange={(e) => updateField('eyebrow', e.target.value)} />
                 </div>
                 <div className="pdash-field">
                   <label>Hero kicker</label>
-                  <input value={form.heroKicker} onChange={(e) => updateField('heroKicker', e.target.value)} />
+                  <input value={form.heroKicker || ''} onChange={(e) => updateField('heroKicker', e.target.value)} />
                 </div>
               </div>
               <div className="pdash-grid-2">
                 <div className="pdash-field">
                   <label>Title — first line (gray)</label>
-                  <input value={form.titleBlack} onChange={(e) => updateField('titleBlack', e.target.value)} />
+                  <input value={form.titleBlack || ''} onChange={(e) => updateField('titleBlack', e.target.value)} />
                 </div>
                 <div className="pdash-field">
                   <label>Title — accent word (brand color)</label>
-                  <input value={form.titleBlue} onChange={(e) => updateField('titleBlue', e.target.value)} />
+                  <input value={form.titleBlue || ''} onChange={(e) => updateField('titleBlue', e.target.value)} />
                 </div>
               </div>
               <div className="pdash-field">
                 <label>Section introduction</label>
-                <textarea rows={3} value={form.intro} onChange={(e) => updateField('intro', e.target.value)} />
+                <textarea rows={3} value={form.intro || ''} onChange={(e) => updateField('intro', e.target.value)} />
               </div>
               <div className="pdash-field">
                 <label>Hero card title</label>
-                <input value={form.heroTitle} onChange={(e) => updateField('heroTitle', e.target.value)} />
+                <input value={form.heroTitle || ''} onChange={(e) => updateField('heroTitle', e.target.value)} />
               </div>
               <div className="pdash-field">
                 <label>Highlight bullets (one per line)</label>
-                <textarea rows={5} value={form.bulletsText} onChange={(e) => updateField('bulletsText', e.target.value)} />
+                <textarea rows={5} value={form.bulletsText || ''} onChange={(e) => updateField('bulletsText', e.target.value)} />
               </div>
             </>
           ) : null}
@@ -254,15 +270,15 @@ function SectionContentEditor({
               <div className="pdash-grid-2">
                 <div className="pdash-field">
                   <label>Section title — first line</label>
-                  <input value={form.titleBlack} onChange={(e) => updateField('titleBlack', e.target.value)} />
+                  <input value={form.titleBlack || ''} onChange={(e) => updateField('titleBlack', e.target.value)} />
                 </div>
                 <div className="pdash-field">
                   <label>Section title — accent line</label>
-                  <input value={form.titleBlue} onChange={(e) => updateField('titleBlue', e.target.value)} />
+                  <input value={form.titleBlue || ''} onChange={(e) => updateField('titleBlue', e.target.value)} />
                 </div>
               </div>
               <div className="pdash-editor-list">
-                {form.items.map((item, index) => (
+                {listItems.map((item, index) => (
                   <div key={`${editorType}-${index}`} className="pdash-editor-list-item">
                     <div className="pdash-editor-list-head">
                       <strong>{editorType === 'faq' ? `Question ${index + 1}` : `Testimonial ${index + 1}`}</strong>
@@ -320,7 +336,7 @@ function SectionContentEditor({
 
           {editorType === 'impactStats' ? (
             <div className="pdash-editor-list">
-              {form.items.map((item, index) => (
+              {listItems.map((item, index) => (
                 <div key={`impact-${index}`} className="pdash-editor-list-item">
                   <div className="pdash-editor-list-head">
                     <strong>Stat {index + 1}</strong>
@@ -366,6 +382,8 @@ function SectionContentEditor({
       </div>
     </div>
   );
+
+  return createPortal(editorBody, document.body);
 }
 
 export default SectionContentEditor;

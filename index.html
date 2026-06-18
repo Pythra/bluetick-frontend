@@ -5,7 +5,46 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/email-logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="preconnect" href="https://bluetick.fly.dev" crossorigin />
+    <link rel="dns-prefetch" href="https://bluetick.fly.dev" />
     <title>Bluetickgeng Development - Web, App & Publication Solutions</title>
+    <style>
+      html[data-partner-pending='true'] #root { visibility: hidden; }
+      html[data-partner-pending='true'] body { background: #f8fafc; }
+    </style>
+    <script>
+      (function () {
+        var host = location.hostname.toLowerCase();
+        var base = 'bluetickgeng.com';
+        if (host === base || host === 'www.' + base) return;
+        if (!host.endsWith('.' + base)) return;
+
+        var key = 'partnerBranding:v1:' + host;
+        try {
+          var raw = sessionStorage.getItem(key);
+          if (!raw) {
+            document.documentElement.setAttribute('data-partner-pending', 'true');
+            return;
+          }
+
+          var data = JSON.parse(raw);
+          if (!data || !data.isPartnerSite) {
+            document.documentElement.setAttribute('data-partner-pending', 'true');
+            return;
+          }
+
+          document.documentElement.dataset.partnerSite = 'true';
+          document.documentElement.dataset.partnerTemplate = data.templateId || 'modern';
+          if (data.cssVars) {
+            Object.keys(data.cssVars).forEach(function (name) {
+              document.documentElement.style.setProperty(name, data.cssVars[name]);
+            });
+          }
+        } catch (error) {
+          document.documentElement.setAttribute('data-partner-pending', 'true');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

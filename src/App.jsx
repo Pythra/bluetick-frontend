@@ -52,7 +52,7 @@ import PartnerPage from './pages/PartnerPage';
 import PartnerApplicationPage from './pages/PartnerApplicationPage';
 import FAQ from './components/FAQ';
 import ClientsSection from './components/ClientsSection';
-import { subscribeToPushNotifications } from './utils/pushNotifications';
+import PartnerBrandingGate from './components/PartnerBrandingGate';
 import './App.css';
 import './styles/partnerTemplates.css';
 import './styles/brandTheme.css';
@@ -178,6 +178,7 @@ function App() {
   return (
     <AuthProvider>
       <PartnerBrandingProvider>
+      <PartnerBrandingGate>
       <CurrencyProvider>
         <CartProvider>
           <Router history={history}>
@@ -222,6 +223,7 @@ function App() {
           </Router>
         </CartProvider>
       </CurrencyProvider>
+      </PartnerBrandingGate>
       </PartnerBrandingProvider>
     </AuthProvider>
   );

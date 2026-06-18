@@ -30,7 +30,7 @@ function Navbar({ onScrollToSection }) {
         <div className="navbar-logo">
           <Link to="/">
             {isPartnerSite && logoUrl ? (
-              <img src={logoUrl} alt={brandName} className="logo-img" />
+              <img src={logoUrl} alt={brandName} className="logo-img logo-img--partner" />
             ) : isPartnerSite ? (
               <span className="navbar-brand-text">{brandName}</span>
             ) : (

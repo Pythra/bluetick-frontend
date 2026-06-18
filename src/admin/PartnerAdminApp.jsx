@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   MdDashboard,
   MdPalette,
@@ -30,6 +30,7 @@ import {
 } from '../config/partnerSiteConfig';
 import { applyBrandCssVariables } from '../utils/brandTheme';
 import { normalizeMediaUrl } from '../utils/partnerMedia';
+import { resizeImageFile } from '../utils/resizeImageFile';
 import './styles/admin.css';
 import './styles/partnerDashboard.css';
 
@@ -120,6 +121,7 @@ function PartnerAdminApp({ subdomain }) {
   const [saveMessage, setSaveMessage] = useState(null);
   const [domainMessage, setDomainMessage] = useState(null);
   const [activeEditor, setActiveEditor] = useState(null);
+  const pdashRootRef = useRef(null);
 
   const authHeaders = useMemo(
     () => ({
@@ -324,7 +326,8 @@ function PartnerAdminApp({ subdomain }) {
       return;
     }
 
-    const dataUrl = await readFileAsDataUrl(file);
+    const optimizedFile = await resizeImageFile(file, { maxWidth: 420, maxHeight: 96 });
+    const dataUrl = await readFileAsDataUrl(optimizedFile);
     setPendingLogo(dataUrl);
     setLogoPreview(dataUrl);
   };
@@ -503,6 +506,20 @@ function PartnerAdminApp({ subdomain }) {
   const completionPercent = Math.round(
     (setupChecklist.filter((item) => item.done).length / setupChecklist.length) * 100
   );
+
+  useEffect(() => {
+    const root = pdashRootRef.current;
+    if (!root || !token) return;
+
+    const primaryColor = draft?.primaryColor || siteSettings?.siteConfig?.primaryColor || '#2563eb';
+    const primaryColorDark = siteSettings?.siteConfig?.primaryColorDark;
+    applyBrandCssVariables(root, primaryColor, primaryColorDark);
+  }, [
+    token,
+    draft?.primaryColor,
+    siteSettings?.siteConfig?.primaryColor,
+    siteSettings?.siteConfig?.primaryColorDark,
+  ]);
 
   if (!token) {
     return (
@@ -800,17 +817,6 @@ function PartnerAdminApp({ subdomain }) {
           );
           })}
         </div>
-
-        <SectionContentEditor
-          isOpen={Boolean(activeEditor)}
-          sectionKey={activeEditor?.key}
-          editorType={activeEditor?.editorType}
-          title={activeEditor ? `Edit ${activeEditor.label}` : ''}
-          sectionContent={draft.sectionContent}
-          siteContent={draft.content}
-          onClose={() => setActiveEditor(null)}
-          onSave={handleSectionEditorSave}
-        />
       </>
     );
   };
@@ -979,7 +985,7 @@ function PartnerAdminApp({ subdomain }) {
   };
 
   return (
-    <div className="pdash-root">
+    <div className="pdash-root" ref={pdashRootRef}>
       <aside className="pdash-sidebar">
         <div className="pdash-brand">
           {logoPreview ? (
@@ -1081,6 +1087,17 @@ function PartnerAdminApp({ subdomain }) {
           </>
         )}
       </main>
+
+      <SectionContentEditor
+        isOpen={Boolean(activeEditor)}
+        sectionKey={activeEditor?.key}
+        editorType={activeEditor?.editorType}
+        title={activeEditor ? `Edit ${activeEditor.label}` : ''}
+        sectionContent={draft?.sectionContent}
+        siteContent={draft?.content}
+        onClose={() => setActiveEditor(null)}
+        onSave={handleSectionEditorSave}
+      />
     </div>
   );
 }

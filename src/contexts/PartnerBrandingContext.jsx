@@ -4,6 +4,11 @@ import { getPartnerSubdomainFromHost, isBluetickMainHost } from '../utils/partne
 import { applyBrandCssVariables } from '../utils/brandTheme';
 import { getDefaultEnabledServices } from '../config/partnerSiteConfig';
 import { normalizeMediaUrl } from '../utils/partnerMedia';
+import {
+  applyCachedBrandingBootstrap,
+  readCachedPartnerBranding,
+  writeCachedPartnerBranding,
+} from '../utils/partnerBrandingCache';
 
 const DEFAULT_BRANDING = {
   isPartnerSite: false,
@@ -57,15 +62,59 @@ function applyBrandingTheme(branding) {
     : 'Bluetickgeng Development - Web, App & Publication Solutions';
 }
 
+function buildBrandingState(data, { loading }) {
+  return {
+    ...DEFAULT_BRANDING,
+    ...data,
+    logoUrl: normalizeMediaUrl(data.logoUrl),
+    content: data.content || {},
+    assets: Object.fromEntries(
+      Object.entries(data.assets || {}).map(([key, value]) => [key, normalizeMediaUrl(value)])
+    ),
+    features: {
+      ...DEFAULT_BRANDING.features,
+      ...(data.features || {}),
+    },
+    enabledServices: {
+      ...DEFAULT_BRANDING.enabledServices,
+      ...(data.enabledServices || {}),
+    },
+    sectionContent: data.sectionContent || {},
+    loading,
+  };
+}
+
+function getInitialBranding(isMainHost, hostname) {
+  if (isMainHost) {
+    return { ...DEFAULT_BRANDING, loading: false };
+  }
+
+  const cached = readCachedPartnerBranding(hostname);
+  if (cached) {
+    const { cssVars, cachedAt, ...brandingData } = cached;
+    return buildBrandingState(
+      {
+        ...brandingData,
+        isPartnerSite: true,
+      },
+      { loading: true }
+    );
+  }
+
+  return { ...DEFAULT_BRANDING, loading: true };
+}
+
 export function PartnerBrandingProvider({ children }) {
   const { apiUrl } = useAuth();
   const subdomain = useMemo(() => getPartnerSubdomainFromHost(), []);
   const hostname = useMemo(() => window.location.hostname.toLowerCase(), []);
   const isMainHost = useMemo(() => isBluetickMainHost(hostname), [hostname]);
-  const [branding, setBranding] = useState(() => ({
-    ...DEFAULT_BRANDING,
-    loading: !isMainHost,
-  }));
+  const [branding, setBranding] = useState(() => {
+    if (!isMainHost) {
+      applyCachedBrandingBootstrap(hostname);
+    }
+    return getInitialBranding(isMainHost, hostname);
+  });
 
   useEffect(() => {
     if (isMainHost) {
@@ -89,25 +138,9 @@ export function PartnerBrandingProvider({ children }) {
         }
 
         if (response.ok && data.isPartnerSite) {
-          setBranding({
-            ...DEFAULT_BRANDING,
-            ...data,
-            logoUrl: normalizeMediaUrl(data.logoUrl),
-            content: data.content || {},
-            assets: Object.fromEntries(
-              Object.entries(data.assets || {}).map(([key, value]) => [key, normalizeMediaUrl(value)])
-            ),
-            features: {
-              ...DEFAULT_BRANDING.features,
-              ...(data.features || {}),
-            },
-            enabledServices: {
-              ...DEFAULT_BRANDING.enabledServices,
-              ...(data.enabledServices || {}),
-            },
-            sectionContent: data.sectionContent || {},
-            loading: false,
-          });
+          const nextBranding = buildBrandingState(data, { loading: false });
+          setBranding(nextBranding);
+          writeCachedPartnerBranding(nextBranding, hostname);
           return;
         }
 
@@ -115,7 +148,13 @@ export function PartnerBrandingProvider({ children }) {
       } catch (error) {
         console.error('Partner branding load failed:', error);
         if (!cancelled) {
-          setBranding({ ...DEFAULT_BRANDING, loading: false });
+          const cached = readCachedPartnerBranding(hostname);
+          if (cached) {
+            const { cssVars, cachedAt, ...brandingData } = cached;
+            setBranding(buildBrandingState({ ...brandingData, isPartnerSite: true }, { loading: false }));
+          } else {
+            setBranding({ ...DEFAULT_BRANDING, loading: false });
+          }
         }
       }
     };

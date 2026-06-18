@@ -52,6 +52,46 @@ export function hexToRgba(hex, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function getRelativeLuminance(r, g, b) {
+  const transform = (channel) => {
+    const value = channel / 255;
+    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+
+  return 0.2126 * transform(r) + 0.7152 * transform(g) + 0.0722 * transform(b);
+}
+
+export function isLightBrandColor(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  return getRelativeLuminance(r, g, b) > 0.58;
+}
+
+function getReadableAccentOnLight(primary) {
+  let candidate = darkenHex(primary, 0.58);
+  let { r, g, b } = hexToRgb(candidate);
+
+  if (getRelativeLuminance(r, g, b) > 0.32) {
+    candidate = darkenHex(primary, 0.78);
+    ({ r, g, b } = hexToRgb(candidate));
+  }
+
+  if (getRelativeLuminance(r, g, b) > 0.32) {
+    return '#0f172a';
+  }
+
+  return candidate;
+}
+
+function getOnPrimaryText(primary) {
+  return isLightBrandColor(primary) ? '#0f172a' : '#ffffff';
+}
+
+function getSectionDarkColor(primary, amount, fallback = '#0f172a') {
+  const candidate = darkenHex(primary, amount);
+  const { r, g, b } = hexToRgb(candidate);
+  return getRelativeLuminance(r, g, b) > 0.28 ? fallback : candidate;
+}
+
 export function buildBrandCssVariables(primaryColor, primaryColorDark) {
   const primary = normalizeHex(primaryColor) || '#2563eb';
   const dark = normalizeHex(primaryColorDark) || darkenHex(primary, 0.14);
@@ -59,6 +99,9 @@ export function buildBrandCssVariables(primaryColor, primaryColorDark) {
   const lighter = lightenHex(primary, 0.42);
   const pale = lightenHex(primary, 0.58);
   const { r, g, b } = hexToRgb(primary);
+  const textAccent = isLightBrandColor(primary) ? getReadableAccentOnLight(primary) : dark;
+  const onPrimary = getOnPrimaryText(primary);
+  const headingColor = isLightBrandColor(primary) ? '#0f2546' : getSectionDarkColor(primary, 0.55, '#0f2546');
 
   return {
     '--brand-primary': primary,
@@ -72,6 +115,9 @@ export function buildBrandCssVariables(primaryColor, primaryColorDark) {
     '--brand-primary-medium': hexToRgba(primary, 0.18),
     '--brand-primary-strong': hexToRgba(primary, 0.28),
     '--brand-primary-glow': hexToRgba(primary, 0.35),
+    '--brand-text-accent': textAccent,
+    '--brand-on-primary': onPrimary,
+    '--brand-heading-color': headingColor,
     '--brand-gradient-start': lightenHex(primary, 0.18),
     '--brand-gradient-mid': primary,
     '--brand-gradient-end': dark,
@@ -83,14 +129,14 @@ export function buildBrandCssVariables(primaryColor, primaryColorDark) {
     '--brand-navbar-bg': hexToRgba(primary, 0.05),
     '--brand-button-secondary-bg': `linear-gradient(180deg, ${hexToRgba(primary, 0.08)} 0%, ${hexToRgba(primary, 0.14)} 100%)`,
     '--brand-button-secondary-hover': `linear-gradient(180deg, #ffffff 0%, ${hexToRgba(primary, 0.12)} 100%)`,
-    '--brand-footer-bg': darkenHex(primary, 0.62),
-    '--brand-section-dark-start': darkenHex(primary, 0.72),
-    '--brand-section-dark-mid': darkenHex(primary, 0.55),
-    '--brand-section-dark-end': darkenHex(primary, 0.38),
+    '--brand-footer-bg': isLightBrandColor(primary) ? '#0f172a' : darkenHex(primary, 0.62),
+    '--brand-section-dark-start': getSectionDarkColor(primary, 0.72),
+    '--brand-section-dark-mid': getSectionDarkColor(primary, 0.55),
+    '--brand-section-dark-end': getSectionDarkColor(primary, 0.38),
     '--brand-section-glow': hexToRgba(primary, 0.22),
     '--brand-section-glow-soft': hexToRgba(primary, 0.12),
-    '--brand-link': primary,
-    '--brand-link-hover': dark,
+    '--brand-link': textAccent,
+    '--brand-link-hover': isLightBrandColor(primary) ? '#020617' : dark,
     '--brand-shadow': hexToRgba(primary, 0.22),
     '--brand-shadow-soft': hexToRgba(primary, 0.14),
   };

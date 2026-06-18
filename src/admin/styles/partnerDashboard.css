@@ -10,13 +10,15 @@
   --pdash-faint: #94a3b8;
   --pdash-primary: var(--brand-primary, #2563eb);
   --pdash-primary-dark: var(--brand-primary-dark, #1d4ed8);
+  --pdash-text-accent: var(--brand-text-accent, var(--brand-primary-dark, #1d4ed8));
+  --pdash-on-primary: var(--brand-on-primary, #ffffff);
   --pdash-radius: 16px;
   --pdash-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 30px rgba(15, 23, 42, 0.06);
   display: flex;
   min-height: 100vh;
   background:
-    radial-gradient(900px 420px at 100% -5%, rgba(37, 99, 235, 0.08), transparent 55%),
-    radial-gradient(700px 360px at -10% 20%, rgba(124, 58, 237, 0.05), transparent 50%),
+    radial-gradient(900px 420px at 100% -5%, rgba(var(--brand-primary-rgb, 37, 99, 235), 0.08), transparent 55%),
+    radial-gradient(700px 360px at -10% 20%, rgba(var(--brand-primary-rgb, 37, 99, 235), 0.05), transparent 50%),
     var(--pdash-bg);
   font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
   color: var(--pdash-text);
@@ -25,8 +27,13 @@
 .pdash-sidebar {
   width: var(--pdash-sidebar);
   flex-shrink: 0;
-  background: linear-gradient(180deg, #0b1220 0%, #111b31 100%);
-  color: #cbd5e1;
+  background: linear-gradient(
+    180deg,
+    var(--brand-section-dark-start, #0b1220) 0%,
+    var(--brand-section-dark-mid, #111b31) 55%,
+    var(--brand-section-dark-end, #152238) 100%
+  );
+  color: #e2e8f0;
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
@@ -49,8 +56,8 @@
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--pdash-primary), #60a5fa);
-  color: #fff;
+  background: linear-gradient(135deg, var(--pdash-primary), var(--pdash-primary-dark));
+  color: var(--pdash-on-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -112,8 +119,8 @@
 
 .pdash-nav-item.active {
   background: linear-gradient(135deg, var(--pdash-primary), var(--pdash-primary-dark));
-  color: #fff;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.28);
+  color: var(--pdash-on-primary);
+  box-shadow: 0 10px 24px rgba(var(--brand-primary-rgb, 37, 99, 235), 0.28);
 }
 
 .pdash-nav-footer {
@@ -181,8 +188,8 @@
 
 .pdash-btn-primary {
   background: linear-gradient(135deg, var(--pdash-primary), var(--pdash-primary-dark));
-  color: #fff;
-  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+  color: var(--pdash-on-primary);
+  box-shadow: 0 10px 24px rgba(var(--brand-primary-rgb, 37, 99, 235), 0.22);
 }
 
 .pdash-btn-secondary {
@@ -247,7 +254,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(37, 99, 235, 0.1);
+  background: rgba(var(--brand-primary-rgb, 37, 99, 235), 0.1);
   color: var(--pdash-primary);
   margin-bottom: 12px;
 }
@@ -462,7 +469,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  z-index: 1200;
+  z-index: 10000;
 }
 
 .pdash-editor-modal {

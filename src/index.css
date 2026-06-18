@@ -13,6 +13,9 @@
   -moz-osx-font-smoothing: grayscale;
   --brand-primary: #2563eb;
   --brand-primary-dark: #1d4ed8;
+  --brand-text-accent: #1d4ed8;
+  --brand-on-primary: #ffffff;
+  --brand-heading-color: #0f2546;
   --brand-primary-light: #5c8ef1;
   --brand-primary-lighter: #93b6f7;
   --brand-primary-pale: #b8cffb;
