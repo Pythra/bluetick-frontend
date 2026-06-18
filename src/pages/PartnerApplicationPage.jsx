@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaHandshake,
@@ -35,7 +35,7 @@ const MAX_LOGO_BYTES = 2 * 1024 * 1024;
 
 function PartnerApplicationPage() {
   const navigate = useNavigate();
-  const { apiUrl } = useAuth();
+  const { apiUrl, token, user } = useAuth();
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -45,6 +45,19 @@ function PartnerApplicationPage() {
   const [logoFileName, setLogoFileName] = useState('');
 
   const previewSiteUrl = previewPartnerSiteUrl(form.company);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      fullName: prev.fullName || [user.firstName, user.lastName].filter(Boolean).join(' ').trim(),
+      email: prev.email || user.email || '',
+      phone: prev.phone || user.phone || '',
+    }));
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,9 +110,14 @@ function PartnerApplicationPage() {
     setLoading(true);
 
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${apiUrl}/api/partner-application`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ ...form, logo: logoDataUrl || undefined }),
       });
 
