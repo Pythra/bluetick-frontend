@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { getPartnerSubdomainFromHost, isBluetickMainHost } from '../utils/partnerSubdomain';
 import { applyBrandCssVariables } from '../utils/brandTheme';
+import { getDefaultEnabledServices } from '../config/partnerSiteConfig';
 
 const DEFAULT_BRANDING = {
   isPartnerSite: false,
@@ -23,13 +24,17 @@ const DEFAULT_BRANDING = {
   content: {},
   assets: {},
   features: {
+    showHero: true,
     showPublicationLogos: true,
+    showImpactStats: true,
     showCelebrities: true,
     showTestimonials: true,
+    showFaq: true,
     showBlog: true,
     showAffiliateProgram: true,
     showPartnerProgram: true,
   },
+  enabledServices: getDefaultEnabledServices(),
   customDomain: '',
   customDomainVerified: false,
   showPartnerProgram: true,
@@ -90,6 +95,10 @@ export function PartnerBrandingProvider({ children }) {
             features: {
               ...DEFAULT_BRANDING.features,
               ...(data.features || {}),
+            },
+            enabledServices: {
+              ...DEFAULT_BRANDING.enabledServices,
+              ...(data.enabledServices || {}),
             },
             loading: false,
           });

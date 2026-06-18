@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { getFirstVisibleServiceSectionId } from '../config/partnerSiteConfig';
 import CurrencySelector from './CurrencySelector';
 import blueLogo from '../assets/bluelogo.png';
 import './Navbar.css';
@@ -9,8 +10,10 @@ import './Navbar.css';
 function Navbar({ onScrollToSection }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
-  const { isPartnerSite, brandName, logoUrl, features } = usePartnerBranding();
+  const branding = usePartnerBranding();
+  const { isPartnerSite, brandName, logoUrl, features } = branding;
   const navigate = useNavigate();
+  const servicesSectionId = getFirstVisibleServiceSectionId(branding);
 
   const handleAction = (callback) => {
     if (typeof callback === 'function') {
@@ -39,7 +42,7 @@ function Navbar({ onScrollToSection }) {
           <button type="button" className="navbar-link" onClick={() => handleAction(() => navigate('/about'))}>
             About Us
           </button>
-          <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget('website-services'))}>
+          <button type="button" className="navbar-link" onClick={() => handleAction(scrollTarget(servicesSectionId))}>
             Services
           </button>
           {!isPartnerSite ? (

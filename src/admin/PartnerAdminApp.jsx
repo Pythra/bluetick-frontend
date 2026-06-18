@@ -20,7 +20,9 @@ import {
   PARTNER_TEMPLATES,
   PARTNER_ASSET_FIELDS,
   PARTNER_CONTENT_FIELDS,
-  PARTNER_FEATURE_TOGGLES,
+  PARTNER_SECTION_TOGGLES,
+  PARTNER_HOMEPAGE_SERVICES,
+  getDefaultEnabledServices,
 } from '../config/partnerSiteConfig';
 import { applyBrandCssVariables } from '../utils/brandTheme';
 import './styles/admin.css';
@@ -78,6 +80,10 @@ function buildEmptyDraft(siteConfig = {}) {
     customDomain: siteConfig.customDomain || '',
     content: { ...(siteConfig.content || {}) },
     features: { ...(siteConfig.features || {}) },
+    enabledServices: {
+      ...getDefaultEnabledServices(),
+      ...(siteConfig.enabledServices || {}),
+    },
     assets: { ...(siteConfig.assets || {}) },
   };
 }
@@ -260,6 +266,18 @@ function PartnerAdminApp({ subdomain }) {
     }));
   };
 
+  const updateDraftService = (serviceId, enabled) => {
+    setDraft((prev) => ({
+      ...prev,
+      enabledServices: { ...prev.enabledServices, [serviceId]: enabled },
+    }));
+  };
+
+  const enabledServiceCount = useMemo(() => {
+    if (!draft?.enabledServices) return 0;
+    return PARTNER_HOMEPAGE_SERVICES.filter((service) => draft.enabledServices[service.id]).length;
+  }, [draft?.enabledServices]);
+
   const handleLogoChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -322,6 +340,14 @@ function PartnerAdminApp({ subdomain }) {
   const handleSaveSettings = async () => {
     if (!draft) return;
 
+    const selectedServices = PARTNER_HOMEPAGE_SERVICES.filter(
+      (service) => draft.enabledServices?.[service.id]
+    ).length;
+    if (selectedServices === 0) {
+      setSaveMessage({ type: 'error', text: 'Select at least one homepage service before saving.' });
+      return;
+    }
+
     try {
       setSaving(true);
       setSaveMessage(null);
@@ -349,6 +375,7 @@ function PartnerAdminApp({ subdomain }) {
             customDomain: draft.customDomain,
             content: draft.content,
             features: draft.features,
+            enabledServices: draft.enabledServices,
             logo: pendingLogo || undefined,
             assetUploads: Object.keys(assetUploads).length ? assetUploads : undefined,
           }),
@@ -427,6 +454,13 @@ function PartnerAdminApp({ subdomain }) {
       { label: 'Set your brand colors', done: Boolean(config?.primaryColor) },
       { label: 'Add homepage hero video', done: Boolean(assets.heroVideo) },
       { label: 'Customize About page content', done: Boolean(config?.content?.aboutIntro) },
+      {
+        label: 'Choose homepage services',
+        done: Boolean(
+          config?.enabledServices &&
+            PARTNER_HOMEPAGE_SERVICES.some((service) => config.enabledServices[service.id] === false)
+        ),
+      },
       { label: 'Upload app development media', done: Boolean(assets.appDevelopmentImage) },
       { label: 'Connect a custom domain', done: Boolean(config?.customDomainVerified) },
     ];
@@ -658,9 +692,36 @@ function PartnerAdminApp({ subdomain }) {
         </div>
 
         <div className="pdash-panel">
-          <h2>Visibility Settings</h2>
-          <p className="pdash-panel-lead">Control which sections appear on your white-label homepage.</p>
-          {PARTNER_FEATURE_TOGGLES.map((toggle) => (
+          <h2>Homepage Services</h2>
+          <p className="pdash-panel-lead">
+            Choose which services appear on your homepage. This list matches the main Bluetick site — from App Development through Wikipedia Page Services.
+            <strong> {enabledServiceCount} of {PARTNER_HOMEPAGE_SERVICES.length} selected.</strong>
+          </p>
+          <div className="pdash-service-list">
+            {PARTNER_HOMEPAGE_SERVICES.map((service, index) => {
+              const isEnabled = Boolean(draft.enabledServices?.[service.id]);
+              return (
+                <label key={service.id} className={`pdash-service-item${isEnabled ? ' is-enabled' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={isEnabled}
+                    onChange={(e) => updateDraftService(service.id, e.target.checked)}
+                  />
+                  <span className="pdash-service-order">{index + 1}</span>
+                  <span className="pdash-service-copy">
+                    <strong>{service.label}</strong>
+                    <span>{service.description}</span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="pdash-panel">
+          <h2>Homepage Sections</h2>
+          <p className="pdash-panel-lead">Control hero, logos, testimonials, FAQ, and other non-service blocks on your site.</p>
+          {PARTNER_SECTION_TOGGLES.map((toggle) => (
             <div key={toggle.key} className="pdash-toggle">
               <div>
                 <strong>{toggle.label}</strong>
@@ -669,7 +730,11 @@ function PartnerAdminApp({ subdomain }) {
               <label className="pdash-switch">
                 <input
                   type="checkbox"
-                  checked={Boolean(draft.features?.[toggle.key])}
+                  checked={
+                    draft.features?.[toggle.key] ??
+                    toggle.defaultEnabled ??
+                    false
+                  }
                   onChange={(e) => updateDraftFeature(toggle.key, e.target.checked)}
                 />
                 <span className="pdash-switch-slider" />

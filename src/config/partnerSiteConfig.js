@@ -1,3 +1,79 @@
+/**
+ * Canonical homepage services — same order as the main Bluetick site (App.jsx).
+ * Partners pick which of these appear on their white-label homepage.
+ */
+export const PARTNER_HOMEPAGE_SERVICES = [
+  {
+    id: 'appDevelopment',
+    label: 'App Development',
+    description: 'Mobile app development section with packages and CTA.',
+    sectionId: 'app-services',
+  },
+  {
+    id: 'websiteDevelopment',
+    label: 'Website Development',
+    description: 'Website and web application development section.',
+    sectionId: 'website-services',
+  },
+  {
+    id: 'socialMedia',
+    label: 'Social Media Services',
+    description: 'Verification, monetization, and social growth services.',
+    sectionId: 'verification-services',
+  },
+  {
+    id: 'musicStreaming',
+    label: 'Music Artist Streaming Verification',
+    description: 'Spotify, Apple Music, and streaming platform verification.',
+    sectionId: 'music-streaming-services',
+  },
+  {
+    id: 'tiktokArtist',
+    label: 'TikTok for Artist Services',
+    description: 'TikTok song claims and influencer sound campaigns.',
+    sectionId: 'tiktok-artist-services',
+  },
+  {
+    id: 'publication',
+    label: 'Publication & PR Services',
+    description: 'Media placements across local and international outlets.',
+    sectionId: 'publication-services',
+  },
+  {
+    id: 'instagram',
+    label: 'Instagram Blog Promotion',
+    description: 'Promotions on top Instagram pages and celebrity blogs.',
+    sectionId: 'instagram-services',
+  },
+  {
+    id: 'wikipedia',
+    label: 'Wikipedia Page Services',
+    description: 'Wikipedia page creation and online authority building.',
+    sectionId: 'wikipedia-services',
+  },
+];
+
+export const PARTNER_SERVICE_IDS = PARTNER_HOMEPAGE_SERVICES.map((service) => service.id);
+
+export function getDefaultEnabledServices() {
+  return Object.fromEntries(PARTNER_SERVICE_IDS.map((id) => [id, true]));
+}
+
+export function isPartnerHomepageServiceEnabled(branding, serviceId) {
+  if (!branding?.isPartnerSite) {
+    return true;
+  }
+  const enabled = branding.enabledServices || getDefaultEnabledServices();
+  return enabled[serviceId] !== false;
+}
+
+export function getFirstVisibleServiceSectionId(branding) {
+  const match = PARTNER_HOMEPAGE_SERVICES.find((service) =>
+    isPartnerHomepageServiceEnabled(branding, service.id)
+  );
+  return match?.sectionId || 'website-services';
+}
+
 export const PARTNER_TEMPLATES = [
   {
     id: 'modern',
@@ -76,10 +152,57 @@ export const PARTNER_CONTENT_FIELDS = [
   { key: 'aboutVision', label: 'About — Vision', rows: 3, section: 'about' },
 ];
 
-export const PARTNER_FEATURE_TOGGLES = [
-  { key: 'showPublicationLogos', label: 'Show publication logos strip', description: 'Display the media logos carousel on your homepage.' },
-  { key: 'showTestimonials', label: 'Show testimonials', description: 'Include the testimonials section on your homepage.' },
-  { key: 'showCelebrities', label: 'Show celebrities section', description: 'Include the celebrities showcase section.' },
-  { key: 'showBlog', label: 'Show blog in navigation', description: 'Keep blog links visible across your site.' },
-  { key: 'showAffiliateProgram', label: 'Show affiliate program link', description: 'Display affiliate program in the footer.' },
+/** Non-service homepage blocks partners can show or hide. */
+export const PARTNER_SECTION_TOGGLES = [
+  {
+    key: 'showHero',
+    label: 'Homepage hero',
+    description: 'The main hero with your title, video, and call-to-action buttons.',
+    defaultEnabled: true,
+  },
+  {
+    key: 'showPublicationLogos',
+    label: 'Publication logos strip',
+    description: 'Display the media logos carousel below the hero.',
+    defaultEnabled: false,
+  },
+  {
+    key: 'showImpactStats',
+    label: 'Impact statistics',
+    description: 'The metrics strip (publications, customers, launches) on the homepage.',
+    defaultEnabled: true,
+  },
+  {
+    key: 'showCelebrities',
+    label: 'Celebrities section',
+    description: 'Include the celebrities showcase section.',
+    defaultEnabled: false,
+  },
+  {
+    key: 'showTestimonials',
+    label: 'Testimonials',
+    description: 'Include the testimonials section on your homepage.',
+    defaultEnabled: true,
+  },
+  {
+    key: 'showFaq',
+    label: 'FAQ section',
+    description: 'Show frequently asked questions at the bottom of the homepage.',
+    defaultEnabled: true,
+  },
+  {
+    key: 'showBlog',
+    label: 'Blog in navigation',
+    description: 'Keep blog links visible across your site.',
+    defaultEnabled: true,
+  },
+  {
+    key: 'showAffiliateProgram',
+    label: 'Affiliate program link',
+    description: 'Display affiliate program in the footer.',
+    defaultEnabled: false,
+  },
 ];
+
+/** @deprecated Use PARTNER_SECTION_TOGGLES */
+export const PARTNER_FEATURE_TOGGLES = PARTNER_SECTION_TOGGLES;

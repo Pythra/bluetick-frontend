@@ -8,6 +8,7 @@ import { CurrencyProvider } from './contexts/CurrencyContext';
 import { useAuth } from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import LandingPage from './components/LandingPage';
+import Navbar from './components/Navbar';
 import AppServicesSummary from './components/AppServicesSummary';
 import WebsiteServicesSummary from './components/WebsiteServicesSummary';
 import VerificationServicesSummary from './components/VerificationServicesSummary';
@@ -55,9 +56,11 @@ import { subscribeToPushNotifications } from './utils/pushNotifications';
 import './App.css';
 import './styles/partnerTemplates.css';
 import './styles/brandTheme.css';
+import { isPartnerHomepageServiceEnabled } from './config/partnerSiteConfig';
 
 function HomePage() {
-  const { isPartnerSite, features } = usePartnerBranding();
+  const branding = usePartnerBranding();
+  const { isPartnerSite, features } = branding;
 
   useEffect(() => {
     const sections = document.querySelectorAll('.scroll-pop');
@@ -80,7 +83,7 @@ function HomePage() {
 
     sections.forEach((section) => observer.observe(section));
     return () => observer.disconnect();
-  }, []);
+  }, [branding.enabledServices, features]);
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -89,27 +92,52 @@ function HomePage() {
     }
   };
 
+  const showLanding =
+    !isPartnerSite ||
+    features?.showHero !== false ||
+    features?.showPublicationLogos ||
+    features?.showImpactStats !== false;
+
+  const renderService = (serviceId, Component) => {
+    if (!isPartnerHomepageServiceEnabled(branding, serviceId)) {
+      return null;
+    }
+    return (
+      <div className="scroll-pop" key={serviceId}>
+        <Component />
+      </div>
+    );
+  };
+
   return (
     <>
-      <LandingPage onScrollToSection={scrollToSection} />
+      {showLanding ? (
+        <LandingPage onScrollToSection={scrollToSection} />
+      ) : (
+        <section className="landing-page landing-page--navbar-only">
+          <Navbar onScrollToSection={scrollToSection} />
+        </section>
+      )}
       {!isPartnerSite ? (
         <div className="scroll-pop"><PartnerWithUsSection /></div>
       ) : null}
-      <div className="scroll-pop"><AppServicesSummary /></div>
-      <div className="scroll-pop"><WebsiteServicesSummary /></div>
-      <div className="scroll-pop"><VerificationServicesSummary /></div>
-      <div className="scroll-pop"><MusicStreamingVerificationSummary /></div>
-      <div className="scroll-pop"><TikTokArtistServicesSummary /></div>
-      <div className="scroll-pop"><PublicationServicesSummary /></div>
-      <div className="scroll-pop"><InstagramServicesSummary /></div>
-      <div className="scroll-pop"><WikipediaServicesSummary /></div>
+      {renderService('appDevelopment', AppServicesSummary)}
+      {renderService('websiteDevelopment', WebsiteServicesSummary)}
+      {renderService('socialMedia', VerificationServicesSummary)}
+      {renderService('musicStreaming', MusicStreamingVerificationSummary)}
+      {renderService('tiktokArtist', TikTokArtistServicesSummary)}
+      {renderService('publication', PublicationServicesSummary)}
+      {renderService('instagram', InstagramServicesSummary)}
+      {renderService('wikipedia', WikipediaServicesSummary)}
       {(!isPartnerSite || features?.showCelebrities) ? (
         <div className="scroll-pop"><CelebritiesSection /></div>
       ) : null}
       {(!isPartnerSite || features?.showTestimonials) ? (
         <div className="scroll-pop"><TestimonialsSection /></div>
       ) : null}
-      <div className="scroll-pop"><FAQ /></div>
+      {(!isPartnerSite || features?.showFaq !== false) ? (
+        <div className="scroll-pop"><FAQ /></div>
+      ) : null}
       {!isPartnerSite ? <ClientsSection className="landing-page" /> : null}
       <Footer onScrollToSection={scrollToSection} />
     </>

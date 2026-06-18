@@ -126,11 +126,16 @@ function LandingPage({ onScrollToSection }) {
     };
   }, [isCurrencyDropdownOpen]);
 
+  const showHero = !isPartnerSite || features?.showHero !== false;
+  const showPublicationLogos = !isPartnerSite || features?.showPublicationLogos;
+  const showImpactStats = !isPartnerSite || features?.showImpactStats !== false;
+
   return (
     <section id="landing" className="landing-page">
       <Navbar onScrollToSection={onScrollToSection} />
 
       <div className="landing-hero-shell">
+        {showHero ? (
         <div className="landing-hero-grid">
           <div className="landing-copy">
             <p className="landing-kicker">
@@ -230,8 +235,9 @@ function LandingPage({ onScrollToSection }) {
             </div>
           </div>
         </div>
+        ) : null}
 
-        {(!isPartnerSite || features?.showPublicationLogos) ? (
+        {showPublicationLogos ? (
         <div className="landing-logos-strip" aria-label="Featured media logos">
           <PublicationLogosCarousel
             title=""
@@ -241,6 +247,7 @@ function LandingPage({ onScrollToSection }) {
         </div>
         ) : null}
 
+        {showImpactStats ? (
         <section ref={statsRef} className="landing-impact-strip" aria-label="Business impact metrics">
           <div className="landing-impact-inner">
             {impactStats.map((stat) => {
@@ -271,6 +278,7 @@ function LandingPage({ onScrollToSection }) {
             })}
           </div>
         </section>
+        ) : null}
       </div>
     </section>
   );
