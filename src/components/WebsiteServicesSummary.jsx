@@ -5,7 +5,8 @@ import ServicesSummaryLayout from './ServicesSummaryLayout';
 import websiteHeroImage from '../assets/tech.jpg';
 import { usePartnerAsset } from '../utils/partnerMedia';
 import PartnerMediaFrame from './PartnerMediaFrame';
-import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
+import ServiceSectionTitle from './ServiceSectionTitle';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './WebsiteServicesSection.css';
 
 function WebsiteServicesSummary() {

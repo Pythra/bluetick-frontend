@@ -4,7 +4,8 @@ import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
 import publicationHeroImage from '../assets/news.jpg';
-import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
+import ServiceSectionTitle from './ServiceSectionTitle';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './PublicationSection.css';
 import './ServicesSummaryHero.css';
 

@@ -3,7 +3,8 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import instagramHeroImage from '../assets/online.jpg';
-import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
+import ServiceSectionTitle from './ServiceSectionTitle';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './InstagramServicesSummary.css';
 import './ServicesSummaryHero.css';
 

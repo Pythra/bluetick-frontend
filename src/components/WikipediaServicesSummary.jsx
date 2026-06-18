@@ -3,7 +3,8 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import wikipediaHeroImage from '../assets/global.jpg';
-import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
+import ServiceSectionTitle from './ServiceSectionTitle';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './WikipediaServicesSummary.css';
 import './ServicesSummaryHero.css';
 

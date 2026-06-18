@@ -9,7 +9,8 @@ import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import socialVerificationImage from '../assets/social/verification.jpg';
 import { usePartnerAsset } from '../utils/partnerMedia';
-import { ServiceSectionTitle, usePartnerSectionContent } from '../utils/partnerSectionContent';
+import ServiceSectionTitle from './ServiceSectionTitle';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './VerificationSection.css';
 
 const socialServiceCategories = [
