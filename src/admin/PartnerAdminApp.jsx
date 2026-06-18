@@ -85,9 +85,7 @@ function PartnerAdminApp({ subdomain }) {
   const { apiUrl } = useAuth();
   const tokenKey = `partnerAdminToken:${subdomain}`;
 
-  const [token, setToken] = useState(() =>
-    localStorage.getItem(tokenKey) || localStorage.getItem('adminToken')
-  );
+  const [token, setToken] = useState(() => localStorage.getItem(tokenKey));
   const [loginData, setLoginData] = useState({ username: '', password: '' });
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState(null);
@@ -115,17 +113,26 @@ function PartnerAdminApp({ subdomain }) {
     [token]
   );
 
-  const handleLogout = useCallback(() => {
-    const activeToken = token;
+  const clearPartnerSession = useCallback(() => {
     localStorage.removeItem(tokenKey);
-    if (activeToken && activeToken === localStorage.getItem('adminToken')) {
-      localStorage.removeItem('adminToken');
-    }
     setToken(null);
     setOverview(null);
     setSiteSettings(null);
     setDraft(null);
-  }, [token, tokenKey]);
+    setError(null);
+  }, [tokenKey]);
+
+  const handleLogout = useCallback(() => {
+    clearPartnerSession();
+  }, [clearPartnerSession]);
+
+  const handlePartnerSiteMissing = useCallback((message) => {
+    clearPartnerSession();
+    setLoginError(
+      message ||
+        `No partner site is registered for ${subdomain}.${PARTNER_BASE_DOMAIN}. Submit a partnership application on the main site, or confirm the subdomain in Bluetick Admin → Partnerships.`
+    );
+  }, [clearPartnerSession, subdomain]);
 
   const fetchOverview = useCallback(async () => {
     if (!token) return;
@@ -141,12 +148,16 @@ function PartnerAdminApp({ subdomain }) {
         handleLogout();
         return null;
       }
+      if (response.status === 404) {
+        handlePartnerSiteMissing(data.error);
+        return null;
+      }
       throw new Error(data.error || 'Failed to load dashboard');
     }
 
     setOverview(data);
     return data;
-  }, [apiUrl, token, subdomain, handleLogout]);
+  }, [apiUrl, token, subdomain, handleLogout, handlePartnerSiteMissing]);
 
   const fetchSiteSettings = useCallback(async () => {
     if (!token) return;
@@ -162,6 +173,10 @@ function PartnerAdminApp({ subdomain }) {
         handleLogout();
         return null;
       }
+      if (response.status === 404) {
+        handlePartnerSiteMissing(data.error);
+        return null;
+      }
       throw new Error(data.error || 'Failed to load site settings');
     }
 
@@ -171,7 +186,7 @@ function PartnerAdminApp({ subdomain }) {
     setPendingLogo(null);
     setPendingAssets({});
     return data;
-  }, [apiUrl, token, subdomain, handleLogout]);
+  }, [apiUrl, token, subdomain, handleLogout, handlePartnerSiteMissing]);
 
   const loadDashboard = useCallback(async () => {
     if (!token) return;
@@ -196,38 +211,29 @@ function PartnerAdminApp({ subdomain }) {
     setLoginError(null);
 
     try {
-      let response = await fetch(`${apiUrl}/api/admin/login`, {
+      const response = await fetch(`${apiUrl}/api/partner-admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          subdomain,
           username: loginData.username.trim(),
           password: loginData.password,
         }),
       });
-      let data = await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
-        response = await fetch(`${apiUrl}/api/partner-admin/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subdomain, ...loginData }),
-        });
-        data = await response.json();
+        throw new Error(data.error || 'Login failed');
+      }
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Login failed');
-        }
-
-        if (data.isMainAdmin) {
-          localStorage.setItem('adminToken', data.token);
-        }
-      } else {
+      if (data.isMainAdmin) {
         localStorage.setItem('adminToken', data.token);
       }
 
       localStorage.setItem(tokenKey, data.token);
       setToken(data.token);
       setLoginData({ username: '', password: '' });
+      setLoginError(null);
     } catch (err) {
       setLoginError(err.message);
     } finally {
@@ -463,6 +469,13 @@ function PartnerAdminApp({ subdomain }) {
               {loginLoading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
+
+          <p className="pdash-login-sub" style={{ marginTop: 18, marginBottom: 0 }}>
+            No site here yet?{' '}
+            <a href={`https://${PARTNER_BASE_DOMAIN}/partner/apply`} target="_blank" rel="noopener noreferrer">
+              Apply for a partnership
+            </a>
+          </p>
         </div>
       </div>
     );
@@ -899,9 +912,18 @@ function PartnerAdminApp({ subdomain }) {
         ) : error ? (
           <div className="pdash-panel">
             <div className="pdash-alert error">{error}</div>
-            <button type="button" className="pdash-btn pdash-btn-primary" onClick={loadDashboard}>
-              Try Again
-            </button>
+            <p className="pdash-panel-lead">
+              This dashboard is tied to <strong>{subdomain}.{PARTNER_BASE_DOMAIN}</strong>. If you expected a site here,
+              confirm the partnership exists in production and that you are using the correct subdomain.
+            </p>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <button type="button" className="pdash-btn pdash-btn-primary" onClick={loadDashboard}>
+                Try Again
+              </button>
+              <button type="button" className="pdash-btn pdash-btn-secondary" onClick={handleLogout}>
+                Back to Sign In
+              </button>
+            </div>
           </div>
         ) : (
           <>
