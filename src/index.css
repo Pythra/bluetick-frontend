@@ -13,7 +13,36 @@
   -moz-osx-font-smoothing: grayscale;
   --brand-primary: #2563eb;
   --brand-primary-dark: #1d4ed8;
-  --brand-accent: #3b82f6;
+  --brand-primary-light: #5c8ef1;
+  --brand-primary-lighter: #93b6f7;
+  --brand-primary-pale: #b8cffb;
+  --brand-accent: #2563eb;
+  --brand-primary-rgb: 37, 99, 235;
+  --brand-primary-soft: rgba(37, 99, 235, 0.1);
+  --brand-primary-medium: rgba(37, 99, 235, 0.18);
+  --brand-primary-strong: rgba(37, 99, 235, 0.28);
+  --brand-primary-glow: rgba(37, 99, 235, 0.35);
+  --brand-gradient-start: #4f8ef7;
+  --brand-gradient-mid: #2563eb;
+  --brand-gradient-end: #1d4ed8;
+  --brand-gradient-hover-start: #60a5fa;
+  --brand-gradient-hover-mid: #3b82f6;
+  --brand-gradient-hover-end: #2563eb;
+  --brand-surface-tint: rgba(37, 99, 235, 0.06);
+  --brand-surface-bg: rgba(37, 99, 235, 0.04);
+  --brand-navbar-bg: rgba(37, 99, 235, 0.05);
+  --brand-button-secondary-bg: linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.14) 100%);
+  --brand-button-secondary-hover: linear-gradient(180deg, #ffffff 0%, rgba(37, 99, 235, 0.12) 100%);
+  --brand-footer-bg: #0e2a6a;
+  --brand-section-dark-start: #0a1628;
+  --brand-section-dark-mid: #0f2546;
+  --brand-section-dark-end: #1e3a8a;
+  --brand-section-glow: rgba(37, 99, 235, 0.22);
+  --brand-section-glow-soft: rgba(37, 99, 235, 0.12);
+  --brand-link: #2563eb;
+  --brand-link-hover: #1d4ed8;
+  --brand-shadow: rgba(37, 99, 235, 0.22);
+  --brand-shadow-soft: rgba(37, 99, 235, 0.14);
 }
 
 * {

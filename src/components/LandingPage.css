@@ -2,7 +2,7 @@
 
 .landing-page {
   width: 100%;
-  background: #f5f9ff;
+  background: linear-gradient(180deg, var(--brand-surface-bg) 0%, #f5f9ff 100%);
   font-family: 'Poppins', sans-serif;
   border-radius: 0 0 56px 56px;
   overflow: hidden;
@@ -31,7 +31,7 @@
 
 .landing-kicker {
   font-size: 1rem;
-  color: #1d4f9f;
+  color: var(--brand-primary-dark);
   margin-bottom: 0.7rem;
   font-weight: 500;
 }
@@ -86,51 +86,62 @@
 }
 
 .landing-btn-primary {
-  background: linear-gradient(180deg, #4f8ef7 0%, #2563eb 55%, #1d4ed8 100%);
+  background: linear-gradient(
+    180deg,
+    var(--brand-gradient-start) 0%,
+    var(--brand-gradient-mid) 55%,
+    var(--brand-gradient-end) 100%
+  );
   color: #ffffff;
   box-shadow:
-    2px 4px 10px rgba(30, 64, 175, 0.28),
-    3px 6px 14px rgba(37, 99, 235, 0.18);
+    2px 4px 10px var(--brand-shadow),
+    3px 6px 14px var(--brand-shadow-soft);
 }
 
 .landing-btn-primary:hover {
-  background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%);
+  background: linear-gradient(
+    180deg,
+    var(--brand-gradient-hover-start) 0%,
+    var(--brand-gradient-hover-mid) 55%,
+    var(--brand-gradient-hover-end) 100%
+  );
   box-shadow:
-    3px 5px 12px rgba(30, 64, 175, 0.32),
-    4px 8px 16px rgba(37, 99, 235, 0.22);
+    3px 5px 12px var(--brand-shadow),
+    4px 8px 16px var(--brand-shadow-soft);
 }
 
 .landing-btn-primary:active {
   box-shadow:
-    1px 2px 6px rgba(30, 64, 175, 0.22),
-    2px 3px 8px rgba(37, 99, 235, 0.14);
+    1px 2px 6px var(--brand-shadow-soft),
+    2px 3px 8px var(--brand-primary-medium);
 }
 
 .landing-btn-secondary {
-  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  background: var(--brand-button-secondary-bg);
   border: none;
-  color: #1d4ed8;
+  color: var(--brand-primary-dark);
   box-shadow:
-    2px 3px 8px rgba(59, 130, 246, 0.2),
-    3px 5px 12px rgba(147, 197, 253, 0.35);
+    2px 3px 8px var(--brand-shadow-soft),
+    3px 5px 12px var(--brand-primary-medium);
 }
 
 .landing-btn-secondary:hover {
-  background: linear-gradient(180deg, #ffffff 0%, #e0f2fe 100%);
+  background: var(--brand-button-secondary-hover);
+  color: var(--brand-primary-dark);
   box-shadow:
-    3px 4px 10px rgba(59, 130, 246, 0.24),
-    4px 6px 14px rgba(147, 197, 253, 0.4);
+    3px 4px 10px var(--brand-shadow-soft),
+    4px 6px 14px var(--brand-primary-medium);
 }
 
 .landing-btn-secondary:active {
   box-shadow:
-    1px 2px 5px rgba(59, 130, 246, 0.16),
-    2px 3px 8px rgba(147, 197, 253, 0.28);
+    1px 2px 5px var(--brand-shadow-soft),
+    2px 3px 8px var(--brand-primary-soft);
 }
 
 .landing-btn-tertiary {
   background: #ffffff;
-  color: #1e40af;
+  color: var(--brand-primary-dark);
   box-shadow:
     2px 3px 8px rgba(100, 116, 139, 0.14),
     3px 5px 12px rgba(148, 163, 184, 0.22);

@@ -1,5 +1,5 @@
 .footer {
-  background: #172554;
+  background: var(--brand-footer-bg);
   color: #e2e8f0;
   padding: 5rem 1.5rem 2.5rem;
   margin-top: 60px;
@@ -59,20 +59,20 @@ button.footer-top-cta {
   text-decoration: none;
   padding: 0.66rem 1.28rem;
   border-radius: 10px;
-  color: #0f172a;
-  background: #bae6fd;
+  color: var(--brand-primary-dark);
+  background: var(--brand-primary-lighter);
   font-size: 0.94rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
   font-family: inherit;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-  box-shadow: 0 5px 14px rgba(125, 211, 252, 0.3);
+  box-shadow: 0 5px 14px var(--brand-primary-medium);
 }
 
 .footer-top-cta:hover,
 button.footer-top-cta:hover {
-  background: #d7f0fb;
+  background: var(--brand-primary-pale);
   transform: translateY(-1px);
 }
 

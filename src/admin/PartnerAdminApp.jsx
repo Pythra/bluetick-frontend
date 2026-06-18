@@ -22,6 +22,7 @@ import {
   PARTNER_CONTENT_FIELDS,
   PARTNER_FEATURE_TOGGLES,
 } from '../config/partnerSiteConfig';
+import { applyBrandCssVariables } from '../utils/brandTheme';
 import './styles/admin.css';
 import './styles/partnerDashboard.css';
 
@@ -366,8 +367,11 @@ function PartnerAdminApp({ subdomain }) {
       setPendingAssets({});
       setSaveMessage({ type: 'success', text: 'Your site settings were saved successfully.' });
 
-      document.documentElement.style.setProperty('--brand-primary', data.siteConfig.primaryColor);
-      document.documentElement.style.setProperty('--brand-primary-dark', data.siteConfig.primaryColorDark);
+      applyBrandCssVariables(
+        document.documentElement,
+        data.siteConfig.primaryColor,
+        data.siteConfig.primaryColorDark
+      );
     } catch (err) {
       const message =
         err?.message === 'Failed to fetch'

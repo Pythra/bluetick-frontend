@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { getPartnerSubdomainFromHost, isBluetickMainHost } from '../utils/partnerSubdomain';
+import { applyBrandCssVariables } from '../utils/brandTheme';
 
 const DEFAULT_BRANDING = {
   isPartnerSite: false,
@@ -43,9 +44,7 @@ function applyBrandingTheme(branding) {
   const root = document.documentElement;
   root.dataset.partnerSite = branding.isPartnerSite ? 'true' : 'false';
   root.dataset.partnerTemplate = branding.isPartnerSite ? branding.templateId || 'modern' : 'default';
-  root.style.setProperty('--brand-primary', branding.primaryColor);
-  root.style.setProperty('--brand-primary-dark', branding.primaryColorDark);
-  root.style.setProperty('--brand-accent', branding.primaryColor);
+  applyBrandCssVariables(root, branding.primaryColor, branding.primaryColorDark);
   document.title = branding.isPartnerSite
     ? `${branding.brandName} - Digital Growth Services`
     : 'Bluetickgeng Development - Web, App & Publication Solutions';

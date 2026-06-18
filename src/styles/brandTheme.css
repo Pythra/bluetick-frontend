@@ -1,0 +1,392 @@
+/**
+ * Global brand theme tokens — defaults in index.css; partner sites override via JS.
+ */
+
+/* ---- Shared token consumers (main + partner) ---- */
+
+.services-summary-title-blue {
+  color: var(--brand-primary);
+  -webkit-text-fill-color: var(--brand-primary);
+}
+
+.landing-kicker {
+  color: var(--brand-primary-dark);
+}
+
+.landing-page {
+  background: linear-gradient(180deg, var(--brand-surface-bg) 0%, #f5f9ff 100%);
+}
+
+.landing-btn-primary {
+  background: linear-gradient(
+    180deg,
+    var(--brand-gradient-start) 0%,
+    var(--brand-gradient-mid) 55%,
+    var(--brand-gradient-end) 100%
+  );
+  box-shadow:
+    2px 4px 10px var(--brand-shadow),
+    3px 6px 14px var(--brand-shadow-soft);
+}
+
+.landing-btn-primary:hover {
+  background: linear-gradient(
+    180deg,
+    var(--brand-gradient-hover-start) 0%,
+    var(--brand-gradient-hover-mid) 55%,
+    var(--brand-gradient-hover-end) 100%
+  );
+  box-shadow:
+    3px 5px 12px var(--brand-shadow),
+    4px 8px 16px var(--brand-shadow-soft);
+}
+
+.landing-btn-secondary {
+  background: var(--brand-button-secondary-bg);
+  color: var(--brand-primary-dark);
+  box-shadow:
+    2px 3px 8px var(--brand-shadow-soft),
+    3px 5px 12px var(--brand-primary-medium);
+}
+
+.landing-btn-secondary:hover {
+  background: var(--brand-button-secondary-hover);
+  color: var(--brand-primary-dark);
+  box-shadow:
+    3px 4px 10px var(--brand-shadow-soft),
+    4px 6px 14px var(--brand-primary-medium);
+}
+
+.landing-impact-icon--sky {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary);
+}
+
+.navbar {
+  background: var(--brand-navbar-bg, #f5f9ff);
+}
+
+.navbar-link {
+  color: var(--brand-primary-dark);
+}
+
+.navbar-link:hover {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary-dark);
+}
+
+.navbar-brand-text {
+  color: var(--brand-primary-dark);
+}
+
+.navbar-signup {
+  background: var(--brand-button-secondary-bg);
+  color: var(--brand-primary-dark);
+  box-shadow:
+    0 2px 4px var(--brand-shadow-soft),
+    0 4px 10px var(--brand-primary-medium);
+}
+
+.navbar-signup:hover {
+  background: var(--brand-button-secondary-hover);
+  color: var(--brand-primary-dark);
+  box-shadow:
+    0 3px 6px var(--brand-shadow-soft),
+    0 6px 14px var(--brand-primary-medium);
+}
+
+.navbar-login {
+  background: #ffffff;
+  border: none;
+  color: var(--brand-primary-dark);
+  box-shadow:
+    0 2px 4px var(--brand-shadow-soft),
+    0 4px 10px var(--brand-primary-medium);
+}
+
+.navbar-login:hover {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary-dark);
+}
+
+.navbar-toggle span {
+  background: var(--brand-primary);
+}
+
+.cart-icon-button {
+  background: linear-gradient(135deg, var(--brand-gradient-start) 0%, var(--brand-primary) 100%);
+  box-shadow:
+    0 4px 20px var(--brand-primary-glow),
+    0 2px 8px rgba(15, 23, 42, 0.12);
+}
+
+.cart-icon-button:hover {
+  box-shadow:
+    0 6px 24px var(--brand-primary-glow),
+    0 4px 12px rgba(15, 23, 42, 0.14);
+}
+
+.currency-selector-trigger {
+  background: var(--brand-button-secondary-bg);
+  color: var(--brand-primary-dark);
+  box-shadow:
+    0 2px 4px var(--brand-shadow-soft),
+    0 4px 10px var(--brand-primary-medium);
+}
+
+.currency-selector-trigger:hover,
+.currency-selector-trigger:focus-visible {
+  background: var(--brand-button-secondary-hover);
+}
+
+.footer {
+  background: var(--brand-footer-bg);
+}
+
+.footer-top-cta,
+button.footer-top-cta {
+  background: var(--brand-primary-lighter);
+  color: var(--brand-primary-dark);
+  box-shadow: 0 5px 14px var(--brand-primary-medium);
+}
+
+.footer-top-cta:hover,
+button.footer-top-cta:hover {
+  background: var(--brand-primary-pale);
+}
+
+.section-eyebrow {
+  background: var(--section-accent-soft, var(--brand-primary-soft));
+  border-color: color-mix(in srgb, var(--section-accent, var(--brand-primary)) 30%, transparent);
+  color: var(--section-accent, var(--brand-primary));
+}
+
+/* ---- Partner site: unify section accents + deep blue panels ---- */
+
+html[data-partner-site='true'] .app-services-summary,
+html[data-partner-site='true'] .website-services-summary,
+html[data-partner-site='true'] .verification-services-summary,
+html[data-partner-site='true'] .music-streaming-services-summary,
+html[data-partner-site='true'] #tiktok-artist-services.music-streaming-services-summary,
+html[data-partner-site='true'] .publication-services-summary,
+html[data-partner-site='true'] .publication-section,
+html[data-partner-site='true'] .instagram-services-summary,
+html[data-partner-site='true'] .wikipedia-services-summary {
+  --section-accent: var(--brand-primary);
+  --section-accent-soft: var(--brand-primary-soft);
+}
+
+html[data-partner-site='true'] .verification-section,
+html[data-partner-site='true'] .verification-section.verification-services-summary {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, var(--brand-section-glow) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 95% 100%, var(--brand-section-glow-soft) 0%, transparent 50%),
+    linear-gradient(
+      165deg,
+      var(--brand-section-dark-start) 0%,
+      var(--brand-section-dark-mid) 42%,
+      var(--brand-section-dark-end) 100%
+    );
+}
+
+html[data-partner-site='true'] .verification-services-summary-bg-decoration::before {
+  background: radial-gradient(circle, var(--brand-section-glow-soft) 0%, transparent 70%);
+}
+
+html[data-partner-site='true'] .verification-services-summary-bg-decoration::after {
+  background: radial-gradient(circle, var(--brand-primary-medium) 0%, transparent 70%);
+}
+
+html[data-partner-site='true'] .app-services-section {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 70%, #ffffff 100%),
+    linear-gradient(90deg, var(--brand-primary-soft) 0%, #ffffff 100%);
+}
+
+html[data-partner-site='true'] .website-services-section {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 70%, #ffffff 100%),
+    linear-gradient(270deg, var(--brand-primary-soft) 0%, #ffffff 100%);
+}
+
+html[data-partner-site='true'] .app-services-section .section-subtitle,
+html[data-partner-site='true'] .website-services-section .section-subtitle {
+  background: linear-gradient(
+    135deg,
+    var(--brand-primary-dark) 0%,
+    var(--brand-primary) 50%,
+    var(--brand-primary-light) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html[data-partner-site='true'] .landing-media-kicker,
+html[data-partner-site='true'] .app-hero-kicker,
+html[data-partner-site='true'] .website-hero-kicker {
+  color: var(--brand-primary-light);
+}
+
+html[data-partner-site='true'] .service-detail-hero .services-summary-title-blue,
+html[data-partner-site='true'] .service-detail-card-cta.btn,
+html[data-partner-site='true'] .service-detail-page .service-detail-card-cta.btn {
+  color: var(--brand-primary-dark);
+}
+
+html[data-partner-site='true'] .service-detail-page .service-detail-card-cta.btn,
+html[data-partner-site='true'] .bounce-btn {
+  background: var(--brand-button-secondary-bg);
+  color: var(--brand-primary-dark);
+}
+
+html[data-partner-site='true'] .service-detail-page .service-detail-card-cta.btn:hover,
+html[data-partner-site='true'] .bounce-btn:hover {
+  background: var(--brand-button-secondary-hover);
+  color: var(--brand-primary-dark);
+}
+
+html[data-partner-site='true'] .about-eyebrow {
+  color: var(--brand-primary);
+}
+
+html[data-partner-site='true'] .about-cta-button {
+  color: var(--brand-primary-dark);
+}
+
+html[data-partner-site='true'] .about-mv-card h3 {
+  color: var(--brand-primary);
+}
+
+html[data-partner-site='true'] .partner-media-placeholder-icon {
+  color: var(--brand-primary);
+}
+
+html[data-partner-site='true'] .landing-currency-btn-symbol {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary-dark);
+}
+
+html[data-partner-site='true'] .landing-currency-option.is-active {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary-dark);
+}
+
+html[data-partner-site='true'] .place-order-dropdown-trigger.landing-btn-primary {
+  background: linear-gradient(
+    180deg,
+    var(--brand-gradient-start) 0%,
+    var(--brand-gradient-mid) 55%,
+    var(--brand-gradient-end) 100%
+  );
+}
+
+html[data-partner-site='true'] .place-order-dropdown-trigger.landing-btn-primary:hover {
+  background: linear-gradient(
+    180deg,
+    var(--brand-gradient-hover-start) 0%,
+    var(--brand-gradient-hover-mid) 55%,
+    var(--brand-gradient-hover-end) 100%
+  );
+}
+
+html[data-partner-site='true'] .landing-title {
+  color: var(--brand-section-dark-mid);
+}
+
+html[data-partner-site='true'] .landing-btn-tertiary {
+  color: var(--brand-primary-dark);
+}
+
+html[data-partner-site='true'] .landing-btn-tertiary:hover {
+  background: var(--brand-primary-soft);
+}
+
+/* Verification / social media section — replace hardcoded blue accents */
+html[data-partner-site='true'] .verification-services-summary .social-services-category-card::before {
+  background: radial-gradient(circle, var(--brand-primary-medium) 0%, transparent 70%);
+}
+
+html[data-partner-site='true'] .verification-services-summary .social-services-category-card::after {
+  background: radial-gradient(circle, var(--brand-section-glow-soft) 0%, transparent 60%);
+}
+
+html[data-partner-site='true'] .verification-services-summary .social-services-category-icon,
+html[data-partner-site='true'] .verification-services-summary .social-services-category-icon--mint,
+html[data-partner-site='true'] .verification-services-summary .social-services-category-icon--sky,
+html[data-partner-site='true'] .verification-services-summary .social-services-category-icon--amber {
+  background: var(--brand-primary-medium);
+}
+
+html[data-partner-site='true'] .verification-services-summary .social-services-category-cta.btn {
+  background: var(--brand-primary-medium);
+  border-color: var(--brand-primary-strong);
+}
+
+html[data-partner-site='true'] .verification-services-summary .social-services-category-cta.btn::before {
+  background: var(--brand-primary-strong);
+}
+
+html[data-partner-site='true'] .verification-services-summary .social-services-category-cta.btn:hover {
+  background: var(--brand-primary-strong);
+}
+
+html[data-partner-site='true'] .verification-services-summary .social-services-category-cta.btn:active {
+  background: var(--brand-primary-medium);
+}
+
+html[data-partner-site='true'] .verification-section .verification-hero-subtitle,
+html[data-partner-site='true'] .verification-services-summary .verification-hero-subtitle {
+  background: linear-gradient(
+    135deg,
+    var(--brand-primary-lighter) 0%,
+    var(--brand-primary-light) 50%,
+    var(--brand-primary) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Instagram / service summary decorative orbs — blue tones → brand */
+html[data-partner-site='true'] .instagram-services-summary .floating-ball:nth-child(odd),
+html[data-partner-site='true'] .website-services-section .floating-ball:nth-child(odd),
+html[data-partner-site='true'] .verification-section .floating-ball:nth-child(odd) {
+  background: radial-gradient(
+    circle,
+    var(--brand-primary-light) 0%,
+    var(--brand-primary) 50%,
+    var(--brand-primary-dark) 100%
+  ) !important;
+}
+
+html[data-partner-site='true'] .instagram-services-summary .floating-ball:nth-child(even) {
+  background: radial-gradient(
+    circle,
+    var(--brand-primary-pale) 0%,
+    var(--brand-primary-lighter) 50%,
+    var(--brand-primary-light) 100%
+  ) !important;
+}
+
+html[data-partner-site='true'] .home-impact-section .landing-impact-icon--sky {
+  background: var(--brand-primary-soft);
+  color: var(--brand-primary);
+}
+
+html[data-partner-site='true'] .faq-section .section-eyebrow,
+html[data-partner-site='true'] .testimonials-section .section-eyebrow,
+html[data-partner-site='true'] .celebrities-section .section-eyebrow {
+  --section-accent: var(--brand-primary);
+  --section-accent-soft: var(--brand-primary-soft);
+}
+
+html[data-partner-site='true'] .footer a:hover,
+html[data-partner-site='true'] .footer-link:hover {
+  color: var(--brand-primary-lighter);
+}
+
+html[data-partner-site='true'] .footer-social-link:hover {
+  background: var(--brand-primary-medium);
+  color: #ffffff;
+}

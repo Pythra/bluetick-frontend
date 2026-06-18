@@ -54,6 +54,7 @@ import ClientsSection from './components/ClientsSection';
 import { subscribeToPushNotifications } from './utils/pushNotifications';
 import './App.css';
 import './styles/partnerTemplates.css';
+import './styles/brandTheme.css';
 
 function HomePage() {
   const { isPartnerSite, features } = usePartnerBranding();

@@ -6,7 +6,7 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0) 70%, #ffffff 100%),
-    linear-gradient(90deg, #e0f2fe 0%, #ffffff 100%);
+    linear-gradient(90deg, var(--brand-primary-soft) 0%, #ffffff 100%);
   margin-top: 0;
 }
 
@@ -24,7 +24,12 @@
 }
 
 .app-services-section .section-subtitle {
-  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+  background: linear-gradient(
+    135deg,
+    var(--brand-primary-dark) 0%,
+    var(--brand-primary) 50%,
+    var(--brand-primary-light) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

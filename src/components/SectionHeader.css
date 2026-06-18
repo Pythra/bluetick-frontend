@@ -253,8 +253,8 @@
 }
 
 .services-summary-title-blue {
-  color: #2563eb;
-  -webkit-text-fill-color: #2563eb;
+  color: var(--brand-primary);
+  -webkit-text-fill-color: var(--brand-primary);
 }
 
 .services-summary-intro {

@@ -10,7 +10,7 @@ html[data-partner-template='modern'] .landing-title {
 
 html[data-partner-template='modern'] .landing-media-card {
   border-radius: 22px;
-  box-shadow: 0 24px 60px rgba(37, 99, 235, 0.18);
+  box-shadow: 0 24px 60px var(--brand-primary-glow);
 }
 
 html[data-partner-template='minimal'] .landing-page {
@@ -56,16 +56,16 @@ html[data-partner-template='corporate'] .landing-kicker {
 
 html[data-partner-template='corporate'] .landing-title {
   font-weight: 800;
-  color: #0b1f44;
+  color: var(--brand-section-dark-mid);
 }
 
 html[data-partner-template='corporate'] .landing-media-card {
   border-radius: 8px;
-  box-shadow: 0 16px 40px rgba(11, 61, 145, 0.14);
+  box-shadow: 0 16px 40px var(--brand-shadow-soft);
 }
 
 html[data-partner-template='corporate'] .footer {
-  background: #0b1f44;
+  background: var(--brand-footer-bg);
 }
 
 html[data-partner-template='corporate'] .navbar {
