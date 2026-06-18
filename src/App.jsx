@@ -53,10 +53,25 @@ import PartnerApplicationPage from './pages/PartnerApplicationPage';
 import FAQ from './components/FAQ';
 import ClientsSection from './components/ClientsSection';
 import PartnerBrandingGate from './components/PartnerBrandingGate';
+import HomepagePromoBanner from './components/HomepagePromoBanner';
+import CustomRequestsSection from './components/CustomRequestsSection';
+import CustomServiceSection from './components/CustomServiceSection';
+import { isPartnerHomepageServiceEnabled, PARTNER_HOMEPAGE_SERVICES, getCustomServiceDefinitions } from './config/partnerSiteConfig';
+import { subscribeToPushNotifications } from './utils/pushNotifications';
 import './App.css';
 import './styles/partnerTemplates.css';
 import './styles/brandTheme.css';
-import { isPartnerHomepageServiceEnabled } from './config/partnerSiteConfig';
+
+const HOMEPAGE_SERVICE_COMPONENTS = [
+  ['appDevelopment', AppServicesSummary],
+  ['websiteDevelopment', WebsiteServicesSummary],
+  ['socialMedia', VerificationServicesSummary],
+  ['musicStreaming', MusicStreamingVerificationSummary],
+  ['tiktokArtist', TikTokArtistServicesSummary],
+  ['publication', PublicationServicesSummary],
+  ['instagram', InstagramServicesSummary],
+  ['wikipedia', WikipediaServicesSummary],
+];
 
 function HomePage() {
   const branding = usePartnerBranding();
@@ -98,6 +113,22 @@ function HomePage() {
     features?.showPublicationLogos ||
     features?.showImpactStats !== false;
 
+  const promoItems = branding.sectionContent?.homepagePromos?.items || [];
+
+  const renderPromosAfter = (serviceId) => {
+    if (!isPartnerSite) {
+      return null;
+    }
+
+    return promoItems
+      .filter((promo) => promo?.enabled !== false && promo.afterService === serviceId && promo.imageUrl)
+      .map((promo) => (
+        <div className="scroll-pop" key={`promo-${promo.id}`}>
+          <HomepagePromoBanner promo={promo} />
+        </div>
+      ));
+  };
+
   const renderService = (serviceId, Component) => {
     if (!isPartnerHomepageServiceEnabled(branding, serviceId)) {
       return null;
@@ -121,14 +152,24 @@ function HomePage() {
       {!isPartnerSite ? (
         <div className="scroll-pop"><PartnerWithUsSection /></div>
       ) : null}
-      {renderService('appDevelopment', AppServicesSummary)}
-      {renderService('websiteDevelopment', WebsiteServicesSummary)}
-      {renderService('socialMedia', VerificationServicesSummary)}
-      {renderService('musicStreaming', MusicStreamingVerificationSummary)}
-      {renderService('tiktokArtist', TikTokArtistServicesSummary)}
-      {renderService('publication', PublicationServicesSummary)}
-      {renderService('instagram', InstagramServicesSummary)}
-      {renderService('wikipedia', WikipediaServicesSummary)}
+      {HOMEPAGE_SERVICE_COMPONENTS.map(([serviceId, Component]) => (
+        <div key={serviceId}>
+          {renderService(serviceId, Component)}
+          {renderPromosAfter(serviceId)}
+        </div>
+      ))}
+      {isPartnerSite
+        ? getCustomServiceDefinitions(branding)
+            .filter((service) => isPartnerHomepageServiceEnabled(branding, service.id))
+            .map((service) => (
+              <div key={service.id}>
+                <div className="scroll-pop">
+                  <CustomServiceSection service={service} />
+                </div>
+                {renderPromosAfter(service.id)}
+              </div>
+            ))
+        : null}
       {(!isPartnerSite || features?.showCelebrities) ? (
         <div className="scroll-pop"><CelebritiesSection /></div>
       ) : null}
@@ -137,6 +178,9 @@ function HomePage() {
       ) : null}
       {(!isPartnerSite || features?.showFaq !== false) ? (
         <div className="scroll-pop"><FAQ /></div>
+      ) : null}
+      {(!isPartnerSite || features?.showCustomRequests !== false) ? (
+        <div className="scroll-pop"><CustomRequestsSection /></div>
       ) : null}
       {!isPartnerSite ? <ClientsSection className="landing-page" /> : null}
       <Footer onScrollToSection={scrollToSection} />

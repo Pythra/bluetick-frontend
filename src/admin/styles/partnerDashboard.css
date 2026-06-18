@@ -425,6 +425,32 @@
   gap: 10px;
 }
 
+.pdash-custom-services {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--pdash-border);
+}
+
+.pdash-custom-services-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.pdash-custom-services-head strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.pdash-custom-services-head span {
+  display: block;
+  color: var(--pdash-soft);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
 .pdash-service-item {
   display: flex;
   align-items: flex-start;
@@ -516,6 +542,16 @@
 
 .pdash-editor-form {
   padding: 18px 24px 24px;
+}
+
+.pdash-editor-note {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--pdash-soft);
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .pdash-editor-list {

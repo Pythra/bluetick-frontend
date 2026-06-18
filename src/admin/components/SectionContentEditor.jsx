@@ -2,11 +2,14 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { MdAdd, MdClose, MdDelete } from 'react-icons/md';
 import {
+  PARTNER_CUSTOM_REQUESTS_DEFAULTS,
+  PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS,
   PARTNER_FAQ_DEFAULTS,
   PARTNER_IMPACT_STATS_DEFAULTS,
   PARTNER_SERVICE_SECTION_DEFAULTS,
   PARTNER_TESTIMONIALS_DEFAULTS,
 } from '../../data/partnerSectionDefaults';
+import { isCustomServiceId } from '../../config/partnerSiteConfig';
 
 function bulletsToText(bullets = []) {
   return bullets.join('\n');
@@ -31,7 +34,9 @@ function buildInitialState(editorType, sectionKey, sectionContent = {}, siteCont
   const stored = sectionContent[sectionKey] || {};
 
   if (editorType === 'service') {
-    const defaults = PARTNER_SERVICE_SECTION_DEFAULTS[sectionKey] || {};
+    const defaults = isCustomServiceId(sectionKey)
+      ? PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS
+      : PARTNER_SERVICE_SECTION_DEFAULTS[sectionKey] || {};
     return {
       eyebrow: stored.eyebrow ?? defaults.eyebrow ?? '',
       titleBlack: stored.titleBlack ?? defaults.titleBlack ?? '',
@@ -65,6 +70,16 @@ function buildInitialState(editorType, sectionKey, sectionContent = {}, siteCont
     const defaults = PARTNER_IMPACT_STATS_DEFAULTS;
     return {
       items: (stored.items?.length ? stored.items : defaults.items).map((item) => ({ ...item })),
+    };
+  }
+
+  if (editorType === 'customRequests') {
+    const defaults = PARTNER_CUSTOM_REQUESTS_DEFAULTS;
+    return {
+      titleBlack: stored.titleBlack ?? defaults.titleBlack,
+      titleBlue: stored.titleBlue ?? defaults.titleBlue,
+      intro: stored.intro ?? defaults.intro,
+      successMessage: stored.successMessage ?? defaults.successMessage,
     };
   }
 
@@ -110,6 +125,17 @@ function serializeState(editorType, state) {
     return {
       sectionPatch: {
         items: state.items,
+      },
+    };
+  }
+
+  if (editorType === 'customRequests') {
+    return {
+      sectionPatch: {
+        titleBlack: state.titleBlack,
+        titleBlue: state.titleBlue,
+        intro: state.intro,
+        successMessage: state.successMessage,
       },
     };
   }
@@ -213,6 +239,10 @@ function SectionContentEditor({
         <form className="pdash-editor-form" onSubmit={handleSubmit}>
           {editorType === 'hero' ? (
             <>
+              <p className="pdash-editor-note">
+                Hero video or image is uploaded in the <strong>Media Library</strong> tab under <strong>Homepage Hero</strong>.
+                If both are set, the hero image takes priority over the video.
+              </p>
               <div className="pdash-field">
                 <label>Brand tagline</label>
                 <textarea rows={2} value={form.tagline || ''} onChange={(e) => updateField('tagline', e.target.value)} />
@@ -368,6 +398,29 @@ function SectionContentEditor({
                 <MdAdd /> Add stat
               </button>
             </div>
+          ) : null}
+
+          {editorType === 'customRequests' ? (
+            <>
+              <div className="pdash-grid-2">
+                <div className="pdash-field">
+                  <label>Section title — first line</label>
+                  <input value={form.titleBlack || ''} onChange={(e) => updateField('titleBlack', e.target.value)} />
+                </div>
+                <div className="pdash-field">
+                  <label>Section title — accent line</label>
+                  <input value={form.titleBlue || ''} onChange={(e) => updateField('titleBlue', e.target.value)} />
+                </div>
+              </div>
+              <div className="pdash-field">
+                <label>Introduction text</label>
+                <textarea rows={3} value={form.intro || ''} onChange={(e) => updateField('intro', e.target.value)} />
+              </div>
+              <div className="pdash-field">
+                <label>Success message (after form submit)</label>
+                <textarea rows={2} value={form.successMessage || ''} onChange={(e) => updateField('successMessage', e.target.value)} />
+              </div>
+            </>
           ) : null}
 
           <div className="pdash-editor-actions">

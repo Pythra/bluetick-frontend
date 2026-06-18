@@ -36,6 +36,7 @@ const DEFAULT_BRANDING = {
     showCelebrities: true,
     showTestimonials: true,
     showFaq: true,
+    showCustomRequests: true,
     showBlog: true,
     showAffiliateProgram: true,
     showPartnerProgram: true,

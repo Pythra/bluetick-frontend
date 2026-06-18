@@ -55,6 +55,33 @@ export const PARTNER_HOMEPAGE_SERVICES = [
 
 export const PARTNER_SERVICE_IDS = PARTNER_HOMEPAGE_SERVICES.map((service) => service.id);
 
+export function isCustomServiceId(serviceId) {
+  return typeof serviceId === 'string' && serviceId.startsWith('custom-');
+}
+
+export function getCustomServiceDefinitions(source = {}) {
+  return source?.sectionContent?.customServices?.items || [];
+}
+
+export function createCustomServiceDefinition(label = 'Custom Service') {
+  const id = `custom-${Date.now()}`;
+  return {
+    id,
+    label,
+    description: 'Your own service offering on the homepage.',
+    sectionId: id,
+    imageUrl: '',
+    ctaLabel: 'Get Started',
+    ctaLink: '#custom-requests',
+  };
+}
+
+export function countEnabledHomepageServices(enabledServices = {}, customItems = []) {
+  const builtInCount = PARTNER_HOMEPAGE_SERVICES.filter((service) => enabledServices[service.id]).length;
+  const customCount = customItems.filter((service) => enabledServices[service.id] !== false).length;
+  return builtInCount + customCount;
+}
+
 export function getDefaultEnabledServices() {
   return Object.fromEntries(PARTNER_SERVICE_IDS.map((id) => [id, true]));
 }
@@ -68,10 +95,17 @@ export function isPartnerHomepageServiceEnabled(branding, serviceId) {
 }
 
 export function getFirstVisibleServiceSectionId(branding) {
-  const match = PARTNER_HOMEPAGE_SERVICES.find((service) =>
+  const builtIn = PARTNER_HOMEPAGE_SERVICES.find((service) =>
     isPartnerHomepageServiceEnabled(branding, service.id)
   );
-  return match?.sectionId || 'website-services';
+  if (builtIn) {
+    return builtIn.sectionId;
+  }
+
+  const custom = getCustomServiceDefinitions(branding).find((service) =>
+    isPartnerHomepageServiceEnabled(branding, service.id)
+  );
+  return custom?.sectionId || 'website-services';
 }
 
 export const PARTNER_TEMPLATES = [
@@ -100,44 +134,64 @@ export const PARTNER_ASSET_FIELDS = [
     key: 'heroVideo',
     label: 'Homepage Hero Video',
     type: 'video',
-    hint: 'MP4, WEBM or MOV up to 25MB. Shown on your homepage hero.',
+    group: 'hero',
+    hint: 'MP4, WEBM or MOV up to 25MB. Shown in the homepage hero (used if no hero image is set).',
+  },
+  {
+    key: 'heroImage',
+    label: 'Homepage Hero Image',
+    type: 'image',
+    group: 'hero',
+    hint: 'PNG or JPG up to 5MB. Replaces the hero video when uploaded — great for a static banner or ad.',
   },
   {
     key: 'heroPoster',
     label: 'Hero Video Poster',
     type: 'image',
-    hint: 'Fallback image while the hero video loads.',
+    group: 'hero',
+    hint: 'Fallback thumbnail while the hero video loads (video mode only).',
   },
   {
     key: 'appDevelopmentImage',
     label: 'App Development Section',
     type: 'image',
+    group: 'services',
     hint: 'Image for the app development section on your homepage.',
   },
   {
     key: 'websiteServicesImage',
     label: 'Website Services Section',
     type: 'image',
+    group: 'services',
     hint: 'Image for the website development section on your homepage.',
   },
   {
     key: 'aboutHero',
     label: 'About Page — Hero Image',
     type: 'image',
+    group: 'about',
     hint: 'Primary image on your About page.',
   },
   {
     key: 'aboutTeam',
     label: 'About Page — Team Image',
     type: 'image',
+    group: 'about',
     hint: 'Secondary image for your About page story section.',
   },
   {
     key: 'contactBackground',
     label: 'About Page — Contact Background',
     type: 'image',
+    group: 'about',
     hint: 'Background for the contact call-to-action on About.',
   },
+];
+
+export const PARTNER_MEDIA_GROUPS = [
+  { id: 'hero', label: 'Homepage Hero', description: 'Video or image shown in the top hero section. Upload a hero image to use a picture instead of video.' },
+  { id: 'services', label: 'Service Sections', description: 'Images inside your homepage service blocks.' },
+  { id: 'about', label: 'About Page', description: 'Images on your About page.' },
 ];
 
 export const PARTNER_CONTENT_FIELDS = [
@@ -191,6 +245,12 @@ export const PARTNER_SECTION_TOGGLES = [
     defaultEnabled: true,
   },
   {
+    key: 'showCustomRequests',
+    label: 'Custom requests form',
+    description: 'A contact form at the bottom of the homepage for bespoke project inquiries.',
+    defaultEnabled: true,
+  },
+  {
     key: 'showBlog',
     label: 'Blog in navigation',
     description: 'Keep blog links visible across your site.',
@@ -210,6 +270,7 @@ export const PARTNER_TOGGLE_EDITOR_MAP = {
   showImpactStats: { key: 'impactStats', editorType: 'impactStats', label: 'Impact statistics' },
   showTestimonials: { key: 'testimonials', editorType: 'testimonials', label: 'Testimonials' },
   showFaq: { key: 'faq', editorType: 'faq', label: 'FAQ section' },
+  showCustomRequests: { key: 'customRequests', editorType: 'customRequests', label: 'Custom requests' },
 };
 
 export function getServiceEditorMeta(service) {
@@ -218,6 +279,14 @@ export function getServiceEditorMeta(service) {
     editorType: 'service',
     label: service.label,
   };
+}
+
+export function getHomepageServiceOptions(brandingOrDraft = {}) {
+  const customItems = getCustomServiceDefinitions(brandingOrDraft).map((service) => ({
+    id: service.id,
+    label: service.label,
+  }));
+  return [...PARTNER_HOMEPAGE_SERVICES, ...customItems];
 }
 
 /** @deprecated Use PARTNER_SECTION_TOGGLES */

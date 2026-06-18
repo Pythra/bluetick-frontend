@@ -4,9 +4,13 @@ import {
   getDefaultSectionContent,
   PARTNER_FAQ_DEFAULTS,
   PARTNER_IMPACT_STATS_DEFAULTS,
+  PARTNER_CUSTOM_REQUESTS_DEFAULTS,
+  PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS,
+  PARTNER_HOMEPAGE_PROMOS_DEFAULTS,
   PARTNER_SERVICE_SECTION_DEFAULTS,
   PARTNER_TESTIMONIALS_DEFAULTS,
 } from '../data/partnerSectionDefaults';
+import { isCustomServiceId } from '../config/partnerSiteConfig';
 
 function mergeServiceSection(stored, serviceId) {
   const defaults = PARTNER_SERVICE_SECTION_DEFAULTS[serviceId] || {};
@@ -47,10 +51,34 @@ export function resolvePartnerSectionContent(branding, sectionKey) {
       : PARTNER_IMPACT_STATS_DEFAULTS;
   }
 
+  if (sectionKey === 'customRequests') {
+    return isPartner
+      ? { ...PARTNER_CUSTOM_REQUESTS_DEFAULTS, ...(stored.customRequests || {}) }
+      : PARTNER_CUSTOM_REQUESTS_DEFAULTS;
+  }
+
+  if (sectionKey === 'homepagePromos') {
+    return isPartner
+      ? mergeListSection(stored, 'homepagePromos', PARTNER_HOMEPAGE_PROMOS_DEFAULTS)
+      : PARTNER_HOMEPAGE_PROMOS_DEFAULTS;
+  }
+
   if (PARTNER_SERVICE_SECTION_DEFAULTS[sectionKey]) {
     return isPartner
       ? mergeServiceSection(stored, sectionKey)
       : PARTNER_SERVICE_SECTION_DEFAULTS[sectionKey];
+  }
+
+  if (isCustomServiceId(sectionKey)) {
+    const defaults = PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS;
+    const custom = stored?.[sectionKey] || {};
+    return isPartner
+      ? {
+          ...defaults,
+          ...custom,
+          bullets: custom.bullets?.length ? custom.bullets : defaults.bullets || [],
+        }
+      : defaults;
   }
 
   return stored[sectionKey] || getDefaultSectionContent()[sectionKey] || {};

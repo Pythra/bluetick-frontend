@@ -1,0 +1,111 @@
+.custom-requests-section {
+  padding: 4rem 1.5rem 5rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, var(--brand-primary-soft, rgba(37, 99, 235, 0.08)) 100%);
+}
+
+.custom-requests-container {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.custom-requests-form {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+.custom-requests-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.custom-requests-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.custom-requests-field label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.custom-requests-field input,
+.custom-requests-field textarea {
+  width: 100%;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  padding: 0.8rem 0.95rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: #0f172a;
+  background: #fff;
+}
+
+.custom-requests-field input:focus,
+.custom-requests-field textarea:focus {
+  outline: none;
+  border-color: var(--brand-primary, #2563eb);
+  box-shadow: 0 0 0 3px var(--brand-primary-soft, rgba(37, 99, 235, 0.12));
+}
+
+.custom-requests-alert {
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+}
+
+.custom-requests-alert.success {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.custom-requests-alert.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.custom-requests-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 1.4rem;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--brand-on-primary, #fff);
+  background: linear-gradient(
+    135deg,
+    var(--brand-primary, #2563eb),
+    var(--brand-primary-dark, #1d4ed8)
+  );
+  box-shadow: 0 10px 24px rgba(var(--brand-primary-rgb, 37, 99, 235), 0.22);
+}
+
+.custom-requests-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .custom-requests-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .custom-requests-section {
+    padding: 3rem 1rem 4rem;
+  }
+}

@@ -164,11 +164,40 @@ export const PARTNER_IMPACT_STATS_DEFAULTS = {
   ],
 };
 
+export const PARTNER_CUSTOM_REQUESTS_DEFAULTS = {
+  titleBlack: 'HAVE A CUSTOM',
+  titleBlue: 'REQUEST?',
+  intro:
+    'Tell us what you need — bespoke projects, special packages, or services not listed on the site. We will get back to you shortly.',
+  successMessage: 'Thank you! Your request has been sent. We will contact you soon.',
+};
+
+export const PARTNER_HOMEPAGE_PROMOS_DEFAULTS = {
+  items: [],
+};
+
+export const PARTNER_CUSTOM_SERVICES_DEFAULTS = {
+  items: [],
+};
+
+export const PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS = {
+  eyebrow: 'Your Service',
+  titleBlack: 'CUSTOM',
+  titleBlue: 'SERVICE',
+  intro: 'Describe what you offer and who it helps.',
+  heroKicker: 'What We Offer',
+  heroTitle: 'Your Service Headline',
+  bullets: ['Key benefit or deliverable', 'Another highlight', 'Optional third point'],
+};
+
 export function getDefaultSectionContent() {
   return {
     ...PARTNER_SERVICE_SECTION_DEFAULTS,
     testimonials: PARTNER_TESTIMONIALS_DEFAULTS,
     faq: PARTNER_FAQ_DEFAULTS,
     impactStats: PARTNER_IMPACT_STATS_DEFAULTS,
+    customRequests: PARTNER_CUSTOM_REQUESTS_DEFAULTS,
+    homepagePromos: PARTNER_HOMEPAGE_PROMOS_DEFAULTS,
+    customServices: PARTNER_CUSTOM_SERVICES_DEFAULTS,
   };
 }

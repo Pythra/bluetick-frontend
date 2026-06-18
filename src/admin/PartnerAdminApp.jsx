@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
+  MdAdd,
   MdDashboard,
   MdPalette,
   MdPermMedia,
@@ -14,6 +15,7 @@ import {
   MdPayments,
   MdVerified,
   MdEdit,
+  MdDelete,
 } from 'react-icons/md';
 import SectionContentEditor from './components/SectionContentEditor';
 import { useAuth } from '../contexts/AuthContext';
@@ -24,10 +26,16 @@ import {
   PARTNER_CONTENT_FIELDS,
   PARTNER_SECTION_TOGGLES,
   PARTNER_HOMEPAGE_SERVICES,
+  PARTNER_MEDIA_GROUPS,
   PARTNER_TOGGLE_EDITOR_MAP,
   getServiceEditorMeta,
   getDefaultEnabledServices,
+  getCustomServiceDefinitions,
+  createCustomServiceDefinition,
+  countEnabledHomepageServices,
+  getHomepageServiceOptions,
 } from '../config/partnerSiteConfig';
+import { PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS } from '../data/partnerSectionDefaults';
 import { applyBrandCssVariables } from '../utils/brandTheme';
 import { normalizeMediaUrl } from '../utils/partnerMedia';
 import { resizeImageFile } from '../utils/resizeImageFile';
@@ -113,6 +121,8 @@ function PartnerAdminApp({ subdomain }) {
   const [logoPreview, setLogoPreview] = useState(null);
   const [pendingLogo, setPendingLogo] = useState(null);
   const [pendingAssets, setPendingAssets] = useState({});
+  const [pendingPromoUploads, setPendingPromoUploads] = useState({});
+  const [pendingCustomServiceUploads, setPendingCustomServiceUploads] = useState({});
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -203,6 +213,7 @@ function PartnerAdminApp({ subdomain }) {
     setLogoPreview(normalizeMediaUrl(data.logoUrl) || null);
     setPendingLogo(null);
     setPendingAssets({});
+    setPendingPromoUploads({});
     return data;
   }, [apiUrl, token, subdomain, handleLogout, handlePartnerSiteMissing]);
 
@@ -310,8 +321,17 @@ function PartnerAdminApp({ subdomain }) {
 
   const enabledServiceCount = useMemo(() => {
     if (!draft?.enabledServices) return 0;
-    return PARTNER_HOMEPAGE_SERVICES.filter((service) => draft.enabledServices[service.id]).length;
-  }, [draft?.enabledServices]);
+    return countEnabledHomepageServices(
+      draft.enabledServices,
+      getCustomServiceDefinitions(draft)
+    );
+  }, [draft?.enabledServices, draft?.sectionContent?.customServices?.items]);
+
+  const customServiceItems = getCustomServiceDefinitions(draft);
+  const homepageServiceOptions = useMemo(
+    () => getHomepageServiceOptions(draft),
+    [draft?.sectionContent?.customServices?.items]
+  );
 
   const handleLogoChange = async (event) => {
     const file = event.target.files?.[0];
@@ -373,12 +393,146 @@ function PartnerAdminApp({ subdomain }) {
     }));
   };
 
+  const promoItems = draft?.sectionContent?.homepagePromos?.items || [];
+
+  const updatePromoItems = (items) => {
+    setDraft((prev) => ({
+      ...prev,
+      sectionContent: {
+        ...prev.sectionContent,
+        homepagePromos: { items },
+      },
+    }));
+  };
+
+  const handleAddPromo = () => {
+    const nextItem = {
+      id: `promo-${Date.now()}`,
+      afterService: PARTNER_HOMEPAGE_SERVICES[0]?.id || 'appDevelopment',
+      imageUrl: '',
+      linkUrl: '',
+      alt: 'Promotional banner',
+      enabled: true,
+    };
+    updatePromoItems([...promoItems, nextItem]);
+  };
+
+  const handleUpdatePromo = (promoId, patch) => {
+    updatePromoItems(
+      promoItems.map((item) => (item.id === promoId ? { ...item, ...patch } : item))
+    );
+  };
+
+  const handleRemovePromo = (promoId) => {
+    updatePromoItems(promoItems.filter((item) => item.id !== promoId));
+    setPendingPromoUploads((prev) => {
+      const next = { ...prev };
+      delete next[promoId];
+      return next;
+    });
+  };
+
+  const handlePromoImageChange = async (promoId, event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setSaveMessage({ type: 'error', text: 'Promo banner must be an image file.' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveMessage({ type: 'error', text: 'Promo image must be under 5MB.' });
+      return;
+    }
+
+    const dataUrl = await readFileAsDataUrl(file);
+    setPendingPromoUploads((prev) => ({ ...prev, [promoId]: dataUrl }));
+    handleUpdatePromo(promoId, { imageUrl: dataUrl });
+  };
+
+  const updateCustomServiceItems = (items) => {
+    setDraft((prev) => ({
+      ...prev,
+      sectionContent: {
+        ...prev.sectionContent,
+        customServices: { items },
+      },
+    }));
+  };
+
+  const handleAddCustomService = () => {
+    const nextService = createCustomServiceDefinition('Custom Service');
+    setDraft((prev) => ({
+      ...prev,
+      enabledServices: { ...prev.enabledServices, [nextService.id]: true },
+      sectionContent: {
+        ...prev.sectionContent,
+        customServices: {
+          items: [...getCustomServiceDefinitions(prev), nextService],
+        },
+        [nextService.id]: {
+          ...(prev.sectionContent?.[nextService.id] || {}),
+          ...PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS,
+        },
+      },
+    }));
+  };
+
+  const handleUpdateCustomService = (serviceId, patch) => {
+    updateCustomServiceItems(
+      customServiceItems.map((item) => (item.id === serviceId ? { ...item, ...patch } : item))
+    );
+  };
+
+  const handleRemoveCustomService = (serviceId) => {
+    setDraft((prev) => {
+      const nextEnabled = { ...prev.enabledServices };
+      delete nextEnabled[serviceId];
+      const nextSectionContent = { ...prev.sectionContent };
+      delete nextSectionContent[serviceId];
+      return {
+        ...prev,
+        enabledServices: nextEnabled,
+        sectionContent: {
+          ...nextSectionContent,
+          customServices: {
+            items: getCustomServiceDefinitions(prev).filter((item) => item.id !== serviceId),
+          },
+        },
+      };
+    });
+    setPendingCustomServiceUploads((prev) => {
+      const next = { ...prev };
+      delete next[serviceId];
+      return next;
+    });
+  };
+
+  const handleCustomServiceImageChange = async (serviceId, event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setSaveMessage({ type: 'error', text: 'Service image must be an image file.' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveMessage({ type: 'error', text: 'Service image must be under 5MB.' });
+      return;
+    }
+
+    const dataUrl = await readFileAsDataUrl(file);
+    setPendingCustomServiceUploads((prev) => ({ ...prev, [serviceId]: dataUrl }));
+    handleUpdateCustomService(serviceId, { imageUrl: dataUrl });
+  };
+
   const handleSaveSettings = async () => {
     if (!draft) return;
 
-    const selectedServices = PARTNER_HOMEPAGE_SERVICES.filter(
-      (service) => draft.enabledServices?.[service.id]
-    ).length;
+    const selectedServices = countEnabledHomepageServices(
+      draft.enabledServices,
+      getCustomServiceDefinitions(draft)
+    );
     if (selectedServices === 0) {
       setSaveMessage({ type: 'error', text: 'Select at least one homepage service before saving.' });
       return;
@@ -394,6 +548,20 @@ function PartnerAdminApp({ subdomain }) {
           assetUploads[slot] = null;
         } else if (typeof value === 'string' && value.startsWith('data:')) {
           assetUploads[slot] = value;
+        }
+      });
+
+      const promoUploads = {};
+      Object.entries(pendingPromoUploads).forEach(([promoId, value]) => {
+        if (typeof value === 'string' && value.startsWith('data:')) {
+          promoUploads[promoId] = value;
+        }
+      });
+
+      const customServiceUploads = {};
+      Object.entries(pendingCustomServiceUploads).forEach(([serviceId, value]) => {
+        if (typeof value === 'string' && value.startsWith('data:')) {
+          customServiceUploads[serviceId] = value;
         }
       });
 
@@ -415,6 +583,8 @@ function PartnerAdminApp({ subdomain }) {
             sectionContent: draft.sectionContent,
             logo: pendingLogo || undefined,
             assetUploads: Object.keys(assetUploads).length ? assetUploads : undefined,
+            promoUploads: Object.keys(promoUploads).length ? promoUploads : undefined,
+            customServiceUploads: Object.keys(customServiceUploads).length ? customServiceUploads : undefined,
           }),
         }
       );
@@ -429,6 +599,8 @@ function PartnerAdminApp({ subdomain }) {
       setLogoPreview(normalizeMediaUrl(data.logoUrl) || null);
       setPendingLogo(null);
       setPendingAssets({});
+      setPendingPromoUploads({});
+      setPendingCustomServiceUploads({});
       setSaveMessage({ type: 'success', text: 'Your site settings were saved successfully.' });
 
       applyBrandCssVariables(
@@ -746,7 +918,7 @@ function PartnerAdminApp({ subdomain }) {
           <h2>Homepage Services</h2>
           <p className="pdash-panel-lead">
             Choose which services appear on your homepage. This list matches the main Bluetick site — from App Development through Wikipedia Page Services.
-            <strong> {enabledServiceCount} of {PARTNER_HOMEPAGE_SERVICES.length} selected.</strong>
+            <strong> {enabledServiceCount} service{enabledServiceCount === 1 ? '' : 's'} enabled.</strong>
           </p>
           <div className="pdash-service-list">
             {PARTNER_HOMEPAGE_SERVICES.map((service, index) => {
@@ -776,6 +948,119 @@ function PartnerAdminApp({ subdomain }) {
                 </div>
               );
             })}
+          </div>
+
+          <div className="pdash-custom-services">
+            <div className="pdash-custom-services-head">
+              <div>
+                <strong>Custom Services</strong>
+                <span>Add your own service sections with a name, image, and write-up.</span>
+              </div>
+              <button
+                type="button"
+                className="pdash-btn pdash-btn-ghost pdash-editor-add"
+                onClick={handleAddCustomService}
+              >
+                <MdAdd /> Add custom service
+              </button>
+            </div>
+
+            {customServiceItems.length ? (
+              <div className="pdash-editor-list">
+                {customServiceItems.map((service, index) => {
+                  const previewSrc = pendingCustomServiceUploads[service.id] || service.imageUrl;
+                  const isEnabled = draft.enabledServices?.[service.id] !== false;
+                  const editorMeta = getServiceEditorMeta(service);
+                  return (
+                    <div key={service.id} className={`pdash-editor-list-item${isEnabled ? ' is-enabled' : ''}`}>
+                      <div className="pdash-editor-list-head">
+                        <strong>Custom service {index + 1}</strong>
+                        <button
+                          type="button"
+                          className="pdash-btn pdash-btn-ghost"
+                          onClick={() => handleRemoveCustomService(service.id)}
+                        >
+                          <MdDelete /> Remove
+                        </button>
+                      </div>
+
+                      <label className="pdash-service-item-main" style={{ marginBottom: 12 }}>
+                        <input
+                          type="checkbox"
+                          checked={isEnabled}
+                          onChange={(e) => updateDraftService(service.id, e.target.checked)}
+                        />
+                        <span className="pdash-service-copy">
+                          <strong>Show on homepage</strong>
+                        </span>
+                      </label>
+
+                      <div className="pdash-grid-2">
+                        <div className="pdash-field">
+                          <label>Service name</label>
+                          <input
+                            value={service.label || ''}
+                            onChange={(e) => handleUpdateCustomService(service.id, { label: e.target.value })}
+                            placeholder="e.g. Brand Consulting"
+                          />
+                        </div>
+                        <div className="pdash-field">
+                          <label>Short description (dashboard only)</label>
+                          <input
+                            value={service.description || ''}
+                            onChange={(e) => handleUpdateCustomService(service.id, { description: e.target.value })}
+                            placeholder="Brief note for your reference"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="pdash-field">
+                        <label>Section image</label>
+                        {previewSrc ? (
+                          <img
+                            src={previewSrc}
+                            alt={service.label || 'Service preview'}
+                            style={{ maxWidth: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 12 }}
+                          />
+                        ) : null}
+                        <input type="file" accept="image/*" onChange={(e) => handleCustomServiceImageChange(service.id, e)} />
+                      </div>
+
+                      <div className="pdash-grid-2">
+                        <div className="pdash-field">
+                          <label>Button label</label>
+                          <input
+                            value={service.ctaLabel || ''}
+                            onChange={(e) => handleUpdateCustomService(service.id, { ctaLabel: e.target.value })}
+                            placeholder="Get Started"
+                          />
+                        </div>
+                        <div className="pdash-field">
+                          <label>Button link</label>
+                          <input
+                            value={service.ctaLink || ''}
+                            onChange={(e) => handleUpdateCustomService(service.id, { ctaLink: e.target.value })}
+                            placeholder="#custom-requests or https://..."
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="pdash-btn pdash-btn-ghost"
+                        onClick={() => openSectionEditor(editorMeta)}
+                      >
+                        <MdEdit /> Edit section content
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="pdash-panel-lead" style={{ marginTop: 12 }}>
+                No custom services yet. Use the button above to create one.
+              </p>
+            )}
           </div>
         </div>
 
@@ -817,6 +1102,90 @@ function PartnerAdminApp({ subdomain }) {
           );
           })}
         </div>
+
+        <div className="pdash-panel">
+          <h2>Homepage Promo Banners</h2>
+          <p className="pdash-panel-lead">
+            Add image banners (ads, announcements, offers) that appear between service sections on your homepage.
+          </p>
+          <div className="pdash-editor-list">
+            {promoItems.map((promo, index) => {
+              const previewSrc = pendingPromoUploads[promo.id] || promo.imageUrl;
+              return (
+                <div key={promo.id} className="pdash-editor-list-item">
+                  <div className="pdash-editor-list-head">
+                    <strong>Promo banner {index + 1}</strong>
+                    <button
+                      type="button"
+                      className="pdash-btn pdash-btn-ghost"
+                      onClick={() => handleRemovePromo(promo.id)}
+                    >
+                      <MdDelete /> Remove
+                    </button>
+                  </div>
+                  <div className="pdash-grid-2">
+                    <div className="pdash-field">
+                      <label>Show after service</label>
+                      <select
+                        value={promo.afterService}
+                        onChange={(e) => handleUpdatePromo(promo.id, { afterService: e.target.value })}
+                      >
+                        {homepageServiceOptions.map((service) => (
+                          <option key={service.id} value={service.id}>
+                            {service.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="pdash-field">
+                      <label>Enabled</label>
+                      <label className="pdash-switch" style={{ marginTop: 8 }}>
+                        <input
+                          type="checkbox"
+                          checked={promo.enabled !== false}
+                          onChange={(e) => handleUpdatePromo(promo.id, { enabled: e.target.checked })}
+                        />
+                        <span className="pdash-switch-slider" />
+                      </label>
+                    </div>
+                  </div>
+                  <div className="pdash-field">
+                    <label>Banner image</label>
+                    {previewSrc ? (
+                      <img
+                        src={previewSrc}
+                        alt={promo.alt || 'Promo preview'}
+                        style={{ maxWidth: '100%', maxHeight: 140, objectFit: 'cover', borderRadius: 12 }}
+                      />
+                    ) : null}
+                    <input type="file" accept="image/*" onChange={(e) => handlePromoImageChange(promo.id, e)} />
+                  </div>
+                  <div className="pdash-grid-2">
+                    <div className="pdash-field">
+                      <label>Link URL (optional)</label>
+                      <input
+                        value={promo.linkUrl || ''}
+                        onChange={(e) => handleUpdatePromo(promo.id, { linkUrl: e.target.value })}
+                        placeholder="https://your-offer-page.com"
+                      />
+                    </div>
+                    <div className="pdash-field">
+                      <label>Alt text</label>
+                      <input
+                        value={promo.alt || ''}
+                        onChange={(e) => handleUpdatePromo(promo.id, { alt: e.target.value })}
+                        placeholder="Describe the banner"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <button type="button" className="pdash-btn pdash-btn-ghost pdash-editor-add" onClick={handleAddPromo}>
+            <MdAdd /> Add promo banner
+          </button>
+        </div>
       </>
     );
   };
@@ -825,13 +1194,21 @@ function PartnerAdminApp({ subdomain }) {
     if (!draft) return null;
 
     return (
-      <div className="pdash-panel">
-        <h2>Media Library</h2>
-        <p className="pdash-panel-lead">
-          Upload your own images and videos. Bluetick assets are never shown on your partner site — only your uploads or neutral placeholders.
-        </p>
-        <div className="pdash-asset-grid">
-          {PARTNER_ASSET_FIELDS.map((field) => {
+      <>
+        <div className="pdash-panel">
+          <h2>Media Library</h2>
+          <p className="pdash-panel-lead">
+            Upload images and videos for your homepage hero, service sections, and About page.
+            For hero media, go to the <strong>Homepage Hero</strong> group below — use a hero image for a static banner, or a hero video for motion.
+          </p>
+        </div>
+
+        {PARTNER_MEDIA_GROUPS.map((group) => (
+          <div key={group.id} className="pdash-panel">
+            <h2>{group.label}</h2>
+            <p className="pdash-panel-lead">{group.description}</p>
+            <div className="pdash-asset-grid">
+              {PARTNER_ASSET_FIELDS.filter((field) => field.group === group.id).map((field) => {
             const assetSrc = draft.assets?.[field.key];
             const isDataUrl = typeof assetSrc === 'string' && assetSrc.startsWith('data:');
             const displaySrc = isDataUrl ? assetSrc : assetSrc;
@@ -869,8 +1246,10 @@ function PartnerAdminApp({ subdomain }) {
               </div>
             );
           })}
-        </div>
-      </div>
+            </div>
+          </div>
+        ))}
+      </>
     );
   };
 

@@ -67,7 +67,10 @@ function LandingPage({ onScrollToSection }) {
   const { isPartnerSite, brandName, shortName, tagline, heroTitle, heroDescription, features } = usePartnerBranding();
   const impactSection = usePartnerSectionContent('impactStats');
   const { src: partnerHeroVideo, isPartnerSite: onPartnerSite } = usePartnerAsset('heroVideo', heroVideo);
+  const { src: partnerHeroImage } = usePartnerAsset('heroImage', null);
   const { src: heroPoster } = usePartnerAsset('heroPoster', null);
+  const heroMediaSrc = onPartnerSite ? (partnerHeroImage || partnerHeroVideo) : heroVideo;
+  const heroMediaType = onPartnerSite && partnerHeroImage ? 'image' : 'video';
   const displayName = shortName || brandName;
   const { currency, setCurrency, currencies } = useCurrency();
   const selectedCurrency = getCurrencyByCode(currency);
@@ -215,8 +218,8 @@ function LandingPage({ onScrollToSection }) {
 
           <div className="landing-media-card">
             <PartnerMediaFrame
-              src={onPartnerSite ? partnerHeroVideo : heroVideo}
-              type="video"
+              src={heroMediaSrc}
+              type={heroMediaType}
               poster={heroPoster}
               className="landing-media-video-wrap"
               overlayClassName="landing-media-overlay"
