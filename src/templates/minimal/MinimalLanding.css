@@ -1,0 +1,96 @@
+.tpl-minimal {
+  width: 100%;
+  background: #fafbfc;
+  font-family: 'Poppins', sans-serif;
+  border-radius: 0 0 32px 32px;
+  overflow: hidden;
+}
+
+.tpl-minimal-shell {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 0;
+  text-align: center;
+}
+
+.tpl-minimal-hero {
+  padding: 2.5rem 0 1.5rem;
+}
+
+.tpl-minimal-kicker {
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.tpl-minimal-title {
+  margin: 0 auto;
+  color: #0f172a;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+
+.tpl-minimal-description {
+  margin: 1.25rem auto 0;
+  color: #64748b;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 52ch;
+}
+
+.tpl-minimal-actions {
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+.tpl-minimal-logos {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.tpl-minimal-stats {
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.tpl-minimal-stats-inner {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  padding-top: 2rem;
+}
+
+.tpl-minimal-stat {
+  text-align: center;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+}
+
+.tpl-minimal-stat .landing-impact-top {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tpl-minimal-stat .landing-impact-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 720px) {
+  .tpl-minimal-stats-inner {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}

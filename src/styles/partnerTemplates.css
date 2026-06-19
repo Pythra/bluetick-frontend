@@ -1,80 +1,56 @@
-/* Partner site layout templates */
+/* Partner template chrome — navbar & footer variants */
 
-html[data-partner-template='modern'] .landing-page {
-  --landing-radius: 18px;
+html[data-partner-template='minimal'] .navbar--tpl-minimal {
+  background: transparent;
+  box-shadow: none;
 }
 
-html[data-partner-template='modern'] .landing-title {
-  letter-spacing: -0.03em;
+html[data-partner-template='minimal'] .footer--tpl-minimal {
+  background: #f8fafc;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-html[data-partner-template='modern'] .landing-media-card {
-  border-radius: 22px;
-  box-shadow: 0 24px 60px var(--brand-primary-glow);
-}
-
-html[data-partner-template='minimal'] .landing-page {
-  background: #fafbfc;
-}
-
-html[data-partner-template='minimal'] .landing-hero-shell {
-  padding-top: 28px;
-}
-
-html[data-partner-template='minimal'] .landing-title {
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #0f172a;
-}
-
-html[data-partner-template='minimal'] .landing-media-card {
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-html[data-partner-template='minimal'] .landing-btn-primary,
-html[data-partner-template='minimal'] .bounce-btn {
-  border-radius: 10px;
-}
-
-html[data-partner-template='minimal'] .about-hero,
-html[data-partner-template='minimal'] .about-mv-card {
-  border-radius: 12px;
-}
-
-html[data-partner-template='corporate'] .landing-page {
-  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 42%);
-}
-
-html[data-partner-template='corporate'] .landing-kicker {
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-html[data-partner-template='corporate'] .landing-title {
-  font-weight: 800;
-  color: var(--brand-section-dark-mid);
-}
-
-html[data-partner-template='corporate'] .landing-media-card {
-  border-radius: 8px;
-  box-shadow: 0 16px 40px var(--brand-shadow-soft);
-}
-
-html[data-partner-template='corporate'] .footer {
-  background: var(--brand-footer-bg);
-}
-
-html[data-partner-template='corporate'] .navbar {
+html[data-partner-template='corporate'] .navbar--tpl-corporate {
   border-bottom: 1px solid rgba(148, 163, 184, 0.2);
   box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
 }
 
-html[data-partner-template='corporate'] .about-eyebrow,
-html[data-partner-template='corporate'] .about-service-card h3 {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+html[data-partner-template='corporate'] .footer--tpl-corporate {
+  background: var(--brand-footer-bg);
+}
+
+html[data-partner-template='bold'] .footer--tpl-bold {
+  background: #0b1220;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+html[data-partner-template='bold'] .footer--tpl-bold .footer-top-title,
+html[data-partner-template='bold'] .footer--tpl-bold .footer-top-subtitle,
+html[data-partner-template='bold'] .footer--tpl-bold .footer-link,
+html[data-partner-template='bold'] .footer--tpl-bold .footer-contact-item {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+html[data-partner-template='studio'] .navbar--tpl-studio {
+  background: transparent;
+}
+
+html[data-partner-template='studio'] .footer--tpl-studio {
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+}
+
+/* Shared landing section scroll animations still apply to partner templates */
+.tpl-landing .landing-btn-primary,
+.tpl-landing .bounce-btn {
+  border-radius: 999px;
+}
+
+html[data-partner-template='minimal'] .tpl-landing .landing-btn-primary,
+html[data-partner-template='minimal'] .tpl-landing .bounce-btn {
+  border-radius: 10px;
+}
+
+html[data-partner-template='corporate'] .tpl-landing .landing-btn-primary,
+html[data-partner-template='corporate'] .tpl-landing .bounce-btn {
+  border-radius: 8px;
 }

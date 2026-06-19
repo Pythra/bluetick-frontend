@@ -42,7 +42,10 @@ function Footer({ onScrollToSection }) {
     content,
     logoUrl,
     features,
+    templateId,
   } = usePartnerBranding();
+  const templateFooterClass =
+    isPartnerSite && templateId ? `footer--tpl-${templateId}` : '';
   const displayName = shortName || brandName;
   const footerLogoSrc = isPartnerSite ? logoUrl : bluegoLogo;
   const phoneHref = isPartnerSite ? formatPhoneHref(contactPhone) : 'tel:+2349069439149';
@@ -53,7 +56,7 @@ function Footer({ onScrollToSection }) {
   const whatsappDisplay = isPartnerSite ? contactWhatsapp : companyWhatsappDemoDisplay;
 
   return (
-    <footer className="footer">
+    <footer className={`footer ${templateFooterClass}`.trim()}>
       <div className="footer-container">
         <div className="footer-top">
           <div className="logo-container">

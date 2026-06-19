@@ -8,6 +8,7 @@ import { CurrencyProvider } from './contexts/CurrencyContext';
 import { useAuth } from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import LandingPage from './components/LandingPage';
+import PartnerLandingPage from './templates/PartnerLandingPage';
 import Navbar from './components/Navbar';
 import AppServicesSummary from './components/AppServicesSummary';
 import WebsiteServicesSummary from './components/WebsiteServicesSummary';
@@ -162,7 +163,11 @@ function HomePage() {
   return (
     <>
       {showLanding ? (
-        <LandingPage onScrollToSection={scrollToSection} />
+        isPartnerSite ? (
+          <PartnerLandingPage onScrollToSection={scrollToSection} />
+        ) : (
+          <LandingPage onScrollToSection={scrollToSection} />
+        )
       ) : (
         <section className="landing-page landing-page--navbar-only">
           <Navbar onScrollToSection={scrollToSection} />

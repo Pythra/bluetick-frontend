@@ -11,7 +11,9 @@ function Navbar({ onScrollToSection }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, user } = useAuth();
   const branding = usePartnerBranding();
-  const { isPartnerSite, brandName, logoUrl, features } = branding;
+  const { isPartnerSite, brandName, logoUrl, features, templateId } = branding;
+  const templateNavClass =
+    isPartnerSite && templateId ? `navbar--tpl-${templateId}` : '';
   const navigate = useNavigate();
   const servicesSectionId = getFirstVisibleServiceSectionId(branding);
 
@@ -25,7 +27,7 @@ function Navbar({ onScrollToSection }) {
   const scrollTarget = (sectionId) => () => onScrollToSection?.(sectionId);
 
   return (
-    <nav className="navbar">
+    <nav className={`navbar ${templateNavClass}`.trim()}>
       <div className="navbar-container">
         <div className="navbar-logo">
           <Link to="/">

@@ -127,6 +127,18 @@ export const PARTNER_TEMPLATES = [
     description: 'Structured sections, strong hierarchy, and a trustworthy enterprise tone.',
     preview: 'linear-gradient(135deg, #0b3d91 0%, #1e5aa8 100%)',
   },
+  {
+    id: 'bold',
+    name: 'Bold',
+    description: 'Full-screen dark hero, oversized typography, and high-impact presentation.',
+    preview: 'linear-gradient(135deg, #0f172a 0%, #6366f1 100%)',
+  },
+  {
+    id: 'studio',
+    name: 'Studio',
+    description: 'Split-screen editorial layout with edge-to-edge media and content sidebar.',
+    preview: 'linear-gradient(135deg, #1e293b 0%, #f8fafc 50%, #2563eb 100%)',
+  },
 ];
 
 export const PARTNER_ASSET_FIELDS = [

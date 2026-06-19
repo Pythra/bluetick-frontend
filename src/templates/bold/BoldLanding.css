@@ -1,0 +1,148 @@
+.tpl-bold {
+  position: relative;
+  width: 100%;
+  min-height: 92vh;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  overflow: hidden;
+  border-radius: 0 0 48px 48px;
+}
+
+.tpl-bold-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.tpl-bold-bg-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tpl-bold-bg-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(8, 12, 28, 0.55) 0%,
+    rgba(8, 12, 28, 0.92) 65%,
+    rgba(8, 12, 28, 0.98) 100%
+  );
+}
+
+.tpl-bold .navbar {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.tpl-bold .navbar-link,
+.tpl-bold .navbar-brand-text {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.tpl-bold .navbar-signup,
+.tpl-bold .navbar-login {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+
+.tpl-bold-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  text-align: center;
+}
+
+.tpl-bold-kicker {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+}
+
+.tpl-bold-title {
+  margin: 0 auto;
+  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 16ch;
+  background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0.82) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.tpl-bold-description {
+  margin: 1.35rem auto 0;
+  font-size: 1.08rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 50ch;
+}
+
+.tpl-bold-actions {
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+.tpl-bold-carousel {
+  margin-top: 2.5rem;
+  padding: 1.5rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.tpl-bold-carousel-inner .landing-media-kicker {
+  color: var(--brand-primary-light, #93c5fd);
+}
+
+.tpl-bold-carousel-inner h2 {
+  color: #fff;
+  font-size: 1.35rem;
+}
+
+.tpl-bold-carousel-inner .landing-media-description {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.tpl-bold-logos {
+  margin-top: 2rem;
+  opacity: 0.95;
+}
+
+.tpl-bold-stats {
+  margin-top: 2.5rem;
+}
+
+.tpl-bold-stats-inner {
+  gap: 1rem;
+}
+
+.tpl-bold-stat {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+}
+
+.tpl-bold-stat .landing-impact-value,
+.tpl-bold-stat .landing-impact-label {
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .tpl-bold {
+    min-height: auto;
+  }
+}

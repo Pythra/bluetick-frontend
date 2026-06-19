@@ -1,0 +1,146 @@
+.tpl-studio {
+  width: 100%;
+  background: #fff;
+  font-family: 'Poppins', sans-serif;
+  overflow: hidden;
+}
+
+.tpl-studio-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  min-height: 88vh;
+}
+
+.tpl-studio-visual {
+  position: relative;
+  min-height: 420px;
+  background: #0f172a;
+}
+
+.tpl-studio-visual-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tpl-studio-visual-overlay {
+  background: linear-gradient(
+    180deg,
+    transparent 40%,
+    rgba(15, 23, 42, 0.85) 100%
+  );
+}
+
+.tpl-studio-visual-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 1.75rem;
+  color: #fff;
+}
+
+.tpl-studio-carousel .landing-media-kicker {
+  color: var(--brand-primary-light, #93c5fd);
+}
+
+.tpl-studio-carousel h2 {
+  color: #fff;
+  font-size: 1.25rem;
+  margin: 0.35rem 0;
+}
+
+.tpl-studio-carousel .landing-media-description {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
+}
+
+.tpl-studio-main {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #fafbfd 0%, #fff 100%);
+}
+
+.tpl-studio-main .navbar {
+  background: transparent;
+}
+
+.tpl-studio-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem 2.5rem 2.5rem;
+  max-width: 640px;
+}
+
+.tpl-studio-kicker {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--brand-primary-dark);
+  margin-bottom: 0.85rem;
+}
+
+.tpl-studio-title {
+  margin: 0;
+  font-size: clamp(1.9rem, 3.2vw, 2.65rem);
+  line-height: 1.12;
+  font-weight: 700;
+  color: #0f2546;
+  letter-spacing: -0.025em;
+}
+
+.tpl-studio-description {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.tpl-studio-actions {
+  margin-top: 1.75rem;
+}
+
+.tpl-studio-logos {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.tpl-studio-stats {
+  margin-top: 1.5rem;
+  padding-bottom: 0;
+}
+
+.tpl-studio-stats-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 2rem;
+}
+
+.tpl-studio-stat {
+  flex: 1 1 140px;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+@media (max-width: 960px) {
+  .tpl-studio-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tpl-studio-visual {
+    min-height: 320px;
+    order: 2;
+  }
+
+  .tpl-studio-main {
+    order: 1;
+  }
+
+  .tpl-studio-content {
+    padding: 0.5rem 1.25rem 2rem;
+    max-width: none;
+  }
+}
