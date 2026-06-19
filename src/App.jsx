@@ -50,6 +50,7 @@ import BlogPostPage from './pages/BlogPostPage';
 import AboutPage from './pages/AboutPage';
 import PartnerPage from './pages/PartnerPage';
 import PartnerApplicationPage from './pages/PartnerApplicationPage';
+import PartnerVerifyEmailPage from './pages/PartnerVerifyEmailPage';
 import FAQ from './components/FAQ';
 import ClientsSection from './components/ClientsSection';
 import PartnerBrandingGate from './components/PartnerBrandingGate';
@@ -301,6 +302,7 @@ function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/partner" element={<PartnerPage />} />
               <Route path="/partner/apply" element={<PartnerApplicationPage />} />
+              <Route path="/partner/verify-email" element={<PartnerVerifyEmailPage />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
             </Routes>

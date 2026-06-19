@@ -962,3 +962,258 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── Partner platform extensions ─── */
+
+.pdash-stats--wide {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1100px) {
+  .pdash-stats--wide {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.pdash-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.pdash-mini-stat {
+  background: var(--pdash-bg);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+
+.pdash-mini-stat strong {
+  display: block;
+  font-size: 1.25rem;
+  color: var(--pdash-primary);
+}
+
+.pdash-mini-stat span {
+  font-size: 0.85rem;
+  color: var(--pdash-soft);
+}
+
+.pdash-subnav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.pdash-subnav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--pdash-border);
+  background: var(--pdash-surface);
+  color: var(--pdash-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pdash-subnav-item.active {
+  background: var(--pdash-primary);
+  color: var(--pdash-on-primary);
+  border-color: var(--pdash-primary);
+}
+
+.pdash-table-wrap {
+  overflow-x: auto;
+}
+
+.pdash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.pdash-table th,
+.pdash-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--pdash-border);
+}
+
+.pdash-table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pdash-soft);
+}
+
+.pdash-profit {
+  color: #047857;
+  font-weight: 600;
+}
+
+.pdash-pricing-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 20px;
+  border: 1px solid var(--pdash-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pdash-pricing-head,
+.pdash-pricing-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  gap: 12px;
+  padding: 12px 16px;
+  align-items: center;
+}
+
+.pdash-pricing-head {
+  background: var(--pdash-bg);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pdash-soft);
+  font-weight: 700;
+}
+
+.pdash-pricing-row {
+  border-top: 1px solid var(--pdash-border);
+}
+
+.pdash-pricing-row input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--pdash-border);
+  border-radius: 8px;
+}
+
+.pdash-messages-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  min-height: 480px;
+}
+
+.pdash-messages-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.pdash-thread-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  border: none;
+  border-bottom: 1px solid var(--pdash-border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.pdash-thread-item.active {
+  background: rgba(var(--brand-primary-rgb, 37, 99, 235), 0.08);
+}
+
+.pdash-thread-item span {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--pdash-soft);
+  margin-top: 4px;
+}
+
+.pdash-chat-messages {
+  min-height: 300px;
+  max-height: 420px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.pdash-chat-bubble {
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  max-width: 80%;
+  background: var(--pdash-bg);
+}
+
+.pdash-chat-bubble.partner {
+  margin-left: auto;
+  background: rgba(var(--brand-primary-rgb, 37, 99, 235), 0.1);
+}
+
+.pdash-chat-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pdash-payout-card {
+  padding: 12px;
+  border: 1px solid var(--pdash-border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pdash-notifications {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pdash-notification-item {
+  text-align: left;
+  padding: 14px 16px;
+  border: 1px solid var(--pdash-border);
+  border-radius: 12px;
+  background: var(--pdash-surface);
+  cursor: pointer;
+}
+
+.pdash-notification-item.unread {
+  border-color: var(--pdash-primary);
+  background: rgba(var(--brand-primary-rgb, 37, 99, 235), 0.05);
+}
+
+.pdash-notification-item p {
+  margin: 4px 0;
+  color: var(--pdash-soft);
+  font-size: 0.9rem;
+}
+
+.pdash-order-project {
+  font-size: 0.85rem;
+  color: var(--pdash-primary);
+  margin-bottom: 6px;
+}
+
+.pdash-order-profit {
+  font-size: 0.8rem;
+  color: #047857;
+}
+
+.pdash-simple-list {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--pdash-soft);
+}
+
+@media (max-width: 900px) {
+  .pdash-messages-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pdash-pricing-head,
+  .pdash-pricing-row {
+    grid-template-columns: 1fr;
+  }
+}

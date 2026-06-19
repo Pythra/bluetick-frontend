@@ -2,24 +2,42 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   MdAdd,
   MdDashboard,
-  MdPalette,
-  MdPermMedia,
   MdLanguage,
+  MdWeb,
+  MdStorefront,
   MdInventory2,
+  MdPeople,
+  MdChat,
+  MdAccountBalanceWallet,
+  MdPayments,
+  MdReceipt,
+  MdNotifications,
+  MdSupport,
+  MdSettings,
   MdLogout,
   MdOpenInNew,
   MdSave,
   MdRefresh,
   MdCheckCircle,
-  MdAccessTime,
-  MdPayments,
   MdVerified,
   MdEdit,
   MdDelete,
+  MdPalette,
+  MdPermMedia,
 } from 'react-icons/md';
 import SectionContentEditor from './components/SectionContentEditor';
 import { useAuth } from '../contexts/AuthContext';
-import { getOrderServiceLabel } from './utils/orderServices';
+import { createPartnerAdminApi } from './partner/partnerAdminApi';
+import PartnerDashboardTab from './partner/PartnerDashboardTab';
+import PartnerServicesTab from './partner/PartnerServicesTab';
+import PartnerOrdersTab, { PartnerClientsTab } from './partner/PartnerOrdersTab';
+import PartnerMessagesTab from './partner/PartnerMessagesTab';
+import PartnerEarningsTab from './partner/PartnerEarningsTab';
+import PartnerWithdrawalsTab from './partner/PartnerWithdrawalsTab';
+import PartnerInvoicesTab from './partner/PartnerInvoicesTab';
+import PartnerNotificationsTab from './partner/PartnerNotificationsTab';
+import PartnerSupportTab from './partner/PartnerSupportTab';
+import PartnerSettingsTab from './partner/PartnerSettingsTab';
 import {
   PARTNER_TEMPLATES,
   PARTNER_ASSET_FIELDS,
@@ -46,36 +64,26 @@ import './styles/partnerDashboard.css';
 
 const PARTNER_BASE_DOMAIN = import.meta.env.VITE_PARTNER_BASE_DOMAIN || 'bluetickgeng.com';
 
-const STATUS_LABELS = {
-  completed: 'Completed',
-  in_progress: 'In Progress',
-  pending: 'Pending',
-  cancelled: 'Cancelled',
-};
-
 const NAV_ITEMS = [
-  { id: 'overview', label: 'Overview', icon: MdDashboard },
-  { id: 'customize', label: 'Site Customization', icon: MdPalette },
-  { id: 'media', label: 'Media Library', icon: MdPermMedia },
-  { id: 'domain', label: 'Custom Domain', icon: MdLanguage },
+  { id: 'overview', label: 'Dashboard', icon: MdDashboard },
+  { id: 'website', label: 'My Website', icon: MdWeb },
+  { id: 'services', label: 'Services', icon: MdStorefront },
   { id: 'orders', label: 'Orders', icon: MdInventory2 },
+  { id: 'clients', label: 'Clients', icon: MdPeople },
+  { id: 'messages', label: 'Messages', icon: MdChat },
+  { id: 'earnings', label: 'Earnings', icon: MdAccountBalanceWallet },
+  { id: 'withdrawals', label: 'Withdrawals', icon: MdPayments },
+  { id: 'invoices', label: 'Invoices', icon: MdReceipt },
+  { id: 'notifications', label: 'Notifications', icon: MdNotifications },
+  { id: 'support', label: 'Support', icon: MdSupport },
+  { id: 'settings', label: 'Settings', icon: MdSettings },
 ];
 
-function formatDate(dateString) {
-  return new Date(dateString).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function formatAmount(amount, currency = 'NGN') {
-  if (amount == null) return '—';
-  const symbol = currency === 'USD' ? '$' : currency === 'NGN' ? '₦' : `${currency} `;
-  return `${symbol}${Number(amount).toLocaleString()}`;
-}
+const WEBSITE_SUB_TABS = [
+  { id: 'customize', label: 'Branding & Content', icon: MdPalette },
+  { id: 'media', label: 'Media Library', icon: MdPermMedia },
+  { id: 'domain', label: 'Custom Domain', icon: MdLanguage },
+];
 
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
@@ -117,6 +125,8 @@ function PartnerAdminApp({ subdomain }) {
   const [loginError, setLoginError] = useState(null);
 
   const [activeTab, setActiveTab] = useState('overview');
+  const [websiteSubTab, setWebsiteSubTab] = useState('customize');
+  const [dashboard, setDashboard] = useState(null);
   const [overview, setOverview] = useState(null);
   const [siteSettings, setSiteSettings] = useState(null);
   const [draft, setDraft] = useState(null);
@@ -142,6 +152,11 @@ function PartnerAdminApp({ subdomain }) {
       'Content-Type': 'application/json',
     }),
     [token]
+  );
+
+  const partnerApi = useMemo(
+    () => (token ? createPartnerAdminApi(apiUrl, subdomain, token) : null),
+    [apiUrl, subdomain, token]
   );
 
   const clearPartnerSession = useCallback(() => {
@@ -220,18 +235,30 @@ function PartnerAdminApp({ subdomain }) {
     return data;
   }, [apiUrl, token, subdomain, handleLogout, handlePartnerSiteMissing]);
 
+  const fetchDashboard = useCallback(async () => {
+    if (!token || !partnerApi) return null;
+    try {
+      const data = await partnerApi.getDashboard();
+      setDashboard(data);
+      setOverview((prev) => ({ ...prev, stats: data.stats, orders: data.orders, branding: data.branding, site: data.site }));
+      return data;
+    } catch {
+      return fetchOverview();
+    }
+  }, [token, partnerApi, fetchOverview]);
+
   const loadDashboard = useCallback(async () => {
     if (!token) return;
     try {
       setLoading(true);
       setError(null);
-      await Promise.all([fetchOverview(), fetchSiteSettings()]);
+      await Promise.all([fetchDashboard(), fetchSiteSettings()]);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }, [token, fetchOverview, fetchSiteSettings]);
+  }, [token, fetchDashboard, fetchSiteSettings]);
 
   useEffect(() => {
     loadDashboard();
@@ -823,67 +850,36 @@ function PartnerAdminApp({ subdomain }) {
   }
 
   const renderOverview = () => (
+    <PartnerDashboardTab
+      dashboard={dashboard}
+      overview={overview}
+      siteSettings={siteSettings}
+      siteUrl={siteUrl}
+      setupChecklist={setupChecklist}
+      completionPercent={completionPercent}
+    />
+  );
+
+  const renderWebsite = () => (
     <>
-      <div className="pdash-stats">
-        <div className="pdash-stat">
-          <div className="pdash-stat-icon"><MdInventory2 size={22} /></div>
-          <div className="pdash-stat-value">{overview?.stats?.totalOrders ?? 0}</div>
-          <div className="pdash-stat-label">Total Orders</div>
-        </div>
-        <div className="pdash-stat">
-          <div className="pdash-stat-icon"><MdAccessTime size={22} /></div>
-          <div className="pdash-stat-value">
-            {(overview?.stats?.pending ?? 0) + (overview?.stats?.inProgress ?? 0)}
-          </div>
-          <div className="pdash-stat-label">In Progress</div>
-        </div>
-        <div className="pdash-stat">
-          <div className="pdash-stat-icon"><MdCheckCircle size={22} /></div>
-          <div className="pdash-stat-value">{overview?.stats?.completed ?? 0}</div>
-          <div className="pdash-stat-label">Completed</div>
-        </div>
-        <div className="pdash-stat">
-          <div className="pdash-stat-icon"><MdPayments size={22} /></div>
-          <div className="pdash-stat-value">{formatAmount(overview?.stats?.totalRevenue)}</div>
-          <div className="pdash-stat-label">Total Revenue</div>
-        </div>
+      <div className="pdash-subnav">
+        {WEBSITE_SUB_TABS.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              className={`pdash-subnav-item${websiteSubTab === tab.id ? ' active' : ''}`}
+              onClick={() => setWebsiteSubTab(tab.id)}
+            >
+              <Icon size={16} /> {tab.label}
+            </button>
+          );
+        })}
       </div>
-
-      <div className="pdash-grid-2">
-        <div className="pdash-panel">
-          <h2>Your Live Site</h2>
-          <p className="pdash-panel-lead">
-            Share this link with your audience. Orders placed here appear in your dashboard automatically.
-          </p>
-          {siteUrl ? (
-            <a className="adm-site-url" href={siteUrl} target="_blank" rel="noopener noreferrer">
-              <MdOpenInNew size={15} style={{ verticalAlign: '-2px', marginRight: 5 }} />
-              {siteUrl}
-            </a>
-          ) : null}
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 14 }}>
-            <span className="pdash-badge live">Site Live</span>
-            {siteSettings?.siteConfig?.customDomainVerified ? (
-              <span className="pdash-badge verified"><MdVerified size={14} /> Custom domain active</span>
-            ) : (
-              <span className="pdash-badge pending">Subdomain active</span>
-            )}
-          </div>
-        </div>
-
-        <div className="pdash-panel">
-          <h2>Site Setup Progress</h2>
-          <p className="pdash-panel-lead">{completionPercent}% complete — finish these steps for a fully branded experience.</p>
-          <div className="pdash-checklist">
-            {setupChecklist.map((item) => (
-              <div key={item.label} className={`pdash-check-item${item.done ? ' done' : ''}`}>
-                <MdCheckCircle size={18} color={item.done ? '#047857' : '#94a3b8'} />
-                <span>{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      {websiteSubTab === 'customize' && renderCustomize()}
+      {websiteSubTab === 'media' && renderMedia()}
+      {websiteSubTab === 'domain' && renderDomain()}
     </>
   );
 
@@ -1449,58 +1445,41 @@ function PartnerAdminApp({ subdomain }) {
   };
 
   const renderOrders = () => (
-    <div className="pdash-panel">
-      <h2>Orders on Your Site</h2>
-      <p className="pdash-panel-lead">Every order placed on your white-label storefront appears here in real time.</p>
-
-      {!overview?.orders?.length ? (
-        <div className="adm-empty" style={{ border: 'none' }}>
-          <div className="adm-empty-emoji">🛍️</div>
-          <p style={{ margin: '0 0 6px', fontWeight: 700 }}>No orders yet</p>
-          <p style={{ margin: 0 }}>Share your site link — orders will appear here automatically.</p>
-        </div>
-      ) : (
-        <div className="pdash-orders-grid">
-          {overview.orders.map((order) => (
-            <div key={order.id} className="pdash-order-card">
-              <div className="pdash-order-top">
-                <h3>{order.email}</h3>
-                <span className={`adm-badge ${order.status}`}>
-                  {STATUS_LABELS[order.status] || order.status}
-                </span>
-              </div>
-              <div className="pdash-order-services">{getOrderServiceLabel(order)}</div>
-              <div className="pdash-order-foot">
-                <div>
-                  <div className="pdash-order-amount">{formatAmount(order.totalAmount, order.currency)}</div>
-                  <div className="pdash-order-date">{formatDate(order.createdAt)}</div>
-                </div>
-                <span className={`adm-badge ${order.paymentStatus === 'paid' ? 'completed' : 'pending'}`}>
-                  {order.paymentStatus === 'paid' ? 'Paid' : 'Payment Pending'}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <PartnerOrdersTab orders={dashboard?.orders} overviewOrders={overview?.orders} />
   );
 
   const tabTitles = {
-    overview: 'Dashboard Overview',
-    customize: 'Site Customization',
-    media: 'Media Library',
-    domain: 'Custom Domain',
+    overview: 'Dashboard',
+    website: 'My Website',
+    services: 'Services',
     orders: 'Orders',
+    clients: 'Clients',
+    messages: 'Messages',
+    earnings: 'Earnings',
+    withdrawals: 'Withdrawals',
+    invoices: 'Invoices',
+    notifications: 'Notifications',
+    support: 'Support',
+    settings: 'Settings',
   };
 
   const tabDescriptions = {
-    overview: 'Performance snapshot and setup progress for your white-label storefront.',
-    customize: 'Brand identity, templates, content, and visibility controls.',
-    media: 'Upload images and videos that represent your business.',
-    domain: 'Connect and verify your custom domain.',
-    orders: 'Track revenue and fulfillment for orders on your site.',
+    overview: 'Performance snapshot — orders, revenue, clients, and earnings.',
+    website: 'Brand your white-label site — logo, colors, content, domain, and media.',
+    services: 'Set your selling prices and manage service availability.',
+    orders: 'Track client orders and project status on your storefront.',
+    clients: 'View and manage customers who ordered through your site.',
+    messages: 'Real-time messaging with clients and Bluetickgeng support.',
+    earnings: 'Monitor available balance, pending earnings, and profit history.',
+    withdrawals: 'Request payouts via bank, PayPal, Wise, Payoneer, or crypto.',
+    invoices: 'Download invoices and receipts for client orders.',
+    notifications: 'Order, message, and earnings alerts.',
+    support: 'Get help from the Bluetickgeng fulfillment team.',
+    settings: 'Profile, KYC verification, business address, and preferences.',
   };
+
+  const websiteSaveTabs = ['website'];
+  const showSaveButton = activeTab === 'website' && websiteSubTab !== 'domain';
 
   return (
     <div className="pdash-root" ref={pdashRootRef}>
@@ -1565,7 +1544,7 @@ function PartnerAdminApp({ subdomain }) {
               <MdRefresh size={16} />
               Refresh
             </button>
-            {activeTab !== 'orders' && activeTab !== 'overview' ? (
+            {activeTab !== 'orders' && activeTab !== 'overview' && showSaveButton ? (
               <button type="button" className="pdash-btn pdash-btn-primary" onClick={handleSaveSettings} disabled={saving || !draft}>
                 <MdSave size={16} />
                 {saving ? 'Saving...' : 'Save Changes'}
@@ -1598,10 +1577,25 @@ function PartnerAdminApp({ subdomain }) {
         ) : (
           <>
             {activeTab === 'overview' && renderOverview()}
-            {activeTab === 'customize' && renderCustomize()}
-            {activeTab === 'media' && renderMedia()}
-            {activeTab === 'domain' && renderDomain()}
+            {activeTab === 'website' && renderWebsite()}
+            {activeTab === 'services' && partnerApi && (
+              <PartnerServicesTab api={partnerApi} onMessage={setSaveMessage} />
+            )}
             {activeTab === 'orders' && renderOrders()}
+            {activeTab === 'clients' && partnerApi && <PartnerClientsTab api={partnerApi} />}
+            {activeTab === 'messages' && partnerApi && <PartnerMessagesTab api={partnerApi} />}
+            {activeTab === 'earnings' && partnerApi && <PartnerEarningsTab api={partnerApi} />}
+            {activeTab === 'withdrawals' && partnerApi && (
+              <PartnerWithdrawalsTab api={partnerApi} onMessage={setSaveMessage} />
+            )}
+            {activeTab === 'invoices' && partnerApi && <PartnerInvoicesTab api={partnerApi} />}
+            {activeTab === 'notifications' && partnerApi && <PartnerNotificationsTab api={partnerApi} />}
+            {activeTab === 'support' && partnerApi && (
+              <PartnerSupportTab api={partnerApi} onMessage={setSaveMessage} />
+            )}
+            {activeTab === 'settings' && partnerApi && (
+              <PartnerSettingsTab api={partnerApi} onMessage={setSaveMessage} />
+            )}
           </>
         )}
       </main>

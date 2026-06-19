@@ -7,6 +7,7 @@ const STATUS_LABELS = {
   under_review: 'Under Review',
   approved: 'Approved',
   rejected: 'Rejected',
+  suspended: 'Suspended',
 }
 
 const PARTNERSHIP_LABELS = {
@@ -63,7 +64,60 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
     loadApplications()
   }, [loadApplications])
 
-  const handleStatusUpdate = async (id, newStatus) => {
+  const handlePartnerAction = async (id, body) => {
+    setUpdatingId(id)
+    try {
+      const response = await fetch(`${apiUrl}/api/admin/partnerships/${id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      })
+      const data = await response.json()
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update partner')
+      }
+      if (data.application) {
+        setApplications((prev) =>
+          prev.map((item) => (item.id === id ? { ...item, ...data.application, id: data.application.id || id } : item))
+        )
+      }
+    } catch (updateError) {
+      setError(updateError.message || 'Failed to update partner')
+    } finally {
+      setUpdatingId(null)
+    }
+  }
+
+  const handleStatusUpdate = async (id, newStatus, app = null) => {
+    if (newStatus === 'rejected') {
+      const target = app || applications.find((item) => item.id === id)
+      if (!target) {
+        return
+      }
+
+      const subdomain = target.siteDetails?.subdomain
+      const customDomain = target.siteConfig?.customDomain
+      const domainLines = [
+        subdomain ? `Subdomain: ${subdomain}` : null,
+        customDomain ? `Custom domain: ${customDomain}` : null,
+      ].filter(Boolean)
+
+      const domainNote = domainLines.length
+        ? `\n\nThis will release:\n${domainLines.join('\n')}\n\nThose names can be used again for a new partnership application.`
+        : '\n\nAny assigned subdomain or custom domain will be released for reuse.'
+
+      const confirmed = window.confirm(
+        `Reject and permanently remove the partnership application for ${target.company || target.fullName}?${domainNote}\n\nThis cannot be undone.`
+      )
+
+      if (!confirmed) {
+        return
+      }
+    }
+
     setUpdatingId(id)
 
     try {
@@ -81,8 +135,18 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
         throw new Error(data.error || 'Failed to update status')
       }
 
+      if (data.deleted) {
+        setApplications((prev) => prev.filter((item) => item.id !== id))
+        if (expandedId === id) {
+          setExpandedId(null)
+        }
+        return
+      }
+
       setApplications((prev) =>
-        prev.map((app) => (app.id === id ? { ...app, status: newStatus, updatedAt: data.application.updatedAt } : app))
+        prev.map((item) =>
+          item.id === id ? { ...item, status: newStatus, updatedAt: data.application.updatedAt } : item
+        )
       )
     } catch (updateError) {
       setError(updateError.message || 'Failed to update application')
@@ -189,8 +253,8 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
           <div className="adm-stat-label">Approved</div>
         </div>
         <div className="adm-stat-card" style={{ cursor: 'default' }}>
-          <div className="adm-stat-value">{statusCounts.rejected || 0}</div>
-          <div className="adm-stat-label">Rejected</div>
+          <div className="adm-stat-value">{statusCounts.pending || 0}</div>
+          <div className="adm-stat-label">Pending</div>
         </div>
       </div>
 
@@ -208,7 +272,7 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
           <option value="pending">Pending</option>
           <option value="under_review">Under Review</option>
           <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
+          <option value="suspended">Suspended</option>
         </select>
       </div>
 
@@ -316,6 +380,44 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                       </div>
                     ) : null}
 
+                    {app.kyc?.status ? (
+                      <div className="adm-panel" style={{ padding: 16, marginBottom: 12 }}>
+                        <div className="adm-detail-label">KYC Status</div>
+                        <div className="adm-detail-value">{app.kyc.status}</div>
+                        {app.kyc.status === 'pending' ? (
+                          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                            <button
+                              type="button"
+                              className="adm-btn adm-btn-success"
+                              disabled={updatingId === app.id}
+                              onClick={() => handlePartnerAction(app.id, { kycStatus: 'approved' })}
+                            >
+                              Approve KYC
+                            </button>
+                            <button
+                              type="button"
+                              className="adm-btn adm-btn-danger"
+                              disabled={updatingId === app.id}
+                              onClick={() => handlePartnerAction(app.id, { kycStatus: 'rejected', kycNotes: 'Rejected by admin' })}
+                            >
+                              Reject KYC
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+
+                    {app.earnings ? (
+                      <div className="adm-panel" style={{ padding: 16, marginBottom: 12 }}>
+                        <div className="adm-detail-label">Partner Earnings</div>
+                        <div className="adm-detail-value">
+                          Available: ₦{(app.earnings.availableBalance || 0).toLocaleString()} ·
+                          Pending: ₦{(app.earnings.pendingEarnings || 0).toLocaleString()} ·
+                          Total: ₦{(app.earnings.totalEarnings || 0).toLocaleString()}
+                        </div>
+                      </div>
+                    ) : null}
+
                     {siteUrl ? (
                       <div className="adm-panel" style={{ padding: 16, marginBottom: 0 }}>
                         <div className="adm-detail-label">Partner Site</div>
@@ -358,11 +460,30 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                           type="button"
                           className="adm-btn adm-btn-danger"
                           disabled={updatingId === app.id || deletingId === app.id}
-                          onClick={() => handleStatusUpdate(app.id, 'rejected')}
+                          onClick={() => handleStatusUpdate(app.id, 'rejected', app)}
                         >
                           Reject
                         </button>
                       )}
+                      {app.status === 'suspended' ? (
+                        <button
+                          type="button"
+                          className="adm-btn adm-btn-success"
+                          disabled={updatingId === app.id}
+                          onClick={() => handlePartnerAction(app.id, { action: 'unsuspend' })}
+                        >
+                          Unsuspend
+                        </button>
+                      ) : app.status === 'approved' ? (
+                        <button
+                          type="button"
+                          className="adm-btn adm-btn-warn"
+                          disabled={updatingId === app.id}
+                          onClick={() => handlePartnerAction(app.id, { action: 'suspend', suspendedReason: 'Suspended by admin' })}
+                        >
+                          Suspend
+                        </button>
+                      ) : null}
                       <button
                         type="button"
                         className="adm-btn adm-btn-danger"

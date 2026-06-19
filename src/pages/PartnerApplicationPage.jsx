@@ -29,6 +29,11 @@ const initialForm = {
   website: '',
   audience: '',
   message: '',
+  addressLine1: '',
+  addressLine2: '',
+  city: '',
+  state: '',
+  postalCode: '',
 };
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024;
@@ -118,7 +123,18 @@ function PartnerApplicationPage() {
       const response = await fetch(`${apiUrl}/api/partner-application`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ ...form, logo: logoDataUrl || undefined }),
+        body: JSON.stringify({
+          ...form,
+          logo: logoDataUrl || undefined,
+          businessAddress: {
+            line1: form.addressLine1,
+            line2: form.addressLine2,
+            city: form.city,
+            state: form.state,
+            postalCode: form.postalCode,
+            country: form.country,
+          },
+        }),
       });
 
       const data = await response.json();
@@ -337,7 +353,34 @@ function PartnerApplicationPage() {
                   </div>
 
                   <div className="partner-apply-field partner-apply-field--full">
-                    <label htmlFor="website">Website / Social Media Handle</label>
+                    <label htmlFor="addressLine1">Business Address</label>
+                    <input
+                      id="addressLine1"
+                      name="addressLine1"
+                      type="text"
+                      placeholder="Street address"
+                      value={form.addressLine1}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="partner-apply-field">
+                    <label htmlFor="city">City</label>
+                    <input id="city" name="city" type="text" value={form.city} onChange={handleChange} />
+                  </div>
+
+                  <div className="partner-apply-field">
+                    <label htmlFor="state">State / Region</label>
+                    <input id="state" name="state" type="text" value={form.state} onChange={handleChange} />
+                  </div>
+
+                  <div className="partner-apply-field">
+                    <label htmlFor="postalCode">Postal Code</label>
+                    <input id="postalCode" name="postalCode" type="text" value={form.postalCode} onChange={handleChange} />
+                  </div>
+
+                  <div className="partner-apply-field partner-apply-field--full">
+                    <label htmlFor="website">Website / Social Media Handle (optional)</label>
                     <input
                       id="website"
                       name="website"
