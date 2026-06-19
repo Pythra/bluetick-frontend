@@ -14,6 +14,7 @@ export default function PartnerServicesTab({ api, onMessage }) {
       setServices(data.pricing || []);
     } catch (err) {
       onMessage?.({ type: 'error', text: err.message });
+      setServices([]);
     } finally {
       setLoading(false);
     }
@@ -38,6 +39,14 @@ export default function PartnerServicesTab({ api, onMessage }) {
   };
 
   const handleSave = async () => {
+    if (!services.length) {
+      onMessage?.({
+        type: 'error',
+        text: 'No enabled services to save. Enable services under Website → Services first.',
+      });
+      return;
+    }
+
     try {
       setSaving(true);
       const pricing = Object.fromEntries(
@@ -69,36 +78,48 @@ export default function PartnerServicesTab({ api, onMessage }) {
       <div className="pdash-panel">
         <h2>Service Pricing</h2>
         <p className="pdash-panel-lead">
-          Set your selling prices. Bluetickgeng base price is fixed — your profit is the difference.
+          Set your selling prices for the services enabled on your homepage. Bluetickgeng base price is fixed — your profit is the difference.
         </p>
-        <div className="pdash-pricing-table">
-          <div className="pdash-pricing-head">
-            <span>Service</span>
-            <span>Base Price</span>
-            <span>Your Price</span>
-            <span>Your Profit</span>
-            <span>Bluetick Revenue</span>
+
+        {services.length === 0 ? (
+          <div className="pdash-empty-state">
+            <p>No homepage services are enabled yet.</p>
+            <p className="pdash-panel-lead">
+              Go to <strong>Website → Services</strong>, enable the services you want to offer, save your site settings, then return here to set pricing.
+            </p>
           </div>
-          {services.map((service) => (
-            <div key={service.id} className="pdash-pricing-row">
-              <span><strong>{service.label}</strong></span>
-              <span>{formatNgn(service.basePriceNgn)}</span>
-              <span>
-                <input
-                  type="number"
-                  min={service.basePriceNgn}
-                  value={service.sellingPriceNgn}
-                  onChange={(e) => updatePrice(service.id, 'sellingPriceNgn', e.target.value)}
-                />
-              </span>
-              <span className="pdash-profit">{formatNgn(Math.max(0, service.sellingPriceNgn - service.basePriceNgn))}</span>
-              <span>{formatNgn(service.basePriceNgn)}</span>
+        ) : (
+          <>
+            <div className="pdash-pricing-table">
+              <div className="pdash-pricing-head">
+                <span>Service</span>
+                <span>Base Price</span>
+                <span>Your Price</span>
+                <span>Your Profit</span>
+                <span>Bluetick Revenue</span>
+              </div>
+              {services.map((service) => (
+                <div key={service.id} className="pdash-pricing-row">
+                  <span><strong>{service.label}</strong></span>
+                  <span>{formatNgn(service.basePriceNgn)}</span>
+                  <span>
+                    <input
+                      type="number"
+                      min={service.basePriceNgn}
+                      value={service.sellingPriceNgn}
+                      onChange={(e) => updatePrice(service.id, 'sellingPriceNgn', e.target.value)}
+                    />
+                  </span>
+                  <span className="pdash-profit">{formatNgn(Math.max(0, service.sellingPriceNgn - service.basePriceNgn))}</span>
+                  <span>{formatNgn(service.basePriceNgn)}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <button type="button" className="pdash-btn pdash-btn-primary" onClick={handleSave} disabled={saving}>
-          <MdSave size={16} /> {saving ? 'Saving...' : 'Save Pricing'}
-        </button>
+            <button type="button" className="pdash-btn pdash-btn-primary" onClick={handleSave} disabled={saving}>
+              <MdSave size={16} /> {saving ? 'Saving...' : 'Save Pricing'}
+            </button>
+          </>
+        )}
       </div>
     </>
   );

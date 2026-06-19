@@ -67,12 +67,28 @@ export default function PartnerOrdersTab({ orders = [], overviewOrders }) {
 export function PartnerClientsTab({ api }) {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    api.getClients().then((d) => setClients(d.clients || [])).finally(() => setLoading(false));
-  }, []);
+    api
+      .getClients()
+      .then((d) => setClients(d.clients || []))
+      .catch((err) => setError(err.message || 'Failed to load clients'))
+      .finally(() => setLoading(false));
+  }, [api]);
 
   if (loading) return <div className="pdash-panel"><div className="pdash-spinner" /></div>;
+
+  if (error) {
+    return (
+      <div className="pdash-panel">
+        <div className="pdash-alert error">{error}</div>
+        <p className="pdash-panel-lead">
+          Client data could not be loaded. If the API route is missing, redeploy the backend to pick up the latest partner dashboard routes.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="pdash-panel">

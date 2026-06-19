@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   FaHandshake,
@@ -48,8 +48,69 @@ function PartnerApplicationPage() {
   const [reservedSiteUrl, setReservedSiteUrl] = useState('');
   const [logoDataUrl, setLogoDataUrl] = useState('');
   const [logoFileName, setLogoFileName] = useState('');
+  const [brandCheck, setBrandCheck] = useState({ status: 'idle', message: '', subdomain: '', siteUrl: '' });
 
-  const previewSiteUrl = previewPartnerSiteUrl(form.company);
+  const previewSiteUrl =
+    brandCheck.status === 'available' && brandCheck.siteUrl
+      ? brandCheck.siteUrl
+      : previewPartnerSiteUrl(form.company);
+
+  const checkBrandAvailability = useCallback(async () => {
+    const company = form.company.trim();
+    const website = form.website.trim();
+    const fullName = form.fullName.trim();
+
+    if (!company && !website && !fullName) {
+      setBrandCheck({ status: 'idle', message: '', subdomain: '', siteUrl: '' });
+      return;
+    }
+
+    setBrandCheck((prev) => ({ ...prev, status: 'checking', message: '' }));
+
+    try {
+      const params = new URLSearchParams();
+      if (company) params.set('company', company);
+      if (website) params.set('website', website);
+      if (fullName) params.set('fullName', fullName);
+
+      const response = await fetch(`${apiUrl}/api/partner-application/check-brand?${params.toString()}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not check brand availability');
+      }
+
+      if (data.available) {
+        setBrandCheck({
+          status: 'available',
+          message: 'This brand name is available.',
+          subdomain: data.subdomain,
+          siteUrl: data.siteUrl,
+        });
+      } else {
+        setBrandCheck({
+          status: 'taken',
+          message: data.message || 'This brand name is already taken.',
+          subdomain: data.subdomain,
+          siteUrl: '',
+        });
+      }
+    } catch (err) {
+      setBrandCheck({
+        status: 'error',
+        message: err.message || 'Could not verify brand availability.',
+        subdomain: '',
+        siteUrl: '',
+      });
+    }
+  }, [apiUrl, form.company, form.website, form.fullName]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      checkBrandAvailability();
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [checkBrandAvailability]);
 
   useEffect(() => {
     if (!user) {
@@ -111,6 +172,12 @@ function PartnerApplicationPage() {
     if (!form.phone.trim()) return setError('Please enter your phone number.');
     if (!form.country.trim()) return setError('Please enter your country.');
     if (!form.partnershipType) return setError('Please select a partnership type.');
+    if (brandCheck.status === 'taken') {
+      return setError(brandCheck.message || 'This brand name is already taken. Please choose a different name.');
+    }
+    if (brandCheck.status === 'checking') {
+      return setError('Please wait while we verify your brand name availability.');
+    }
 
     setLoading(true);
 
@@ -232,6 +299,9 @@ function PartnerApplicationPage() {
                     onClick={() => {
                       setForm(initialForm);
                       setReservedSiteUrl('');
+                      setLogoDataUrl('');
+                      setLogoFileName('');
+                      setBrandCheck({ status: 'idle', message: '', subdomain: '', siteUrl: '' });
                       setSubmitted(false);
                     }}
                   >
@@ -309,6 +379,18 @@ function PartnerApplicationPage() {
                       <p className="partner-apply-site-preview">
                         Your site will be hosted at <strong>{previewSiteUrl}</strong>
                       </p>
+                    ) : null}
+                    {brandCheck.status === 'checking' ? (
+                      <p className="partner-apply-site-preview">Checking brand availability…</p>
+                    ) : null}
+                    {brandCheck.status === 'available' ? (
+                      <p className="partner-apply-brand-available" role="status">{brandCheck.message}</p>
+                    ) : null}
+                    {brandCheck.status === 'taken' ? (
+                      <p className="partner-apply-error partner-apply-brand-error" role="alert">{brandCheck.message}</p>
+                    ) : null}
+                    {brandCheck.status === 'error' ? (
+                      <p className="partner-apply-site-preview">{brandCheck.message}</p>
                     ) : null}
                   </div>
 
@@ -420,7 +502,7 @@ function PartnerApplicationPage() {
                   <p className="partner-apply-error" role="alert">{error}</p>
                 ) : null}
 
-                <button type="submit" className="partner-apply-submit" disabled={loading}>
+                <button type="submit" className="partner-apply-submit" disabled={loading || brandCheck.status === 'taken' || brandCheck.status === 'checking'}>
                   <span>{loading ? 'Submitting...' : 'Submit Application'}</span>
                   <FaArrowRight />
                 </button>

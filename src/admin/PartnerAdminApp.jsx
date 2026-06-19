@@ -59,6 +59,7 @@ import { PARTNER_CUSTOM_SERVICE_CONTENT_DEFAULTS } from '../data/partnerSectionD
 import { applyBrandCssVariables } from '../utils/brandTheme';
 import { normalizeMediaUrl } from '../utils/partnerMedia';
 import { resizeImageFile } from '../utils/resizeImageFile';
+import AdminMessagesFab from '../components/AdminMessagesFab';
 import './styles/admin.css';
 import './styles/partnerDashboard.css';
 
@@ -144,6 +145,7 @@ function PartnerAdminApp({ subdomain }) {
   const [saveMessage, setSaveMessage] = useState(null);
   const [domainMessage, setDomainMessage] = useState(null);
   const [activeEditor, setActiveEditor] = useState(null);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const pdashRootRef = useRef(null);
 
   const authHeaders = useMemo(
@@ -263,6 +265,21 @@ function PartnerAdminApp({ subdomain }) {
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
+
+  useEffect(() => {
+    if (!partnerApi) return undefined;
+
+    const fetchUnread = () => {
+      partnerApi
+        .getUnreadCount()
+        .then((data) => setUnreadMessages(data.unreadCount || 0))
+        .catch(() => {});
+    };
+
+    fetchUnread();
+    const intervalId = window.setInterval(fetchUnread, 30000);
+    return () => window.clearInterval(intervalId);
+  }, [partnerApi, activeTab]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -1508,6 +1525,9 @@ function PartnerAdminApp({ subdomain }) {
               >
                 <Icon size={18} />
                 {item.label}
+                {item.id === 'messages' && unreadMessages > 0 ? (
+                  <span className="pdash-nav-badge">{unreadMessages > 99 ? '99+' : unreadMessages}</span>
+                ) : null}
               </button>
             );
           })}
@@ -1609,6 +1629,15 @@ function PartnerAdminApp({ subdomain }) {
         siteContent={draft?.content}
         onClose={() => setActiveEditor(null)}
         onSave={handleSectionEditorSave}
+      />
+
+      <AdminMessagesFab
+        apiUrl={apiUrl}
+        token={token}
+        mode="partner"
+        subdomain={subdomain}
+        onNavigate={() => setActiveTab('messages')}
+        refreshKey={activeTab}
       />
     </div>
   );

@@ -405,6 +405,18 @@
   color: #94a3b8;
 }
 
+.partner-apply-brand-available {
+  margin: 0.45rem 0 0;
+  font-size: 0.88rem;
+  color: #15803d;
+}
+
+.partner-apply-brand-error {
+  margin: 0.45rem 0 0;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.88rem;
+}
+
 .partner-apply-link {
   background: none;
   border: none;

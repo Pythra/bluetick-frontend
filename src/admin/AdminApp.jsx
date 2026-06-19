@@ -10,6 +10,7 @@ import { BlogManagement } from './pages/BlogManagement'
 import { EmailBroadcast } from './pages/EmailBroadcast'
 import { PartnershipManagement } from './pages/PartnershipManagement'
 import PartnerAdminApp from './PartnerAdminApp'
+import AdminMessagesFab from '../components/AdminMessagesFab'
 import { useAuth } from '../contexts/AuthContext'
 import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain'
 import './styles/admin.css'
@@ -265,6 +266,8 @@ function AdminApp() {
           <EmailBroadcast apiUrl={apiUrl} adminToken={adminToken} users={users} />
         ) : null}
       </div>
+
+      <AdminMessagesFab apiUrl={apiUrl} token={adminToken} mode="admin" refreshKey={activeTab} />
     </div>
   )
 }

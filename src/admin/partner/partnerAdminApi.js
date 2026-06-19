@@ -12,7 +12,8 @@ export function createPartnerAdminApi(apiUrl, subdomain, token) {
     const response = await fetch(url, { ...options, headers: { ...headers, ...options.headers } });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(data.error || 'Request failed');
+      const message = data.error || `Request failed (${response.status})`;
+      throw new Error(message);
     }
     return data;
   }
@@ -24,7 +25,9 @@ export function createPartnerAdminApi(apiUrl, subdomain, token) {
       request('/services', { method: 'PATCH', body: JSON.stringify({ pricing }) }),
     getClients: () => request('/clients'),
     getMessages: () => request('/messages'),
+    getUnreadCount: () => request('/messages/unread-count'),
     getThread: (threadId) => request(`/messages/${threadId}`),
+    markThreadRead: (threadId) => request(`/messages/${threadId}/read`, { method: 'PATCH' }),
     sendMessage: (body) => request('/messages', { method: 'POST', body: JSON.stringify(body) }),
     getEarnings: () => request('/earnings'),
     getPayoutMethods: () => request('/payout-methods'),

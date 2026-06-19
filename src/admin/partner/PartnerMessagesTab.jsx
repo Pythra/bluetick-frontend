@@ -21,6 +21,12 @@ export default function PartnerMessagesTab({ api }) {
     loadThreads();
   }, []);
 
+  useEffect(() => {
+    if (activeThread?.threadId) {
+      api.markThreadRead(activeThread.threadId).catch(() => {});
+    }
+  }, [activeThread?.threadId, api]);
+
   const openThread = async (threadId) => {
     const data = await api.getThread(threadId);
     setActiveThread(data.thread);
@@ -64,7 +70,14 @@ export default function PartnerMessagesTab({ api }) {
               className={`pdash-thread-item${activeThread?.threadId === t.threadId ? ' active' : ''}`}
               onClick={() => openThread(t.threadId)}
             >
-              <strong>{t.participantName || t.participantEmail || 'Conversation'}</strong>
+              <strong>
+                {t.channel === 'partner-admin'
+                  ? 'Bluetickgeng Support'
+                  : t.participantName || t.participantEmail || 'Conversation'}
+              </strong>
+              {t.channel === 'partner-admin' ? (
+                <span className="pdash-thread-badge">Platform</span>
+              ) : null}
               <span>{t.lastMessage?.body?.slice(0, 60) || t.subject}</span>
             </button>
           ))
@@ -72,7 +85,13 @@ export default function PartnerMessagesTab({ api }) {
       </div>
 
       <div className="pdash-panel pdash-messages-chat">
-        <h2>{activeThread ? activeThread.subject : 'New Message'}</h2>
+        <h2>
+          {activeThread?.channel === 'partner-admin'
+            ? 'Bluetickgeng Support'
+            : activeThread
+              ? activeThread.subject
+              : 'New Message'}
+        </h2>
         <div className="pdash-chat-messages">
           {(activeThread?.messages || []).map((m) => (
             <div key={m.id} className={`pdash-chat-bubble ${m.senderType}`}>

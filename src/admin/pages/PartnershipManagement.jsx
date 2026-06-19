@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { MdDelete, MdExpandMore, MdLanguage, MdEmail, MdPhone } from 'react-icons/md'
+import PartnershipCommunications from '../components/PartnershipCommunications'
 import '../styles/admin.css'
 
 const STATUS_LABELS = {
@@ -419,7 +420,7 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                     ) : null}
 
                     {siteUrl ? (
-                      <div className="adm-panel" style={{ padding: 16, marginBottom: 0 }}>
+                      <div className="adm-panel" style={{ padding: 16, marginBottom: 12 }}>
                         <div className="adm-detail-label">Partner Site</div>
                         <a className="adm-site-url" href={siteUrl} target="_blank" rel="noopener noreferrer">
                           {siteUrl}
@@ -434,7 +435,9 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                       </div>
                     ) : null}
 
-                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <PartnershipCommunications apiUrl={apiUrl} adminToken={adminToken} partner={app} />
+
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
                       {app.status !== 'under_review' && (
                         <button
                           type="button"

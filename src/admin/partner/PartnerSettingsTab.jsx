@@ -15,17 +15,25 @@ export default function PartnerSettingsTab({ api, onMessage }) {
   const [settings, setSettings] = useState({});
   const [businessAddress, setBusinessAddress] = useState({});
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [saving, setSaving] = useState(false);
   const [kycFiles, setKycFiles] = useState({ idDocument: '', businessDocument: '' });
   const [submittingKyc, setSubmittingKyc] = useState(false);
 
   useEffect(() => {
-    api.getSettings().then((data) => {
-      setProfile(data.profile || {});
-      setSettings(data.profile?.settings || {});
-      setBusinessAddress(data.profile?.businessAddress || {});
-    }).finally(() => setLoading(false));
-  }, []);
+    setLoadError('');
+    api
+      .getSettings()
+      .then((data) => {
+        setProfile(data.profile || {});
+        setSettings(data.profile?.settings || {});
+        setBusinessAddress(data.profile?.businessAddress || {});
+      })
+      .catch((err) => {
+        setLoadError(err.message || 'Failed to load settings');
+      })
+      .finally(() => setLoading(false));
+  }, [api]);
 
   const handleSave = async () => {
     try {
@@ -69,6 +77,25 @@ export default function PartnerSettingsTab({ api, onMessage }) {
   };
 
   if (loading) return <div className="pdash-panel"><div className="pdash-spinner" /></div>;
+
+  if (loadError) {
+    return (
+      <div className="pdash-panel">
+        <div className="pdash-alert error">{loadError}</div>
+        <p className="pdash-panel-lead">
+          Settings could not be loaded. If you see a route-not-found error, the backend may need to be redeployed with the latest partner dashboard APIs.
+        </p>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="pdash-panel">
+        <p className="pdash-panel-lead">No profile data available.</p>
+      </div>
+    );
+  }
 
   const kycStatus = profile.kyc?.status || 'not_started';
 
