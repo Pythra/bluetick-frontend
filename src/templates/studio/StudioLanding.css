@@ -1,146 +1,97 @@
-.tpl-studio {
-  width: 100%;
-  background: #fff;
-  font-family: 'Poppins', sans-serif;
+/* Editorial landing */
+.tpl-editorial {
+  font-family: var(--tpl-font-body, 'Work Sans', sans-serif);
+  background: #faf7f2;
   overflow: hidden;
 }
 
-.tpl-studio-layout {
+.tpl-editorial-layout {
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-  min-height: 88vh;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  min-height: 90vh;
 }
 
-.tpl-studio-visual {
-  position: relative;
-  min-height: 420px;
-  background: #0f172a;
+.tpl-editorial-main {
+  background: #faf7f2;
+  padding: 0 2.5rem 2.5rem max(1.25rem, calc((100vw - 1240px) / 2 + 1.25rem));
 }
 
-.tpl-studio-visual-media {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.tpl-editorial-content {
+  max-width: 520px;
+  padding-top: 1rem;
 }
 
-.tpl-studio-visual-overlay {
-  background: linear-gradient(
-    180deg,
-    transparent 40%,
-    rgba(15, 23, 42, 0.85) 100%
-  );
+.tpl-editorial-meta {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 1.25rem;
 }
 
-.tpl-studio-visual-caption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 1.75rem;
-  color: #fff;
-}
-
-.tpl-studio-carousel .landing-media-kicker {
-  color: var(--brand-primary-light, #93c5fd);
-}
-
-.tpl-studio-carousel h2 {
-  color: #fff;
-  font-size: 1.25rem;
-  margin: 0.35rem 0;
-}
-
-.tpl-studio-carousel .landing-media-description {
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.92rem;
-}
-
-.tpl-studio-main {
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(180deg, #fafbfd 0%, #fff 100%);
-}
-
-.tpl-studio-main .navbar {
-  background: transparent;
-}
-
-.tpl-studio-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 1rem 2.5rem 2.5rem;
-  max-width: 640px;
-}
-
-.tpl-studio-kicker {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--brand-primary-dark);
-  margin-bottom: 0.85rem;
-}
-
-.tpl-studio-title {
+.tpl-editorial-title {
   margin: 0;
-  font-size: clamp(1.9rem, 3.2vw, 2.65rem);
-  line-height: 1.12;
+  font-family: var(--tpl-font-display, 'Libre Baskerville', serif);
+  font-size: clamp(2rem, 3.5vw, 2.85rem);
   font-weight: 700;
-  color: #0f2546;
-  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: #1a1a1a;
 }
 
-.tpl-studio-description {
-  margin-top: 1rem;
-  color: #64748b;
-  font-size: 1.02rem;
+.tpl-editorial-quote {
+  margin: 1.25rem 0 0;
+  padding-left: 1rem;
+  border-left: 3px solid #1a1a1a;
+  font-family: var(--tpl-font-display, 'Libre Baskerville', serif);
+  font-size: 1.05rem;
+  font-style: italic;
   line-height: 1.65;
+  color: #555;
 }
 
-.tpl-studio-actions {
+.tpl-editorial-actions {
   margin-top: 1.75rem;
 }
 
-.tpl-studio-logos {
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.2);
+.tpl-editorial-visual {
+  position: relative;
+  background: #1a1a1a;
+  min-height: 100%;
 }
 
-.tpl-studio-stats {
-  margin-top: 1.5rem;
-  padding-bottom: 0;
+.tpl-editorial-media {
+  width: 100%;
+  height: 65%;
+  min-height: 360px;
+  object-fit: cover;
 }
 
-.tpl-studio-stats-inner {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem 2rem;
+.tpl-editorial-media-overlay {
+  background: linear-gradient(180deg, transparent 60%, rgba(26, 26, 26, 0.5) 100%);
 }
 
-.tpl-studio-stat {
-  flex: 1 1 140px;
-  background: transparent;
-  box-shadow: none;
-  padding: 0;
+.tpl-editorial-logos {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 @media (max-width: 960px) {
-  .tpl-studio-layout {
+  .tpl-editorial-layout {
     grid-template-columns: 1fr;
   }
 
-  .tpl-studio-visual {
-    min-height: 320px;
+  .tpl-editorial-main {
+    padding: 0 1.25rem 2rem;
+  }
+
+  .tpl-editorial-visual {
+    min-height: 360px;
     order: 2;
   }
 
-  .tpl-studio-main {
+  .tpl-editorial-main {
     order: 1;
-  }
-
-  .tpl-studio-content {
-    padding: 0.5rem 1.25rem 2rem;
-    max-width: none;
   }
 }

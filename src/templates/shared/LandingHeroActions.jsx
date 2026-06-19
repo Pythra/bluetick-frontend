@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCurrency } from '../../contexts/CurrencyContext';
 import { getCurrencyByCode } from '../../data/flutterwaveCurrencies';
 
-function LandingHeroActions({ className = 'landing-actions' }) {
+function LandingHeroActions({ className = 'landing-actions', variant = 'default' }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { currency, setCurrency, currencies } = useCurrency();
@@ -37,8 +37,124 @@ function LandingHeroActions({ className = 'landing-actions' }) {
     };
   }, [isCurrencyDropdownOpen]);
 
+  const variantClass = variant !== 'default' ? ` tpl-actions--${variant}` : '';
+  const authClass = isAuthenticated ? ' landing-actions--auth' : '';
+
+  if (variant === 'text') {
+    return (
+      <div className={`${className}${variantClass}${authClass}`.trim()}>
+        <PlaceOrderDropdown triggerClassName="tpl-action-link" label="Place Order →" />
+        {!isAuthenticated && (
+          <button type="button" className="tpl-action-link" onClick={() => navigate('/signup')}>
+            Get Started →
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'stacked') {
+    return (
+      <div className={`${className}${variantClass}${authClass}`.trim()}>
+        <PlaceOrderDropdown triggerClassName="tpl-action-stacked tpl-action-stacked--primary" />
+        {!isAuthenticated && (
+          <button
+            type="button"
+            className="tpl-action-stacked tpl-action-stacked--secondary"
+            onClick={() => navigate('/signup')}
+          >
+            Get Started
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'corporate') {
+    return (
+      <div className={`${className}${variantClass}${authClass}`.trim()}>
+        <PlaceOrderDropdown triggerClassName="tpl-action-corp tpl-action-corp--primary" />
+        {!isAuthenticated && (
+          <button
+            type="button"
+            className="tpl-action-corp tpl-action-corp--ghost"
+            onClick={() => navigate('/signup')}
+          >
+            Get Started
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'bold') {
+    return (
+      <div className={`${className}${variantClass}${authClass}`.trim()}>
+        <PlaceOrderDropdown triggerClassName="tpl-action-bold" />
+        {!isAuthenticated && (
+          <button
+            type="button"
+            className="tpl-action-bold tpl-action-bold--outline"
+            onClick={() => navigate('/signup')}
+          >
+            Sign Up
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === 'aurora') {
+    return (
+      <div className={`${className}${variantClass}${authClass}`.trim()}>
+        <PlaceOrderDropdown triggerClassName="tpl-action-aurora tpl-action-aurora--primary" />
+        {!isAuthenticated && (
+          <button
+            type="button"
+            className="tpl-action-aurora tpl-action-aurora--outline"
+            onClick={() => navigate('/signup')}
+          >
+            Get Started
+          </button>
+        )}
+        <div className="landing-currency-selector" ref={currencyDropdownRef}>
+          <button
+            type="button"
+            className="tpl-action-aurora tpl-action-aurora--outline landing-currency-btn"
+            onClick={() => setIsCurrencyDropdownOpen((open) => !open)}
+          >
+            <CountryFlag code={selectedCurrency.countryCode} size="sm" />
+            <span>{selectedCurrency.code}</span>
+          </button>
+          {isCurrencyDropdownOpen && (
+            <div className="landing-currency-dropdown">
+              <ul className="landing-currency-list">
+                {currencies.map((item) => (
+                  <li key={item.code}>
+                    <button
+                      type="button"
+                      className={`landing-currency-option${item.code === currency ? ' is-active' : ''}`}
+                      onClick={() => {
+                        setCurrency(item.code);
+                        setIsCurrencyDropdownOpen(false);
+                      }}
+                    >
+                      <CountryFlag code={item.countryCode} size="sm" />
+                      <span>{item.name}</span>
+                      <span>{item.code}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`${className}${isAuthenticated ? ' landing-actions--auth' : ''}`}>
+    <div className={`${className}${authClass}`.trim()}>
       <PlaceOrderDropdown />
       {!isAuthenticated && (
         <button

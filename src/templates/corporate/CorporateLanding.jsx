@@ -1,52 +1,52 @@
-import Navbar from '../../components/Navbar';
 import PartnerMediaFrame from '../../components/PartnerMediaFrame';
+import TemplateNavbar from '../shared/TemplateNavbar';
 import { useLandingHero } from '../shared/useLandingHero';
 import LandingHeroActions from '../shared/LandingHeroActions';
-import PublicationLogosBlock from '../shared/PublicationLogosBlock';
-import ImpactStatsStrip from '../shared/ImpactStatsStrip';
-import '../../components/LandingPage.css';
+import TemplateLogosSection from '../shared/TemplateLogosSection';
+import TemplateStatsSection from '../shared/TemplateStatsSection';
+import '../styles/templateActions.css';
+import '../styles/templateStats.css';
+import '../styles/templateLogos.css';
 import './CorporateLanding.css';
 
 function CorporateLanding({ onScrollToSection }) {
   const hero = useLandingHero();
 
   return (
-    <section id="landing" className="tpl-landing tpl-corporate">
-      <Navbar onScrollToSection={onScrollToSection} />
+    <section id="landing" className="tpl-landing tpl-institutional">
+      <TemplateNavbar templateId="corporate" onScrollToSection={onScrollToSection} />
 
       {hero.showHero ? (
-        <div className="tpl-corporate-banner">
-          <PartnerMediaFrame
-            src={hero.heroMediaSrc}
-            type={hero.heroMediaType}
-            poster={hero.heroPoster}
-            className="tpl-corporate-banner-media"
-            overlayClassName="tpl-corporate-banner-overlay"
-          />
-          <div className="tpl-corporate-banner-content">
-            <p className="tpl-corporate-kicker">{hero.kicker}</p>
-            <h1 className="tpl-corporate-title">{hero.title}</h1>
-            <p className="tpl-corporate-description">{hero.description}</p>
-            <LandingHeroActions className="tpl-corporate-actions landing-actions" />
+        <div className="tpl-inst-hero">
+          <div className="tpl-inst-hero-copy">
+            <p className="tpl-inst-kicker">{hero.kicker}</p>
+            <h1 className="tpl-inst-title">{hero.title}</h1>
+            <p className="tpl-inst-description">{hero.description}</p>
+            <LandingHeroActions className="tpl-inst-actions" variant="corporate" />
+          </div>
+          <div className="tpl-inst-hero-media">
+            <PartnerMediaFrame
+              src={hero.heroMediaSrc}
+              type={hero.heroMediaType}
+              poster={hero.heroPoster}
+              className="tpl-inst-media-frame"
+              overlayClassName="tpl-inst-media-overlay"
+            />
           </div>
         </div>
       ) : null}
 
-      <div className="tpl-corporate-body">
+      <div className="tpl-inst-body">
         {hero.showImpactStats ? (
-          <ImpactStatsStrip
+          <TemplateStatsSection
+            variant="table"
             items={hero.impactItems}
             statsRef={hero.statsRef}
             statsVisible={hero.statsVisible}
-            className="tpl-corporate-stats landing-impact-strip"
-            innerClassName="tpl-corporate-stats-inner landing-impact-inner"
-            itemClassName="tpl-corporate-stat landing-impact-item landing-impact-item--card"
           />
         ) : null}
 
-        {hero.showPublicationLogos ? (
-          <PublicationLogosBlock className="tpl-corporate-logos landing-logos-strip" />
-        ) : null}
+        {hero.showPublicationLogos ? <TemplateLogosSection variant="boxed" className="tpl-inst-logos" /> : null}
       </div>
     </section>
   );

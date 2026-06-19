@@ -1,62 +1,53 @@
-import Navbar from '../../components/Navbar';
 import PartnerMediaFrame from '../../components/PartnerMediaFrame';
+import TemplateNavbar from '../shared/TemplateNavbar';
 import { useLandingHero } from '../shared/useLandingHero';
 import LandingHeroActions from '../shared/LandingHeroActions';
-import HeroMediaCarousel from '../shared/HeroMediaCarousel';
-import PublicationLogosBlock from '../shared/PublicationLogosBlock';
-import ImpactStatsStrip from '../shared/ImpactStatsStrip';
-import '../../components/LandingPage.css';
+import TemplateServiceTicker from '../shared/TemplateServiceTicker';
+import TemplateLogosSection from '../shared/TemplateLogosSection';
+import TemplateStatsSection from '../shared/TemplateStatsSection';
+import '../styles/templateActions.css';
+import '../styles/templateStats.css';
+import '../styles/templateLogos.css';
 import './BoldLanding.css';
 
 function BoldLanding({ onScrollToSection }) {
   const hero = useLandingHero();
 
   return (
-    <section id="landing" className="tpl-landing tpl-bold">
-      <div className="tpl-bold-bg" aria-hidden="true">
+    <section id="landing" className="tpl-landing tpl-noir">
+      <div className="tpl-noir-bg">
         <PartnerMediaFrame
           src={hero.heroMediaSrc}
           type={hero.heroMediaType}
           poster={hero.heroPoster}
-          className="tpl-bold-bg-media"
-          overlayClassName="tpl-bold-bg-overlay"
+          className="tpl-noir-bg-media"
+          overlayClassName="tpl-noir-bg-overlay"
         />
       </div>
 
-      <Navbar onScrollToSection={onScrollToSection} />
+      <TemplateNavbar templateId="bold" onScrollToSection={onScrollToSection} />
 
-      <div className="tpl-bold-shell">
+      <div className="tpl-noir-shell">
         {hero.showHero ? (
-          <div className="tpl-bold-hero">
-            <p className="tpl-bold-kicker">{hero.kicker}</p>
-            <h1 className="tpl-bold-title">{hero.title}</h1>
-            <p className="tpl-bold-description">{hero.description}</p>
-            <LandingHeroActions className="tpl-bold-actions landing-actions" />
-
-            <div className="tpl-bold-carousel">
-              <HeroMediaCarousel
-                activeSlide={hero.activeSlide}
-                mediaKicker={hero.mediaKicker}
-                className="tpl-bold-carousel-inner landing-media-carousel"
-              />
-            </div>
+          <div className="tpl-noir-hero">
+            <p className="tpl-noir-kicker">{hero.kicker}</p>
+            <h1 className="tpl-noir-title">{hero.title}</h1>
+            <p className="tpl-noir-description">{hero.description}</p>
+            <LandingHeroActions className="tpl-noir-actions" variant="bold" />
+            <TemplateServiceTicker mediaKicker={hero.mediaKicker} className="tpl-noir-ticker" />
           </div>
         ) : null}
 
-        {hero.showPublicationLogos ? (
-          <PublicationLogosBlock className="tpl-bold-logos landing-logos-strip" />
-        ) : null}
-
         {hero.showImpactStats ? (
-          <ImpactStatsStrip
+          <TemplateStatsSection
+            variant="glow"
             items={hero.impactItems}
             statsRef={hero.statsRef}
             statsVisible={hero.statsVisible}
-            className="tpl-bold-stats landing-impact-strip"
-            innerClassName="tpl-bold-stats-inner landing-impact-inner"
-            itemClassName="tpl-bold-stat landing-impact-item landing-impact-item--card"
           />
         ) : null}
+
+        {hero.showPublicationLogos ? <TemplateLogosSection variant="spotlight" /> : null}
       </div>
     </section>
   );

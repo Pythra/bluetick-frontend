@@ -1,0 +1,177 @@
+/* Template logo sections */
+.tpl-logos {
+  margin: 2rem 0 1.5rem;
+  overflow: hidden;
+}
+
+.tpl-logos--marquee .tpl-logos-marquee-track {
+  opacity: 0.55;
+  filter: grayscale(100%);
+}
+
+.tpl-logos--marquee .impact-logos-carousel {
+  animation: tpl-marquee 40s linear infinite;
+}
+
+@keyframes tpl-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.tpl-logos--grid {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #eee;
+}
+
+.tpl-logos-caption {
+  font-family: var(--tpl-font-body, 'Inter', sans-serif);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: #999;
+  margin-bottom: 1.25rem;
+}
+
+.tpl-logos-grid-wrap {
+  filter: grayscale(100%);
+  opacity: 0.7;
+}
+
+.tpl-logos-grid-wrap img,
+.tpl-logos-grid-wrap .impact-logo-item {
+  max-height: 28px;
+}
+
+.tpl-logos--boxed .tpl-logos-heading {
+  font-family: var(--tpl-font-display, 'Source Serif 4', serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #071526;
+  margin: 0 0 1.25rem;
+  text-align: left;
+}
+
+.tpl-logos-boxed-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.tpl-logos-boxed-wrap .impact-logos-carousel,
+.tpl-logos-boxed-wrap .landing-logos-carousel {
+  display: contents;
+}
+
+.tpl-logos-boxed-wrap img {
+  padding: 0.65rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  background: #fff;
+  max-height: 36px;
+  object-fit: contain;
+}
+
+.tpl-logos--press {
+  position: relative;
+  padding: 1.5rem 1.5rem 1.5rem 2.5rem;
+  background: #faf7f2;
+}
+
+.tpl-logos-press-label {
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center;
+  font-size: 0.58rem;
+  letter-spacing: 0.25em;
+  color: #999;
+  font-weight: 600;
+}
+
+.tpl-logos--spotlight {
+  position: relative;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.tpl-logos-spotlight-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.tpl-logos--spotlight .impact-logos-carousel {
+  position: relative;
+  z-index: 1;
+  filter: brightness(1.2);
+}
+
+.tpl-feature-chips {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-top: 1.75rem;
+}
+
+.tpl-feature-chip {
+  flex: 1 1 140px;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tpl-feature-chip:hover {
+  border-color: var(--brand-primary, #2563eb);
+  box-shadow: 0 4px 16px var(--brand-primary-glow, rgba(37, 99, 235, 0.15));
+}
+
+.tpl-feature-chip-label {
+  display: block;
+  font-family: var(--tpl-font-body, 'DM Sans', sans-serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0f2546;
+}
+
+.tpl-feature-chip-desc {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.tpl-service-ticker {
+  margin-top: 2rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: left;
+  max-width: 520px;
+}
+
+.tpl-service-ticker-kicker {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--brand-primary-light, #93c5fd);
+  margin: 0 0 0.5rem;
+}
+
+.tpl-service-ticker-title {
+  font-family: var(--tpl-font-display, 'Syne', sans-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.tpl-service-ticker-desc {
+  margin: 0.5rem 0 0;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.55;
+}

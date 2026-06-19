@@ -1,42 +1,41 @@
-import Navbar from '../../components/Navbar';
+import TemplateNavbar from '../shared/TemplateNavbar';
 import { useLandingHero } from '../shared/useLandingHero';
 import LandingHeroActions from '../shared/LandingHeroActions';
-import PublicationLogosBlock from '../shared/PublicationLogosBlock';
-import ImpactStatsStrip from '../shared/ImpactStatsStrip';
-import '../../components/LandingPage.css';
+import TemplateLogosSection from '../shared/TemplateLogosSection';
+import TemplateStatsSection from '../shared/TemplateStatsSection';
+import '../styles/templateActions.css';
+import '../styles/templateStats.css';
+import '../styles/templateLogos.css';
 import './MinimalLanding.css';
 
 function MinimalLanding({ onScrollToSection }) {
   const hero = useLandingHero();
 
   return (
-    <section id="landing" className="tpl-landing tpl-minimal">
-      <Navbar onScrollToSection={onScrollToSection} />
+    <section id="landing" className="tpl-landing tpl-atelier">
+      <TemplateNavbar templateId="minimal" onScrollToSection={onScrollToSection} />
 
-      <div className="tpl-minimal-shell">
+      <div className="tpl-atelier-shell">
         {hero.showHero ? (
-          <div className="tpl-minimal-hero">
-            <p className="tpl-minimal-kicker">{hero.kicker}</p>
-            <h1 className="tpl-minimal-title">{hero.title}</h1>
-            <p className="tpl-minimal-description">{hero.description}</p>
-            <LandingHeroActions className="tpl-minimal-actions landing-actions" />
+          <div className="tpl-atelier-hero">
+            <p className="tpl-atelier-kicker">{hero.kicker}</p>
+            <h1 className="tpl-atelier-title">{hero.title}</h1>
+            <hr className="tpl-atelier-rule" aria-hidden="true" />
+            <p className="tpl-atelier-description">{hero.description}</p>
+            <LandingHeroActions className="tpl-atelier-actions" variant="text" />
           </div>
         ) : null}
 
-        {hero.showPublicationLogos ? (
-          <PublicationLogosBlock className="tpl-minimal-logos landing-logos-strip" />
-        ) : null}
-
         {hero.showImpactStats ? (
-          <ImpactStatsStrip
+          <TemplateStatsSection
+            variant="serif-row"
             items={hero.impactItems}
             statsRef={hero.statsRef}
             statsVisible={hero.statsVisible}
-            className="tpl-minimal-stats landing-impact-strip"
-            innerClassName="tpl-minimal-stats-inner landing-impact-inner"
-            itemClassName="tpl-minimal-stat landing-impact-item"
           />
         ) : null}
+
+        {hero.showPublicationLogos ? <TemplateLogosSection variant="grid" /> : null}
       </div>
     </section>
   );

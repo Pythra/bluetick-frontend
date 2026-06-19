@@ -1,76 +1,170 @@
-.tpl-modern {
-  width: 100%;
-  background: linear-gradient(180deg, var(--brand-surface-bg) 0%, #f5f9ff 100%);
-  font-family: 'Poppins', sans-serif;
-  border-radius: 0 0 56px 56px;
+/* Aurora landing */
+.tpl-aurora {
+  position: relative;
+  font-family: var(--tpl-font-body, 'DM Sans', sans-serif);
+  border-radius: 0 0 48px 48px;
   overflow: hidden;
+  padding-bottom: 2rem;
 }
 
-.tpl-modern-shell {
+.tpl-aurora-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tpl-aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.45;
+}
+
+.tpl-aurora-blob--1 {
+  width: 420px;
+  height: 420px;
+  top: -120px;
+  right: -80px;
+  background: var(--brand-primary, #2563eb);
+}
+
+.tpl-aurora-blob--2 {
+  width: 320px;
+  height: 320px;
+  bottom: 10%;
+  left: -60px;
+  background: #7c3aed;
+  opacity: 0.25;
+}
+
+.tpl-aurora-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(15, 37, 70, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.tpl-aurora-shell {
+  position: relative;
+  z-index: 1;
   max-width: 1240px;
   margin: 0 auto;
-  padding: 0.3rem 1.5rem 0;
-  display: flex;
-  flex-direction: column;
+  padding: 0 1.5rem;
 }
 
-.tpl-modern-grid {
+.tpl-aurora-bento {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
-  gap: 2rem;
-  align-items: stretch;
+  grid-template-columns: 1.1fr 0.5fr 0.9fr;
+  grid-template-rows: auto auto;
+  gap: 1.25rem;
+  padding-top: 0.5rem;
 }
 
-.tpl-modern-copy {
-  padding: 0.55rem 0;
+.tpl-aurora-bento-copy {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: center;
+  padding: 1rem 0;
+}
+
+.tpl-aurora-kicker {
+  font-size: 0.88rem;
+  color: var(--brand-primary-dark, #1d4ed8);
+  margin-bottom: 0.85rem;
+  font-weight: 500;
+}
+
+.tpl-aurora-title {
+  margin: 0;
+  font-family: var(--tpl-font-display, 'Fraunces', serif);
+  font-size: clamp(1.85rem, 3.8vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #0f2546;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+}
+
+.tpl-aurora-description {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  max-width: 48ch;
+}
+
+.tpl-aurora-bento-trust {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
+  gap: 0.65rem;
+  justify-content: center;
 }
 
-.tpl-modern-kicker {
-  font-size: 1rem;
-  color: var(--brand-text-accent, var(--brand-primary-dark));
-  margin-bottom: 0.7rem;
-  font-weight: 500;
+.tpl-aurora-trust-item {
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  text-align: center;
 }
 
-.tpl-modern-title {
-  margin: 0;
-  color: #0f2546;
-  font-size: clamp(1.75rem, 3.6vw, 2.45rem);
-  line-height: 1.2;
-  font-weight: 500;
-  max-width: 20ch;
-  letter-spacing: -0.03em;
+.tpl-aurora-trust-value {
+  display: block;
+  font-family: var(--tpl-font-display, 'Fraunces', serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--brand-primary-dark, #1d4ed8);
 }
 
-.tpl-modern-description {
-  margin-top: 0.95rem;
-  color: #8b9cb3;
-  font-size: 1.04rem;
-  line-height: 1.62;
-  max-width: 56ch;
+.tpl-aurora-trust-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
 }
 
-.tpl-modern-actions {
-  margin-top: auto;
-  padding-top: 1.1rem;
-}
-
-.tpl-modern-media {
-  position: relative;
-  border-radius: 22px;
+.tpl-aurora-bento-media {
+  grid-column: 2 / 4;
+  grid-row: 2;
+  transform: rotate(-2deg);
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 24px 60px var(--brand-primary-glow);
-  min-height: 360px;
+  box-shadow: 0 28px 60px var(--brand-primary-glow, rgba(37, 99, 235, 0.25));
+  min-height: 280px;
+}
+
+.tpl-aurora-media-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  object-fit: cover;
+}
+
+.tpl-aurora-media-overlay {
+  background: linear-gradient(180deg, transparent 50%, rgba(15, 37, 70, 0.35) 100%);
 }
 
 @media (max-width: 960px) {
-  .tpl-modern-grid {
+  .tpl-aurora-bento {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
   }
 
-  .tpl-modern-media {
-    min-height: 280px;
+  .tpl-aurora-bento-copy,
+  .tpl-aurora-bento-trust,
+  .tpl-aurora-bento-media {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .tpl-aurora-bento-trust {
+    flex-direction: row;
+  }
+
+  .tpl-aurora-bento-media {
+    transform: none;
   }
 }

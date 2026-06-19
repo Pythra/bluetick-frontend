@@ -1,69 +1,58 @@
-import Navbar from '../../components/Navbar';
 import PartnerMediaFrame from '../../components/PartnerMediaFrame';
+import TemplateNavbar from '../shared/TemplateNavbar';
 import { useLandingHero } from '../shared/useLandingHero';
 import LandingHeroActions from '../shared/LandingHeroActions';
-import HeroMediaCarousel from '../shared/HeroMediaCarousel';
-import PublicationLogosBlock from '../shared/PublicationLogosBlock';
-import ImpactStatsStrip from '../shared/ImpactStatsStrip';
-import '../../components/LandingPage.css';
+import TemplateLogosSection from '../shared/TemplateLogosSection';
+import TemplateStatsSection from '../shared/TemplateStatsSection';
+import '../styles/templateActions.css';
+import '../styles/templateStats.css';
+import '../styles/templateLogos.css';
 import './StudioLanding.css';
 
 function StudioLanding({ onScrollToSection }) {
   const hero = useLandingHero();
+  const metaLine = `Est. ${new Date().getFullYear()} · Digital Services · ${hero.displayName}`;
 
   return (
-    <section id="landing" className="tpl-landing tpl-studio">
-      <div className="tpl-studio-layout">
-        <aside className="tpl-studio-visual" aria-hidden={!hero.showHero}>
-          {hero.showHero ? (
-            <>
-              <PartnerMediaFrame
-                src={hero.heroMediaSrc}
-                type={hero.heroMediaType}
-                poster={hero.heroPoster}
-                className="tpl-studio-visual-media"
-                overlayClassName="tpl-studio-visual-overlay"
-              />
-              <div className="tpl-studio-visual-caption">
-                <HeroMediaCarousel
-                  activeSlide={hero.activeSlide}
-                  mediaKicker={hero.mediaKicker}
-                  className="tpl-studio-carousel landing-media-carousel"
-                />
-              </div>
-            </>
-          ) : null}
-        </aside>
+    <section id="landing" className="tpl-landing tpl-editorial">
+      <div className="tpl-editorial-layout">
+        <div className="tpl-editorial-main">
+          <TemplateNavbar templateId="studio" onScrollToSection={onScrollToSection} />
 
-        <div className="tpl-studio-main">
-          <Navbar onScrollToSection={onScrollToSection} />
-
-          <div className="tpl-studio-content">
+          <div className="tpl-editorial-content">
             {hero.showHero ? (
-              <div className="tpl-studio-hero">
-                <p className="tpl-studio-kicker">{hero.kicker}</p>
-                <h1 className="tpl-studio-title">{hero.title}</h1>
-                <p className="tpl-studio-description">{hero.description}</p>
-                <LandingHeroActions className="tpl-studio-actions landing-actions" />
+              <div className="tpl-editorial-hero">
+                <p className="tpl-editorial-meta">{metaLine}</p>
+                <h1 className="tpl-editorial-title">{hero.title}</h1>
+                <blockquote className="tpl-editorial-quote">{hero.description}</blockquote>
+                <LandingHeroActions className="tpl-editorial-actions" variant="stacked" />
+                {hero.showImpactStats ? (
+                  <TemplateStatsSection
+                    variant="stacked"
+                    items={hero.impactItems}
+                    statsRef={hero.statsRef}
+                    statsVisible={hero.statsVisible}
+                  />
+                ) : null}
               </div>
-            ) : null}
-
-            {hero.showPublicationLogos ? (
-              <PublicationLogosBlock className="tpl-studio-logos landing-logos-strip" />
-            ) : null}
-
-            {hero.showImpactStats ? (
-              <ImpactStatsStrip
-                items={hero.impactItems}
-                statsRef={hero.statsRef}
-                statsVisible={hero.statsVisible}
-                className="tpl-studio-stats landing-impact-strip"
-                innerClassName="tpl-studio-stats-inner landing-impact-inner"
-                itemClassName="tpl-studio-stat landing-impact-item"
-              />
             ) : null}
           </div>
         </div>
+
+        <aside className="tpl-editorial-visual">
+          {hero.showHero ? (
+            <PartnerMediaFrame
+              src={hero.heroMediaSrc}
+              type={hero.heroMediaType}
+              poster={hero.heroPoster}
+              className="tpl-editorial-media"
+              overlayClassName="tpl-editorial-media-overlay"
+            />
+          ) : null}
+          {hero.showPublicationLogos ? (
+            <TemplateLogosSection variant="press" className="tpl-editorial-logos" />
+          ) : null}
+        </aside>
       </div>
     </section>
   );

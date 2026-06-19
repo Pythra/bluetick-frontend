@@ -42,6 +42,7 @@ import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
 import AdminPage from './pages/AdminPage';
 import AdminApp from './admin/AdminApp';
 import Footer from './components/Footer';
+import PartnerTemplateFooter from './templates/shared/PartnerTemplateFooter';
 import TermsAndConditions from './pages/legal/TermsAndConditions';
 import PrivacyPolicy from './pages/legal/PrivacyPolicy';
 import RefundPolicy from './pages/legal/RefundPolicy';
@@ -78,7 +79,7 @@ const HOMEPAGE_SERVICE_COMPONENTS = [
 
 function HomePage() {
   const branding = usePartnerBranding();
-  const { isPartnerSite, features } = branding;
+  const { isPartnerSite, features, templateId } = branding;
   const videoFirstHomepage = isPartnerSite && isVideoFirstPartnerSite(branding);
 
   useEffect(() => {
@@ -231,7 +232,11 @@ function HomePage() {
         <div className="scroll-pop"><CustomRequestsSection /></div>
       ) : null}
       {!isPartnerSite ? <ClientsSection className="landing-page" /> : null}
-      <Footer onScrollToSection={scrollToSection} />
+      {isPartnerSite ? (
+        <PartnerTemplateFooter templateId={templateId} onScrollToSection={scrollToSection} />
+      ) : (
+        <Footer onScrollToSection={scrollToSection} />
+      )}
     </>
   );
 }

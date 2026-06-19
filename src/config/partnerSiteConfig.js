@@ -111,32 +111,32 @@ export function getFirstVisibleServiceSectionId(branding) {
 export const PARTNER_TEMPLATES = [
   {
     id: 'modern',
-    name: 'Modern',
-    description: 'Bold gradients, dynamic hero media, and a polished conversion-focused layout.',
+    name: 'Aurora',
+    description: 'Glass bento hero, mesh gradients, and a premium SaaS feel with DM Sans + Fraunces.',
     preview: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
   },
   {
     id: 'minimal',
-    name: 'Minimal',
-    description: 'Clean whitespace, understated typography, and a refined professional feel.',
+    name: 'Atelier',
+    description: 'Luxury minimal — centered serif typography, no hero media, refined whitespace.',
     preview: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
   },
   {
     id: 'corporate',
-    name: 'Corporate',
-    description: 'Structured sections, strong hierarchy, and a trustworthy enterprise tone.',
+    name: 'Institutional',
+    description: 'Enterprise split hero, two-tier nav, table stats, and a structured mega footer.',
     preview: 'linear-gradient(135deg, #0b3d91 0%, #1e5aa8 100%)',
   },
   {
     id: 'bold',
-    name: 'Bold',
-    description: 'Full-screen dark hero, oversized typography, and high-impact presentation.',
+    name: 'Noir',
+    description: 'Cinematic full-screen dark hero, Syne display type, and bottom-aligned copy.',
     preview: 'linear-gradient(135deg, #0f172a 0%, #6366f1 100%)',
   },
   {
     id: 'studio',
-    name: 'Studio',
-    description: 'Split-screen editorial layout with edge-to-edge media and content sidebar.',
+    name: 'Editorial',
+    description: 'Magazine split layout — serif headlines, edge-to-edge media, cream editorial footer.',
     preview: 'linear-gradient(135deg, #1e293b 0%, #f8fafc 50%, #2563eb 100%)',
   },
 ];

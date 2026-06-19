@@ -9,6 +9,7 @@ import {
   readCachedPartnerBranding,
   writeCachedPartnerBranding,
 } from '../utils/partnerBrandingCache';
+import { applyTemplateFonts, clearTemplateFonts } from '../templates/templateFonts';
 
 const DEFAULT_BRANDING = {
   isPartnerSite: false,
@@ -167,6 +168,14 @@ export function PartnerBrandingProvider({ children }) {
       cancelled = true;
     };
   }, [apiUrl, subdomain, hostname, isMainHost]);
+
+  useEffect(() => {
+    if (branding.isPartnerSite && branding.templateId) {
+      applyTemplateFonts(branding.templateId);
+    } else {
+      clearTemplateFonts();
+    }
+  }, [branding.isPartnerSite, branding.templateId]);
 
   useEffect(() => {
     applyBrandingTheme(branding);

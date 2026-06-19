@@ -1,56 +1,17 @@
-/* Partner template chrome — navbar & footer variants */
+/* Partner template chrome overrides */
 
-html[data-partner-template='minimal'] .navbar--tpl-minimal {
-  background: transparent;
-  box-shadow: none;
+html[data-partner-template='modern'] .tpl-landing,
+html[data-partner-template='minimal'] .tpl-landing,
+html[data-partner-template='corporate'] .tpl-landing,
+html[data-partner-template='bold'] .tpl-landing,
+html[data-partner-template='studio'] .tpl-landing {
+  font-family: var(--tpl-font-body, 'Poppins', sans-serif);
 }
 
-html[data-partner-template='minimal'] .footer--tpl-minimal {
-  background: #f8fafc;
-  border-top: 1px solid rgba(148, 163, 184, 0.2);
-}
-
-html[data-partner-template='corporate'] .navbar--tpl-corporate {
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
-}
-
-html[data-partner-template='corporate'] .footer--tpl-corporate {
-  background: var(--brand-footer-bg);
-}
-
-html[data-partner-template='bold'] .footer--tpl-bold {
-  background: #0b1220;
-  color: rgba(255, 255, 255, 0.88);
-}
-
-html[data-partner-template='bold'] .footer--tpl-bold .footer-top-title,
-html[data-partner-template='bold'] .footer--tpl-bold .footer-top-subtitle,
-html[data-partner-template='bold'] .footer--tpl-bold .footer-link,
-html[data-partner-template='bold'] .footer--tpl-bold .footer-contact-item {
-  color: rgba(255, 255, 255, 0.82);
-}
-
-html[data-partner-template='studio'] .navbar--tpl-studio {
-  background: transparent;
-}
-
-html[data-partner-template='studio'] .footer--tpl-studio {
-  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
-}
-
-/* Shared landing section scroll animations still apply to partner templates */
-.tpl-landing .landing-btn-primary,
-.tpl-landing .bounce-btn {
-  border-radius: 999px;
-}
-
-html[data-partner-template='minimal'] .tpl-landing .landing-btn-primary,
-html[data-partner-template='minimal'] .tpl-landing .bounce-btn {
-  border-radius: 10px;
-}
-
-html[data-partner-template='corporate'] .tpl-landing .landing-btn-primary,
-html[data-partner-template='corporate'] .tpl-landing .bounce-btn {
-  border-radius: 8px;
+html[data-partner-template='modern'] .scroll-pop,
+html[data-partner-template='minimal'] .scroll-pop,
+html[data-partner-template='corporate'] .scroll-pop,
+html[data-partner-template='bold'] .scroll-pop,
+html[data-partner-template='studio'] .scroll-pop {
+  font-family: var(--tpl-font-body, inherit);
 }
