@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { MdChat, MdClose, MdSend } from 'react-icons/md';
 import { useAuth } from '../contexts/AuthContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
-import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain';
 import './ClientMessagesFab.css';
 
 function formatWhen(dateString) {
@@ -151,10 +150,9 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, onClose, on
 
 export default function ClientMessagesFab() {
   const { apiUrl, token } = useAuth();
-  const { isPartnerSite, brandName } = usePartnerBranding();
+  const { isPartnerSite, brandName, subdomain } = usePartnerBranding();
   const [unreadCount, setUnreadCount] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const subdomain = getPartnerSubdomainFromHost();
 
   const fetchUnread = useCallback(async () => {
     if (!token || !subdomain) return;
