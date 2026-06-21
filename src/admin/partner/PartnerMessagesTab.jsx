@@ -1,16 +1,76 @@
-import { useEffect, useState } from 'react';
-import { MdSend, MdSupportAgent, MdPeople, MdAdd } from 'react-icons/md';
+import { useEffect, useMemo, useState } from 'react';
+import { MdSend, MdSupportAgent, MdPeople, MdAdd, MdSearch, MdClose } from 'react-icons/md';
+
+function ClientPicker({ clients, onSelect }) {
+  const [search, setSearch] = useState('');
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return clients.filter(
+      (c) =>
+        !q ||
+        c.email?.toLowerCase().includes(q) ||
+        c.name?.toLowerCase().includes(q)
+    );
+  }, [clients, search]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div style={{ position: 'relative' }}>
+        <MdSearch size={15} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--pdash-soft)' }} />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search clients…"
+          style={{ width: '100%', paddingLeft: 32, paddingRight: 10 }}
+          autoFocus
+        />
+      </div>
+      <div style={{ maxHeight: 260, overflowY: 'auto', border: '1px solid var(--pdash-border)', borderRadius: 8 }}>
+        {!filtered.length ? (
+          <p style={{ padding: '12px 14px', color: 'var(--pdash-soft)', fontSize: '0.85rem', margin: 0 }}>
+            {clients.length === 0 ? 'No clients yet — clients appear once they place an order.' : 'No clients match your search.'}
+          </p>
+        ) : (
+          filtered.map((c) => (
+            <button
+              key={c.email}
+              type="button"
+              onClick={() => onSelect(c)}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                width: '100%', padding: '10px 14px', border: 'none', borderBottom: '1px solid var(--pdash-border)',
+                background: 'transparent', cursor: 'pointer', textAlign: 'left', transition: 'background 0.12s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--pdash-hover)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <strong style={{ fontSize: '0.88rem' }}>{c.name || c.email}</strong>
+              {c.name && <span style={{ fontSize: '0.78rem', color: 'var(--pdash-soft)' }}>{c.email}</span>}
+              {c.orderCount > 0 && (
+                <span style={{ fontSize: '0.72rem', color: 'var(--pdash-soft)', marginTop: 2 }}>
+                  {c.orderCount} order{c.orderCount !== 1 ? 's' : ''}
+                </span>
+              )}
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function PartnerMessagesTab({ api }) {
   const [threads, setThreads] = useState([]);
+  const [clients, setClients] = useState([]);
   const [activeThread, setActiveThread] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [category, setCategory] = useState('support');
   const [composingNew, setComposingNew] = useState(false);
-  const [newClientEmail, setNewClientEmail] = useState('');
-  const [newClientName, setNewClientName] = useState('');
+  const [selectedClient, setSelectedClient] = useState(null);
   const [newSubject, setNewSubject] = useState('');
 
   const loadThreads = async () => {
@@ -24,6 +84,7 @@ export default function PartnerMessagesTab({ api }) {
 
   useEffect(() => {
     loadThreads();
+    api.getClients().then((d) => setClients(d.clients || [])).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -36,6 +97,8 @@ export default function PartnerMessagesTab({ api }) {
     setActiveThread(null);
     setComposingNew(false);
     setMessage('');
+    setSelectedClient(null);
+    setNewSubject('');
   }, [category]);
 
   const openThread = async (threadId) => {
@@ -56,15 +119,16 @@ export default function PartnerMessagesTab({ api }) {
         const channel = category === 'support' ? 'partner-admin' : 'partner-client';
         await api.sendMessage({
           channel,
-          subject: newSubject.trim() || (channel === 'partner-admin' ? 'Message to Bluetickgeng Support' : `Message to ${newClientName.trim() || newClientEmail.trim()}`),
+          subject: newSubject.trim() || (channel === 'partner-admin'
+            ? 'Message to Bluetickgeng Support'
+            : `Message to ${selectedClient?.name || selectedClient?.email || ''}`),
           body: message,
-          participantEmail: channel === 'partner-client' ? newClientEmail.trim() : undefined,
-          participantName: channel === 'partner-client' ? newClientName.trim() : undefined,
+          participantEmail: channel === 'partner-client' ? selectedClient?.email : undefined,
+          participantName: channel === 'partner-client' ? selectedClient?.name : undefined,
         });
         await loadThreads();
         setComposingNew(false);
-        setNewClientEmail('');
-        setNewClientName('');
+        setSelectedClient(null);
         setNewSubject('');
       }
       setMessage('');
@@ -84,50 +148,87 @@ export default function PartnerMessagesTab({ api }) {
 
   const renderChatArea = () => {
     if (composingNew) {
+      const isClientMode = category === 'clients';
+      const canSend = message.trim() && (!isClientMode || selectedClient);
       return (
         <>
           <h2 style={{ marginBottom: 16 }}>
-            {category === 'support' ? 'New message to Bluetickgeng Support' : 'New message to Client'}
+            {isClientMode ? 'New message to Client' : 'New message to Bluetickgeng Support'}
           </h2>
-          {category === 'clients' && (
-            <>
-              <div className="pdash-field">
-                <label>Client Email *</label>
-                <input
-                  type="email"
-                  value={newClientEmail}
-                  onChange={(e) => setNewClientEmail(e.target.value)}
-                  placeholder="client@email.com"
-                />
+
+          {isClientMode && !selectedClient && (
+            <ClientPicker
+              clients={clients}
+              onSelect={(c) => setSelectedClient(c)}
+            />
+          )}
+
+          {isClientMode && selectedClient && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '10px 14px', background: 'var(--pdash-hover)', borderRadius: 8,
+              marginBottom: 12, border: '1px solid var(--pdash-border)',
+            }}>
+              <div>
+                <strong style={{ fontSize: '0.9rem' }}>{selectedClient.name || selectedClient.email}</strong>
+                {selectedClient.name && (
+                  <div style={{ fontSize: '0.78rem', color: 'var(--pdash-soft)' }}>{selectedClient.email}</div>
+                )}
               </div>
-              <div className="pdash-field">
-                <label>Client Name</label>
+              <button
+                type="button"
+                className="pdash-btn pdash-btn-ghost"
+                style={{ padding: '4px 8px' }}
+                onClick={() => setSelectedClient(null)}
+                aria-label="Change client"
+              >
+                <MdClose size={14} /> Change
+              </button>
+            </div>
+          )}
+
+          {(!isClientMode || selectedClient) && (
+            <>
+              <div className="pdash-field" style={{ marginBottom: 10 }}>
+                <label>Subject</label>
                 <input
                   type="text"
-                  value={newClientName}
-                  onChange={(e) => setNewClientName(e.target.value)}
+                  value={newSubject}
+                  onChange={(e) => setNewSubject(e.target.value)}
                   placeholder="Optional"
                 />
               </div>
+              <div className="pdash-chat-compose">
+                <textarea
+                  rows={4}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  autoFocus
+                />
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button
+                    type="button"
+                    className="pdash-btn pdash-btn-ghost"
+                    onClick={() => { setComposingNew(false); setMessage(''); setSelectedClient(null); }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className="pdash-btn pdash-btn-primary"
+                    onClick={handleSend}
+                    disabled={sending || !canSend}
+                  >
+                    <MdSend size={16} /> Send
+                  </button>
+                </div>
+              </div>
             </>
           )}
-          <div className="pdash-field">
-            <label>Subject</label>
-            <input
-              type="text"
-              value={newSubject}
-              onChange={(e) => setNewSubject(e.target.value)}
-              placeholder="Optional"
-            />
-          </div>
-          <div className="pdash-chat-compose">
-            <textarea
-              rows={4}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message..."
-            />
-            <div style={{ display: 'flex', gap: 8 }}>
+
+          {isClientMode && !selectedClient && (
+            <div style={{ marginTop: 12 }}>
               <button
                 type="button"
                 className="pdash-btn pdash-btn-ghost"
@@ -135,16 +236,8 @@ export default function PartnerMessagesTab({ api }) {
               >
                 Cancel
               </button>
-              <button
-                type="button"
-                className="pdash-btn pdash-btn-primary"
-                onClick={handleSend}
-                disabled={sending || !message.trim() || (category === 'clients' && !newClientEmail.trim())}
-              >
-                <MdSend size={16} /> Send
-              </button>
             </div>
-          </div>
+          )}
         </>
       );
     }
