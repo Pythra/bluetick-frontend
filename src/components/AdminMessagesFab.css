@@ -105,6 +105,82 @@
   font-size: 0.875rem;
 }
 
+.admin-messages-drawer-cats {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--adm-border, #e2e8f0);
+  background: #f8fafc;
+  flex-wrap: wrap;
+}
+
+.admin-messages-cat-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--adm-border, #e2e8f0);
+  background: #fff;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-messages-cat-tab:hover {
+  background: #f1f5f9;
+}
+
+.admin-messages-cat-tab.active {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
+  color: #fff;
+}
+
+.admin-messages-cat-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-messages-cat-tab:not(.active) .admin-messages-cat-count {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.admin-messages-channel-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+.admin-messages-channel-tag.partner-tag {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.admin-messages-channel-tag.client-tag {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.admin-messages-chat-meta {
+  margin: -6px 0 10px;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
 .admin-messages-drawer-body {
   flex: 1;
   min-height: 0;

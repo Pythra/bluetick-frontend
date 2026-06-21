@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import bluego from '../assets/bluego.png';
@@ -10,6 +11,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { isPartnerSite, brandName, logoUrl, primaryColor } = usePartnerBranding();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -62,15 +64,22 @@ function LoginPage() {
       <Navbar onScrollToSection={scrollToSection} />
       <main className="auth-main">
         <div className="auth-shell">
-          <aside className="auth-aside">
+          <aside className="auth-aside" style={isPartnerSite && primaryColor ? { background: `linear-gradient(135deg, ${primaryColor}22 0%, ${primaryColor}11 100%)` } : undefined}>
             <div className="auth-aside-inner">
-              <img src={bluego} alt="Bluetick" className="auth-aside-logo" />
+              {isPartnerSite ? (
+                logoUrl
+                  ? <img src={logoUrl} alt={brandName} className="auth-aside-logo" style={{ maxHeight: 64, objectFit: 'contain' }} />
+                  : <div style={{ fontSize: 28, fontWeight: 800, color: primaryColor || '#2563eb', marginBottom: 8 }}>{brandName}</div>
+              ) : (
+                <img src={bluego} alt="Bluetick" className="auth-aside-logo" />
+              )}
               <h1>
                 Welcome<span> back</span>
               </h1>
               <p>
-                Continue from where you stopped. Access your active services, monitor order progress, and keep
-                your brand projects moving quickly.
+                {isPartnerSite
+                  ? `Sign in to access your ${brandName} account and manage your orders.`
+                  : 'Continue from where you stopped. Access your active services, monitor order progress, and keep your brand projects moving quickly.'}
               </p>
               <ul className="auth-perks">
                 <li>See your latest orders and account updates</li>
@@ -81,7 +90,7 @@ function LoginPage() {
           </aside>
           <section className="auth-form-panel">
             <h1>Login</h1>
-            <p className="auth-form-sub">Sign in to continue with your Bluetick account.</p>
+            <p className="auth-form-sub">{isPartnerSite ? `Sign in to your ${brandName} account.` : 'Sign in to continue with your Bluetick account.'}</p>
 
             {error && <div className="auth-error">{error}</div>}
 

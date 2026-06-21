@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import { MdChat, MdClose, MdSend } from 'react-icons/md';
+import { MdChat, MdClose, MdSend, MdHandshake, MdPeople, MdApps } from 'react-icons/md';
 import { useCallback, useEffect, useState } from 'react';
 import './AdminMessagesFab.css';
 
@@ -13,6 +13,12 @@ function formatWhen(dateString) {
   });
 }
 
+const CATEGORIES = [
+  { id: 'all', label: 'All', icon: MdApps },
+  { id: 'partners', label: 'Partners', icon: MdHandshake },
+  { id: 'clients', label: 'Clients', icon: MdPeople },
+];
+
 function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
   const [threads, setThreads] = useState([]);
   const [activeThread, setActiveThread] = useState(null);
@@ -20,6 +26,7 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
+  const [category, setCategory] = useState('all');
 
   const headers = {
     Authorization: `Bearer ${token}`,
@@ -47,6 +54,11 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
   useEffect(() => {
     loadInbox();
   }, [loadInbox]);
+
+  useEffect(() => {
+    setActiveThread(null);
+    setMessage('');
+  }, [category]);
 
   const openThread = async (thread) => {
     setError('');
@@ -99,6 +111,27 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
     }
   };
 
+  const filteredThreads = threads.filter((thread) => {
+    if (category === 'partners') return thread.channel === 'partner-admin';
+    if (category === 'clients') return thread.channel === 'partner-client';
+    return true;
+  });
+
+  const partnerCount = threads.filter((t) => t.channel === 'partner-admin').length;
+  const clientCount = threads.filter((t) => t.channel === 'partner-client').length;
+
+  const getCategoryCount = (cat) => {
+    if (cat === 'partners') return partnerCount;
+    if (cat === 'clients') return clientCount;
+    return threads.length;
+  };
+
+  const getCategoryDescription = () => {
+    if (category === 'partners') return 'Threads with your partner admins';
+    if (category === 'clients') return 'Threads with partner end-clients';
+    return 'Partners, clients, and platform support threads';
+  };
+
   return (
     <div className="admin-messages-drawer-backdrop" onClick={onClose} role="presentation">
       <div
@@ -110,11 +143,28 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
         <div className="admin-messages-drawer-head">
           <div>
             <h2>Messages</h2>
-            <p>Partners, clients, and platform support threads</p>
+            <p>{getCategoryDescription()}</p>
           </div>
           <button type="button" className="admin-messages-drawer-close" onClick={onClose} aria-label="Close">
             <MdClose size={22} />
           </button>
+        </div>
+
+        <div className="admin-messages-drawer-cats">
+          {CATEGORIES.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              className={`admin-messages-cat-tab${category === id ? ' active' : ''}`}
+              onClick={() => setCategory(id)}
+            >
+              <Icon size={14} />
+              {label}
+              {getCategoryCount(id) > 0 ? (
+                <span className="admin-messages-cat-count">{getCategoryCount(id)}</span>
+              ) : null}
+            </button>
+          ))}
         </div>
 
         {error ? <p className="admin-messages-drawer-error">{error}</p> : null}
@@ -123,10 +173,16 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
           <div className="admin-messages-drawer-list">
             {loading ? (
               <div className="adm-spinner" style={{ margin: '24px auto' }} />
-            ) : !threads.length ? (
-              <p className="admin-messages-drawer-empty">No conversations yet.</p>
+            ) : !filteredThreads.length ? (
+              <p className="admin-messages-drawer-empty">
+                {category === 'partners'
+                  ? 'No partner threads yet.'
+                  : category === 'clients'
+                    ? 'No client threads yet.'
+                    : 'No conversations yet.'}
+              </p>
             ) : (
-              threads.map((thread) => (
+              filteredThreads.map((thread) => (
                 <button
                   key={thread.threadId}
                   type="button"
@@ -144,8 +200,10 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
                     ) : null}
                   </div>
                   <span className="admin-messages-drawer-meta">
-                    {thread.channel === 'partner-admin' ? 'Partner thread' : thread.partnerName} ·{' '}
-                    {formatWhen(thread.lastMessageAt)}
+                    {thread.channel === 'partner-admin'
+                      ? <span className="admin-messages-channel-tag partner-tag">Partner</span>
+                      : <span className="admin-messages-channel-tag client-tag">Client · {thread.partnerName}</span>}
+                    {' '}· {formatWhen(thread.lastMessageAt)}
                   </span>
                   <span className="admin-messages-drawer-preview">
                     {thread.lastMessage?.body?.slice(0, 72) || thread.subject}
@@ -158,7 +216,16 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
           <div className="admin-messages-drawer-chat">
             {activeThread ? (
               <>
-                <h3>{activeThread.subject}</h3>
+                <h3>
+                  {activeThread.channel === 'partner-admin'
+                    ? activeThread.partnerName || activeThread.subject
+                    : activeThread.participantName || activeThread.participantEmail || activeThread.subject}
+                </h3>
+                <p className="admin-messages-chat-meta">
+                  {activeThread.channel === 'partner-admin'
+                    ? `Partner thread · ${activeThread.partnerEmail || ''}`
+                    : `Client of ${activeThread.partnerName || 'partner'} · ${activeThread.participantEmail || ''}`}
+                </p>
                 <div className="admin-messages-drawer-messages">
                   {(activeThread.messages || []).map((entry) => (
                     <div key={entry.id} className={`adm-comm-bubble ${entry.senderType}`}>
