@@ -9,7 +9,6 @@ import {
   MdPeople,
   MdChat,
   MdAccountBalanceWallet,
-  MdPayments,
   MdReceipt,
   MdInsertChart,
   MdSettings,
@@ -31,8 +30,7 @@ import PartnerDashboardTab from './partner/PartnerDashboardTab';
 import PartnerServicesTab from './partner/PartnerServicesTab';
 import PartnerOrdersTab, { PartnerClientsTab } from './partner/PartnerOrdersTab';
 import PartnerMessagesTab from './partner/PartnerMessagesTab';
-import PartnerEarningsTab from './partner/PartnerEarningsTab';
-import PartnerWithdrawalsTab from './partner/PartnerWithdrawalsTab';
+import PartnerWalletTab from './partner/PartnerWalletTab';
 import PartnerInvoicesTab from './partner/PartnerInvoicesTab';
 import PartnerProgressReportTab from './partner/PartnerProgressReportTab';
 import PartnerSettingsTab from './partner/PartnerSettingsTab';
@@ -70,8 +68,7 @@ const NAV_ITEMS = [
   { id: 'orders', label: 'Orders', icon: MdInventory2 },
   { id: 'clients', label: 'Clients', icon: MdPeople },
   { id: 'messages', label: 'Messages', icon: MdChat },
-  { id: 'earnings', label: 'Earnings', icon: MdAccountBalanceWallet },
-  { id: 'withdrawals', label: 'Withdrawals', icon: MdPayments },
+  { id: 'wallet', label: 'Wallet', icon: MdAccountBalanceWallet },
   { id: 'invoices', label: 'Invoices', icon: MdReceipt },
   { id: 'reports', label: 'Progress Report', icon: MdInsertChart },
   { id: 'settings', label: 'Settings', icon: MdSettings },
@@ -1466,8 +1463,7 @@ function PartnerAdminApp({ subdomain }) {
     orders: 'Orders',
     clients: 'Clients',
     messages: 'Messages',
-    earnings: 'Earnings',
-    withdrawals: 'Withdrawals',
+    wallet: 'Wallet',
     invoices: 'Invoices',
     reports: 'Progress Report',
     settings: 'Settings',
@@ -1480,8 +1476,7 @@ function PartnerAdminApp({ subdomain }) {
     orders: 'Track client orders and project status on your storefront.',
     clients: 'View and manage customers who ordered through your site.',
     messages: 'Real-time messaging with clients and Bluetickgeng support.',
-    earnings: 'Monitor available balance, pending earnings, and profit history.',
-    withdrawals: 'Request payouts via bank, PayPal, Wise, Payoneer, or crypto.',
+    wallet: 'Track earnings, request withdrawals, and manage payout methods in one place.',
     invoices: 'Download invoices and receipts for client orders.',
     reports: 'Track signups, orders, revenue, and earnings trends over time.',
     settings: 'Profile, KYC verification, business address, and preferences.',
@@ -1618,9 +1613,8 @@ function PartnerAdminApp({ subdomain }) {
                 initialClient={messagesIntent?.client || null}
               />
             )}
-            {activeTab === 'earnings' && partnerApi && <PartnerEarningsTab api={partnerApi} />}
-            {activeTab === 'withdrawals' && partnerApi && (
-              <PartnerWithdrawalsTab api={partnerApi} onMessage={setSaveMessage} />
+            {activeTab === 'wallet' && partnerApi && (
+              <PartnerWalletTab api={partnerApi} onMessage={setSaveMessage} />
             )}
             {activeTab === 'invoices' && partnerApi && <PartnerInvoicesTab api={partnerApi} />}
             {activeTab === 'reports' && partnerApi && (
