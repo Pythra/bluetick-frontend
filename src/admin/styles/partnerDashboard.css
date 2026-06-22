@@ -1203,6 +1203,23 @@
   gap: 10px;
 }
 
+.pdash-messages-chat .chat-compose {
+  margin-top: 4px;
+}
+
+.pdash-messages-chat .chat-compose-actions {
+  flex-wrap: wrap;
+}
+
+.pdash-messages-chat .chat-compose-send {
+  min-width: 120px;
+  justify-content: center;
+}
+
+.pdash-messages-chat .chat-compose-icon-btn {
+  flex-shrink: 0;
+}
+
 .pdash-payout-card {
   padding: 12px;
   border: 1px solid var(--pdash-border);

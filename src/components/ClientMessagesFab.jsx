@@ -26,10 +26,13 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [matchedEmails, setMatchedEmails] = useState([]);
+  const [loadError, setLoadError] = useState('');
 
   const headers = { Authorization: `Bearer ${token}` };
 
   const loadThreads = useCallback(async () => {
+    if (!subdomain) return;
+    setLoadError('');
     try {
       const res = await fetch(`${apiUrl}/api/partner-site/${subdomain}/client-messages`, { headers });
       const data = await res.json();
@@ -37,13 +40,15 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
         setThreads(data.threads || []);
         setMatchedEmails(data.matchedEmails || []);
         onUnreadChange?.(data.unreadCount || 0);
+      } else {
+        setLoadError(data.error || 'Could not load messages');
       }
     } catch {
-      /* silent */
+      setLoadError('Could not load messages');
     } finally {
       setLoading(false);
     }
-  }, [apiUrl, subdomain, token]);
+  }, [apiUrl, subdomain, token, onUnreadChange]);
 
   useEffect(() => { loadThreads(); }, [loadThreads]);
 
@@ -100,6 +105,10 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
           <div className="cmsg-list">
             {loading ? (
               <div style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>Loading…</div>
+            ) : loadError ? (
+              <div className="cmsg-empty-wrap">
+                <p className="cmsg-empty">{loadError}</p>
+              </div>
             ) : !threads.length ? (
               <div className="cmsg-empty-wrap">
                 <p className="cmsg-empty">No messages yet.</p>
@@ -167,7 +176,7 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
 
 export default function ClientMessagesFab() {
   const { apiUrl, token, user } = useAuth();
-  const { isPartnerSite, brandName, subdomain: brandingSubdomain } = usePartnerBranding();
+  const { isPartnerSite, brandName, subdomain: brandingSubdomain, loading: brandingLoading } = usePartnerBranding();
   const location = useLocation();
   const hostSubdomain = getPartnerSubdomainFromHost();
   const subdomain = brandingSubdomain || hostSubdomain;
@@ -196,7 +205,15 @@ export default function ClientMessagesFab() {
     return undefined;
   }, [isPartnerSite, token, subdomain, isAdminRoute, fetchUnread]);
 
-  if (!isPartnerSite || !token || !subdomain || isAdminRoute || typeof document === 'undefined') {
+  if (!isPartnerSite || !token || isAdminRoute || typeof document === 'undefined') {
+    return null;
+  }
+
+  if (brandingLoading && !subdomain) {
+    return null;
+  }
+
+  if (!subdomain) {
     return null;
   }
 
