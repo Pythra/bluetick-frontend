@@ -2,14 +2,20 @@ export default function MessageBubbleContent({ message, brandName }) {
   if (!message) return null;
 
   const body = message.body?.trim();
+  const attachments = message.attachments || [];
+  const voiceFromAttachment = attachments.find((item) => item.type === 'voice');
+  const voiceUrl = message.voiceNoteUrl || voiceFromAttachment?.url || null;
+  const nonVoiceAttachments = attachments.filter(
+    (item) => item.type !== 'voice' || (voiceUrl && item.url !== voiceUrl)
+  );
 
   return (
     <>
       {body ? <p className="chat-bubble-body">{message.body}</p> : null}
-      {message.voiceNoteUrl ? (
-        <audio className="chat-bubble-audio" src={message.voiceNoteUrl} controls preload="metadata" />
+      {voiceUrl ? (
+        <audio className="chat-bubble-audio" src={voiceUrl} controls preload="metadata" />
       ) : null}
-      {(message.attachments || []).map((attachment, index) => {
+      {nonVoiceAttachments.map((attachment, index) => {
         const key = `${attachment.url || attachment.name}-${index}`;
         if (attachment.type === 'image') {
           return (
@@ -34,7 +40,7 @@ export default function MessageBubbleContent({ message, brandName }) {
           </a>
         );
       })}
-      {!body && !message.voiceNoteUrl && !(message.attachments || []).length ? (
+      {!body && !voiceUrl && !nonVoiceAttachments.length ? (
         <p className="chat-bubble-body chat-bubble-muted">Sent an attachment</p>
       ) : null}
     </>
