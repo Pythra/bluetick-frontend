@@ -15,17 +15,17 @@ export const NIGERIA_BANKS = [
 ];
 
 export const WITHDRAWAL_STATUS_LABELS = {
-  pending: 'Pending',
-  approved: 'Approved',
+  pending: 'Pending Review',
+  approved: 'Processing',
   paid: 'Paid',
   rejected: 'Rejected',
 };
 
-export function getPayoutMethodFields(type) {
+export function getPayoutMethodFields(type, { bankOptions = NIGERIA_BANKS } = {}) {
   switch (type) {
     case 'bank':
       return [
-        { key: 'bankName', label: 'Bank Name', type: 'select', options: NIGERIA_BANKS },
+        { key: 'bankName', label: 'Bank Name', type: 'select', options: bankOptions },
         { key: 'accountName', label: 'Account Name', type: 'text' },
         { key: 'accountNumber', label: 'Account Number', type: 'text' },
       ];

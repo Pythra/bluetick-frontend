@@ -49,11 +49,16 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
   const handleWithdraw = async () => {
     try {
       setSubmitting(true);
-      await api.requestWithdrawal({
+      const result = await api.requestWithdrawal({
         amount: Number(amount),
         payoutMethodId: selectedMethodId,
       });
-      onMessage?.({ type: 'success', text: 'Withdrawal request submitted.' });
+      onMessage?.({
+        type: 'success',
+        text: result.autoPayout
+          ? 'Withdrawal submitted and Paystack transfer initiated.'
+          : 'Withdrawal request submitted.',
+      });
       setAmount('');
       await load();
     } catch (err) {
@@ -65,16 +70,34 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
 
   if (loading) return <div className="pdash-panel"><div className="pdash-spinner" /></div>;
 
-  const fields = getPayoutMethodFields(newMethod.type);
+  const bankOptions =
+    payoutData?.paystackBanks?.length > 0
+      ? payoutData.paystackBanks.map((bank) => bank.name)
+      : payoutData?.nigeriaBanks || [];
+  const fields = getPayoutMethodFields(newMethod.type, { bankOptions });
+  const minWithdrawal = payoutData?.minWithdrawalNgn || 5000;
 
   return (
     <>
       <div className="pdash-grid-2">
         <div className="pdash-panel">
           <h2>Request Withdrawal</h2>
+          {payoutData?.paystackTransfersEnabled && (
+            <p className="pdash-panel-lead">
+              Nigerian bank withdrawals are paid via Paystack
+              {payoutData?.autoPayoutEnabled ? ' automatically' : ' after admin approval'}.
+              Minimum: ₦{minWithdrawal.toLocaleString()}.
+            </p>
+          )}
           <div className="pdash-field">
             <label>Amount (NGN)</label>
-            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" />
+            <input
+              type="number"
+              min={minWithdrawal}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder={String(minWithdrawal)}
+            />
           </div>
           <div className="pdash-field">
             <label>Payout Method</label>
@@ -108,6 +131,7 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
               <strong>{PAYOUT_METHOD_LABELS[m.type]}</strong>
               <span>{m.bankName || m.email || m.network}</span>
               <span>{m.accountNumber || m.walletAddress || ''}</span>
+              {m.paystackRecipientCode && <span>Paystack verified</span>}
             </div>
           ))}
           {!showAddMethod ? (
