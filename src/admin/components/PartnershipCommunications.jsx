@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { MdSend } from 'react-icons/md'
+import ChatComposeBar from '../../components/chat/ChatComposeBar'
+import MessageBubbleContent from '../../components/chat/MessageBubbleContent'
+import { messagePreviewText } from '../../utils/chatMedia'
 
 function formatWhen(dateString) {
   if (!dateString) return ''
@@ -117,8 +119,8 @@ export default function PartnershipCommunications({ apiUrl, adminToken, partner 
     setSubject('')
   }
 
-  const handleSend = async () => {
-    if (!message.trim()) return
+  const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
+    if (!body?.trim() && !attachment) return
 
     setSending(true)
     setError('')
@@ -126,7 +128,10 @@ export default function PartnershipCommunications({ apiUrl, adminToken, partner 
     try {
       const payload = {
         channel,
-        body: message.trim(),
+        body,
+        attachment,
+        attachmentType,
+        attachmentName,
       }
 
       if (activeThread) {
@@ -260,7 +265,7 @@ export default function PartnershipCommunications({ apiUrl, adminToken, partner 
                     ? brandName
                     : thread.participantName || thread.participantEmail}
                 </strong>
-                <span>{thread.lastMessage?.body?.slice(0, 60) || thread.subject}</span>
+                <span>{messagePreviewText(thread.lastMessage) || thread.subject}</span>
                 <span>{formatWhen(thread.lastMessageAt)}</span>
               </button>
             ))
@@ -281,7 +286,7 @@ export default function PartnershipCommunications({ apiUrl, adminToken, partner 
                       <strong>{entry.senderName}</strong>
                       <span>{formatWhen(entry.createdAt)}</span>
                     </div>
-                    <p>{entry.body}</p>
+                    <MessageBubbleContent message={entry} />
                   </div>
                 ))}
                 {!activeThread?.messages?.length ? (
@@ -299,28 +304,18 @@ export default function PartnershipCommunications({ apiUrl, adminToken, partner 
                 />
               ) : null}
 
-              <div className="adm-comm-compose">
-                <textarea
-                  className="adm-input"
-                  rows={3}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder={
-                    commTab === 'partner'
-                      ? `Write to ${brandName}...`
-                      : `Write to ${selectedClient?.name || selectedClient?.email}...`
-                  }
-                />
-                <button
-                  type="button"
-                  className="adm-btn adm-btn-primary"
-                  onClick={handleSend}
-                  disabled={sending || !message.trim()}
-                >
-                  <MdSend size={16} />
-                  {sending ? 'Sending...' : 'Send'}
-                </button>
-              </div>
+              <ChatComposeBar
+                message={message}
+                onMessageChange={setMessage}
+                onSend={handleSend}
+                sending={sending}
+                placeholder={
+                  commTab === 'partner'
+                    ? `Write to ${brandName}...`
+                    : `Write to ${selectedClient?.name || selectedClient?.email}...`
+                }
+                variant="panel"
+              />
             </>
           )}
         </div>

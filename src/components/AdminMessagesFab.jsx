@@ -1,6 +1,9 @@
 import { createPortal } from 'react-dom';
-import { MdChat, MdClose, MdSend, MdHandshake, MdApps } from 'react-icons/md';
+import { MdChat, MdClose, MdHandshake, MdApps } from 'react-icons/md';
 import { useCallback, useEffect, useState } from 'react';
+import ChatComposeBar from './chat/ChatComposeBar';
+import MessageBubbleContent from './chat/MessageBubbleContent';
+import { messagePreviewText } from '../utils/chatMedia';
 import './AdminMessagesFab.css';
 
 function formatWhen(dateString) {
@@ -77,8 +80,8 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
     }
   };
 
-  const handleSend = async () => {
-    if (!activeThread || !message.trim()) return;
+  const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
+    if (!activeThread || (!body?.trim() && !attachment)) return;
     setSending(true);
     setError('');
     try {
@@ -90,7 +93,10 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
           body: JSON.stringify({
             threadId: activeThread.threadId,
             channel: activeThread.channel,
-            body: message.trim(),
+            body,
+            attachment,
+            attachmentType,
+            attachmentName,
             participantEmail: activeThread.participantEmail,
             participantName: activeThread.participantName,
           }),
@@ -194,7 +200,7 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
                     {' '}· {formatWhen(thread.lastMessageAt)}
                   </span>
                   <span className="admin-messages-drawer-preview">
-                    {thread.lastMessage?.body?.slice(0, 72) || thread.subject}
+                    {messagePreviewText(thread.lastMessage) || thread.subject}
                   </span>
                 </button>
               ))
@@ -221,28 +227,18 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
                         <strong>{entry.senderName}</strong>
                         <span>{formatWhen(entry.createdAt)}</span>
                       </div>
-                      <p>{entry.body}</p>
+                      <MessageBubbleContent message={entry} />
                     </div>
                   ))}
                 </div>
-                <div className="admin-messages-drawer-compose">
-                  <textarea
-                    className="adm-input"
-                    rows={3}
-                    value={message}
-                    onChange={(event) => setMessage(event.target.value)}
-                    placeholder="Reply..."
-                  />
-                  <button
-                    type="button"
-                    className="adm-btn adm-btn-primary"
-                    onClick={handleSend}
-                    disabled={sending || !message.trim()}
-                  >
-                    <MdSend size={16} />
-                    {sending ? 'Sending...' : 'Send'}
-                  </button>
-                </div>
+                <ChatComposeBar
+                  message={message}
+                  onMessageChange={setMessage}
+                  onSend={handleSend}
+                  sending={sending}
+                  placeholder="Reply..."
+                  variant="drawer"
+                />
               </>
             ) : (
               <p className="admin-messages-drawer-empty">Select a conversation to read and reply.</p>

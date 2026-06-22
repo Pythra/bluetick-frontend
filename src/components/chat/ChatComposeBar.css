@@ -1,0 +1,133 @@
+.chat-compose {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-compose textarea {
+  width: 100%;
+  border: 1px solid var(--pdash-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  resize: vertical;
+  min-height: 72px;
+}
+
+.chat-compose-drawer textarea {
+  min-height: 56px;
+}
+
+.chat-compose textarea:focus {
+  outline: none;
+  border-color: var(--brand-primary, #2563eb);
+}
+
+.chat-compose-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-compose-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid var(--pdash-border, #e2e8f0);
+  background: #fff;
+  color: var(--pdash-text, #0f172a);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.chat-compose-icon-btn.recording {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #b91c1c;
+}
+
+.chat-compose-icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-compose-send {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: var(--brand-primary, #2563eb);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chat-compose-send:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.chat-compose-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid var(--pdash-border, #e2e8f0);
+  font-size: 0.82rem;
+}
+
+.chat-compose-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 0.82rem;
+}
+
+.chat-bubble-body {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.chat-bubble-muted {
+  color: var(--pdash-soft, #64748b);
+  font-style: italic;
+}
+
+.chat-bubble-audio,
+.chat-bubble-video {
+  width: 100%;
+  max-width: 280px;
+  margin-top: 8px;
+  border-radius: 8px;
+}
+
+.chat-bubble-image {
+  display: block;
+  max-width: 240px;
+  max-height: 220px;
+  border-radius: 10px;
+  margin-top: 8px;
+  object-fit: cover;
+}
+
+.chat-bubble-file {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.06);
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.chat-bubble-media-link {
+  display: inline-block;
+}

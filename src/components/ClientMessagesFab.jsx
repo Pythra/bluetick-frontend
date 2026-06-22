@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
-import { MdChat, MdClose, MdSend } from 'react-icons/md';
+import { MdChat, MdClose } from 'react-icons/md';
 import { useAuth } from '../contexts/AuthContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain';
+import ChatComposeBar from './chat/ChatComposeBar';
+import MessageBubbleContent from './chat/MessageBubbleContent';
+import { messagePreviewText } from '../utils/chatMedia';
 import './ClientMessagesFab.css';
 
 const ADMIN_PATH_PREFIXES = ['/admin', '/admin-dashboard'];
@@ -55,8 +58,8 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
     } catch { /* silent */ }
   };
 
-  const handleSend = async () => {
-    if (!activeThread || !message.trim()) return;
+  const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
+    if (!activeThread || (!body?.trim() && !attachment)) return;
     setSending(true);
     try {
       const res = await fetch(
@@ -64,7 +67,7 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
         {
           method: 'POST',
           headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ body: message.trim() }),
+          body: JSON.stringify({ body, attachment, attachmentType, attachmentName }),
         }
       );
       const data = await res.json();
@@ -124,7 +127,7 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
                     <strong>{t.subject || brandName}</strong>
                     {t.unreadCount > 0 && <span className="cmsg-unread">{t.unreadCount}</span>}
                   </div>
-                  <span className="cmsg-preview">{t.lastMessage?.body?.slice(0, 60) || '—'}</span>
+                  <span className="cmsg-preview">{messagePreviewText(t.lastMessage)}</span>
                   <span className="cmsg-when">{formatWhen(t.lastMessageAt)}</span>
                 </button>
               ))
@@ -139,26 +142,18 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
                   {(activeThread.messages || []).map((m) => (
                     <div key={m.id} className={`cmsg-bubble ${m.senderType === 'client' ? 'mine' : 'theirs'}`}>
                       <div className="cmsg-bubble-meta">{m.senderName || brandName} · {formatWhen(m.createdAt)}</div>
-                      <p>{m.body}</p>
+                      <MessageBubbleContent message={m} />
                     </div>
                   ))}
                 </div>
-                <div className="cmsg-compose">
-                  <textarea
-                    rows={3}
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Type your reply…"
-                  />
-                  <button
-                    type="button"
-                    className="cmsg-send-btn"
-                    onClick={handleSend}
-                    disabled={sending || !message.trim()}
-                  >
-                    <MdSend size={16} /> {sending ? 'Sending…' : 'Send'}
-                  </button>
-                </div>
+                <ChatComposeBar
+                  message={message}
+                  onMessageChange={setMessage}
+                  onSend={handleSend}
+                  sending={sending}
+                  placeholder="Type your reply…"
+                  variant="drawer"
+                />
               </>
             ) : (
               <p className="cmsg-empty">Select a conversation to read and reply.</p>

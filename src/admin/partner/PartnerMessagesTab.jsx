@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MdSend, MdSupportAgent, MdPeople, MdAdd, MdSearch, MdClose } from 'react-icons/md';
+import { MdSupportAgent, MdPeople, MdAdd, MdSearch, MdClose } from 'react-icons/md';
+import ChatComposeBar from '../../components/chat/ChatComposeBar';
+import MessageBubbleContent from '../../components/chat/MessageBubbleContent';
+import { messagePreviewText } from '../../utils/chatMedia';
 
 function ClientPicker({ clients, onSelect }) {
   const [search, setSearch] = useState('');
@@ -119,12 +122,13 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
     setComposingNew(false);
   };
 
-  const handleSend = async () => {
-    if (!message.trim()) return;
+  const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
+    if (!body?.trim() && !attachment) return;
     setSending(true);
     try {
+      const mediaFields = { body, attachment, attachmentType, attachmentName };
       if (activeThread) {
-        await api.sendMessage({ threadId: activeThread.threadId, channel: activeThread.channel, body: message });
+        await api.sendMessage({ threadId: activeThread.threadId, channel: activeThread.channel, ...mediaFields });
         const data = await api.getThread(activeThread.threadId);
         setActiveThread(data.thread);
       } else {
@@ -134,7 +138,7 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
           subject: newSubject.trim() || (channel === 'partner-admin'
             ? 'Message to Bluetickgeng Support'
             : `Message to ${selectedClient?.name || selectedClient?.email || ''}`),
-          body: message,
+          ...mediaFields,
           participantEmail: channel === 'partner-client' ? selectedClient?.email : undefined,
           participantName: channel === 'partner-client' ? selectedClient?.name : undefined,
         });
@@ -165,7 +169,6 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
   const renderChatArea = () => {
     if (composingNew) {
       const isClientMode = category === 'clients';
-      const canSend = message.trim() && (!isClientMode || selectedClient);
       return (
         <>
           <h2 style={{ marginBottom: 16 }}>
@@ -220,32 +223,22 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
                   placeholder="Optional"
                 />
               </div>
-              <div className="pdash-chat-compose">
-                <textarea
-                  rows={4}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  autoFocus
-                />
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button
-                    type="button"
-                    className="pdash-btn pdash-btn-ghost"
-                    onClick={() => { setComposingNew(false); setMessage(''); setSelectedClient(null); }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="pdash-btn pdash-btn-primary"
-                    onClick={handleSend}
-                    disabled={sending || !canSend}
-                  >
-                    <MdSend size={16} /> Send
-                  </button>
-                </div>
-              </div>
+              <ChatComposeBar
+                message={message}
+                onMessageChange={setMessage}
+                onSend={handleSend}
+                sending={sending}
+                disabled={isClientMode && !selectedClient}
+                variant="panel"
+              />
+              <button
+                type="button"
+                className="pdash-btn pdash-btn-ghost"
+                style={{ alignSelf: 'flex-start' }}
+                onClick={() => { setComposingNew(false); setMessage(''); setSelectedClient(null); }}
+              >
+                Cancel
+              </button>
             </>
           )}
 
@@ -277,29 +270,17 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
               .map((m) => (
               <div key={m.id} className={`pdash-chat-bubble ${m.senderType}`}>
                 <strong>{m.senderName}</strong>
-                <p>{m.body}</p>
-                {m.voiceNoteUrl ? <audio src={m.voiceNoteUrl} controls /> : null}
-                {m.attachments?.map((a, i) => (
-                  a.type === 'image' ? (
-                    <img key={i} src={a.url} alt="" style={{ maxWidth: 200, borderRadius: 8 }} />
-                  ) : (
-                    <a key={i} href={a.url} target="_blank" rel="noopener noreferrer">{a.name || 'Attachment'}</a>
-                  )
-                ))}
+                <MessageBubbleContent message={m} />
               </div>
             ))}
           </div>
-          <div className="pdash-chat-compose">
-            <textarea
-              rows={3}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message..."
-            />
-            <button type="button" className="pdash-btn pdash-btn-primary" onClick={handleSend} disabled={sending}>
-              <MdSend size={16} /> Send
-            </button>
-          </div>
+          <ChatComposeBar
+            message={message}
+            onMessageChange={setMessage}
+            onSend={handleSend}
+            sending={sending}
+            variant="panel"
+          />
         </>
       );
     }
@@ -382,7 +363,7 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
               {t.channel === 'partner-admin' ? (
                 <span className="pdash-thread-badge">Platform</span>
               ) : null}
-              <span>{t.lastMessage?.body?.slice(0, 60) || t.subject}</span>
+              <span>{messagePreviewText(t.lastMessage) || t.subject}</span>
             </button>
           ))
         )}
