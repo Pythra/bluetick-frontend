@@ -1,5 +1,5 @@
 export const streamingPlatformVerifications = [
-  { title: 'Boomplay Verification', price: 100000 },
+  { title: 'Boomplay Verification', price: 100 },
   { title: 'Spotify Verification', price: 150000 },
   { title: 'Audiomack Verification', price: 200000 },
   { title: 'Apple Music Verification', price: 100000 },
