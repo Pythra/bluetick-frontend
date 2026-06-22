@@ -122,6 +122,8 @@ function MyAccountPage() {
   const { brandName, subdomain: brandingSubdomain, contactEmail, isPartnerSite } = usePartnerBranding();
   const hostSubdomain = getPartnerSubdomainFromHost();
   const messageSubdomain = (brandingSubdomain || hostSubdomain || '').trim().toLowerCase();
+  const isMainSiteAccount = !messageSubdomain;
+  const messagesSiteMode = isMainSiteAccount ? 'main' : 'partner';
   const { user, isAuthenticated, loading, logout, apiUrl, authFetch, token } = useAuth();
   const { cartItemCount, fetchCart } = useCart();
   const [activeSection, setActiveSection] = useState(SECTIONS.dashboard);
@@ -209,7 +211,7 @@ function MyAccountPage() {
   }, [isAuthenticated, apiUrl, authFetch]);
 
   useEffect(() => {
-    if (!isAuthenticated || !token || !apiUrl || !messageSubdomain) {
+    if (!isAuthenticated || !token || !apiUrl) {
       return undefined;
     }
 
@@ -217,8 +219,10 @@ function MyAccountPage() {
 
     const loadUnread = async () => {
       try {
-        const siteSlug = encodeURIComponent(messageSubdomain);
-        const response = await fetch(`${apiUrl}/api/partner-site/${siteSlug}/client-messages`, {
+        const messagesUrl = isMainSiteAccount
+          ? `${apiUrl}/api/account/client-messages`
+          : `${apiUrl}/api/partner-site/${encodeURIComponent(messageSubdomain)}/client-messages`;
+        const response = await fetch(messagesUrl, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -235,7 +239,7 @@ function MyAccountPage() {
     return () => {
       cancelled = true;
     };
-  }, [isAuthenticated, token, apiUrl, messageSubdomain]);
+  }, [isAuthenticated, token, apiUrl, isMainSiteAccount, messageSubdomain]);
 
   const scrollToSection = (sectionId) => {
     navigate('/');
@@ -361,9 +365,9 @@ function MyAccountPage() {
     {
       key: 'messages',
       title: 'Messages',
-      description: messageSubdomain
-        ? `Chat with ${brandName || shortBrandName} about your orders`
-        : `Contact ${shortBrandName} support about your account`,
+      description: isMainSiteAccount
+        ? `Chat with ${shortBrandName} support about your orders`
+        : `Chat with ${brandName || shortBrandName} about your orders`,
       icon: IoChatbubbleOutline,
       onClick: () => goToSection(SECTIONS.messages),
     },
@@ -534,9 +538,9 @@ function MyAccountPage() {
           Messages
         </h2>
         <p className="my-account-panel-lead">
-          {messageSubdomain
-            ? `Send and receive messages with ${brandName || shortBrandName} about your orders.`
-            : `Send a message to the ${shortBrandName} team about your account or orders.`}
+          {isMainSiteAccount
+            ? `Send and receive messages with the ${shortBrandName} team about your account or orders.`
+            : `Send and receive messages with ${brandName || shortBrandName} about your orders.`}
         </p>
       </header>
 
@@ -544,6 +548,7 @@ function MyAccountPage() {
         apiUrl={apiUrl}
         token={token}
         subdomain={messageSubdomain}
+        siteMode={messagesSiteMode}
         brandName={brandName || shortBrandName}
         accountEmail={user.email}
         supportEmail={contactEmail || supportEmail}
@@ -649,33 +654,137 @@ function MyAccountPage() {
     </section>
   );
 
-  const renderDashboard = () => (
-    <div className="my-account-dashboard">
-      <header className="my-account-dashboard-head">
-        <h2 className="my-account-dashboard-title">Dashboard</h2>
-        <p className="my-account-dashboard-lead">Choose a section to manage your account and services.</p>
-      </header>
-      <div className="my-account-dashboard-grid">
-        {dashboardCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <button
-              key={card.key}
-              type="button"
-              className="my-account-dash-card"
-              onClick={card.onClick}
-            >
-              <span className="my-account-dash-card-icon" aria-hidden="true">
-                <Icon />
-              </span>
-              <span className="my-account-dash-card-title">{card.title}</span>
-              <span className="my-account-dash-card-desc">{card.description}</span>
-            </button>
-          );
-        })}
+  const renderDashboard = () => {
+    const recentOrders = orders.slice(0, 2);
+    const recentInvoices = paidOrders.slice(0, 3);
+    const supportBrand = isMainSiteAccount ? shortBrandName : brandName || shortBrandName;
+
+    return (
+      <div className="my-account-dashboard">
+        <header className="my-account-dashboard-head">
+          <h2 className="my-account-dashboard-title">Dashboard</h2>
+          <p className="my-account-dashboard-lead">
+            Track orders, download invoices, and message support from one place.
+          </p>
+        </header>
+
+        <div className="my-account-dashboard-summaries">
+          <section className="my-account-dash-widget" aria-labelledby="dash-orders-heading">
+            <div className="my-account-dash-widget-head">
+              <h3 id="dash-orders-heading">Order tracking</h3>
+              <button type="button" className="my-account-dash-widget-link" onClick={() => goToSection(SECTIONS.orders)}>
+                View all
+              </button>
+            </div>
+            {ordersLoading ? (
+              <p className="my-account-dash-widget-empty">Loading orders…</p>
+            ) : ordersError ? (
+              <p className="my-account-dash-widget-empty">{ordersError}</p>
+            ) : recentOrders.length === 0 ? (
+              <p className="my-account-dash-widget-empty">No orders yet. Browse services to get started.</p>
+            ) : (
+              <ul className="my-account-dash-order-list">
+                {recentOrders.map((order) => {
+                  const tracking = resolveOrderTracking(order);
+                  const stageLabel = resolveOrderStageLabel(order, tracking);
+                  return (
+                    <li key={order._id} className="my-account-dash-order-item">
+                      <div className="my-account-dash-order-top">
+                        <strong>{order.productName}</strong>
+                        {stageLabel ? <span className="my-account-dash-order-stage">{stageLabel}</span> : null}
+                      </div>
+                      <OrderTrackingTimeline
+                        tracking={tracking}
+                        paymentStatus={order.paymentStatus}
+                        paymentGateway={order.paymentGateway}
+                        compact
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
+
+          <section className="my-account-dash-widget" aria-labelledby="dash-invoices-heading">
+            <div className="my-account-dash-widget-head">
+              <h3 id="dash-invoices-heading">Invoices</h3>
+              <button type="button" className="my-account-dash-widget-link" onClick={() => goToSection(SECTIONS.invoices)}>
+                View all
+              </button>
+            </div>
+            {ordersLoading ? (
+              <p className="my-account-dash-widget-empty">Loading invoices…</p>
+            ) : recentInvoices.length === 0 ? (
+              <p className="my-account-dash-widget-empty">Paid order invoices will appear here.</p>
+            ) : (
+              <ul className="my-account-dash-invoice-list">
+                {recentInvoices.map((order) => (
+                  <li key={order._id} className="my-account-dash-invoice-item">
+                    <div>
+                      <strong>{order.productName}</strong>
+                      <span>{formatOrderAmount(order)}</span>
+                    </div>
+                    <button
+                      type="button"
+                      className="my-account-invoice-link"
+                      onClick={() => setSelectedInvoice(orderToInvoice(order, invoiceBrandName, user.email))}
+                    >
+                      Download
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="my-account-dash-widget my-account-dash-widget-messages" aria-labelledby="dash-messages-heading">
+            <div className="my-account-dash-widget-head">
+              <h3 id="dash-messages-heading">Messages</h3>
+              <button type="button" className="my-account-dash-widget-link" onClick={() => goToSection(SECTIONS.messages)}>
+                Open inbox
+                {unreadMessages > 0 ? (
+                  <span className="my-account-nav-badge">{unreadMessages > 99 ? '99+' : unreadMessages}</span>
+                ) : null}
+              </button>
+            </div>
+            <AccountMessagesPanel
+              apiUrl={apiUrl}
+              token={token}
+              subdomain={messageSubdomain}
+              siteMode={messagesSiteMode}
+              brandName={supportBrand}
+              accountEmail={user.email}
+              supportEmail={contactEmail || supportEmail}
+              variant="inline"
+              compact
+              onUnreadChange={setUnreadMessages}
+            />
+          </section>
+        </div>
+
+        <div className="my-account-dashboard-grid">
+          {dashboardCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <button
+                key={card.key}
+                type="button"
+                className="my-account-dash-card"
+                onClick={card.onClick}
+              >
+                <span className="my-account-dash-card-icon" aria-hidden="true">
+                  <Icon />
+                </span>
+                <span className="my-account-dash-card-title">{card.title}</span>
+                <span className="my-account-dash-card-desc">{card.description}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="my-account-page">

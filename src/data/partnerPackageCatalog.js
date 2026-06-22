@@ -261,18 +261,32 @@ export function buildDefaultPackagePricing() {
   );
 }
 
+export function resolvePackageCurrentPrice(packageId, storedPricing = {}) {
+  const entry = getPackageCatalogEntry(packageId);
+  if (!entry) return 0;
+
+  const extracted = extractPackagePricingFromServicePricing(storedPricing);
+  const stored = extracted[packageId] || storedPricing[packageId];
+  const saved = Number(stored?.sellingPriceNgn ?? stored?.currentPriceNgn);
+  if (Number.isFinite(saved) && saved > 0) {
+    return saved;
+  }
+  return entry.basePriceNgn;
+}
+
 export function mergePackagePricing(stored = {}) {
   const defaults = buildDefaultPackagePricing();
   const merged = { ...defaults };
   Object.entries(stored).forEach(([id, value]) => {
     if (!defaults[id] || !value || typeof value !== 'object') return;
-    const base = Number(value.basePriceNgn) || defaults[id].basePriceNgn;
-    const selling = Number(value.sellingPriceNgn) || defaults[id].sellingPriceNgn;
+    const catalogBase = defaults[id].basePriceNgn;
+    const current = resolvePackageCurrentPrice(id, { [id]: value });
     merged[id] = {
       ...defaults[id],
       ...value,
-      basePriceNgn: base,
-      sellingPriceNgn: Math.max(base, selling),
+      basePriceNgn: catalogBase,
+      sellingPriceNgn: current,
+      currentPriceNgn: current,
     };
   });
   return merged;
@@ -282,37 +296,25 @@ export function buildPartnerPackagePricingRows(storedPricing = {}) {
   const pricing = mergePackagePricing(storedPricing);
   return PARTNER_PACKAGE_CATALOG.map((entry) => {
     const value = pricing[entry.id] || {};
-    const base = Number(value.basePriceNgn) || entry.basePriceNgn;
-    const storedSelling = Number(value.sellingPriceNgn);
-    const selling = Number.isFinite(storedSelling) && storedSelling > 0
-      ? Math.max(base, storedSelling)
-      : base;
+    const current = resolvePackageCurrentPrice(entry.id, storedPricing);
     return {
       ...entry,
-      basePriceNgn: base,
-      sellingPriceNgn: selling,
-      partnerProfit: Math.max(0, selling - base),
+      currentPriceNgn: current,
       enabled: value.enabled !== false,
     };
   });
 }
 
 export function buildPublicPackagePricing(storedPricing = {}) {
-  const extracted = extractPackagePricingFromServicePricing(storedPricing);
   return Object.fromEntries(
-    Object.entries(extracted).map(([id, value]) => {
-      const entry = getPackageCatalogEntry(id);
-      const base = Number(value.basePriceNgn) || entry?.basePriceNgn || 0;
-      const storedSelling = Number(value.sellingPriceNgn);
-      const selling =
-        Number.isFinite(storedSelling) && storedSelling > 0
-          ? Math.max(base, storedSelling)
-          : base;
+    PARTNER_PACKAGE_CATALOG.map((entry) => {
+      const current = resolvePackageCurrentPrice(entry.id, storedPricing);
       return [
-        id,
+        entry.id,
         {
-          sellingPriceNgn: selling,
-          basePriceNgn: base,
+          priceNgn: current,
+          currentPriceNgn: current,
+          sellingPriceNgn: current,
         },
       ];
     })
@@ -320,15 +322,7 @@ export function buildPublicPackagePricing(storedPricing = {}) {
 }
 
 export function resolvePackageSellingPrice(packageId, storedPricing = {}) {
-  const entry = getPackageCatalogEntry(packageId);
-  if (!entry) return null;
-  const stored = storedPricing[packageId];
-  const base = Number(stored?.basePriceNgn) || entry.basePriceNgn;
-  const storedSelling = Number(stored?.sellingPriceNgn);
-  if (Number.isFinite(storedSelling) && storedSelling > 0) {
-    return Math.max(base, storedSelling);
-  }
-  return base;
+  return resolvePackageCurrentPrice(packageId, storedPricing) || null;
 }
 
 export function extractPackagePricingFromServicePricing(servicePricing = {}) {
@@ -340,6 +334,43 @@ export function extractPackagePricingFromServicePricing(servicePricing = {}) {
 
 export function isPackagePricingKey(key) {
   return packageMap.has(key);
+}
+
+export function findPackagePricingBelowMinimum(pricingEntries = []) {
+  const entries = Array.isArray(pricingEntries)
+    ? pricingEntries
+    : Object.entries(pricingEntries).map(([id, value]) => ({ id, ...value }));
+
+  return entries
+    .map(({ id, sellingPriceNgn, currentPriceNgn, basePriceNgn: attemptedBase }) => {
+      const entry = getPackageCatalogEntry(id);
+      if (!entry) return null;
+      const attempted = Number(sellingPriceNgn ?? currentPriceNgn ?? attemptedBase);
+      if (!Number.isFinite(attempted) || attempted <= 0 || attempted >= entry.basePriceNgn) {
+        return null;
+      }
+      return {
+        id,
+        label: entry.label,
+        minimumPriceNgn: entry.basePriceNgn,
+        attemptedPriceNgn: attempted,
+      };
+    })
+    .filter(Boolean);
+}
+
+export function buildPackagePricingMinimumError(violations = []) {
+  if (!violations.length) return '';
+  const preview = violations
+    .slice(0, 4)
+    .map(
+      (item) =>
+        `${item.label} (minimum ₦${Number(item.minimumPriceNgn).toLocaleString('en-NG')}, you entered ₦${Number(item.attemptedPriceNgn).toLocaleString('en-NG')})`
+    )
+    .join('; ');
+  const suffix =
+    violations.length > 4 ? `; and ${violations.length - 4} more package${violations.length - 4 === 1 ? '' : 's'}` : '';
+  return `Some prices are below the original minimum. ${preview}${suffix}. Set each price to at least the original amount, then save again.`;
 }
 
 export function getPackagesByGroup(groupId) {

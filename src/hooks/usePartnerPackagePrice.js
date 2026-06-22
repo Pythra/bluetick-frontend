@@ -3,13 +3,12 @@ import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 
 export function resolvePartnerPackagePrice(packageId, defaultPrice, packagePricing) {
   if (!packageId || defaultPrice == null) return defaultPrice;
-  if (!packagePricing || !Object.prototype.hasOwnProperty.call(packagePricing, packageId)) {
-    return defaultPrice;
-  }
-  const stored = packagePricing[packageId];
-  const selling = Number(stored?.sellingPriceNgn);
-  if (Number.isFinite(selling) && selling > 0) {
-    return selling;
+  const stored = packagePricing?.[packageId];
+  if (!stored) return defaultPrice;
+
+  const current = Number(stored.priceNgn ?? stored.currentPriceNgn ?? stored.sellingPriceNgn);
+  if (Number.isFinite(current) && current > 0) {
+    return current;
   }
   return defaultPrice;
 }

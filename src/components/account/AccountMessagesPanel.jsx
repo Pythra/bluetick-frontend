@@ -7,6 +7,8 @@ import { isOwnMessage } from '../../utils/chatDisplay';
 import { messagePreviewText } from '../../utils/chatMedia';
 import '../ClientMessagesFab.css';
 
+export const MAIN_SITE_MESSAGING_SUBDOMAIN = 'bluetick-main';
+
 function formatWhen(dateString) {
   if (!dateString) return '';
   return new Date(dateString).toLocaleString('en-US', {
@@ -17,20 +19,40 @@ function formatWhen(dateString) {
   });
 }
 
+function resolveSiteMode(subdomain, siteMode) {
+  if (siteMode === 'main' || siteMode === 'partner') {
+    return siteMode;
+  }
+  return subdomain ? 'partner' : 'main';
+}
+
+function buildMessagesApiBase(apiUrl, siteMode, subdomain) {
+  if (siteMode === 'main') {
+    return `${apiUrl}/api/account/client-messages`;
+  }
+  const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
+  return `${apiUrl}/api/partner-site/${siteSlug}/client-messages`;
+}
+
 export default function AccountMessagesPanel({
   apiUrl,
   token,
   subdomain,
+  siteMode: siteModeProp,
   brandName,
   accountEmail,
   supportEmail,
   variant = 'inline',
+  compact = false,
   onUnreadChange,
 }) {
+  const siteMode = resolveSiteMode(subdomain, siteModeProp);
+  const socketSubdomain = siteMode === 'main' ? MAIN_SITE_MESSAGING_SUBDOMAIN : subdomain;
+
   const [threads, setThreads] = useState([]);
   const [activeThread, setActiveThread] = useState(null);
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(Boolean(subdomain));
+  const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [matchedEmails, setMatchedEmails] = useState([]);
   const [loadError, setLoadError] = useState('');
@@ -39,7 +61,8 @@ export default function AccountMessagesPanel({
   activeThreadIdRef.current = activeThread?.threadId;
 
   const headers = { Authorization: `Bearer ${token}` };
-  const canChat = Boolean(subdomain && token && apiUrl);
+  const canChat = Boolean(token && apiUrl && (siteMode === 'main' || subdomain));
+  const messagesApiBase = canChat ? buildMessagesApiBase(apiUrl, siteMode, subdomain) : '';
 
   const loadThreads = useCallback(async () => {
     if (!canChat) {
@@ -47,9 +70,8 @@ export default function AccountMessagesPanel({
       return;
     }
     setLoadError('');
-    const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
     try {
-      const res = await fetch(`${apiUrl}/api/partner-site/${siteSlug}/client-messages`, { headers });
+      const res = await fetch(messagesApiBase, { headers });
       const data = await res.json();
       if (res.ok && data.success) {
         setThreads(data.threads || []);
@@ -63,9 +85,10 @@ export default function AccountMessagesPanel({
     } finally {
       setLoading(false);
     }
-  }, [apiUrl, subdomain, token, canChat, onUnreadChange]);
+  }, [apiUrl, canChat, messagesApiBase, onUnreadChange, token]);
 
   useEffect(() => {
+    setLoading(true);
     loadThreads();
   }, [loadThreads]);
 
@@ -73,43 +96,40 @@ export default function AccountMessagesPanel({
     await loadThreads();
     if (activeThreadIdRef.current === payload.threadId) {
       try {
-        const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
-        const res = await fetch(
-          `${apiUrl}/api/partner-site/${siteSlug}/client-messages/${payload.threadId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await fetch(`${messagesApiBase}/${payload.threadId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         if (res.ok && data.success) {
           setActiveThread(data.thread);
         }
       } catch { /* silent */ }
     }
-  }, [apiUrl, subdomain, token, loadThreads]);
+  }, [messagesApiBase, token, loadThreads]);
 
   useMessageSocket({
     apiUrl,
     token,
-    subdomain,
+    subdomain: socketSubdomain,
     enabled: canChat,
     onEvent: handleRealtimeMessage,
   });
 
   const openThread = useCallback(async (threadId) => {
     try {
-      const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
-      const res = await fetch(`${apiUrl}/api/partner-site/${siteSlug}/client-messages/${threadId}`, { headers });
+      const res = await fetch(`${messagesApiBase}/${threadId}`, { headers });
       const data = await res.json();
       if (res.ok && data.success) {
         setActiveThread(data.thread);
         await loadThreads();
       }
     } catch { /* silent */ }
-  }, [apiUrl, subdomain, token, headers, loadThreads]);
+  }, [messagesApiBase, headers, loadThreads]);
 
   useEffect(() => {
-    if (loading || activeThread || threads.length !== 1) return;
+    if (loading || activeThread || threads.length !== 1 || compact) return;
     openThread(threads[0].threadId);
-  }, [loading, threads, activeThread, openThread]);
+  }, [loading, threads, activeThread, openThread, compact]);
 
   const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
     if (!body?.trim() && !attachment) return;
@@ -117,10 +137,7 @@ export default function AccountMessagesPanel({
     setSendError('');
     try {
       const payload = { body, attachment, attachmentType, attachmentName };
-      const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
-      const url = activeThread
-        ? `${apiUrl}/api/partner-site/${siteSlug}/client-messages/${activeThread.threadId}/reply`
-        : `${apiUrl}/api/partner-site/${siteSlug}/client-messages`;
+      const url = activeThread ? `${messagesApiBase}/${activeThread.threadId}/reply` : messagesApiBase;
 
       const res = await fetch(url, {
         method: 'POST',
@@ -155,11 +172,11 @@ export default function AccountMessagesPanel({
 
   const showSinglePartnerChat = threads.length <= 1;
   const showCompose = showSinglePartnerChat || Boolean(activeThread) || !threads.length;
-  const bodyClass = `cmsg-body${showSinglePartnerChat ? ' cmsg-body-single' : ''}${variant === 'inline' ? ' cmsg-body-inline' : ''}`;
+  const bodyClass = `cmsg-body${showSinglePartnerChat ? ' cmsg-body-single' : ''}${variant === 'inline' ? ' cmsg-body-inline' : ''}${compact ? ' cmsg-body-compact' : ''}`;
 
   const chatContent = (
     <div className={bodyClass}>
-        {!showSinglePartnerChat ? (
+        {!showSinglePartnerChat && !compact ? (
           <div className="cmsg-list">
             {loading ? (
               <div className="my-account-messages-loading">Loading…</div>
@@ -209,10 +226,12 @@ export default function AccountMessagesPanel({
             <p className="cmsg-empty">{loadError}</p>
           ) : (showSinglePartnerChat || showCompose) ? (
             <>
-              <h3>{activeThread?.subject || `Message ${brandName}`}</h3>
+              {!compact ? (
+                <h3>{activeThread?.subject || `Message ${brandName}`}</h3>
+              ) : null}
               {activeThread ? (
                 <ChatMessagesPane
-                  className="cmsg-messages"
+                  className={`cmsg-messages${compact ? ' cmsg-messages-compact' : ''}`}
                   threadKey={activeThread.threadId}
                   messageCount={activeThread.messages?.length || 0}
                 >
@@ -225,21 +244,27 @@ export default function AccountMessagesPanel({
                     />
                   ))}
                 </ChatMessagesPane>
+              ) : compact ? (
+                <p className="cmsg-empty cmsg-empty-compact">
+                  No messages yet. Open Messages to start a conversation with {brandName}.
+                </p>
               ) : (
                 <p className="cmsg-empty">
                   Send a message to {brandName}. They will see it in their dashboard.
                 </p>
               )}
               {sendError ? <p className="cmsg-compose-error">{sendError}</p> : null}
-              <ChatComposeBar
-                message={message}
-                onMessageChange={setMessage}
-                onSend={handleSend}
-                sending={sending}
-                placeholder={activeThread ? 'Type your reply…' : `Write to ${brandName}…`}
-                sendLabel={activeThread ? 'Send' : 'Send message'}
-                variant={variant === 'inline' ? 'panel' : 'drawer'}
-              />
+              {!compact ? (
+                <ChatComposeBar
+                  message={message}
+                  onMessageChange={setMessage}
+                  onSend={handleSend}
+                  sending={sending}
+                  placeholder={activeThread ? 'Type your reply…' : `Write to ${brandName}…`}
+                  sendLabel={activeThread ? 'Send' : 'Send message'}
+                  variant={variant === 'inline' ? 'panel' : 'drawer'}
+                />
+              ) : null}
             </>
           ) : (
             <p className="cmsg-empty">Select a conversation to read and reply.</p>

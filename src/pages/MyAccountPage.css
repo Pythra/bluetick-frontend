@@ -255,6 +255,147 @@
   max-width: 16rem;
 }
 
+.my-account-dashboard-summaries {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.my-account-dash-widget {
+  min-width: 0;
+  padding: 1.1rem 1.15rem;
+  border-radius: 16px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.my-account-dash-widget-messages {
+  display: flex;
+  flex-direction: column;
+}
+
+.my-account-dash-widget-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.my-account-dash-widget-head h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.my-account-dash-widget-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+.my-account-dash-widget-link:hover {
+  text-decoration: underline;
+}
+
+.my-account-dash-widget-empty {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #64748b;
+}
+
+.my-account-dash-order-list,
+.my-account-dash-invoice-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.my-account-dash-order-item,
+.my-account-dash-invoice-item {
+  padding-top: 0.85rem;
+  border-top: 1px solid #eef2f7;
+}
+
+.my-account-dash-order-list > li:first-child,
+.my-account-dash-invoice-list > li:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.my-account-dash-order-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.my-account-dash-order-top strong,
+.my-account-dash-invoice-item strong {
+  font-size: 0.84rem;
+  color: #0f172a;
+}
+
+.my-account-dash-order-stage {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #2563eb;
+  background: #eff6ff;
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+}
+
+.my-account-dash-invoice-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.my-account-dash-invoice-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.my-account-dash-invoice-item span {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.cmsg-body-compact {
+  min-height: 0;
+}
+
+.cmsg-messages-compact {
+  max-height: 140px;
+}
+
+.cmsg-empty-compact {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #64748b;
+}
+
 /* Detail panels (orders, account) */
 .my-account-panel {
   padding: 1.35rem 1.35rem 1.5rem;
@@ -947,6 +1088,10 @@
 }
 
 @media (max-width: 900px) {
+  .my-account-dashboard-summaries {
+    grid-template-columns: 1fr;
+  }
+
   .my-account-dashboard-grid {
     gap: 1.25rem;
     max-width: none;

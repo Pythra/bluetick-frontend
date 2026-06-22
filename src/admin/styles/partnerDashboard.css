@@ -1138,7 +1138,21 @@
 
 .pdash-pricing-table-packages .pdash-pricing-head,
 .pdash-pricing-table-packages .pdash-pricing-row {
-  grid-template-columns: 2fr 1fr 1.2fr 1fr;
+  grid-template-columns: 2fr 1.2fr 1fr;
+}
+
+.pdash-pricing-table-current .pdash-pricing-head,
+.pdash-pricing-table-current .pdash-pricing-row {
+  grid-template-columns: 2fr 1fr;
+}
+
+.pdash-price-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--pdash-border);
+  border-radius: 8px;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
 }
 
 .pdash-package-pricing {

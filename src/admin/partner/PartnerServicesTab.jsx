@@ -1,23 +1,58 @@
 import { useEffect, useMemo, useState } from 'react';
 import { MdArrowBack, MdChevronRight, MdSave } from 'react-icons/md';
-import { formatNgn } from '../../data/partnerServiceCatalog';
-import { PARTNER_PACKAGE_CATALOG } from '../../data/partnerPackageCatalog';
+import {
+  PARTNER_PACKAGE_CATALOG,
+  resolvePackageCurrentPrice,
+  buildPackagePricingMinimumError,
+} from '../../data/partnerPackageCatalog';
 
 function buildPackageRows(pricingRows) {
   const pricingMap = Object.fromEntries((pricingRows || []).map((row) => [row.id, row]));
   return PARTNER_PACKAGE_CATALOG.map((entry) => {
     const row = pricingMap[entry.id];
-    const base = row?.basePriceNgn ?? entry.basePriceNgn;
-    const storedSelling = Number(row?.sellingPriceNgn);
-    const selling =
-      Number.isFinite(storedSelling) && storedSelling > 0 ? Math.max(base, storedSelling) : base;
+    const storedPricing = row ? { [entry.id]: row } : {};
     return {
       ...entry,
-      basePriceNgn: base,
-      sellingPriceNgn: selling,
-      partnerProfit: Math.max(0, selling - base),
+      currentPriceNgn: row?.currentPriceNgn ?? resolvePackageCurrentPrice(entry.id, storedPricing),
     };
   });
+}
+
+function CurrentPriceInput({ value, onCommit }) {
+  const [draft, setDraft] = useState(String(value ?? ''));
+
+  useEffect(() => {
+    setDraft(String(value ?? ''));
+  }, [value]);
+
+  const commit = () => {
+    const digits = draft.replace(/[^\d]/g, '');
+    if (!digits) {
+      setDraft(String(value ?? ''));
+      return;
+    }
+    const parsed = Number(digits);
+    onCommit(parsed);
+    setDraft(String(parsed));
+  };
+
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      className="pdash-price-input"
+      value={draft}
+      aria-label="Current price in Naira"
+      onChange={(event) => setDraft(event.target.value.replace(/[^\d]/g, ''))}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          event.currentTarget.blur();
+        }
+      }}
+    />
+  );
 }
 
 const SERVICE_ORDER = [
@@ -100,28 +135,36 @@ export default function PartnerServicesTab({ api, onMessage }) {
     selectedService?.groups.find((group) => group.groupId === selectedGroupId) || null;
 
   const updatePrice = (id, value) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed <= 0) return;
     setPackages((prev) =>
-      prev.map((pkg) => {
-        if (pkg.id !== id) return pkg;
-        const selling = Math.max(pkg.basePriceNgn, Number(value) || pkg.basePriceNgn);
-        return {
-          ...pkg,
-          sellingPriceNgn: selling,
-          partnerProfit: Math.max(0, selling - pkg.basePriceNgn),
-        };
-      })
+      prev.map((pkg) => (pkg.id === id ? { ...pkg, currentPriceNgn: parsed } : pkg))
     );
   };
 
   const handleSave = async () => {
+    const violations = packages
+      .filter((pkg) => Number(pkg.currentPriceNgn) < Number(pkg.basePriceNgn))
+      .map((pkg) => ({
+        id: pkg.id,
+        label: pkg.label,
+        minimumPriceNgn: pkg.basePriceNgn,
+        attemptedPriceNgn: pkg.currentPriceNgn,
+      }));
+
+    if (violations.length) {
+      onMessage?.({ type: 'error', text: buildPackagePricingMinimumError(violations) });
+      return;
+    }
+
     try {
       setSaving(true);
       const pricing = Object.fromEntries(
         packages.map((pkg) => [
           pkg.id,
           {
-            basePriceNgn: pkg.basePriceNgn,
-            sellingPriceNgn: Math.max(pkg.basePriceNgn, pkg.sellingPriceNgn),
+            sellingPriceNgn: pkg.currentPriceNgn,
+            currentPriceNgn: pkg.currentPriceNgn,
             enabled: true,
           },
         ])
@@ -178,28 +221,22 @@ export default function PartnerServicesTab({ api, onMessage }) {
   }
 
   const renderPricingTable = (rows) => (
-    <div className="pdash-pricing-table pdash-pricing-table-packages">
+    <div className="pdash-pricing-table pdash-pricing-table-packages pdash-pricing-table-current">
       <div className="pdash-pricing-head">
         <span>Package</span>
-        <span>Base price</span>
-        <span>Your selling price</span>
-        <span>Your profit</span>
+        <span>Current price</span>
       </div>
       {rows.map((pkg) => (
         <div key={pkg.id} className="pdash-pricing-row">
           <span>
             <strong>{pkg.label}</strong>
           </span>
-          <span>{formatNgn(pkg.basePriceNgn)}</span>
           <span>
-            <input
-              type="number"
-              min={pkg.basePriceNgn}
-              value={pkg.sellingPriceNgn}
-              onChange={(event) => updatePrice(pkg.id, event.target.value)}
+            <CurrentPriceInput
+              value={pkg.currentPriceNgn}
+              onCommit={(value) => updatePrice(pkg.id, value)}
             />
           </span>
-          <span className="pdash-profit">{formatNgn(pkg.partnerProfit)}</span>
         </div>
       ))}
     </div>
@@ -260,8 +297,9 @@ export default function PartnerServicesTab({ api, onMessage }) {
     <div className="pdash-panel">
       <h2>Service package pricing</h2>
       <p className="pdash-panel-lead">
-        Select a service, then choose a category or package group to set your selling prices. Base prices
-        are fixed by Bluetickgeng — your profit is the difference between your price and the base.
+        Select a service, then choose a category or package group to set the prices shown on your
+        public site. You can enter any amount while editing, but each price must stay at or above the
+        original minimum when you save.
       </p>
 
       <div className="pdash-pricing-nav">
