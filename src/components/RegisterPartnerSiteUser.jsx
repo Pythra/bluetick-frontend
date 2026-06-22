@@ -12,7 +12,7 @@ export default function RegisterPartnerSiteUser() {
   useEffect(() => {
     if (!isPartnerSite || !token || !subdomain) return;
 
-    fetch(`${apiUrl}/api/partner-site/${subdomain}/site-user/register`, {
+    fetch(`${apiUrl}/api/partner-site/${encodeURIComponent(subdomain)}/site-user/register`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

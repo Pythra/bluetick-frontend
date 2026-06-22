@@ -35,8 +35,9 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
   const loadThreads = useCallback(async () => {
     if (!subdomain) return;
     setLoadError('');
+    const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
     try {
-      const res = await fetch(`${apiUrl}/api/partner-site/${subdomain}/client-messages`, { headers });
+      const res = await fetch(`${apiUrl}/api/partner-site/${siteSlug}/client-messages`, { headers });
       const data = await res.json();
       if (res.ok && data.success) {
         setThreads(data.threads || []);
@@ -56,7 +57,8 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
 
   const openThread = async (threadId) => {
     try {
-      const res = await fetch(`${apiUrl}/api/partner-site/${subdomain}/client-messages/${threadId}`, { headers });
+      const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
+      const res = await fetch(`${apiUrl}/api/partner-site/${siteSlug}/client-messages/${threadId}`, { headers });
       const data = await res.json();
       if (res.ok && data.success) {
         setActiveThread(data.thread);
@@ -72,9 +74,10 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
     setSendError('');
     try {
       const payload = { body, attachment, attachmentType, attachmentName };
+      const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
       const url = activeThread
-        ? `${apiUrl}/api/partner-site/${subdomain}/client-messages/${activeThread.threadId}/reply`
-        : `${apiUrl}/api/partner-site/${subdomain}/client-messages`;
+        ? `${apiUrl}/api/partner-site/${siteSlug}/client-messages/${activeThread.threadId}/reply`
+        : `${apiUrl}/api/partner-site/${siteSlug}/client-messages`;
 
       const res = await fetch(url, {
         method: 'POST',
@@ -220,7 +223,7 @@ export default function ClientMessagesFab() {
   const { isPartnerSite, brandName, subdomain: brandingSubdomain, loading: brandingLoading } = usePartnerBranding();
   const location = useLocation();
   const hostSubdomain = getPartnerSubdomainFromHost();
-  const subdomain = brandingSubdomain || hostSubdomain;
+  const subdomain = (brandingSubdomain || hostSubdomain || '').trim().toLowerCase();
   const [unreadCount, setUnreadCount] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
