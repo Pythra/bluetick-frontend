@@ -31,7 +31,6 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
   const [matchedEmails, setMatchedEmails] = useState([]);
   const [loadError, setLoadError] = useState('');
   const [sendError, setSendError] = useState('');
-  const [composingNew, setComposingNew] = useState(false);
   const activeThreadIdRef = useRef(null);
   activeThreadIdRef.current = activeThread?.threadId;
 
@@ -85,18 +84,22 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
     onEvent: handleRealtimeMessage,
   });
 
-  const openThread = async (threadId) => {
+  const openThread = useCallback(async (threadId) => {
     try {
       const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
       const res = await fetch(`${apiUrl}/api/partner-site/${siteSlug}/client-messages/${threadId}`, { headers });
       const data = await res.json();
       if (res.ok && data.success) {
         setActiveThread(data.thread);
-        setComposingNew(false);
         await loadThreads();
       }
     } catch { /* silent */ }
-  };
+  }, [apiUrl, subdomain, token, headers, loadThreads]);
+
+  useEffect(() => {
+    if (loading || activeThread || threads.length !== 1) return;
+    openThread(threads[0].threadId);
+  }, [loading, threads, activeThread, openThread]);
 
   const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
     if (!body?.trim() && !attachment) return;
@@ -118,7 +121,6 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
       if (res.ok && data.success) {
         setActiveThread(data.thread);
         setMessage('');
-        setComposingNew(false);
         await loadThreads();
       } else {
         setSendError(data.error || 'Failed to send message');
@@ -130,7 +132,8 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
     }
   };
 
-  const showCompose = composingNew || activeThread || !threads.length;
+  const showSinglePartnerChat = threads.length <= 1;
+  const showCompose = showSinglePartnerChat || Boolean(activeThread) || !threads.length;
 
   return (
     <div className="cmsg-backdrop" onClick={onClose} role="presentation">
@@ -148,7 +151,8 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
           </button>
         </div>
 
-        <div className="cmsg-body">
+        <div className={`cmsg-body${showSinglePartnerChat ? ' cmsg-body-single' : ''}`}>
+          {!showSinglePartnerChat ? (
           <div className="cmsg-list">
             {loading ? (
               <div style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>Loading…</div>
@@ -167,26 +171,12 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
                   </p>
                 ) : (
                   <p className="cmsg-empty-hint">
-                    No conversations yet. Use the compose box on the right to send {brandName} your first message.
+                    Use the compose box to send {brandName} your first message.
                   </p>
                 )}
               </div>
             ) : (
-              <>
-                {threads.length ? (
-                  <button
-                    type="button"
-                    className="cmsg-new-btn"
-                    onClick={() => {
-                      setActiveThread(null);
-                      setComposingNew(true);
-                      setMessage('');
-                    }}
-                  >
-                    New message
-                  </button>
-                ) : null}
-                {threads.map((t) => (
+              threads.map((t) => (
                 <button
                   key={t.threadId}
                   type="button"
@@ -200,18 +190,20 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
                   <span className="cmsg-preview">{messagePreviewText(t.lastMessage)}</span>
                   <span className="cmsg-when">{formatWhen(t.lastMessageAt)}</span>
                 </button>
-              ))}
-              </>
+              ))
             )}
           </div>
+          ) : null}
 
           <div className="cmsg-chat">
-            {showCompose ? (
+            {loading && showSinglePartnerChat ? (
+              <div style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>Loading…</div>
+            ) : loadError && showSinglePartnerChat ? (
+              <p className="cmsg-empty">{loadError}</p>
+            ) : (showSinglePartnerChat || showCompose) ? (
               <>
                 <h3>
-                  {activeThread?.subject || (composingNew || !threads.length
-                    ? `Message ${brandName}`
-                    : 'Select a conversation')}
+                  {activeThread?.subject || `Message ${brandName}`}
                 </h3>
                 {activeThread ? (
                   <ChatMessagesPane
@@ -245,7 +237,7 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
                 />
               </>
             ) : (
-              <p className="cmsg-empty">Select a conversation to read and reply, or start a new message.</p>
+              <p className="cmsg-empty">Select a conversation to read and reply.</p>
             )}
           </div>
         </div>

@@ -57,13 +57,50 @@
   justify-content: flex-end;
 }
 
-.admin-messages-drawer {
+.admin-messages-drawer-shell {
   width: min(920px, 100vw);
   height: 100%;
   background: #fff;
   box-shadow: -8px 0 32px rgba(15, 23, 42, 0.18);
   display: flex;
   flex-direction: column;
+}
+
+.admin-messages-drawer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-messages-page-wrap {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-messages-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 140px);
+}
+
+.admin-messages-page-head {
+  padding: 20px 24px 0;
+}
+
+.admin-messages-page-head h2 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.admin-messages-page-head p {
+  margin: 0;
+  color: var(--adm-text-soft, #64748b);
+  font-size: 0.875rem;
+}
+
+.admin-messages-page-body {
+  min-height: 520px;
 }
 
 .admin-messages-drawer-head {

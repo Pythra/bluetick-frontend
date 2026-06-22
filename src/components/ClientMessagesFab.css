@@ -126,6 +126,14 @@
   grid-template-columns: 220px 1fr;
 }
 
+.cmsg-body-single {
+  grid-template-columns: 1fr;
+}
+
+.cmsg-body-single .cmsg-chat {
+  border-left: none;
+}
+
 .cmsg-list {
   border-right: 1px solid #e2e8f0;
   overflow-y: auto;
