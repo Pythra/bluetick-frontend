@@ -30,6 +30,7 @@ function AdminApp() {
   const [loginError, setLoginError] = useState(null)
 
   const [users, setUsers] = useState([])
+  const [broadcastAudience, setBroadcastAudience] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken'))
@@ -90,12 +91,47 @@ function AdminApp() {
     }
   }, [apiUrl, adminToken, handleLogout])
 
+  const fetchBroadcastAudience = useCallback(async () => {
+    if (!adminToken) return
+
+    try {
+      const response = await fetch(`${apiUrl}/api/admin/broadcast-audience`, {
+        headers: {
+          Authorization: `Bearer ${adminToken}`,
+        },
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (response.status === 403) {
+          handleLogout(false)
+          return
+        }
+        throw new Error(data.error || 'Failed to fetch broadcast audience')
+      }
+
+      if (data.success) {
+        setBroadcastAudience(data.clients || [])
+      }
+    } catch (err) {
+      console.error('Error fetching broadcast audience:', err)
+      setBroadcastAudience([])
+    }
+  }, [apiUrl, adminToken, handleLogout])
+
   useEffect(() => {
     if (adminToken && !partnerSubdomain) {
       setIsLoggedIn(true)
       fetchUsers()
     }
   }, [adminToken, partnerSubdomain, fetchUsers])
+
+  useEffect(() => {
+    if (adminToken && !partnerSubdomain && activeTab === 'broadcast') {
+      fetchBroadcastAudience()
+    }
+  }, [adminToken, partnerSubdomain, activeTab, fetchBroadcastAudience])
 
   // Partner subdomains get their own white-label dashboard
   if (partnerSubdomain) {
@@ -325,7 +361,12 @@ function AdminApp() {
         ) : activeTab === 'blog' ? (
           <BlogManagement apiUrl={apiUrl} adminToken={adminToken} />
         ) : activeTab === 'broadcast' ? (
-          <EmailBroadcast apiUrl={apiUrl} adminToken={adminToken} users={users} />
+          <EmailBroadcast
+            apiUrl={apiUrl}
+            adminToken={adminToken}
+            users={broadcastAudience}
+            recipientNoun="main-site user"
+          />
         ) : null}
       </div>
 

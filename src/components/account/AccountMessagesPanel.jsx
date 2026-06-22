@@ -68,17 +68,22 @@ export default function AccountMessagesPanel({
   const activeThreadIdRef = useRef(null);
   activeThreadIdRef.current = activeThread?.threadId;
   const loadThreadsRef = useRef(null);
+  const onUnreadChangeRef = useRef(onUnreadChange);
+  onUnreadChangeRef.current = onUnreadChange;
 
-  const headers = { Authorization: `Bearer ${token}` };
   const canChat = Boolean(token && apiUrl && (siteMode === 'main' || subdomain));
   const messagesApiBase = canChat ? buildMessagesApiBase(apiUrl, siteMode, subdomain) : '';
 
-  const loadThreads = useCallback(async () => {
+  const loadThreads = useCallback(async ({ background = false } = {}) => {
     if (!canChat || deferLoad) {
       setLoading(false);
       return;
     }
-    setLoadError('');
+
+    if (!background) {
+      setLoadError('');
+    }
+
     try {
       const params = new URLSearchParams();
       if (!compact) {
@@ -86,36 +91,53 @@ export default function AccountMessagesPanel({
       }
       const query = params.toString();
       const url = query ? `${messagesApiBase}?${query}` : messagesApiBase;
-      const res = await fetch(url, { headers });
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       if (res.ok && data.success) {
         setThreads(data.threads || []);
         setMatchedEmails(data.matchedEmails || []);
         if (data.activeThread) {
-          setActiveThread(data.activeThread);
+          setActiveThread((previous) => {
+            if (previous?.threadId !== data.activeThread.threadId) {
+              return data.activeThread;
+            }
+            const previousCount = previous.messages?.length || 0;
+            const nextCount = data.activeThread.messages?.length || 0;
+            if (nextCount >= previousCount) {
+              return data.activeThread;
+            }
+            return previous;
+          });
         }
-        onUnreadChange?.(data.unreadCount || 0);
-      } else {
+        onUnreadChangeRef.current?.(data.unreadCount || 0);
+      } else if (!background) {
         setLoadError(data.error || 'Could not load messages');
       }
     } catch {
-      setLoadError('Could not load messages');
+      if (!background) {
+        setLoadError('Could not load messages');
+      }
     } finally {
-      setLoading(false);
+      if (!background) {
+        setLoading(false);
+      }
     }
-  }, [canChat, compact, deferLoad, headers, messagesApiBase, onUnreadChange]);
+  }, [canChat, compact, deferLoad, messagesApiBase, token]);
 
-  loadThreadsRef.current = loadThreads;
+  loadThreadsRef.current = () => loadThreads({ background: true });
 
   useEffect(() => {
     if (deferLoad) {
       setLoading(false);
       return undefined;
     }
+
     setLoading(true);
     loadThreads();
     return undefined;
-  }, [loadThreads, deferLoad]);
+  }, [canChat, compact, deferLoad, messagesApiBase, token, loadThreads]);
 
   const handleRealtimeMessage = useCallback((payload) => {
     setThreads((previous) => {
@@ -125,7 +147,7 @@ export default function AccountMessagesPanel({
         return previous;
       }
       if (result.changed) {
-        onUnreadChange?.(computeClientUnreadCount(result.threads));
+        onUnreadChangeRef.current?.(computeClientUnreadCount(result.threads));
       }
       return result.changed ? result.threads : previous;
     });
@@ -133,9 +155,9 @@ export default function AccountMessagesPanel({
     if (activeThreadIdRef.current === payload.threadId) {
       setActiveThread((previous) => appendThreadMessage(previous, payload));
       setThreads((previous) => clearThreadUnread(previous, payload.threadId));
-      onUnreadChange?.(0);
+      onUnreadChangeRef.current?.(0);
     }
-  }, [onUnreadChange]);
+  }, []);
 
   useMessageSocket({
     apiUrl,
@@ -147,18 +169,20 @@ export default function AccountMessagesPanel({
 
   const openThread = useCallback(async (threadId) => {
     try {
-      const res = await fetch(`${messagesApiBase}/${threadId}`, { headers });
+      const res = await fetch(`${messagesApiBase}/${threadId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
       if (res.ok && data.success) {
         setActiveThread(data.thread);
         setThreads((previous) => {
           const next = clearThreadUnread(previous, threadId);
-          onUnreadChange?.(computeClientUnreadCount(next));
+          onUnreadChangeRef.current?.(computeClientUnreadCount(next));
           return next;
         });
       }
     } catch { /* silent */ }
-  }, [messagesApiBase, headers, onUnreadChange]);
+  }, [messagesApiBase, token]);
 
   const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
     if (!body?.trim() && !attachment) return;
@@ -170,7 +194,10 @@ export default function AccountMessagesPanel({
 
       const res = await fetch(url, {
         method: 'POST',
-        headers: { ...headers, 'Content-Type': 'application/json' },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -209,13 +236,14 @@ export default function AccountMessagesPanel({
 
   const showSinglePartnerChat = threads.length <= 1;
   const showCompose = showSinglePartnerChat || Boolean(activeThread) || !threads.length;
+  const showInitialLoading = loading && !threads.length && !activeThread && !loadError;
   const bodyClass = `cmsg-body${showSinglePartnerChat ? ' cmsg-body-single' : ''}${variant === 'inline' ? ' cmsg-body-inline' : ''}${compact ? ' cmsg-body-compact' : ''}`;
 
   const chatContent = (
     <div className={bodyClass}>
         {!showSinglePartnerChat && !compact ? (
           <div className="cmsg-list">
-            {loading ? (
+            {showInitialLoading ? (
               <div className="my-account-messages-loading">Loading…</div>
             ) : loadError ? (
               <div className="cmsg-empty-wrap">
@@ -257,7 +285,7 @@ export default function AccountMessagesPanel({
         ) : null}
 
         <div className="cmsg-chat">
-          {loading && showSinglePartnerChat ? (
+          {showInitialLoading && showSinglePartnerChat ? (
             <div className="my-account-messages-loading">Loading…</div>
           ) : loadError && showSinglePartnerChat ? (
             <p className="cmsg-empty">{loadError}</p>
