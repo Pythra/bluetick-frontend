@@ -52,6 +52,7 @@ export function createPartnerAdminApi(apiUrl, subdomain, token) {
     submitSupport: (payload) =>
       request('/support', { method: 'POST', body: JSON.stringify(payload) }),
     getAnalytics: () => request('/analytics'),
+    getProgressReport: () => request('/reports/progress'),
     resendVerification: () =>
       request('/resend-verification', { method: 'POST' }),
   };

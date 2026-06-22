@@ -10,6 +10,7 @@ import { BlogManagement } from './pages/BlogManagement'
 import { EmailBroadcast } from './pages/EmailBroadcast'
 import { PartnershipManagement } from './pages/PartnershipManagement'
 import AdminMessages from './pages/AdminMessages'
+import AdminReports from './pages/AdminReports'
 import PartnerAdminApp from './PartnerAdminApp'
 import AdminMessagesFab from '../components/AdminMessagesFab'
 import { useAuth } from '../contexts/AuthContext'
@@ -208,6 +209,7 @@ function AdminApp() {
       'submissions': 'Article Submissions',
       'partnerships': 'Partnership Applications',
       'messages': 'Messages',
+      'reports': 'Progress Reports',
       'blog': 'Blog Management',
       'broadcast': 'Email Broadcast',
     }
@@ -264,6 +266,8 @@ function AdminApp() {
           <PartnershipManagement apiUrl={apiUrl} adminToken={adminToken} />
         ) : activeTab === 'messages' ? (
           <AdminMessages apiUrl={apiUrl} adminToken={adminToken} />
+        ) : activeTab === 'reports' ? (
+          <AdminReports apiUrl={apiUrl} adminToken={adminToken} />
         ) : activeTab === 'blog' ? (
           <BlogManagement apiUrl={apiUrl} adminToken={adminToken} />
         ) : activeTab === 'broadcast' ? (

@@ -11,8 +11,7 @@ import {
   MdAccountBalanceWallet,
   MdPayments,
   MdReceipt,
-  MdNotifications,
-  MdSupport,
+  MdInsertChart,
   MdSettings,
   MdLogout,
   MdOpenInNew,
@@ -35,8 +34,7 @@ import PartnerMessagesTab from './partner/PartnerMessagesTab';
 import PartnerEarningsTab from './partner/PartnerEarningsTab';
 import PartnerWithdrawalsTab from './partner/PartnerWithdrawalsTab';
 import PartnerInvoicesTab from './partner/PartnerInvoicesTab';
-import PartnerNotificationsTab from './partner/PartnerNotificationsTab';
-import PartnerSupportTab from './partner/PartnerSupportTab';
+import PartnerProgressReportTab from './partner/PartnerProgressReportTab';
 import PartnerSettingsTab from './partner/PartnerSettingsTab';
 import {
   PARTNER_TEMPLATES,
@@ -75,8 +73,7 @@ const NAV_ITEMS = [
   { id: 'earnings', label: 'Earnings', icon: MdAccountBalanceWallet },
   { id: 'withdrawals', label: 'Withdrawals', icon: MdPayments },
   { id: 'invoices', label: 'Invoices', icon: MdReceipt },
-  { id: 'notifications', label: 'Notifications', icon: MdNotifications },
-  { id: 'support', label: 'Support', icon: MdSupport },
+  { id: 'reports', label: 'Progress Report', icon: MdInsertChart },
   { id: 'settings', label: 'Settings', icon: MdSettings },
 ];
 
@@ -1476,8 +1473,7 @@ function PartnerAdminApp({ subdomain }) {
     earnings: 'Earnings',
     withdrawals: 'Withdrawals',
     invoices: 'Invoices',
-    notifications: 'Notifications',
-    support: 'Support',
+    reports: 'Progress Report',
     settings: 'Settings',
   };
 
@@ -1491,8 +1487,7 @@ function PartnerAdminApp({ subdomain }) {
     earnings: 'Monitor available balance, pending earnings, and profit history.',
     withdrawals: 'Request payouts via bank, PayPal, Wise, Payoneer, or crypto.',
     invoices: 'Download invoices and receipts for client orders.',
-    notifications: 'Order, message, and earnings alerts.',
-    support: 'Get help from the Bluetickgeng fulfillment team.',
+    reports: 'Track signups, orders, revenue, and earnings trends over time.',
     settings: 'Profile, KYC verification, business address, and preferences.',
   };
 
@@ -1628,9 +1623,8 @@ function PartnerAdminApp({ subdomain }) {
               <PartnerWithdrawalsTab api={partnerApi} onMessage={setSaveMessage} />
             )}
             {activeTab === 'invoices' && partnerApi && <PartnerInvoicesTab api={partnerApi} />}
-            {activeTab === 'notifications' && partnerApi && <PartnerNotificationsTab api={partnerApi} />}
-            {activeTab === 'support' && partnerApi && (
-              <PartnerSupportTab api={partnerApi} onMessage={setSaveMessage} />
+            {activeTab === 'reports' && partnerApi && (
+              <PartnerProgressReportTab api={partnerApi} />
             )}
             {activeTab === 'settings' && partnerApi && (
               <PartnerSettingsTab api={partnerApi} onMessage={setSaveMessage} />
