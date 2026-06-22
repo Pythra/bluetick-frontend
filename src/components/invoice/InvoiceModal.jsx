@@ -12,11 +12,13 @@ export default function InvoiceModal({ invoice, onClose, className = '' }) {
     if (!content) return;
     const win = window.open('', '_blank', 'width=900,height=700');
     win.document.write(
-      `<!DOCTYPE html><html><head><title>Invoice ${invoice.invoiceId}</title><style>${INVOICE_PRINT_STYLES}</style></head><body>${content}</body></html>`
+      `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Invoice ${invoice.invoiceId}</title><style>${INVOICE_PRINT_STYLES}</style></head><body>${content}</body></html>`
     );
     win.document.close();
     win.focus();
-    win.print();
+    setTimeout(() => {
+      win.print();
+    }, 250);
   };
 
   return (

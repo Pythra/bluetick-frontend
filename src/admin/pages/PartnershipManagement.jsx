@@ -17,6 +17,17 @@ const PARTNERSHIP_LABELS = {
   both: 'White-Label + Referral',
 }
 
+const KYC_STATUS_LABELS = {
+  not_started: 'Not started',
+  pending: 'Pending review',
+  approved: 'Approved',
+  rejected: 'Rejected',
+}
+
+function formatKycStatus(status = 'not_started') {
+  return KYC_STATUS_LABELS[status] || String(status).replace(/_/g, ' ')
+}
+
 function formatDate(dateString) {
   return new Date(dateString).toLocaleString('en-US', {
     year: 'numeric',
@@ -381,32 +392,69 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                       </div>
                     ) : null}
 
-                    {app.kyc?.status ? (
-                      <div className="adm-panel" style={{ padding: 16, marginBottom: 12 }}>
-                        <div className="adm-detail-label">KYC Status</div>
-                        <div className="adm-detail-value">{app.kyc.status}</div>
-                        {app.kyc.status === 'pending' ? (
-                          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-                            <button
-                              type="button"
-                              className="adm-btn adm-btn-success"
-                              disabled={updatingId === app.id}
-                              onClick={() => handlePartnerAction(app.id, { kycStatus: 'approved' })}
-                            >
-                              Approve KYC
-                            </button>
-                            <button
-                              type="button"
-                              className="adm-btn adm-btn-danger"
-                              disabled={updatingId === app.id}
-                              onClick={() => handlePartnerAction(app.id, { kycStatus: 'rejected', kycNotes: 'Rejected by admin' })}
-                            >
-                              Reject KYC
-                            </button>
-                          </div>
+                    <div className="adm-panel" style={{ padding: 16, marginBottom: 12 }}>
+                      <div className="adm-detail-label">KYC Verification</div>
+                      <div className="adm-detail-value">{formatKycStatus(app.kyc?.status)}</div>
+                      {app.kyc?.submittedAt ? (
+                        <div style={{ marginTop: 8, fontSize: 13, color: 'var(--adm-text-soft)' }}>
+                          Submitted: {formatDate(app.kyc.submittedAt)}
+                        </div>
+                      ) : null}
+                      {app.kyc?.reviewedAt ? (
+                        <div style={{ fontSize: 13, color: 'var(--adm-text-soft)' }}>
+                          Reviewed: {formatDate(app.kyc.reviewedAt)}
+                        </div>
+                      ) : null}
+                      {app.kyc?.notes ? (
+                        <div style={{ marginTop: 8, fontSize: 13 }}>
+                          <strong>Notes:</strong> {app.kyc.notes}
+                        </div>
+                      ) : null}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 12 }}>
+                        {app.kyc?.idDocumentUrl ? (
+                          <a
+                            className="adm-site-url"
+                            href={app.kyc.idDocumentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View government ID
+                          </a>
+                        ) : (
+                          <span style={{ fontSize: 13, color: 'var(--adm-text-soft)' }}>No government ID uploaded yet</span>
+                        )}
+                        {app.kyc?.businessDocumentUrl ? (
+                          <a
+                            className="adm-site-url"
+                            href={app.kyc.businessDocumentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            View business document
+                          </a>
                         ) : null}
                       </div>
-                    ) : null}
+                      {app.kyc?.status === 'pending' ? (
+                        <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                          <button
+                            type="button"
+                            className="adm-btn adm-btn-success"
+                            disabled={updatingId === app.id}
+                            onClick={() => handlePartnerAction(app.id, { kycStatus: 'approved' })}
+                          >
+                            Approve KYC
+                          </button>
+                          <button
+                            type="button"
+                            className="adm-btn adm-btn-danger"
+                            disabled={updatingId === app.id}
+                            onClick={() => handlePartnerAction(app.id, { kycStatus: 'rejected', kycNotes: 'Rejected by admin' })}
+                          >
+                            Reject KYC
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
 
                     {app.earnings ? (
                       <div className="adm-panel" style={{ padding: 16, marginBottom: 12 }}>

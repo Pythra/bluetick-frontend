@@ -4,13 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import bluego from '../assets/bluego.png';
+import AuthShell from '../components/AuthShell';
 import './AuthPage.css';
 
 function SignUpPage() {
   const navigate = useNavigate();
   const { signup } = useAuth();
-  const { isPartnerSite, brandName, logoUrl, primaryColor, subdomain: brandingSubdomain } = usePartnerBranding();
+  const { isPartnerSite, brandName, subdomain: brandingSubdomain } = usePartnerBranding();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -35,7 +35,6 @@ function SignUpPage() {
     setError('');
     setLoading(true);
 
-    // Validation
     if (
       !formData.firstName ||
       !formData.lastName ||
@@ -62,15 +61,15 @@ function SignUpPage() {
     }
 
     try {
-    await signup(
-      formData.email,
-      formData.password,
-      formData.passwordConfirmation,
-      formData.firstName,
-      formData.lastName,
-      formData.phone,
-      brandingSubdomain
-    );
+      await signup(
+        formData.email,
+        formData.password,
+        formData.passwordConfirmation,
+        formData.firstName,
+        formData.lastName,
+        formData.phone,
+        brandingSubdomain
+      );
       navigate('/');
     } catch (err) {
       setError(err.message || 'Failed to sign up. Please try again.');
@@ -93,38 +92,29 @@ function SignUpPage() {
     <div className="auth-page">
       <Navbar onScrollToSection={scrollToSection} />
       <main className="auth-main">
-        <div className="auth-shell">
-          <aside className="auth-aside" style={isPartnerSite && primaryColor ? { background: `linear-gradient(135deg, ${primaryColor}22 0%, ${primaryColor}11 100%)` } : undefined}>
-            <div className="auth-aside-inner">
-              {isPartnerSite ? (
-                logoUrl
-                  ? <img src={logoUrl} alt={brandName} className="auth-aside-logo" style={{ maxHeight: 64, objectFit: 'contain' }} />
-                  : <div style={{ fontSize: 28, fontWeight: 800, color: primaryColor || '#2563eb', marginBottom: 8 }}>{brandName}</div>
-              ) : (
-                <img src={bluego} alt="Bluetick" className="auth-aside-logo" />
-              )}
-              <h1>
-                Create your<span> account</span>
-              </h1>
-              <p>
-                {isPartnerSite
-                  ? `Create your ${brandName} account to manage orders and track your projects.`
-                  : 'Manage orders, submit publication content, and track updates from one professional dashboard.'}
-              </p>
-              <ul className="auth-perks">
-                <li>Checkout and service progress in one place</li>
-                <li>Faster support and publication coordination</li>
-                <li>Secure access to your account and order history</li>
-              </ul>
-            </div>
-          </aside>
-          <section className="auth-form-panel">
-            <h1>Sign Up</h1>
-            <p className="auth-form-sub">{isPartnerSite ? `Create your ${brandName} account and get started.` : 'Join Bluetick and get started in less than a minute.'}</p>
+        <AuthShell
+          asideTitle="Create your"
+          asideHighlight="account"
+          asideLead={
+            isPartnerSite
+              ? `Join ${brandName} to track orders and manage your projects.`
+              : 'One account for orders, publications, and project updates.'
+          }
+          perks={[
+            'Track orders and payments',
+            'Message support about your projects',
+            'Secure access to your history',
+          ]}
+          formTitle="Sign Up"
+          formSub={
+            isPartnerSite
+              ? `Create your ${brandName} account.`
+              : 'Join Bluetick and get started in under a minute.'
+          }
+        >
+          {error ? <div className="auth-error">{error}</div> : null}
 
-            {error && <div className="auth-error">{error}</div>}
-
-            <form onSubmit={handleSubmit} className="auth-form">
+          <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="firstName">First name</label>
               <input
@@ -213,8 +203,7 @@ function SignUpPage() {
           <p className="auth-link">
             Already have an account? <Link to="/login">Login</Link>
           </p>
-          </section>
-        </div>
+        </AuthShell>
       </main>
       <Footer onScrollToSection={scrollToSection} />
     </div>
@@ -222,8 +211,3 @@ function SignUpPage() {
 }
 
 export default SignUpPage;
-
-
-
-
-

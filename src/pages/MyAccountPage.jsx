@@ -219,10 +219,10 @@ function MyAccountPage() {
 
     const loadUnread = async () => {
       try {
-        const messagesUrl = isMainSiteAccount
+        const baseUrl = isMainSiteAccount
           ? `${apiUrl}/api/account/client-messages`
           : `${apiUrl}/api/partner-site/${encodeURIComponent(messageSubdomain)}/client-messages`;
-        const response = await fetch(messagesUrl, {
+        const response = await fetch(`${baseUrl}?summary=1`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -779,6 +779,7 @@ function MyAccountPage() {
               supportEmail={contactEmail || supportEmail}
               variant="inline"
               compact
+              deferLoad
               onUnreadChange={setUnreadMessages}
             />
           </section>

@@ -5,6 +5,13 @@ import ChatMessageRow from '../chat/ChatMessageRow';
 import ChatMessagesPane from '../chat/ChatMessagesPane';
 import { isOwnMessage } from '../../utils/chatDisplay';
 import { messagePreviewText } from '../../utils/chatMedia';
+import {
+  appendThreadMessage,
+  clearThreadUnread,
+  computeClientUnreadCount,
+  patchClientThreadSummaries,
+  upsertClientThreadSummary,
+} from '../../utils/messagingRealtime';
 import '../ClientMessagesFab.css';
 
 export const MAIN_SITE_MESSAGING_SUBDOMAIN = 'bluetick-main';
@@ -44,6 +51,7 @@ export default function AccountMessagesPanel({
   supportEmail,
   variant = 'inline',
   compact = false,
+  deferLoad = false,
   onUnreadChange,
 }) {
   const siteMode = resolveSiteMode(subdomain, siteModeProp);
@@ -52,30 +60,40 @@ export default function AccountMessagesPanel({
   const [threads, setThreads] = useState([]);
   const [activeThread, setActiveThread] = useState(null);
   const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!deferLoad);
   const [sending, setSending] = useState(false);
   const [matchedEmails, setMatchedEmails] = useState([]);
   const [loadError, setLoadError] = useState('');
   const [sendError, setSendError] = useState('');
   const activeThreadIdRef = useRef(null);
   activeThreadIdRef.current = activeThread?.threadId;
+  const loadThreadsRef = useRef(null);
 
   const headers = { Authorization: `Bearer ${token}` };
   const canChat = Boolean(token && apiUrl && (siteMode === 'main' || subdomain));
   const messagesApiBase = canChat ? buildMessagesApiBase(apiUrl, siteMode, subdomain) : '';
 
   const loadThreads = useCallback(async () => {
-    if (!canChat) {
+    if (!canChat || deferLoad) {
       setLoading(false);
       return;
     }
     setLoadError('');
     try {
-      const res = await fetch(messagesApiBase, { headers });
+      const params = new URLSearchParams();
+      if (!compact) {
+        params.set('includeActive', '1');
+      }
+      const query = params.toString();
+      const url = query ? `${messagesApiBase}?${query}` : messagesApiBase;
+      const res = await fetch(url, { headers });
       const data = await res.json();
       if (res.ok && data.success) {
         setThreads(data.threads || []);
         setMatchedEmails(data.matchedEmails || []);
+        if (data.activeThread) {
+          setActiveThread(data.activeThread);
+        }
         onUnreadChange?.(data.unreadCount || 0);
       } else {
         setLoadError(data.error || 'Could not load messages');
@@ -85,33 +103,45 @@ export default function AccountMessagesPanel({
     } finally {
       setLoading(false);
     }
-  }, [apiUrl, canChat, messagesApiBase, onUnreadChange, token]);
+  }, [canChat, compact, deferLoad, headers, messagesApiBase, onUnreadChange]);
+
+  loadThreadsRef.current = loadThreads;
 
   useEffect(() => {
+    if (deferLoad) {
+      setLoading(false);
+      return undefined;
+    }
     setLoading(true);
     loadThreads();
-  }, [loadThreads]);
+    return undefined;
+  }, [loadThreads, deferLoad]);
 
-  const handleRealtimeMessage = useCallback(async (payload) => {
-    await loadThreads();
+  const handleRealtimeMessage = useCallback((payload) => {
+    setThreads((previous) => {
+      const result = patchClientThreadSummaries(previous, payload);
+      if (result.needsReload) {
+        loadThreadsRef.current?.();
+        return previous;
+      }
+      if (result.changed) {
+        onUnreadChange?.(computeClientUnreadCount(result.threads));
+      }
+      return result.changed ? result.threads : previous;
+    });
+
     if (activeThreadIdRef.current === payload.threadId) {
-      try {
-        const res = await fetch(`${messagesApiBase}/${payload.threadId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          setActiveThread(data.thread);
-        }
-      } catch { /* silent */ }
+      setActiveThread((previous) => appendThreadMessage(previous, payload));
+      setThreads((previous) => clearThreadUnread(previous, payload.threadId));
+      onUnreadChange?.(0);
     }
-  }, [messagesApiBase, token, loadThreads]);
+  }, [onUnreadChange]);
 
   useMessageSocket({
     apiUrl,
     token,
     subdomain: socketSubdomain,
-    enabled: canChat,
+    enabled: canChat && !deferLoad,
     onEvent: handleRealtimeMessage,
   });
 
@@ -121,15 +151,14 @@ export default function AccountMessagesPanel({
       const data = await res.json();
       if (res.ok && data.success) {
         setActiveThread(data.thread);
-        await loadThreads();
+        setThreads((previous) => {
+          const next = clearThreadUnread(previous, threadId);
+          onUnreadChange?.(computeClientUnreadCount(next));
+          return next;
+        });
       }
     } catch { /* silent */ }
-  }, [messagesApiBase, headers, loadThreads]);
-
-  useEffect(() => {
-    if (loading || activeThread || threads.length !== 1 || compact) return;
-    openThread(threads[0].threadId);
-  }, [loading, threads, activeThread, openThread, compact]);
+  }, [messagesApiBase, headers, onUnreadChange]);
 
   const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
     if (!body?.trim() && !attachment) return;
@@ -148,7 +177,7 @@ export default function AccountMessagesPanel({
       if (res.ok && data.success) {
         setActiveThread(data.thread);
         setMessage('');
-        await loadThreads();
+        setThreads((previous) => upsertClientThreadSummary(previous, data.thread));
       } else {
         setSendError(data.error || 'Failed to send message');
       }
@@ -167,6 +196,14 @@ export default function AccountMessagesPanel({
           <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.
         </p>
       </div>
+    );
+  }
+
+  if (deferLoad) {
+    return (
+      <p className="cmsg-empty cmsg-empty-compact">
+        Open Messages to view and send conversations with {brandName}.
+      </p>
     );
   }
 

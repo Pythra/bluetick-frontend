@@ -18,7 +18,20 @@ const inputStyle = {
   boxSizing: 'border-box',
 }
 
-export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
+export const EmailBroadcast = ({
+  apiUrl,
+  adminToken,
+  users = [],
+  broadcastEndpoint = '/api/admin/email-broadcast',
+  authQuery = '',
+  recipientNoun = 'user',
+  excludeField = 'excludeUserIds',
+}) => {
+  const buildBroadcastUrl = () => {
+    const path = `${apiUrl}${broadcastEndpoint}`;
+    if (!authQuery) return path;
+    return path.includes('?') ? `${path}&${authQuery}` : `${path}?${authQuery}`;
+  };
   const [subject, setSubject] = useState('')
   const [content, setContent] = useState('')
   const [excludedUserIds, setExcludedUserIds] = useState([])
@@ -123,7 +136,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
     }
 
     if (recipientCount === 0) {
-      setError('No recipients selected. Remove some exclusions or register users first.')
+      setError(`No recipients selected. Remove some exclusions or add ${recipientNoun}s first.`)
       return
     }
 
@@ -137,13 +150,13 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
       : ''
 
     const shouldSend = window.confirm(
-      `Send this email to ${recipientCount} registered user${recipientCount === 1 ? '' : 's'}?${exclusionNote}${scheduleNote}\n\nThis cannot be undone.`
+      `Send this email to ${recipientCount} ${recipientNoun}${recipientCount === 1 ? '' : 's'}?${exclusionNote}${scheduleNote}\n\nThis cannot be undone.`
     )
     if (!shouldSend) return
 
     setSubmitLoading(true)
     try {
-      const response = await fetch(`${apiUrl}/api/admin/email-broadcast`, {
+      const response = await fetch(buildBroadcastUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,7 +166,7 @@ export const EmailBroadcast = ({ apiUrl, adminToken, users = [] }) => {
         body: JSON.stringify({
           subject: trimmedSubject,
           contentHtml: normalizedContent,
-          excludeUserIds: excludedUserIds,
+          [excludeField]: excludedUserIds,
           scheduledFor: scheduleAt ? new Date(scheduleAt).toISOString() : undefined,
         }),
       })

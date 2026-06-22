@@ -6,6 +6,13 @@ import ChatMessagesPane from './chat/ChatMessagesPane';
 import useMessageSocket from '../hooks/useMessageSocket';
 import { getDisplayName, isOwnMessage } from '../utils/chatDisplay';
 import { messagePreviewText } from '../utils/chatMedia';
+import {
+  appendThreadMessage,
+  clearAdminClientThreadUnread,
+  patchAdminClientPartners,
+  patchAdminPartnerInbox,
+  upsertAdminThreadSummary,
+} from '../utils/messagingRealtime';
 import './AdminMessagesFab.css';
 
 function formatWhen(dateString) {
@@ -57,6 +64,9 @@ export default function AdminMessagesPanel({
     'Content-Type': 'application/json',
   };
 
+  const loadInboxRef = useRef(null);
+  const loadClientDirectoryRef = useRef(null);
+
   const loadInbox = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -77,6 +87,8 @@ export default function AdminMessagesPanel({
     }
   }, [apiUrl, token, onUnreadChange]);
 
+  loadInboxRef.current = loadInbox;
+
   const loadClientDirectory = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -95,6 +107,8 @@ export default function AdminMessagesPanel({
       setLoading(false);
     }
   }, [apiUrl, token]);
+
+  loadClientDirectoryRef.current = loadClientDirectory;
 
   const refreshUnreadTotal = useCallback(async () => {
     try {
@@ -118,30 +132,19 @@ export default function AdminMessagesPanel({
     }
   }, [category, loadInbox, loadClientDirectory]);
 
-  const handleRealtimeMessage = useCallback(async (payload) => {
+  const handleRealtimeMessage = useCallback((payload) => {
+    refreshUnreadTotal();
+
     if (categoryRef.current === 'clients') {
-      await loadClientDirectory();
+      setClientPartners((previous) => patchAdminClientPartners(previous, payload));
     } else {
-      await loadInbox();
+      setThreads((previous) => patchAdminPartnerInbox(previous, payload));
     }
-    await refreshUnreadTotal();
 
-    const current = activeThreadRef.current;
-    if (current?.threadId !== payload.threadId) return;
-
-    try {
-      const response = await fetch(
-        `${apiUrl}/api/admin/partnerships/${current.partnerId}/messages/${payload.threadId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setActiveThread(data.thread);
-      }
-    } catch {
-      /* silent */
+    if (activeThreadRef.current?.threadId === payload.threadId) {
+      setActiveThread((previous) => appendThreadMessage(previous, payload));
     }
-  }, [apiUrl, token, loadInbox, loadClientDirectory, refreshUnreadTotal]);
+  }, [refreshUnreadTotal]);
 
   useMessageSocket({
     apiUrl,
@@ -171,9 +174,13 @@ export default function AdminMessagesPanel({
       }
       setActiveThread(data.thread);
       if (category === 'partners') {
-        await loadInbox();
+        setThreads((previous) =>
+          previous.map((entry) =>
+            entry.threadId === thread.threadId ? { ...entry, unreadCount: 0 } : entry
+          )
+        );
       } else {
-        await loadClientDirectory();
+        setClientPartners((previous) => clearAdminClientThreadUnread(previous, data.thread));
       }
       await refreshUnreadTotal();
     } catch (loadError) {
@@ -249,9 +256,9 @@ export default function AdminMessagesPanel({
       setMessage('');
 
       if (category === 'clients') {
-        await loadClientDirectory();
+        setClientPartners((previous) => clearAdminClientThreadUnread(previous, data.thread));
       } else {
-        await loadInbox();
+        setThreads((previous) => upsertAdminThreadSummary(previous, data.thread));
       }
       await refreshUnreadTotal();
     } catch (sendError) {

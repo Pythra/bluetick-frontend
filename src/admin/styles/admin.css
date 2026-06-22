@@ -254,6 +254,44 @@
   letter-spacing: -0.01em;
 }
 
+.adm-panel-title {
+  margin: 0 0 8px;
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.adm-panel-lead {
+  margin: 0 0 18px;
+  color: var(--adm-text-soft);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.adm-table-wrap {
+  overflow-x: auto;
+}
+
+.adm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.adm-table th,
+.adm-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--adm-border);
+}
+
+.adm-table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--adm-text-soft);
+}
+
 /* Card grid for list pages — two wide columns on desktop */
 .adm-card-grid {
   display: grid;

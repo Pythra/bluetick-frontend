@@ -1,4 +1,9 @@
 /* Screen + shared document layout (print styles in invoiceUtils INVOICE_PRINT_STYLES) */
+.invoice-doc {
+  width: 100%;
+  max-width: none;
+}
+
 .invoice-doc__header {
   display: flex;
   justify-content: space-between;
@@ -14,8 +19,8 @@
 }
 
 .invoice-doc__logo {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   object-fit: contain;
   border-radius: 10px;
   background: #f8fafc;
@@ -25,7 +30,7 @@
 
 .invoice-doc__company {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.45rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #0f172a;
@@ -34,10 +39,10 @@
 
 .invoice-doc__tagline {
   margin: 4px 0 0;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: #64748b;
   line-height: 1.45;
-  max-width: 260px;
+  max-width: none;
 }
 
 .invoice-doc__meta {
@@ -46,7 +51,7 @@
 }
 
 .invoice-doc__title {
-  font-size: 1.75rem;
+  font-size: 2rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   color: #0f172a;
@@ -54,7 +59,7 @@
 }
 
 .invoice-doc__meta-row {
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: #475569;
   line-height: 1.7;
 }
@@ -62,18 +67,18 @@
 .invoice-doc__accent {
   height: 4px;
   border-radius: 999px;
-  margin: 22px 0 28px;
+  margin: 18px 0 22px;
 }
 
 .invoice-doc__parties {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 28px;
-  margin-bottom: 28px;
+  gap: 24px;
+  margin-bottom: 22px;
 }
 
 .invoice-doc__party-label {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #94a3b8;
@@ -82,14 +87,14 @@
 }
 
 .invoice-doc__party-name {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: #0f172a;
 }
 
 .invoice-doc__party-detail {
   margin-top: 4px;
-  font-size: 0.84rem;
+  font-size: 0.95rem;
   color: #64748b;
   line-height: 1.5;
 }
@@ -102,9 +107,9 @@
 
 .invoice-doc__table th {
   background: #f8fafc;
-  padding: 11px 14px;
+  padding: 10px 12px;
   text-align: left;
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #64748b;
@@ -124,18 +129,18 @@
 }
 
 .invoice-doc__table td {
-  padding: 13px 14px;
+  padding: 12px 12px;
   border-bottom: 1px solid #f1f5f9;
-  font-size: 0.92rem;
+  font-size: 1rem;
   color: #1e293b;
   vertical-align: top;
 }
 
 .invoice-doc__totals {
   margin-left: auto;
-  width: min(100%, 320px);
+  width: min(100%, 280px);
   border-top: 2px solid #e2e8f0;
-  padding-top: 12px;
+  padding-top: 10px;
 }
 
 .invoice-doc__total-row {
@@ -143,7 +148,7 @@
   justify-content: space-between;
   gap: 24px;
   padding: 5px 0;
-  font-size: 0.92rem;
+  font-size: 1rem;
   color: #475569;
 }
 
@@ -151,20 +156,20 @@
   margin-top: 8px;
   padding-top: 10px;
   border-top: 1px solid #e2e8f0;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #0f172a;
 }
 
 .invoice-doc__footer {
-  margin-top: 36px;
-  padding-top: 22px;
+  margin-top: 28px;
+  padding-top: 18px;
   border-top: 1px solid #e2e8f0;
 }
 
 .invoice-doc__footer-note {
   text-align: center;
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: #94a3b8;
   margin: 0 0 18px;
   line-height: 1.55;
@@ -186,7 +191,7 @@
 
 .invoice-doc__contact-label {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #94a3b8;
@@ -195,7 +200,7 @@
 }
 
 .invoice-doc__contact-value {
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: #334155;
   line-height: 1.45;
   word-break: break-word;
@@ -226,7 +231,7 @@
 .invoice-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 2000;
+  z-index: 11000;
   background: rgba(15, 23, 42, 0.55);
   display: flex;
   align-items: center;
@@ -296,7 +301,34 @@
 }
 
 .invoice-modal__body {
-  padding: 36px 40px;
+  padding: 24px 28px;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .invoice-modal-backdrop,
+  .invoice-modal__toolbar {
+    display: none !important;
+  }
+
+  .invoice-modal,
+  .invoice-modal__body {
+    box-shadow: none;
+    border-radius: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+    width: 100%;
+  }
 }
 
 @media (max-width: 640px) {

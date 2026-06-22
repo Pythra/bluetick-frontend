@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { MdAttachFile, MdMic, MdSend, MdStop, MdClose } from 'react-icons/md';
 import { blobToDataUrl, CHAT_FILE_ACCEPT, fileToAttachmentPayload, validateChatFile } from '../../utils/chatMedia';
+import VoiceRecordingIndicator from './VoiceRecordingIndicator';
 import './ChatComposeBar.css';
 
 export default function ChatComposeBar({
@@ -15,9 +16,11 @@ export default function ChatComposeBar({
 }) {
   const fileInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
+  const recordStreamRef = useRef(null);
   const recordChunksRef = useRef([]);
   const [pendingAttachment, setPendingAttachment] = useState(null);
   const [recording, setRecording] = useState(false);
+  const [recordingStream, setRecordingStream] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -25,6 +28,7 @@ export default function ChatComposeBar({
       if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
         mediaRecorderRef.current.stop();
       }
+      recordStreamRef.current?.getTracks().forEach((track) => track.stop());
     };
   }, []);
 
@@ -50,17 +54,25 @@ export default function ChatComposeBar({
     }
   };
 
+  const clearRecordingStream = () => {
+    recordStreamRef.current?.getTracks().forEach((track) => track.stop());
+    recordStreamRef.current = null;
+    setRecordingStream(null);
+  };
+
   const startRecording = async () => {
     setError('');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recordStreamRef.current = stream;
+      setRecordingStream(stream);
       const recorder = new MediaRecorder(stream);
       recordChunksRef.current = [];
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) recordChunksRef.current.push(event.data);
       };
       recorder.onstop = async () => {
-        stream.getTracks().forEach((track) => track.stop());
+        clearRecordingStream();
         setRecording(false);
         try {
           const blob = new Blob(recordChunksRef.current, { type: recorder.mimeType || 'audio/webm' });
@@ -79,6 +91,8 @@ export default function ChatComposeBar({
       recorder.start(250);
       setRecording(true);
     } catch (micError) {
+      clearRecordingStream();
+      setRecording(false);
       setError(micError.message || 'Microphone access denied');
     }
   };
@@ -108,9 +122,11 @@ export default function ChatComposeBar({
   return (
     <div className={`chat-compose chat-compose-${variant}`}>
       {pendingAttachment ? (
-        <div className="chat-compose-preview">
+        <div className={`chat-compose-preview${pendingAttachment.attachmentType === 'voice' ? ' chat-compose-preview--voice' : ''}`}>
           <span>
-            Attached: {pendingAttachment.attachmentName || pendingAttachment.attachmentType}
+            {pendingAttachment.attachmentType === 'voice'
+              ? 'Voice note ready to send'
+              : `Attached: ${pendingAttachment.attachmentName || pendingAttachment.attachmentType}`}
           </span>
           <button type="button" className="chat-compose-icon-btn" onClick={() => setPendingAttachment(null)} aria-label="Remove attachment">
             <MdClose size={16} />
@@ -120,13 +136,17 @@ export default function ChatComposeBar({
 
       {error ? <p className="chat-compose-error">{error}</p> : null}
 
-      <textarea
-        rows={variant === 'drawer' ? 2 : 3}
-        value={message}
-        onChange={(event) => onMessageChange(event.target.value)}
-        placeholder={placeholder}
-        disabled={disabled || sending}
-      />
+      {recording && recordingStream ? (
+        <VoiceRecordingIndicator stream={recordingStream} />
+      ) : (
+        <textarea
+          rows={variant === 'drawer' ? 2 : 3}
+          value={message}
+          onChange={(event) => onMessageChange(event.target.value)}
+          placeholder={placeholder}
+          disabled={disabled || sending}
+        />
+      )}
 
       <div className="chat-compose-actions">
         <input

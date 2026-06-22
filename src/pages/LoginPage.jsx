@@ -4,14 +4,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import bluego from '../assets/bluego.png';
+import AuthShell from '../components/AuthShell';
 import './AuthPage.css';
 
 function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const { isPartnerSite, brandName, logoUrl, primaryColor, subdomain: brandingSubdomain } = usePartnerBranding();
+  const { isPartnerSite, brandName, subdomain: brandingSubdomain } = usePartnerBranding();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -63,38 +63,29 @@ function LoginPage() {
     <div className="auth-page">
       <Navbar onScrollToSection={scrollToSection} />
       <main className="auth-main">
-        <div className="auth-shell">
-          <aside className="auth-aside" style={isPartnerSite && primaryColor ? { background: `linear-gradient(135deg, ${primaryColor}22 0%, ${primaryColor}11 100%)` } : undefined}>
-            <div className="auth-aside-inner">
-              {isPartnerSite ? (
-                logoUrl
-                  ? <img src={logoUrl} alt={brandName} className="auth-aside-logo" style={{ maxHeight: 64, objectFit: 'contain' }} />
-                  : <div style={{ fontSize: 28, fontWeight: 800, color: primaryColor || '#2563eb', marginBottom: 8 }}>{brandName}</div>
-              ) : (
-                <img src={bluego} alt="Bluetick" className="auth-aside-logo" />
-              )}
-              <h1>
-                Welcome<span> back</span>
-              </h1>
-              <p>
-                {isPartnerSite
-                  ? `Sign in to access your ${brandName} account and manage your orders.`
-                  : 'Continue from where you stopped. Access your active services, monitor order progress, and keep your brand projects moving quickly.'}
-              </p>
-              <ul className="auth-perks">
-                <li>See your latest orders and account updates</li>
-                <li>Manage article and publication submissions</li>
-                <li>Get a smooth, secure sign-in experience</li>
-              </ul>
-            </div>
-          </aside>
-          <section className="auth-form-panel">
-            <h1>Login</h1>
-            <p className="auth-form-sub">{isPartnerSite ? `Sign in to your ${brandName} account.` : 'Sign in to continue with your Bluetick account.'}</p>
+        <AuthShell
+          asideTitle="Welcome"
+          asideHighlight="back"
+          asideLead={
+            isPartnerSite
+              ? `Sign in to your ${brandName} account.`
+              : 'Pick up where you left off with your orders and projects.'
+          }
+          perks={[
+            'View order status and history',
+            'Download invoices and receipts',
+            'Message support in one place',
+          ]}
+          formTitle="Login"
+          formSub={
+            isPartnerSite
+              ? `Sign in to your ${brandName} account.`
+              : 'Sign in to continue with your Bluetick account.'
+          }
+        >
+          {error ? <div className="auth-error">{error}</div> : null}
 
-            {error && <div className="auth-error">{error}</div>}
-
-            <form onSubmit={handleSubmit} className="auth-form">
+          <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
@@ -127,10 +118,9 @@ function LoginPage() {
           </form>
 
           <p className="auth-link">
-            Don't have an account? <Link to="/signup">Sign Up</Link>
+            Don&apos;t have an account? <Link to="/signup">Sign Up</Link>
           </p>
-          </section>
-        </div>
+        </AuthShell>
       </main>
       <Footer onScrollToSection={scrollToSection} />
     </div>
@@ -138,8 +128,3 @@ function LoginPage() {
 }
 
 export default LoginPage;
-
-
-
-
-

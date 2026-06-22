@@ -1,13 +1,38 @@
 import { useEffect, useState } from 'react';
 import { MdSave } from 'react-icons/md';
 
+const MAX_KYC_FILE_BYTES = 8 * 1024 * 1024;
+const ALLOWED_KYC_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'application/pdf',
+]);
+
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
+    reader.onerror = () => reject(new Error('Could not read the selected file. Try a different file.'));
     reader.readAsDataURL(file);
   });
+}
+
+function formatKycStatus(status = 'not_started') {
+  return String(status).replace(/_/g, ' ');
+}
+
+function validateKycFile(file, label) {
+  if (!file) return null;
+  if (!ALLOWED_KYC_TYPES.has(file.type)) {
+    return `${label} must be JPG, PNG, WEBP, GIF, or PDF.`;
+  }
+  if (file.size > MAX_KYC_FILE_BYTES) {
+    return `${label} is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum size is 8MB.`;
+  }
+  return null;
 }
 
 export default function PartnerSettingsTab({ api, onMessage }) {
@@ -18,6 +43,8 @@ export default function PartnerSettingsTab({ api, onMessage }) {
   const [loadError, setLoadError] = useState('');
   const [saving, setSaving] = useState(false);
   const [kycFiles, setKycFiles] = useState({ idDocument: '', businessDocument: '' });
+  const [kycFileNames, setKycFileNames] = useState({ idDocument: '', businessDocument: '' });
+  const [kycError, setKycError] = useState('');
   const [submittingKyc, setSubmittingKyc] = useState(false);
 
   useEffect(() => {
@@ -57,20 +84,49 @@ export default function PartnerSettingsTab({ api, onMessage }) {
   };
 
   const handleKycFile = async (field, file) => {
+    setKycError('');
     if (!file) return;
-    const dataUrl = await readFileAsDataUrl(file);
-    setKycFiles((prev) => ({ ...prev, [field]: dataUrl }));
+
+    const label = field === 'idDocument' ? 'Government ID' : 'Business document';
+    const validationError = validateKycFile(file, label);
+    if (validationError) {
+      setKycError(validationError);
+      onMessage?.({ type: 'error', text: validationError });
+      return;
+    }
+
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      setKycFiles((prev) => ({ ...prev, [field]: dataUrl }));
+      setKycFileNames((prev) => ({ ...prev, [field]: file.name }));
+    } catch (error) {
+      const message = error.message || `Could not read ${label.toLowerCase()}.`;
+      setKycError(message);
+      onMessage?.({ type: 'error', text: message });
+    }
   };
 
   const submitKyc = async () => {
+    setKycError('');
+
+    if (!kycFiles.idDocument && !profile?.kyc?.idDocumentUrl) {
+      const message = 'Upload your government ID before submitting. Accepted formats: JPG, PNG, WEBP, GIF, or PDF (max 8MB).';
+      setKycError(message);
+      onMessage?.({ type: 'error', text: message });
+      return;
+    }
+
     try {
       setSubmittingKyc(true);
-      await api.submitKyc(kycFiles);
-      onMessage?.({ type: 'success', text: 'KYC documents submitted for review.' });
-      const data = await api.getSettings();
-      setProfile(data.profile || {});
+      const data = await api.submitKyc(kycFiles);
+      setProfile((prev) => ({ ...prev, kyc: data.kyc || { ...prev?.kyc, status: 'pending' } }));
+      setKycFiles({ idDocument: '', businessDocument: '' });
+      setKycFileNames({ idDocument: '', businessDocument: '' });
+      onMessage?.({ type: 'success', text: data.message || 'KYC documents submitted for review.' });
     } catch (err) {
-      onMessage?.({ type: 'error', text: err.message });
+      const message = err.message || 'Could not submit KYC. Check your files and try again.';
+      setKycError(message);
+      onMessage?.({ type: 'error', text: message });
     } finally {
       setSubmittingKyc(false);
     }
@@ -98,6 +154,10 @@ export default function PartnerSettingsTab({ api, onMessage }) {
   }
 
   const kycStatus = profile.kyc?.status || 'not_started';
+  const kycPending = kycStatus === 'pending';
+  const kycApproved = kycStatus === 'approved';
+  const kycRejected = kycStatus === 'rejected';
+  const canSubmitKyc = !kycApproved && !kycPending;
 
   return (
     <>
@@ -169,21 +229,50 @@ export default function PartnerSettingsTab({ api, onMessage }) {
       <div className="pdash-panel">
         <h2>KYC Verification</h2>
         <p className="pdash-panel-lead">
-          Status: <strong>{kycStatus.replace('_', ' ')}</strong>
+          Status: <strong>{formatKycStatus(kycStatus)}</strong>
         </p>
-        {kycStatus !== 'approved' ? (
+        {kycPending ? (
+          <p className="pdash-panel-lead" style={{ color: '#1d4ed8' }}>
+            Your documents were submitted and are awaiting review by the Bluetick team.
+          </p>
+        ) : null}
+        {kycRejected ? (
+          <p className="pdash-panel-lead" style={{ color: '#b45309' }}>
+            Your previous submission was rejected{profile.kyc?.notes ? `: ${profile.kyc.notes}` : ''}. Upload updated documents and submit again.
+          </p>
+        ) : null}
+        {kycApproved ? (
+          <p className="pdash-panel-lead" style={{ color: '#047857' }}>
+            Your identity verification is approved.
+          </p>
+        ) : null}
+        {canSubmitKyc ? (
           <>
+            <p className="pdash-panel-lead">
+              Upload a clear government ID (required) and optional business registration document. JPG, PNG, WEBP, GIF, or PDF — max 8MB each.
+            </p>
             <div className="pdash-grid-2">
               <div className="pdash-field">
-                <label>Government ID</label>
-                <input type="file" accept="image/*,.pdf" onChange={(e) => handleKycFile('idDocument', e.target.files?.[0])} />
+                <label>Government ID *</label>
+                <input type="file" accept="image/*,.pdf,application/pdf" onChange={(e) => handleKycFile('idDocument', e.target.files?.[0])} />
+                {kycFileNames.idDocument ? <small>Selected: {kycFileNames.idDocument}</small> : null}
+                {!kycFileNames.idDocument && profile.kyc?.idDocumentUrl ? (
+                  <small>Previously uploaded ID on file — upload again only if replacing it.</small>
+                ) : null}
               </div>
               <div className="pdash-field">
                 <label>Business Document (optional)</label>
-                <input type="file" accept="image/*,.pdf" onChange={(e) => handleKycFile('businessDocument', e.target.files?.[0])} />
+                <input type="file" accept="image/*,.pdf,application/pdf" onChange={(e) => handleKycFile('businessDocument', e.target.files?.[0])} />
+                {kycFileNames.businessDocument ? <small>Selected: {kycFileNames.businessDocument}</small> : null}
               </div>
             </div>
-            <button type="button" className="pdash-btn pdash-btn-primary" onClick={submitKyc} disabled={submittingKyc || !kycFiles.idDocument}>
+            {kycError ? <div className="pdash-alert error" style={{ marginBottom: 12 }}>{kycError}</div> : null}
+            <button
+              type="button"
+              className="pdash-btn pdash-btn-primary"
+              onClick={submitKyc}
+              disabled={submittingKyc || (!kycFiles.idDocument && !profile.kyc?.idDocumentUrl)}
+            >
               {submittingKyc ? 'Submitting...' : 'Submit KYC'}
             </button>
           </>

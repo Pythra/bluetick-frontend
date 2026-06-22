@@ -21,8 +21,20 @@ const defaultFormData = {
   isPublished: true,
 }
 
-export const BlogManagement = ({ apiUrl, adminToken }) => {
-  const [formData, setFormData] = useState(defaultFormData)
+export const BlogManagement = ({
+  apiUrl,
+  adminToken,
+  apiBasePath = '/api/admin/blog-posts',
+  authQuery = '',
+  defaultAuthor = 'Bluetick Editorial',
+}) => {
+  const buildBlogUrl = (suffix = '') => {
+    const path = `${apiUrl}${apiBasePath}${suffix}`;
+    if (!authQuery) return path;
+    return path.includes('?') ? `${path}&${authQuery}` : `${path}?${authQuery}`;
+  };
+
+  const [formData, setFormData] = useState({ ...defaultFormData, author: defaultAuthor })
   const [imageFiles, setImageFiles] = useState([])
   const [imagePreviews, setImagePreviews] = useState([])
   const [existingImageUrls, setExistingImageUrls] = useState([])
@@ -46,7 +58,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
     setLoadingPosts(true)
     setError('')
     try {
-      const response = await fetch(`${apiUrl}/api/admin/blog-posts`, {
+      const response = await fetch(buildBlogUrl(), {
         headers: {
           Authorization: `Bearer ${adminToken}`,
         },
@@ -61,7 +73,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
     } finally {
       setLoadingPosts(false)
     }
-  }, [adminToken, apiUrl])
+  }, [adminToken, apiUrl, authQuery, apiBasePath])
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target
@@ -132,7 +144,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
       payload.append('title', formData.title.trim())
       payload.append('excerpt', formData.excerpt.trim())
       payload.append('content', formData.content.trim())
-      payload.append('author', formData.author.trim() || 'Bluetick Editorial')
+      payload.append('author', formData.author.trim() || defaultAuthor)
       payload.append('category', formData.category.trim() || 'General')
       payload.append('isPublished', String(formData.isPublished))
       payload.append('existingImageUrls', JSON.stringify(existingImageUrls))
@@ -140,7 +152,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
 
       const isEditing = Boolean(editingPostId)
       const response = await fetch(
-        isEditing ? `${apiUrl}/api/admin/blog-posts/${editingPostId}` : `${apiUrl}/api/admin/blog-posts`,
+        isEditing ? buildBlogUrl(`/${editingPostId}`) : buildBlogUrl(),
         {
           method: isEditing ? 'PUT' : 'POST',
           headers: {
@@ -205,7 +217,7 @@ export const BlogManagement = ({ apiUrl, adminToken }) => {
     setError('')
     setSuccess('')
     try {
-      const response = await fetch(`${apiUrl}/api/admin/blog-posts/${post.id}`, {
+      const response = await fetch(buildBlogUrl(`/${post.id}`), {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${adminToken}`,

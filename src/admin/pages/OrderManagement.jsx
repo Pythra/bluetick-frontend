@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { MdCheckCircle, MdAccessTime, MdCancel } from 'react-icons/md'
 import { getOrderServiceLabel, orderMatchesServiceSearch } from '../utils/orderServices'
 import OrderTrackingControl from '../../components/OrderTrackingControl'
+import InvoiceModal from '../../components/invoice/InvoiceModal'
+import { buildAdminInvoiceFromOrder } from '../../components/invoice/invoiceUtils'
 import '../styles/admin.css'
 
 const STATUS_CONFIG = {
@@ -16,6 +18,7 @@ export const OrderManagement = ({ users, onUpdateOrder, onUpdateTracking }) => {
   const [statusFilter, setStatusFilter] = useState('all')
   const [expandedOrders, setExpandedOrders] = useState({})
   const [updatingOrderId, setUpdatingOrderId] = useState(null)
+  const [selectedInvoice, setSelectedInvoice] = useState(null)
 
   const formatDate = (dateString) => {
     const date = new Date(dateString)
@@ -79,6 +82,10 @@ export const OrderManagement = ({ users, onUpdateOrder, onUpdateTracking }) => {
 
   return (
     <div>
+      {selectedInvoice ? (
+        <InvoiceModal invoice={selectedInvoice} onClose={() => setSelectedInvoice(null)} />
+      ) : null}
+
       <div className="adm-toolbar">
         <input
           type="text"
@@ -278,6 +285,16 @@ export const OrderManagement = ({ users, onUpdateOrder, onUpdateTracking }) => {
                       showPartnerBadge
                       onSave={(payload) => handleSaveTracking(order.id, payload)}
                     />
+
+                    {order.paymentStatus === 'paid' ? (
+                      <button
+                        type="button"
+                        className="adm-btn adm-btn-ghost"
+                        onClick={() => setSelectedInvoice(buildAdminInvoiceFromOrder(order))}
+                      >
+                        View Invoice
+                      </button>
+                    ) : null}
 
                     {order.status !== 'completed' && (
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

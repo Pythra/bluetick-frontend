@@ -22,6 +22,8 @@ import {
   MdDelete,
   MdPalette,
   MdPermMedia,
+  MdArticle,
+  MdCampaign,
 } from 'react-icons/md';
 import SectionContentEditor from './components/SectionContentEditor';
 import { useAuth } from '../contexts/AuthContext';
@@ -34,6 +36,8 @@ import PartnerWalletTab from './partner/PartnerWalletTab';
 import PartnerInvoicesTab from './partner/PartnerInvoicesTab';
 import PartnerProgressReportTab from './partner/PartnerProgressReportTab';
 import PartnerSettingsTab from './partner/PartnerSettingsTab';
+import { BlogManagement } from './pages/BlogManagement';
+import { EmailBroadcast } from './pages/EmailBroadcast';
 import {
   PARTNER_TEMPLATES,
   PARTNER_ASSET_FIELDS,
@@ -68,6 +72,8 @@ const NAV_ITEMS = [
   { id: 'orders', label: 'Orders', icon: MdInventory2 },
   { id: 'clients', label: 'Clients', icon: MdPeople },
   { id: 'messages', label: 'Messages', icon: MdChat },
+  { id: 'blog', label: 'Blog', icon: MdArticle },
+  { id: 'broadcast', label: 'Email Broadcast', icon: MdCampaign },
   { id: 'wallet', label: 'Wallet', icon: MdAccountBalanceWallet },
   { id: 'invoices', label: 'Invoices', icon: MdReceipt },
   { id: 'reports', label: 'Progress Report', icon: MdInsertChart },
@@ -146,6 +152,7 @@ function PartnerAdminApp({ subdomain }) {
   const [activeEditor, setActiveEditor] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [messagesIntent, setMessagesIntent] = useState(null);
+  const [broadcastClients, setBroadcastClients] = useState([]);
   const pdashRootRef = useRef(null);
 
   const authHeaders = useMemo(
@@ -279,6 +286,27 @@ function PartnerAdminApp({ subdomain }) {
     fetchUnread();
     const intervalId = window.setInterval(fetchUnread, 30000);
     return () => window.clearInterval(intervalId);
+  }, [partnerApi, activeTab]);
+
+  useEffect(() => {
+    if (!partnerApi || activeTab !== 'broadcast') {
+      return undefined;
+    }
+
+    partnerApi
+      .getClients()
+      .then((data) => {
+        const clients = (data.clients || []).map((client) => ({
+          id: client.email,
+          email: client.email,
+          firstName: client.firstName || client.name?.split(' ')[0] || '',
+          lastName: client.lastName || client.name?.split(' ').slice(1).join(' ') || '',
+        }));
+        setBroadcastClients(clients);
+      })
+      .catch(() => setBroadcastClients([]));
+
+    return undefined;
   }, [partnerApi, activeTab]);
 
   const handleLogin = async (e) => {
@@ -1458,7 +1486,12 @@ function PartnerAdminApp({ subdomain }) {
   };
 
   const renderOrders = () => (
-    <PartnerOrdersTab orders={dashboard?.orders} overviewOrders={overview?.orders} api={partnerApi} />
+    <PartnerOrdersTab
+      orders={dashboard?.orders}
+      overviewOrders={overview?.orders}
+      api={partnerApi}
+      branding={dashboard?.branding || overview?.branding}
+    />
   );
 
   const tabTitles = {
@@ -1468,6 +1501,8 @@ function PartnerAdminApp({ subdomain }) {
     orders: 'Orders',
     clients: 'Clients',
     messages: 'Messages',
+    blog: 'Blog',
+    broadcast: 'Email Broadcast',
     wallet: 'Wallet',
     invoices: 'Invoices',
     reports: 'Progress Report',
@@ -1481,6 +1516,8 @@ function PartnerAdminApp({ subdomain }) {
     orders: 'Track client orders and project status on your storefront.',
     clients: 'View and manage customers who ordered through your site.',
     messages: 'Real-time messaging with clients and Bluetickgeng support.',
+    blog: 'Publish articles on your partner site — same workflow as the main Bluetick blog.',
+    broadcast: 'Email all clients who signed up, ordered, or visited your partner site.',
     wallet: 'Track earnings, request withdrawals, and manage payout methods in one place.',
     invoices: 'Download invoices and receipts for client orders.',
     reports: 'Track signups, orders, revenue, and earnings trends over time.',
@@ -1488,6 +1525,13 @@ function PartnerAdminApp({ subdomain }) {
   };
 
   const websiteSaveTabs = ['website'];
+  const partnerBrandName =
+    overview?.branding?.brandName ||
+    siteSettings?.company ||
+    siteSettings?.fullName ||
+    subdomain;
+  const partnerAuthQuery = `subdomain=${encodeURIComponent(subdomain)}`;
+
   const showSaveButton = activeTab === 'website' && websiteSubTab !== 'domain';
 
   return (
@@ -1616,6 +1660,26 @@ function PartnerAdminApp({ subdomain }) {
                 subdomain={subdomain}
                 initialCategory={messagesIntent?.category || 'support'}
                 initialClient={messagesIntent?.client || null}
+              />
+            )}
+            {activeTab === 'blog' && token && (
+              <BlogManagement
+                apiUrl={apiUrl}
+                adminToken={token}
+                apiBasePath="/api/partner-admin/blog-posts"
+                authQuery={partnerAuthQuery}
+                defaultAuthor={partnerBrandName}
+              />
+            )}
+            {activeTab === 'broadcast' && token && (
+              <EmailBroadcast
+                apiUrl={apiUrl}
+                adminToken={token}
+                users={broadcastClients}
+                broadcastEndpoint="/api/partner-admin/email-broadcast"
+                authQuery={partnerAuthQuery}
+                recipientNoun="client"
+                excludeField="excludeRecipientEmails"
               />
             )}
             {activeTab === 'wallet' && partnerApi && (

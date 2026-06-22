@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { formatBlogDate, getBlogPostBySlug } from '../data/blogPosts';
 import { useAuth } from '../contexts/AuthContext';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import './BlogPage.css';
 
 const handleBlogImageError = (event) => {
@@ -18,7 +19,8 @@ const handleBlogImageError = (event) => {
 function BlogPostPage() {
   const { slug } = useParams();
   const { apiUrl } = useAuth();
-  const [post, setPost] = useState(() => getBlogPostBySlug(slug));
+  const { isPartnerSite, subdomain } = usePartnerBranding();
+  const [post, setPost] = useState(() => (isPartnerSite ? null : getBlogPostBySlug(slug)));
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState(post?.comments ?? []);
   const [likesCount, setLikesCount] = useState(post?.likesCount || 0);
@@ -29,7 +31,10 @@ function BlogPostPage() {
   const [commentLoading, setCommentLoading] = useState(false);
   const [commentError, setCommentError] = useState('');
 
-  const likedStorageKey = `bluetick_blog_liked_${slug}`;
+  const likedStorageKey = `bluetick_blog_liked_${isPartnerSite ? `${subdomain}_` : ''}${slug}`;
+  const blogActionBase = isPartnerSite && subdomain
+    ? `${apiUrl}/api/partner-site/${encodeURIComponent(subdomain)}/blog/posts/${encodeURIComponent(slug)}`
+    : `${apiUrl}/api/blog/posts/${encodeURIComponent(slug)}`;
 
   useEffect(() => {
     let active = true;
@@ -39,7 +44,10 @@ function BlogPostPage() {
 
     const loadPost = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/blog/posts/${encodeURIComponent(slug)}`);
+        const postUrl = isPartnerSite && subdomain
+          ? `${apiUrl}/api/partner-site/${encodeURIComponent(subdomain)}/blog/posts/${encodeURIComponent(slug)}`
+          : `${apiUrl}/api/blog/posts/${encodeURIComponent(slug)}`;
+        const response = await fetch(postUrl);
         const data = await response.json();
         if (!response.ok || !data.success || !data.post) {
           throw new Error(data.error || 'Failed to load blog post');
@@ -51,11 +59,15 @@ function BlogPostPage() {
         }
       } catch (error) {
         console.error('Blog post fallback to static data:', error);
-        if (active) {
+        if (active && !isPartnerSite) {
           const fallbackPost = getBlogPostBySlug(slug);
           setPost(fallbackPost || null);
           setComments(fallbackPost?.comments ?? []);
           setLikesCount(fallbackPost?.likesCount || 0);
+        } else if (active) {
+          setPost(null);
+          setComments([]);
+          setLikesCount(0);
         }
       } finally {
         if (active) {
@@ -70,7 +82,7 @@ function BlogPostPage() {
     return () => {
       active = false;
     };
-  }, [apiUrl, likedStorageKey, slug]);
+  }, [apiUrl, likedStorageKey, slug, isPartnerSite, subdomain]);
 
   if (loading) {
     return (
@@ -120,7 +132,7 @@ function BlogPostPage() {
     setCommentLoading(true);
     setCommentError('');
     try {
-      const response = await fetch(`${apiUrl}/api/blog/posts/${encodeURIComponent(slug)}/comments`, {
+      const response = await fetch(`${blogActionBase}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -147,7 +159,7 @@ function BlogPostPage() {
     const nextLikedState = !liked;
     setLikeLoading(true);
     try {
-      const response = await fetch(`${apiUrl}/api/blog/posts/${encodeURIComponent(slug)}/likes`, {
+      const response = await fetch(`${blogActionBase}/likes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ liked: nextLikedState }),

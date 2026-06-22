@@ -6,6 +6,10 @@ import ChatMessagesPane from '../../components/chat/ChatMessagesPane';
 import useMessageSocket from '../../hooks/useMessageSocket';
 import { isOwnMessage } from '../../utils/chatDisplay';
 import { messagePreviewText } from '../../utils/chatMedia';
+import {
+  appendThreadMessage,
+  patchPartnerThreadSummaries,
+} from '../../utils/messagingRealtime';
 
 function ClientPicker({ clients, onSelect }) {
   const [search, setSearch] = useState('');
@@ -92,6 +96,7 @@ export default function PartnerMessagesTab({
   const [activeThread, setActiveThread] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [clientsLoading, setClientsLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [category, setCategory] = useState(initialCategory);
   const [composingNew, setComposingNew] = useState(Boolean(initialClient));
@@ -100,29 +105,54 @@ export default function PartnerMessagesTab({
   const activeThreadIdRef = useRef(null);
   activeThreadIdRef.current = activeThread?.threadId;
 
-  const loadThreads = async () => {
+  const loadThreadsRef = useRef(null);
+
+  const loadThreads = useCallback(async () => {
     try {
       const data = await api.getMessages();
       setThreads(data.threads || []);
     } finally {
       setLoading(false);
     }
-  };
+  }, [api]);
+
+  loadThreadsRef.current = loadThreads;
 
   useEffect(() => {
+    setLoading(true);
     loadThreads();
-    refreshClients();
+  }, [loadThreads]);
+
+  const refreshClients = useCallback(() => {
+    setClientsLoading(true);
+    api.getClients()
+      .then((data) => setClients(data.clients || []))
+      .catch(() => {})
+      .finally(() => setClientsLoading(false));
   }, [api]);
 
-  const handleRealtimeMessage = useCallback(async (payload) => {
-    await loadThreads();
-    if (activeThreadIdRef.current === payload.threadId) {
-      try {
-        const data = await api.getThread(payload.threadId);
-        setActiveThread(data.thread);
-      } catch { /* silent */ }
+  useEffect(() => {
+    if (composingNew && category === 'clients' && !clients.length && !clientsLoading) {
+      refreshClients();
     }
-  }, [api]);
+  }, [composingNew, category, clients.length, clientsLoading, refreshClients]);
+
+  const handleRealtimeMessage = useCallback((payload) => {
+    setThreads((previous) => {
+      const result = patchPartnerThreadSummaries(previous, payload);
+      if (result.needsReload) {
+        loadThreadsRef.current?.();
+        return previous;
+      }
+      return result.changed ? result.threads : previous;
+    });
+
+    if (activeThreadIdRef.current === payload.threadId) {
+      setActiveThread((previous) =>
+        appendThreadMessage(previous, payload, { hideSenderTypes: ['admin'] })
+      );
+    }
+  }, []);
 
   useMessageSocket({
     apiUrl,
@@ -131,10 +161,6 @@ export default function PartnerMessagesTab({
     enabled: Boolean(apiUrl && token),
     onEvent: handleRealtimeMessage,
   });
-
-  const refreshClients = () => {
-    api.getClients().then((d) => setClients(d.clients || [])).catch(() => {});
-  };
 
   useEffect(() => {
     if (initialClient) {
@@ -174,9 +200,15 @@ export default function PartnerMessagesTab({
     try {
       const mediaFields = { body, attachment, attachmentType, attachmentName };
       if (activeThread) {
-        await api.sendMessage({ threadId: activeThread.threadId, channel: activeThread.channel, ...mediaFields });
-        const data = await api.getThread(activeThread.threadId);
-        setActiveThread(data.thread);
+        const result = await api.sendMessage({ threadId: activeThread.threadId, channel: activeThread.channel, ...mediaFields });
+        setActiveThread(result?.thread || activeThread);
+        if (result?.thread) {
+          setThreads((previous) => patchPartnerThreadSummaries(previous, {
+            threadId: result.thread.threadId,
+            message: result.thread.messages?.[result.thread.messages.length - 1],
+            lastMessageAt: result.thread.lastMessageAt,
+          }).threads);
+        }
       } else {
         const channel = category === 'support' ? 'partner-admin' : 'partner-client';
         const result = await api.sendMessage({
@@ -190,8 +222,7 @@ export default function PartnerMessagesTab({
         });
         await loadThreads();
         if (result?.thread?.threadId) {
-          const data = await api.getThread(result.thread.threadId);
-          setActiveThread(data.thread);
+          setActiveThread(result.thread);
         }
         setComposingNew(false);
         setSelectedClient(null);
@@ -211,7 +242,18 @@ export default function PartnerMessagesTab({
   const supportCount = threads.filter((t) => t.channel === 'partner-admin').length;
   const clientCount = threads.filter((t) => t.channel === 'partner-client').length;
 
-  if (loading) return <div className="pdash-panel"><div className="pdash-spinner" /></div>;
+  if (loading) {
+    return (
+      <div className="pdash-messages-layout">
+        <div className="pdash-panel pdash-messages-list">
+          <div className="pdash-spinner" style={{ margin: '24px auto' }} />
+        </div>
+        <div className="pdash-panel pdash-messages-chat">
+          <div className="pdash-spinner" style={{ margin: '24px auto' }} />
+        </div>
+      </div>
+    );
+  }
 
   const renderChatArea = () => {
     if (composingNew) {
@@ -223,10 +265,14 @@ export default function PartnerMessagesTab({
           </h2>
 
           {isClientMode && !selectedClient && (
-            <ClientPicker
-              clients={clients}
-              onSelect={(c) => setSelectedClient(c)}
-            />
+            clientsLoading ? (
+              <div className="pdash-spinner" style={{ margin: '12px auto' }} />
+            ) : (
+              <ClientPicker
+                clients={clients}
+                onSelect={(c) => setSelectedClient(c)}
+              />
+            )
           )}
 
           {isClientMode && selectedClient && (

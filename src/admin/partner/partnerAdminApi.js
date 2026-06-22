@@ -12,7 +12,10 @@ export function createPartnerAdminApi(apiUrl, subdomain, token) {
     const response = await fetch(url, { ...options, headers: { ...headers, ...options.headers } });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const message = data.error || `Request failed (${response.status})`;
+      let message = data.error || data.message || `Request failed (${response.status})`;
+      if (response.status === 413) {
+        message = 'Upload too large. Each KYC document must be 8MB or smaller.';
+      }
       throw new Error(message);
     }
     return data;

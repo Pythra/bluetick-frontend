@@ -57,7 +57,7 @@ export default function ClientMessagesFab() {
   const fetchUnread = useCallback(async () => {
     if (!token || !subdomain) return;
     try {
-      const res = await fetch(`${apiUrl}/api/partner-site/${subdomain}/client-messages`, {
+      const res = await fetch(`${apiUrl}/api/partner-site/${subdomain}/client-messages?summary=1`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

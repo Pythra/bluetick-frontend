@@ -11,6 +11,7 @@ import { EmailBroadcast } from './pages/EmailBroadcast'
 import { PartnershipManagement } from './pages/PartnershipManagement'
 import AdminMessages from './pages/AdminMessages'
 import AdminReports from './pages/AdminReports'
+import AdminInvoicesTab from './pages/AdminInvoicesTab'
 import PartnerAdminApp from './PartnerAdminApp'
 import AdminMessagesFab from '../components/AdminMessagesFab'
 import { useAuth } from '../contexts/AuthContext'
@@ -252,6 +253,7 @@ function AdminApp() {
       'users': 'User Management',
       'carts': 'Shopping Carts',
       'orders': 'Orders',
+      'invoices': 'Invoices',
       'submissions': 'Article Submissions',
       'partnerships': 'Partnership Applications',
       'messages': 'Messages',
@@ -310,6 +312,8 @@ function AdminApp() {
             onUpdateOrder={handleUpdateOrderStatus}
             onUpdateTracking={handleUpdateOrderTracking}
           />
+        ) : activeTab === 'invoices' ? (
+          <AdminInvoicesTab users={users} />
         ) : activeTab === 'submissions' ? (
           <SubmissionManagement users={users} />
         ) : activeTab === 'partnerships' ? (

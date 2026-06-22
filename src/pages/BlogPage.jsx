@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { blogPosts, formatBlogDate } from '../data/blogPosts';
 import { useAuth } from '../contexts/AuthContext';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import './BlogPage.css';
 
 const handleBlogImageError = (event) => {
@@ -17,6 +18,7 @@ const handleBlogImageError = (event) => {
 
 function BlogPage() {
   const { apiUrl } = useAuth();
+  const { isPartnerSite, subdomain, brandName } = usePartnerBranding();
   const [posts, setPosts] = useState(blogPosts);
   const [loading, setLoading] = useState(true);
 
@@ -24,18 +26,23 @@ function BlogPage() {
     let active = true;
     const fetchPosts = async () => {
       try {
-        const response = await fetch(`${apiUrl}/api/blog/posts`);
+        const postsUrl = isPartnerSite && subdomain
+          ? `${apiUrl}/api/partner-site/${encodeURIComponent(subdomain)}/blog/posts`
+          : `${apiUrl}/api/blog/posts`;
+        const response = await fetch(postsUrl);
         const data = await response.json();
         if (!response.ok || !data.success || !Array.isArray(data.posts)) {
           throw new Error(data.error || 'Failed to load blog posts');
         }
         if (active) {
-          setPosts(data.posts);
+          setPosts(isPartnerSite ? data.posts : data.posts);
         }
       } catch (error) {
         console.error('Blog posts fallback to static data:', error);
-        if (active) {
+        if (active && !isPartnerSite) {
           setPosts(blogPosts);
+        } else if (active) {
+          setPosts([]);
         }
       } finally {
         if (active) {
@@ -48,15 +55,19 @@ function BlogPage() {
     return () => {
       active = false;
     };
-  }, [apiUrl]);
+  }, [apiUrl, isPartnerSite, subdomain]);
 
   return (
     <div className="blog-page">
       <Navbar />
       <main className="blog-container">
         <header className="blog-header">
-          <h1>Blog</h1>
-          <p>Insights on verification, publications, and building a credible brand online.</p>
+          <h1>{isPartnerSite ? `${brandName || 'Partner'} Blog` : 'Blog'}</h1>
+          <p>
+            {isPartnerSite
+              ? `Updates, insights, and announcements from ${brandName || 'our team'}.`
+              : 'Insights on verification, publications, and building a credible brand online.'}
+          </p>
         </header>
         {loading && <p className="blog-page-message">Loading posts...</p>}
         {!loading && posts.length === 0 && <p className="blog-page-message">No blog posts published yet.</p>}

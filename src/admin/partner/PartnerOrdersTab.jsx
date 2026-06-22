@@ -3,6 +3,8 @@ import { MdChat } from 'react-icons/md';
 import { formatAmount } from '../../data/partnerServiceCatalog';
 import { getOrderServiceLabel } from '../utils/orderServices';
 import OrderTrackingControl from '../../components/OrderTrackingControl';
+import InvoiceModal from '../../components/invoice/InvoiceModal';
+import { buildPartnerInvoiceFromOrder } from '../../components/invoice/invoiceUtils';
 
 const STATUS_LABELS = {
   completed: 'Completed',
@@ -17,14 +19,32 @@ function formatDate(dateString) {
   });
 }
 
-export default function PartnerOrdersTab({ orders = [], overviewOrders, api }) {
+export default function PartnerOrdersTab({ orders = [], overviewOrders, api, branding }) {
   const initialList = orders.length ? orders : overviewOrders || [];
   const [list, setList] = useState(initialList);
   const [expandedOrders, setExpandedOrders] = useState({});
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [invoiceMap, setInvoiceMap] = useState({});
 
   useEffect(() => {
     setList(orders.length ? orders : overviewOrders || []);
   }, [orders, overviewOrders]);
+
+  useEffect(() => {
+    if (!api?.getInvoices) return;
+    api
+      .getInvoices()
+      .then((data) => {
+        const next = {};
+        (data.invoices || []).forEach((invoice) => {
+          if (invoice.orderId) {
+            next[String(invoice.orderId)] = invoice;
+          }
+        });
+        setInvoiceMap(next);
+      })
+      .catch(() => {});
+  }, [api]);
 
   const toggleOrder = (orderId) => {
     setExpandedOrders((prev) => ({ ...prev, [orderId]: !prev[orderId] }));
@@ -41,8 +61,22 @@ export default function PartnerOrdersTab({ orders = [], overviewOrders, api }) {
     );
   };
 
+  const openInvoice = (order) => {
+    const enriched = invoiceMap[String(order.id)];
+    if (enriched) {
+      setSelectedInvoice(enriched);
+      return;
+    }
+    setSelectedInvoice(buildPartnerInvoiceFromOrder(order, branding));
+  };
+
   return (
-    <div className="pdash-panel">
+    <>
+      {selectedInvoice ? (
+        <InvoiceModal invoice={selectedInvoice} onClose={() => setSelectedInvoice(null)} />
+      ) : null}
+
+      <div className="pdash-panel">
       <h2>Orders</h2>
       <p className="pdash-panel-lead">
         Track orders placed on your storefront and share progress updates with your clients.
@@ -83,6 +117,16 @@ export default function PartnerOrdersTab({ orders = [], overviewOrders, api }) {
                     <span className={`adm-badge ${order.paymentStatus === 'paid' ? 'completed' : 'pending'}`}>
                       {order.paymentStatus === 'paid' ? 'Paid' : 'Payment Pending'}
                     </span>
+                    {order.paymentStatus === 'paid' ? (
+                      <button
+                        type="button"
+                        className="pdash-btn pdash-btn-ghost"
+                        style={{ padding: '4px 10px', fontSize: '0.78rem' }}
+                        onClick={() => openInvoice(order)}
+                      >
+                        View Invoice
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       className="pdash-btn pdash-btn-ghost"
@@ -105,7 +149,8 @@ export default function PartnerOrdersTab({ orders = [], overviewOrders, api }) {
           })}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
 
