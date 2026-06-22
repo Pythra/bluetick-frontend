@@ -1,39 +1,42 @@
-export const wikipediaPagePackages = [
-  {
-    id: 'individual-wiki',
-    title: 'Wikipedia Page for Individuals',
-    price: 1250000,
-    deliveryTime: '48 hours',
-    description:
-      'Professional Wikipedia page creation for individuals with comprehensive content development and quality assurance.',
-    features: [
-      'Content creation and publication',
-      'Up to 12 news publications',
-      'Content review and compliance',
-      'Quality assurance',
-      'Wikipedia standards compliance',
-      'Professional page layout',
-    ],
-  },
-  {
-    id: 'company-wiki',
-    title: 'Wikipedia Page for Organizations',
-    price: 1800000,
-    deliveryTime: '72 hours',
-    description:
-      'Specialized Wikipedia page creation for businesses and organizations with stricter notability and sourcing requirements.',
-    features: [
-      'Comprehensive content creation',
-      'Up to 12 high-quality publications',
-      'Detailed business coverage',
-      'Company achievement highlights',
-      'Advanced content review',
-      'Wikipedia compliance verification',
-      'Media sourcing support',
-      'Notability assessment',
-    ],
-  },
-];
+import { getPackagesByGroup, PARTNER_PACKAGE_CATALOG } from './partnerPackageCatalog';
+
+function getPackageEntry(packageId) {
+  return PARTNER_PACKAGE_CATALOG.find((entry) => entry.id === packageId);
+}
+
+export const wikipediaPagePackages = ['wikipedia.individual', 'wikipedia.company'].map((packageId) => {
+  const entry = getPackageEntry(packageId);
+  const isIndividual = packageId === 'wikipedia.individual';
+  return {
+    id: entry.id,
+    packageId: entry.id,
+    title: entry.label,
+    price: entry.basePriceNgn,
+    deliveryTime: isIndividual ? '48 hours' : '72 hours',
+    description: isIndividual
+      ? 'Professional Wikipedia page creation for individuals with comprehensive content development and quality assurance.'
+      : 'Specialized Wikipedia page creation for businesses and organizations with stricter notability and sourcing requirements.',
+    features: isIndividual
+      ? [
+          'Content creation and publication',
+          'Up to 12 news publications',
+          'Content review and compliance',
+          'Quality assurance',
+          'Wikipedia standards compliance',
+          'Professional page layout',
+        ]
+      : [
+          'Comprehensive content creation',
+          'Up to 12 high-quality publications',
+          'Detailed business coverage',
+          'Company achievement highlights',
+          'Advanced content review',
+          'Wikipedia compliance verification',
+          'Media sourcing support',
+          'Notability assessment',
+        ],
+  };
+});
 
 export const wikipediaScopeItems = [
   {
@@ -56,24 +59,22 @@ export const wikipediaScopeItems = [
   },
 ];
 
-export const googleKnowledgePanelPackages = [
-  {
-    id: 'individual-kp',
-    title: 'Individual Google Knowledge Panel',
-    price: 500000,
-    deliveryTime: '72 hours',
-    description:
-      'Enhance personal credibility with a Google Knowledge Panel alongside your Wikipedia presence.',
-  },
-  {
-    id: 'company-kp',
-    title: 'Company Google Knowledge Panel',
-    price: 800000,
-    deliveryTime: '72 hours',
-    description:
-      'Establish your brand in Google search with a Knowledge Panel built to complement your Wikipedia page.',
-  },
-];
+export const googleKnowledgePanelPackages = ['google-knowledge.individual', 'google-knowledge.company'].map(
+  (packageId) => {
+    const entry = getPackageEntry(packageId);
+    const isIndividual = packageId === 'google-knowledge.individual';
+    return {
+      id: entry.id,
+      packageId: entry.id,
+      title: entry.label,
+      price: entry.basePriceNgn,
+      deliveryTime: '72 hours',
+      description: isIndividual
+        ? 'Enhance personal credibility with a Google Knowledge Panel alongside your Wikipedia presence.'
+        : 'Establish your brand in Google search with a Knowledge Panel built to complement your Wikipedia page.',
+    };
+  }
+);
 
 export const wikipediaServiceNotice = {
   lead: 'Our Wikipedia services provide a comprehensive approach to building credible encyclopedia pages.',

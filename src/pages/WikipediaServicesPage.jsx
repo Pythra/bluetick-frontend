@@ -11,8 +11,10 @@ import {
 import { useCart } from '../contexts/CartContext';
 import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
+import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
+import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import ClientsSection from '../components/ClientsSection';
 import wikipediaHeroVideo from '../assets/wiki.mp4';
 import {
@@ -63,14 +65,12 @@ function WikipediaServicesPage() {
   }, []);
 
   const handleAddToCart = async (item, category) => {
-    const result = await addToCart({
-      itemId: `${category}-${item.id}-${Date.now()}`,
-      title: item.title,
-      price: item.price,
+    const result = await addToCart(buildPartnerCartItem(item, {
       description: item.description || item.deliveryTime || '',
       category: 'wikipedia',
-      quantity: 1,
-    });
+      tier: category,
+      price: item.price,
+    }));
 
     if (result.success) {
       setShowCartNotification(true);
@@ -135,15 +135,15 @@ function WikipediaServicesPage() {
           <section className="service-detail-section wikipedia-page-packages" aria-label="Wikipedia package options">
             <div className="service-detail-grid wikipedia-page-packages-grid">
               {wikipediaPagePackages.map((pkg) => (
-                <ServiceDetailCard
-                  key={pkg.id}
+                <PartnerPricedServiceCard
+                  key={pkg.packageId || pkg.id}
+                  service={pkg}
                   title={pkg.title}
                   meta={`Delivery: ${pkg.deliveryTime}`}
                   description={buildPackageDescription(pkg)}
-                  price={formatPrice(pkg.price, '₦')}
                   pricePrefix=""
-                  icon={pkg.id === 'company-wiki' ? IoBusinessOutline : IoBookOutline}
-                  onAddToCart={() => handleAddToCart(pkg, 'wikipedia-package')}
+                  icon={pkg.packageId === 'wikipedia.company' ? IoBusinessOutline : IoBookOutline}
+                  onAddToCart={(resolved) => handleAddToCart(resolved, 'wikipedia-package')}
                 />
               ))}
             </div>
@@ -180,15 +180,15 @@ function WikipediaServicesPage() {
             </p>
             <div className="service-detail-grid service-detail-grid--pair">
               {googleKnowledgePanelPackages.map((pkg) => (
-                <ServiceDetailCard
-                  key={pkg.id}
+                <PartnerPricedServiceCard
+                  key={pkg.packageId || pkg.id}
+                  service={pkg}
                   title={pkg.title}
                   meta={`Delivery: ${pkg.deliveryTime}`}
                   description={pkg.description}
-                  price={formatPrice(pkg.price, '₦')}
                   pricePrefix=""
-                  icon={pkg.id === 'company-kp' ? IoBusinessOutline : IoBookOutline}
-                  onAddToCart={() => handleAddToCart(pkg, 'google-knowledge-panel')}
+                  icon={pkg.packageId === 'google-knowledge.company' ? IoBusinessOutline : IoBookOutline}
+                  onAddToCart={(resolved) => handleAddToCart(resolved, 'google-knowledge-panel')}
                 />
               ))}
             </div>

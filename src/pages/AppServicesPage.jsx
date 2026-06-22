@@ -15,75 +15,47 @@ import {
 import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
-import ServiceDetailCard from '../components/ServiceDetailCard';
+import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import { appDevelopmentServices } from '../data/developmentServices';
+import { buildPartnerCartItem } from '../utils/partnerCartItem';
+import ServiceDetailCard from '../components/ServiceDetailCard';
 import appHeroImage from '../assets/app.png';
 import appHeroVideo from '../assets/app.mp4';
 import './ServiceDetailPage.css';
 
-const appServices = [
-  {
-    title: 'Health & Fitness Apps',
-    price: 3300000,
-    icon: IoFitnessOutline,
-    description: 'Workout tracking, wellness dashboards, and subscription-ready fitness experiences.',
-  },
-  {
-    title: 'E-commerce Apps',
-    price: 2250000,
-    icon: IoCartOutline,
-    description: 'Product catalogs, secure checkout, and order management for mobile storefronts.',
-  },
-  {
-    title: 'Fintech & Banking Apps',
-    price: 9000000,
-    icon: IoWalletOutline,
-    description: 'Digital wallets, transfers, KYC flows, and compliant financial product interfaces.',
-  },
-  {
-    title: 'Social Media Apps',
-    price: 5250000,
-    icon: IoPeopleOutline,
-    description: 'Feeds, messaging, profiles, and engagement features built for growing communities.',
-  },
-  {
-    title: 'Travel & Booking Apps',
-    price: 3750000,
-    icon: IoAirplaneOutline,
-    description: 'Trip planning, reservations, itineraries, and real-time booking confirmations.',
-  },
-  {
-    title: 'Productivity Apps',
-    price: 6000000,
-    icon: IoRocketOutline,
-    description: 'Task management, team workflows, and tools that help users stay organized on the go.',
-  },
-  {
-    title: 'Streaming & Entertainment Apps',
-    price: 5700000,
-    icon: IoPlayCircleOutline,
-    description: 'Media libraries, live streams, and content discovery tuned for retention.',
-  },
-  {
-    title: 'Gaming Apps',
-    price: 7500000,
-    icon: IoGameControllerOutline,
-    description: 'Gameplay loops, leaderboards, in-app purchases, and multiplayer-ready architecture.',
-  },
-  {
-    title: 'Bill Payment Apps',
-    price: 4800000,
-    icon: IoReceiptOutline,
-    description: 'Utility payments, receipts, reminders, and simple bill-management for end users.',
-  },
-  {
-    title: 'Cryptocurrency Apps',
-    price: 3450000,
-    icon: IoGlobeOutline,
-    description: 'Portfolio views, trading flows, and secure wallet interactions for crypto users.',
-  },
-];
+const appDescriptions = {
+  'Health & Fitness Apps': 'Workout tracking, wellness dashboards, and subscription-ready fitness experiences.',
+  'E-commerce Apps': 'Product catalogs, secure checkout, and order management for mobile storefronts.',
+  'Fintech & Banking Apps': 'Digital wallets, transfers, KYC flows, and compliant financial product interfaces.',
+  'Social Media Apps': 'Feeds, messaging, profiles, and engagement features built for growing communities.',
+  'Travel & Booking Apps': 'Trip planning, reservations, itineraries, and real-time booking confirmations.',
+  'Productivity Apps': 'Task management, team workflows, and tools that help users stay organized on the go.',
+  'Streaming & Entertainment Apps': 'Media libraries, live streams, and content discovery tuned for retention.',
+  'Gaming Apps': 'Gameplay loops, leaderboards, in-app purchases, and multiplayer-ready architecture.',
+  'Bill Payment Apps': 'Utility payments, receipts, reminders, and simple bill-management for end users.',
+  'Cryptocurrency Apps': 'Portfolio views, trading flows, and secure wallet interactions for crypto users.',
+};
+
+const appIcons = {
+  'Health & Fitness Apps': IoFitnessOutline,
+  'E-commerce Apps': IoCartOutline,
+  'Fintech & Banking Apps': IoWalletOutline,
+  'Social Media Apps': IoPeopleOutline,
+  'Travel & Booking Apps': IoAirplaneOutline,
+  'Productivity Apps': IoRocketOutline,
+  'Streaming & Entertainment Apps': IoPlayCircleOutline,
+  'Gaming Apps': IoGameControllerOutline,
+  'Bill Payment Apps': IoReceiptOutline,
+  'Cryptocurrency Apps': IoGlobeOutline,
+};
+
+const appServices = appDevelopmentServices.map((service) => ({
+  ...service,
+  icon: appIcons[service.title],
+  description: appDescriptions[service.title] || '',
+}));
 
 const customAppInfo = {
   title: 'Custom App Development',
@@ -101,14 +73,10 @@ function AppServicesPage() {
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
-    const result = await addToCart({
-      itemId: `${service.title}-${Date.now()}`,
-      title: service.title,
-      price: service.price,
-      description: '',
+    const result = await addToCart(buildPartnerCartItem(service, {
       category: 'app',
-      quantity: 1,
-    });
+      price: service.price,
+    }));
 
     if (result.success) {
       setShowCartNotification(true);
@@ -157,14 +125,14 @@ function AppServicesPage() {
         <main className="service-detail-main">
           <div className="service-detail-grid">
             {appServices.map((service) => (
-              <ServiceDetailCard
-                key={service.title}
+              <PartnerPricedServiceCard
+                key={service.packageId || service.title}
+                service={service}
                 title={service.title}
                 meta="Mobile app"
                 description={service.description}
-                price={format(service.price)}
                 icon={service.icon}
-                onAddToCart={() => handleAddToCart(service)}
+                onAddToCart={handleAddToCart}
               />
             ))}
           </div>

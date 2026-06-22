@@ -4,9 +4,10 @@ import { IoLogoInstagram } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
-import ServiceDetailCard from '../components/ServiceDetailCard';
+import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import instagramHeroImage from '../assets/online.jpg';
 import {
   getInstagramCartTitle,
@@ -28,14 +29,12 @@ function InstagramServicesPage() {
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (item, section) => {
-    const result = await addToCart({
-      itemId: `instagram-${item.id}-${Date.now()}`,
+    const result = await addToCart(buildPartnerCartItem(item, {
       title: getInstagramCartTitle(item),
-      price: item.price,
       description: section,
       category: 'instagram',
-      quantity: 1,
-    });
+      price: item.price,
+    }));
 
     if (result.success) {
       setShowCartNotification(true);
@@ -55,15 +54,15 @@ function InstagramServicesPage() {
 
   const renderCards = (items, sectionLabel, description) =>
     items.map((item) => (
-      <ServiceDetailCard
-        key={item.id}
+      <PartnerPricedServiceCard
+        key={item.packageId || item.id}
+        service={item}
         title={item.title}
         meta={item.note ? `${sectionLabel} · ${item.note}` : sectionLabel}
         description={description}
-        price={format(item.price)}
         pricePrefix=""
         icon={IoLogoInstagram}
-        onAddToCart={() => handleAddToCart(item, sectionLabel)}
+        onAddToCart={(resolved) => handleAddToCart(resolved, sectionLabel)}
       />
     ));
 

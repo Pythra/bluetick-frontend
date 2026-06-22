@@ -1125,6 +1125,75 @@
   border-radius: 8px;
 }
 
+.pdash-pricing-table-packages .pdash-pricing-head,
+.pdash-pricing-table-packages .pdash-pricing-row {
+  grid-template-columns: 2fr 1fr 1.2fr 1fr;
+}
+
+.pdash-package-pricing {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.pdash-package-service {
+  border: 1px solid var(--pdash-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pdash-package-service-toggle,
+.pdash-package-group-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: none;
+  background: var(--pdash-bg);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--pdash-text);
+}
+
+.pdash-package-service-toggle strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.pdash-package-count {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.78rem;
+  color: var(--pdash-soft);
+  font-weight: 500;
+}
+
+.pdash-package-service-body {
+  padding: 0 12px 12px;
+}
+
+.pdash-package-group {
+  margin-top: 10px;
+}
+
+.pdash-package-group-toggle {
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--pdash-border);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.pdash-package-group .pdash-pricing-table {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
 .pdash-messages-layout {
   display: grid;
   grid-template-columns: 280px 1fr;

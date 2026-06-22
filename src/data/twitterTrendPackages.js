@@ -1,75 +1,47 @@
-export const twitterTrendPackages = [
-  {
-    id: 'nigeria',
-    countryCode: 'NG',
-    title: 'Nigeria Trend',
-    price: 150000,
-    delivery: '24–48 Hours',
+import { getPackagesByGroup, toServiceListEntries } from './partnerPackageCatalog';
+
+const trendMeta = {
+  'twitter-trend.nigeria-trend': { countryCode: 'NG', delivery: '24–48 Hours' },
+  'twitter-trend.uganda-trend': { countryCode: 'UG', delivery: '24–48 Hours' },
+  'twitter-trend.south-africa-trend': { countryCode: 'ZA', delivery: '24–48 Hours' },
+  'twitter-trend.kenya-trend': { countryCode: 'KE', delivery: '24–48 Hours' },
+  'twitter-trend.ghana-trend': { countryCode: 'GH', delivery: '24–48 Hours' },
+};
+
+const trendCopy = {
+  'twitter-trend.nigeria-trend': {
     description:
       'Premium X (Twitter) trend placement in Nigeria for brands, artists, campaigns, and announcements.',
-    highlights: [
-      'Nigeria trends chart placement',
-      'Hashtag strategy and engagement support',
-      'Campaign reporting summary',
-    ],
+    highlights: ['Nigeria trends chart placement', 'Hashtag strategy and engagement support', 'Campaign reporting summary'],
   },
-  {
-    id: 'uganda',
-    countryCode: 'UG',
-    title: 'Uganda Trend',
-    price: 925000,
-    delivery: '24–48 Hours',
+  'twitter-trend.uganda-trend': {
     description:
       'Targeted trend visibility in Uganda with coordinated content push and localized hashtag planning.',
-    highlights: [
-      'Uganda trends chart placement',
-      'Localized copy and timing strategy',
-      'Engagement amplification',
-    ],
+    highlights: ['Uganda trends chart placement', 'Localized copy and timing strategy', 'Engagement amplification'],
   },
-  {
-    id: 'south-africa',
-    countryCode: 'ZA',
-    title: 'South Africa Trend',
-    price: 899000,
-    delivery: '24–48 Hours',
+  'twitter-trend.south-africa-trend': {
     description:
       'South Africa trend campaigns built for launches, brand moments, and high-visibility announcements on X.',
-    highlights: [
-      'South Africa trends chart placement',
-      'Multi-audience reach coordination',
-      'Post-campaign performance summary',
-    ],
+    highlights: ['South Africa trends chart placement', 'Multi-audience reach coordination', 'Post-campaign performance summary'],
   },
-  {
-    id: 'kenya',
-    countryCode: 'KE',
-    title: 'Kenya Trend',
-    price: 899000,
-    delivery: '24–48 Hours',
+  'twitter-trend.kenya-trend': {
     description:
       'Kenya-focused trend packages for artists, public figures, and brands seeking strong national buzz on X.',
-    highlights: [
-      'Kenya trends chart placement',
-      'Hashtag and content coordination',
-      'Dedicated campaign support',
-    ],
+    highlights: ['Kenya trends chart placement', 'Hashtag and content coordination', 'Dedicated campaign support'],
   },
-  {
-    id: 'ghana',
-    countryCode: 'GH',
-    title: 'Ghana Trend',
-    price: 599900,
-    delivery: '24–48 Hours',
+  'twitter-trend.ghana-trend': {
     description:
       'Ghana trend promotion for campaigns and announcements with structured execution and reporting.',
-    highlights: [
-      'Ghana trends chart placement',
-      'Engagement and momentum support',
-      'Campaign analytics summary',
-    ],
+    highlights: ['Ghana trends chart placement', 'Engagement and momentum support', 'Campaign analytics summary'],
   },
-];
+};
+
+export const twitterTrendPackages = toServiceListEntries(getPackagesByGroup('twitter-trends')).map((entry) => ({
+  ...entry,
+  title: entry.title.replace(' Trend', ' Trend').replace('Nigeria Trend', 'Nigeria Trend'),
+  ...trendMeta[entry.packageId],
+  ...(trendCopy[entry.packageId] || {}),
+}));
 
 export const twitterTrendNotice = {
   lead: 'Every package includes strategy, execution, and post-campaign reporting.',

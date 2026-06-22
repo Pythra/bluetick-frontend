@@ -5,9 +5,11 @@ import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import CountryFlag from '../components/CountryFlag';
+import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import verificationHeroImage from '../assets/social/verification.jpg';
 import { twitterTrendNotice, twitterTrendPackages } from '../data/twitterTrendPackages';
 import './ServiceDetailPage.css';
@@ -24,14 +26,11 @@ function TwitterTrendServicesPage() {
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (pkg) => {
-    const result = await addToCart({
-      itemId: `twitter-trend-${pkg.id}-${Date.now()}`,
-      title: pkg.title,
-      price: pkg.price,
+    const result = await addToCart(buildPartnerCartItem(pkg, {
       description: `Twitter (X) Trend — ${pkg.delivery}`,
       category: 'twitter-trend',
-      quantity: 1,
-    });
+      price: pkg.price,
+    }));
 
     if (result.success) {
       setShowCartNotification(true);
@@ -77,15 +76,15 @@ function TwitterTrendServicesPage() {
             </p>
             <div className="service-detail-grid">
               {twitterTrendPackages.map((pkg) => (
-                <ServiceDetailCard
-                  key={pkg.id}
+                <PartnerPricedServiceCard
+                  key={pkg.packageId || pkg.id}
+                  service={pkg}
                   title={pkg.title}
                   meta={`Delivery: ${pkg.delivery}`}
                   description={buildTrendDescription(pkg)}
-                  price={format(pkg.price)}
                   pricePrefix=""
                   iconNode={<CountryFlag code={pkg.countryCode} alt={`${pkg.title} flag`} />}
-                  onAddToCart={() => handleAddToCart(pkg)}
+                  onAddToCart={handleAddToCart}
                 />
               ))}
             </div>

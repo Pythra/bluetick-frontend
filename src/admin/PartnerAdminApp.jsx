@@ -1477,7 +1477,7 @@ function PartnerAdminApp({ subdomain }) {
   const tabDescriptions = {
     overview: 'Performance snapshot — orders, revenue, clients, and earnings.',
     website: 'Brand your white-label site — logo, colors, content, domain, and media.',
-    services: 'Set your selling prices and manage service availability.',
+    services: 'Set selling prices for every individual service package on your site.',
     orders: 'Track client orders and project status on your storefront.',
     clients: 'View and manage customers who ordered through your site.',
     messages: 'Real-time messaging with clients and Bluetickgeng support.',

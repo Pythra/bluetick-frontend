@@ -1,68 +1,50 @@
-export const tiktokSongClaimService = {
-  id: 'song-claim',
-  title: 'TikTok Song Claim Under Profile',
-  meta: 'Setup & Claiming · $5 USD',
-  price: 7000,
-  description:
-    'Securing official recognition for your track under your artist TikTok profile enhances visibility and allows you to access usage data—such as how many creators are using your sound. This boosts credibility and enables you to track and potentially monetize your music on the platform.',
-  included: [
-    'Verification of track ownership on TikTok',
-    'Analytics access to monitor sound usage and engagement',
-  ],
-  note:
-    'TikTok does not offer a formal public claiming feature; it is managed via distribution platforms. Pricing is minimal as this is predominantly a setup process via distributor services.',
+import { getPackagesByGroup, toServiceListEntries, PARTNER_PACKAGE_CATALOG } from './partnerPackageCatalog';
+
+function getPackageEntry(packageId) {
+  return PARTNER_PACKAGE_CATALOG.find((entry) => entry.id === packageId);
+}
+
+export const tiktokSongClaimService = (() => {
+  const entry = getPackageEntry('tiktok.song-claim');
+  return {
+    id: entry.id,
+    packageId: entry.id,
+    title: entry.label,
+    meta: 'Setup & Claiming · $5 USD',
+    price: entry.basePriceNgn,
+    description:
+      'Securing official recognition for your track under your artist TikTok profile enhances visibility and allows you to access usage data—such as how many creators are using your sound. This boosts credibility and enables you to track and potentially monetize your music on the platform.',
+    included: [
+      'Verification of track ownership on TikTok',
+      'Analytics access to monitor sound usage and engagement',
+    ],
+    note:
+      'TikTok does not offer a formal public claiming feature; it is managed via distribution platforms. Pricing is minimal as this is predominantly a setup process via distributor services.',
+  };
+})();
+
+const influencerDescriptions = {
+  'tiktok.25-micro':
+    'Real TikTok influencers create authentic videos using your sound to spark trends and expand your music’s reach.',
+  'tiktok.50-micro':
+    'Scaled creator push with guaranteed influencers using your sound in creative dance, lip-sync, and challenge content.',
+  'tiktok.100-micro':
+    'Broader campaign reach with guaranteed engagement and flexible support for growing artists and brands.',
+  'tiktok.250-influencers':
+    'High-volume influencer activation designed to maximize sound adoption across TikTok creator networks.',
+  'tiktok.500-influencers':
+    'Large-scale sound promotion with guaranteed influencer participation and wider audience reach.',
+  'tiktok.1000-influencers':
+    'Maximum visibility campaign for established artists and brands seeking dominant TikTok sound presence.',
 };
 
-export const tiktokInfluencerPackages = [
-  {
-    id: '25-micro',
-    title: '25 Micro Influencers',
-    meta: 'Micro influencer package',
-    price: 25000,
-    description:
-      'Real TikTok influencers create authentic videos using your sound to spark trends and expand your music’s reach.',
-  },
-  {
-    id: '50-micro',
-    title: '50 Micro Influencers',
-    meta: 'Micro influencer package',
-    price: 49000,
-    description:
-      'Scaled creator push with guaranteed influencers using your sound in creative dance, lip-sync, and challenge content.',
-  },
-  {
-    id: '100-micro',
-    title: '100 Micro Influencers',
-    meta: 'Micro influencer package',
-    price: 98000,
-    description:
-      'Broader campaign reach with guaranteed engagement and flexible support for growing artists and brands.',
-  },
-  {
-    id: '250-influencers',
-    title: '250 TikTok Influencers',
-    meta: 'Growth package',
-    price: 220000,
-    description:
-      'High-volume influencer activation designed to maximize sound adoption across TikTok creator networks.',
-  },
-  {
-    id: '500-influencers',
-    title: '500 TikTok Influencers',
-    meta: 'Scale package',
-    price: 410000,
-    description:
-      'Large-scale sound promotion with guaranteed influencer participation and wider audience reach.',
-  },
-  {
-    id: '1000-influencers',
-    title: '1,000 TikTok Influencers',
-    meta: 'Premium package',
-    price: 700000,
-    description:
-      'Maximum visibility campaign for established artists and brands seeking dominant TikTok sound presence.',
-  },
-];
+export const tiktokInfluencerPackages = toServiceListEntries(getPackagesByGroup('tiktok-influencer')).map(
+  (entry) => ({
+    ...entry,
+    meta: entry.title.includes('Micro') ? 'Micro influencer package' : 'Growth package',
+    description: influencerDescriptions[entry.packageId] || '',
+  })
+);
 
 export const tiktokInfluencerSectionIntro = {
   title: 'TikTok Influencer Campaigns Using Your Sound',

@@ -13,11 +13,11 @@ import {
   IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
-import ServiceDetailCard from '../components/ServiceDetailCard';
+import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import verificationHeroImage from '../assets/social/verification.jpg';
 import {
   metaSubscriptionService,
@@ -61,18 +61,16 @@ function getVerificationIcon(title) {
 function VerificationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service, tier) => {
-    const result = await addToCart({
-      itemId: `${service.title}-${tier}-${Date.now()}`,
+    const result = await addToCart(buildPartnerCartItem(service, {
       title: `${service.title} (${tier})`,
-      price: service.price,
-      description: tier === 'notable' ? 'Notable account' : 'Non-notable account',
+      description: tier === 'notable' ? 'Notable account' : tier === 'meta' ? 'Meta subscription' : 'Non-notable account',
       category: 'verification',
-      quantity: 1,
-    });
+      tier,
+      price: service.price,
+    }));
 
     if (result.success) {
       setShowCartNotification(true);
@@ -92,18 +90,18 @@ function VerificationServicesPage() {
 
   const renderTierCards = (services, tier, metaLabel) =>
     services.map((service) => (
-      <ServiceDetailCard
-        key={`${tier}-${service.title}`}
+      <PartnerPricedServiceCard
+        key={`${tier}-${service.packageId || service.title}`}
+        service={service}
         title={service.title}
         meta={metaLabel}
         description={
           verificationDescriptions[service.title] ||
           'Full verification workflow from eligibility review through platform approval.'
         }
-        price={format(service.price)}
         pricePrefix=""
         icon={getVerificationIcon(service.title)}
-        onAddToCart={() => handleAddToCart(service, tier)}
+        onAddToCart={(resolved) => handleAddToCart(resolved, tier)}
       />
     ));
 
@@ -150,16 +148,17 @@ function VerificationServicesPage() {
 
           <section className="service-detail-section">
             <h2 className="service-detail-section-title">Meta Subscription</h2>
-            <ServiceDetailCard
+            <PartnerPricedServiceCard
+              service={metaSubscriptionService}
               title={metaSubscriptionService.title}
               meta="Monthly subscription"
               description={metaSubscriptionService.description}
-              price={`${format(metaSubscriptionService.price)}/month`}
+              priceSuffix="/month"
               pricePrefix=""
               icon={IoShieldCheckmarkOutline}
-              onAddToCart={() =>
+              onAddToCart={(resolved) =>
                 handleAddToCart(
-                  { title: 'Meta Subscription', price: metaSubscriptionService.price },
+                  { ...resolved, title: 'Meta Subscription' },
                   'meta',
                 )
               }

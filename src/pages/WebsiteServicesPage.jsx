@@ -4,9 +4,12 @@ import { IoCodeSlashOutline, IoGlobeOutline, IoRocketOutline } from 'react-icons
 import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
+import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import { websiteDevelopmentServices } from '../data/developmentServices';
+import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import websiteHeroImage from '../assets/tech.jpg';
 import { usePartnerAsset } from '../utils/partnerMedia';
@@ -15,29 +18,26 @@ import { companyWhatsappSessionUrl } from '../config/companyContact';
 import { usePartnerText } from '../utils/partnerText';
 import './ServiceDetailPage.css';
 
-const websiteServices = [
-  {
-    title: 'Basic Informational Website',
-    price: 525000,
-    icon: IoGlobeOutline,
-    description:
-      'A clean, professional site for your brand with essential pages, contact flows, and mobile-friendly layouts.',
-  },
-  {
-    title: 'Standard Website',
-    price: 1500000,
-    icon: IoCodeSlashOutline,
-    description:
-      'Multi-page websites with stronger content structure, SEO foundations, and room to grow your online presence.',
-  },
-  {
-    title: 'Custom Web Applications',
-    price: 3750000,
-    icon: IoRocketOutline,
-    description:
-      'Tailored web apps with dashboards, user accounts, integrations, and workflows built around your business.',
-  },
-];
+const websiteDescriptions = {
+  'Basic Informational Website':
+    'A clean, professional site for your brand with essential pages, contact flows, and mobile-friendly layouts.',
+  'Standard Website':
+    'Multi-page websites with stronger content structure, SEO foundations, and room to grow your online presence.',
+  'Custom Web Applications':
+    'Tailored web apps with dashboards, user accounts, integrations, and workflows built around your business.',
+};
+
+const websiteIcons = {
+  'Basic Informational Website': IoGlobeOutline,
+  'Standard Website': IoCodeSlashOutline,
+  'Custom Web Applications': IoRocketOutline,
+};
+
+const websiteServices = websiteDevelopmentServices.map((service) => ({
+  ...service,
+  icon: websiteIcons[service.title],
+  description: websiteDescriptions[service.title] || '',
+}));
 
 const startupConsultation = {
   title: 'Startup Consultation',
@@ -57,14 +57,10 @@ function WebsiteServicesPage() {
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
-    const result = await addToCart({
-      itemId: `${service.title}-${Date.now()}`,
-      title: service.title,
-      price: service.price,
-      description: '',
+    const result = await addToCart(buildPartnerCartItem(service, {
       category: 'website',
-      quantity: 1,
-    });
+      price: service.price,
+    }));
 
     if (result.success) {
       setShowCartNotification(true);
@@ -108,14 +104,14 @@ function WebsiteServicesPage() {
         <main className="service-detail-main">
           <div className="service-detail-grid">
             {websiteServices.map((service) => (
-              <ServiceDetailCard
-                key={service.title}
+              <PartnerPricedServiceCard
+                key={service.packageId || service.title}
+                service={service}
                 title={service.title}
                 meta="Website package"
                 description={service.description}
-                price={format(service.price)}
                 icon={service.icon}
-                onAddToCart={() => handleAddToCart(service)}
+                onAddToCart={handleAddToCart}
               />
             ))}
           </div>

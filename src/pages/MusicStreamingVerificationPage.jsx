@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { useCurrency } from '../contexts/CurrencyContext';
 import { getStreamingPlatformLogo } from '../utils/streamingPlatformSlug';
 import Navbar from '../components/Navbar';
-import StreamingPlatformLogo from '../components/StreamingPlatformLogo';
+import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import ServiceDetailCard from '../components/ServiceDetailCard';
+import StreamingPlatformLogo from '../components/StreamingPlatformLogo';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import musicHeroImage from '../assets/mayorkun.jpg';
 import {
   musicProfilePlacements,
@@ -73,19 +74,16 @@ function renderPlatformIcon(title) {
 function MusicStreamingVerificationPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { format } = useCurrency();
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service, tier) => {
-    const result = await addToCart({
-      itemId: `music-streaming-${service.title}-${tier}-${Date.now()}`,
-      title: service.title,
-      price: service.price,
+    const result = await addToCart(buildPartnerCartItem(service, {
       description:
         tier === 'placement' ? 'Music profile placement' : 'Streaming platform verification',
       category: 'music-streaming-verification',
-      quantity: 1,
-    });
+      tier,
+      price: service.price,
+    }));
 
     if (result.success) {
       setShowCartNotification(true);
@@ -105,19 +103,19 @@ function MusicStreamingVerificationPage() {
 
   const renderCards = (services, tier, defaultMeta) =>
     services.map((service) => (
-      <ServiceDetailCard
-        key={service.title}
+      <PartnerPricedServiceCard
+        key={service.packageId || service.title}
+        service={service}
         title={service.title}
         meta={verificationMeta[service.title] || defaultMeta}
         description={
           verificationDescriptions[service.title] ||
           'Full verification workflow from eligibility review through platform approval.'
         }
-        price={format(service.price)}
         pricePrefix=""
         iconNode={renderPlatformIcon(service.title)}
         iconVariant="platform"
-        onAddToCart={() => handleAddToCart(service, tier)}
+        onAddToCart={(resolved) => handleAddToCart(resolved, tier)}
       />
     ));
 
@@ -153,16 +151,16 @@ function MusicStreamingVerificationPage() {
             <h2 className="service-detail-section-title">Music Profile Placement</h2>
             <div className="service-detail-grid">
               {musicProfilePlacements.map((service) => (
-                <ServiceDetailCard
-                  key={service.title}
+                <PartnerPricedServiceCard
+                  key={service.packageId || service.title}
+                  service={service}
                   title={service.title}
                   meta="Profile placement"
                   description="Strategic placement and optimization so your music profile reaches the right audience on platform discovery surfaces."
-                  price={format(service.price)}
                   pricePrefix=""
                   iconNode={renderPlatformIcon(service.title)}
                   iconVariant="platform"
-                  onAddToCart={() => handleAddToCart(service, 'placement')}
+                  onAddToCart={(resolved) => handleAddToCart(resolved, 'placement')}
                 />
               ))}
             </div>

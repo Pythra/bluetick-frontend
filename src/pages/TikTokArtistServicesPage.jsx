@@ -4,9 +4,10 @@ import { IoLogoTiktok, IoMusicalNoteOutline, IoPeopleOutline } from 'react-icons
 import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
-import ServiceDetailCard from '../components/ServiceDetailCard';
+import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import tiktokArtistHeroImage from '../assets/social/tiktok-artist.jpg';
 import {
   tiktokArtistTermsFooter,
@@ -32,14 +33,11 @@ function TikTokArtistServicesPage() {
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
-    const result = await addToCart({
-      itemId: `tiktok-artist-${service.id}-${Date.now()}`,
-      title: service.title,
-      price: service.price,
+    const result = await addToCart(buildPartnerCartItem(service, {
       description: service.meta || 'TikTok for Artist service',
       category: 'tiktok-artist',
-      quantity: 1,
-    });
+      price: service.price,
+    }));
 
     if (result.success) {
       setShowCartNotification(true);
@@ -88,15 +86,15 @@ function TikTokArtistServicesPage() {
               Minimal setup pricing for track recognition and analytics access via distributor services.
             </p>
             <div className="service-detail-grid service-detail-grid--single">
-              <ServiceDetailCard
+              <PartnerPricedServiceCard
+                service={tiktokSongClaimService}
                 title={tiktokSongClaimService.title}
                 meta={tiktokSongClaimService.meta}
                 description={buildSongClaimDescription(tiktokSongClaimService)}
-                price={format(tiktokSongClaimService.price)}
                 pricePrefix=""
                 icon={IoMusicalNoteOutline}
                 ctaLabel="Order now"
-                onAddToCart={() => handleAddToCart(tiktokSongClaimService)}
+                onAddToCart={handleAddToCart}
               />
             </div>
           </section>
@@ -112,16 +110,16 @@ function TikTokArtistServicesPage() {
             <h3 className="tiktok-artist-packages-heading">Our Micro Influencer Pricing Packages</h3>
             <div className="service-detail-grid">
               {tiktokInfluencerPackages.map((pkg) => (
-                <ServiceDetailCard
-                  key={pkg.id}
+                <PartnerPricedServiceCard
+                  key={pkg.packageId || pkg.id}
+                  service={pkg}
                   title={pkg.title}
                   meta={pkg.meta}
                   description={pkg.description}
-                  price={format(pkg.price)}
                   pricePrefix=""
                   icon={IoPeopleOutline}
                   ctaLabel="Order now"
-                  onAddToCart={() => handleAddToCart(pkg)}
+                  onAddToCart={handleAddToCart}
                 />
               ))}
             </div>

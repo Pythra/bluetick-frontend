@@ -1,49 +1,38 @@
-import { useEffect, useState } from 'react';
-import { MdSave } from 'react-icons/md';
-import { PARTNER_SERVICE_CATALOG, formatNgn } from '../../data/partnerServiceCatalog';
+import { useEffect, useMemo, useState } from 'react';
+import { MdExpandLess, MdExpandMore, MdSave } from 'react-icons/md';
+import { formatNgn } from '../../data/partnerServiceCatalog';
+import { PARTNER_PACKAGE_CATALOG } from '../../data/partnerPackageCatalog';
+
+function buildPackageRows(pricingRows) {
+  const pricingMap = Object.fromEntries((pricingRows || []).map((row) => [row.id, row]));
+  return PARTNER_PACKAGE_CATALOG.map((entry) => {
+    const row = pricingMap[entry.id];
+    const base = row?.basePriceNgn ?? entry.basePriceNgn;
+    const selling = row?.sellingPriceNgn ?? Math.round(base * 1.25);
+    return {
+      ...entry,
+      basePriceNgn: base,
+      sellingPriceNgn: Math.max(base, selling),
+      partnerProfit: Math.max(0, selling - base),
+    };
+  });
+}
 
 export default function PartnerServicesTab({ api, onMessage }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [services, setServices] = useState([]);
-
-  const buildMergedServices = (pricingRows, catalog) => {
-    const pricingMap = Object.fromEntries((pricingRows || []).map((r) => [r.id, r]));
-    return catalog.map((cat) => {
-      const row = pricingMap[cat.id];
-      const base = row?.basePriceNgn ?? cat.basePriceNgn;
-      const selling = row?.sellingPriceNgn ?? Math.round(base * 1.25);
-      return {
-        id: cat.id,
-        label: row?.label || cat.label,
-        category: cat.category,
-        basePriceNgn: base,
-        sellingPriceNgn: Math.max(base, selling),
-        partnerProfit: Math.max(0, selling - base),
-        bluetickRevenue: base,
-        enabledOnSite: row != null,
-      };
-    });
-  };
+  const [packages, setPackages] = useState([]);
+  const [expandedServices, setExpandedServices] = useState({});
+  const [expandedGroups, setExpandedGroups] = useState({});
 
   const load = async () => {
     try {
       setLoading(true);
       const data = await api.getServices();
-      const catalog = data.catalog?.length ? data.catalog : PARTNER_SERVICE_CATALOG;
-      setServices(buildMergedServices(data.pricing || [], catalog));
+      setPackages(buildPackageRows(data.packages || data.pricing || []));
     } catch (err) {
       onMessage?.({ type: 'error', text: err.message });
-      setServices(PARTNER_SERVICE_CATALOG.map((cat) => ({
-        id: cat.id,
-        label: cat.label,
-        category: cat.category,
-        basePriceNgn: cat.basePriceNgn,
-        sellingPriceNgn: Math.round(cat.basePriceNgn * 1.25),
-        partnerProfit: Math.round(cat.basePriceNgn * 0.25),
-        bluetickRevenue: cat.basePriceNgn,
-        enabledOnSite: false,
-      })));
+      setPackages(buildPackageRows([]));
     } finally {
       setLoading(false);
     }
@@ -53,15 +42,59 @@ export default function PartnerServicesTab({ api, onMessage }) {
     load();
   }, []);
 
+  const grouped = useMemo(() => {
+    const byService = new Map();
+    packages.forEach((pkg) => {
+      if (!byService.has(pkg.serviceId)) {
+        byService.set(pkg.serviceId, {
+          serviceId: pkg.serviceId,
+          serviceLabel: pkg.serviceLabel,
+          groups: new Map(),
+        });
+      }
+      const service = byService.get(pkg.serviceId);
+      if (!service.groups.has(pkg.groupId)) {
+        service.groups.set(pkg.groupId, {
+          groupId: pkg.groupId,
+          groupLabel: pkg.groupLabel,
+          packages: [],
+        });
+      }
+      service.groups.get(pkg.groupId).packages.push(pkg);
+    });
+    return Array.from(byService.values()).map((service) => ({
+      ...service,
+      groups: Array.from(service.groups.values()),
+    }));
+  }, [packages]);
+
+  useEffect(() => {
+    if (!grouped.length) return;
+    setExpandedServices((prev) => {
+      if (Object.keys(prev).length) return prev;
+      return Object.fromEntries(grouped.map((service) => [service.serviceId, true]));
+    });
+    setExpandedGroups((prev) => {
+      if (Object.keys(prev).length) return prev;
+      const next = {};
+      grouped.forEach((service) => {
+        service.groups.forEach((group) => {
+          next[group.groupId] = true;
+        });
+      });
+      return next;
+    });
+  }, [grouped]);
+
   const updatePrice = (id, value) => {
-    setServices((prev) =>
-      prev.map((s) => {
-        if (s.id !== id) return s;
-        const selling = Math.max(s.basePriceNgn, Number(value) || s.basePriceNgn);
+    setPackages((prev) =>
+      prev.map((pkg) => {
+        if (pkg.id !== id) return pkg;
+        const selling = Math.max(pkg.basePriceNgn, Number(value) || pkg.basePriceNgn);
         return {
-          ...s,
+          ...pkg,
           sellingPriceNgn: selling,
-          partnerProfit: Math.max(0, selling - s.basePriceNgn),
+          partnerProfit: Math.max(0, selling - pkg.basePriceNgn),
         };
       })
     );
@@ -71,17 +104,17 @@ export default function PartnerServicesTab({ api, onMessage }) {
     try {
       setSaving(true);
       const pricing = Object.fromEntries(
-        services.map((s) => [
-          s.id,
+        packages.map((pkg) => [
+          pkg.id,
           {
-            basePriceNgn: s.basePriceNgn,
-            sellingPriceNgn: Math.max(s.basePriceNgn, s.sellingPriceNgn),
-            enabled: s.enabledOnSite !== false,
+            basePriceNgn: pkg.basePriceNgn,
+            sellingPriceNgn: Math.max(pkg.basePriceNgn, pkg.sellingPriceNgn),
+            enabled: true,
           },
         ])
       );
       await api.updateServices(pricing);
-      onMessage?.({ type: 'success', text: 'Service pricing saved.' });
+      onMessage?.({ type: 'success', text: 'Package pricing saved.' });
       await load();
     } catch (err) {
       onMessage?.({ type: 'error', text: err.message });
@@ -90,65 +123,95 @@ export default function PartnerServicesTab({ api, onMessage }) {
     }
   };
 
+  const toggleService = (serviceId) => {
+    setExpandedServices((prev) => ({ ...prev, [serviceId]: !prev[serviceId] }));
+  };
+
+  const toggleGroup = (groupId) => {
+    setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
+
   if (loading) {
     return <div className="pdash-panel"><div className="pdash-spinner" /></div>;
   }
 
-  const categories = [...new Set(services.map((s) => s.category))];
-
   return (
-    <>
-      <div className="pdash-panel">
-        <h2>Service Pricing</h2>
-        <p className="pdash-panel-lead">
-          Set your selling prices for all services. The base price is fixed by Bluetickgeng — your profit is the difference between your price and the base.
-          Services marked <strong>Active on site</strong> are currently shown on your homepage.
-        </p>
+    <div className="pdash-panel">
+      <h2>Service package pricing</h2>
+      <p className="pdash-panel-lead">
+        Set your selling price for every individual package — verification tiers, monetization options,
+        app and website packages, publications add-ons, and more. Base prices are fixed by Bluetickgeng;
+        your profit is the difference between your price and the base.
+      </p>
 
-        {categories.map((cat) => {
-          const catServices = services.filter((s) => s.category === cat);
-          return (
-            <div key={cat} style={{ marginBottom: 24 }}>
-              <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--pdash-soft)', margin: '0 0 10px' }}>
-                {cat}
-              </h3>
-              <div className="pdash-pricing-table">
-                <div className="pdash-pricing-head">
-                  <span>Service</span>
-                  <span>Base Price</span>
-                  <span>Your Selling Price (NGN)</span>
-                  <span>Your Profit</span>
-                  <span>Status</span>
-                </div>
-                {catServices.map((service) => (
-                  <div key={service.id} className="pdash-pricing-row">
-                    <span><strong>{service.label}</strong></span>
-                    <span>{formatNgn(service.basePriceNgn)}</span>
-                    <span>
-                      <input
-                        type="number"
-                        min={service.basePriceNgn}
-                        value={service.sellingPriceNgn}
-                        onChange={(e) => updatePrice(service.id, e.target.value)}
-                      />
-                    </span>
-                    <span className="pdash-profit">{formatNgn(Math.max(0, service.sellingPriceNgn - service.basePriceNgn))}</span>
-                    <span>
-                      {service.enabledOnSite
-                        ? <span style={{ color: '#047857', fontWeight: 600, fontSize: '0.8rem' }}>● Active on site</span>
-                        : <span style={{ color: 'var(--pdash-soft)', fontSize: '0.8rem' }}>○ Not on site</span>}
-                    </span>
+      <div className="pdash-package-pricing">
+        {grouped.map((service) => (
+          <section key={service.serviceId} className="pdash-package-service">
+            <button
+              type="button"
+              className="pdash-package-service-toggle"
+              onClick={() => toggleService(service.serviceId)}
+              aria-expanded={expandedServices[service.serviceId] !== false}
+            >
+              <span>
+                <strong>{service.serviceLabel}</strong>
+                <span className="pdash-package-count">
+                  {service.groups.reduce((sum, group) => sum + group.packages.length, 0)} packages
+                </span>
+              </span>
+              {expandedServices[service.serviceId] !== false ? <MdExpandLess size={20} /> : <MdExpandMore size={20} />}
+            </button>
+
+            {expandedServices[service.serviceId] !== false ? (
+              <div className="pdash-package-service-body">
+                {service.groups.map((group) => (
+                  <div key={group.groupId} className="pdash-package-group">
+                    <button
+                      type="button"
+                      className="pdash-package-group-toggle"
+                      onClick={() => toggleGroup(group.groupId)}
+                      aria-expanded={expandedGroups[group.groupId] !== false}
+                    >
+                      <span>{group.groupLabel}</span>
+                      {expandedGroups[group.groupId] !== false ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
+                    </button>
+
+                    {expandedGroups[group.groupId] !== false ? (
+                      <div className="pdash-pricing-table pdash-pricing-table-packages">
+                        <div className="pdash-pricing-head">
+                          <span>Package</span>
+                          <span>Base price</span>
+                          <span>Your selling price</span>
+                          <span>Your profit</span>
+                        </div>
+                        {group.packages.map((pkg) => (
+                          <div key={pkg.id} className="pdash-pricing-row">
+                            <span><strong>{pkg.label}</strong></span>
+                            <span>{formatNgn(pkg.basePriceNgn)}</span>
+                            <span>
+                              <input
+                                type="number"
+                                min={pkg.basePriceNgn}
+                                value={pkg.sellingPriceNgn}
+                                onChange={(e) => updatePrice(pkg.id, e.target.value)}
+                              />
+                            </span>
+                            <span className="pdash-profit">{formatNgn(pkg.partnerProfit)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                 ))}
               </div>
-            </div>
-          );
-        })}
-
-        <button type="button" className="pdash-btn pdash-btn-primary" onClick={handleSave} disabled={saving}>
-          <MdSave size={16} /> {saving ? 'Saving...' : 'Save All Pricing'}
-        </button>
+            ) : null}
+          </section>
+        ))}
       </div>
-    </>
+
+      <button type="button" className="pdash-btn pdash-btn-primary" onClick={handleSave} disabled={saving}>
+        <MdSave size={16} /> {saving ? 'Saving...' : 'Save all package pricing'}
+      </button>
+    </div>
   );
 }
