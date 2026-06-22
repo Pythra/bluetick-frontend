@@ -49,6 +49,7 @@ const DEFAULT_BRANDING = {
   showPartnerProgram: true,
   isVideoFirstPartnerSite: false,
   packagePricing: {},
+  pricingUpdatedAt: null,
   loading: false,
 };
 
@@ -84,6 +85,8 @@ function buildBrandingState(data, { loading }) {
       ...(data.enabledServices || {}),
     },
     sectionContent: data.sectionContent || {},
+    packagePricing: data.packagePricing || {},
+    pricingUpdatedAt: data.pricingUpdatedAt || null,
     loading,
   };
 }
@@ -128,7 +131,7 @@ export function PartnerBrandingProvider({ children }) {
 
     let cancelled = false;
 
-    const loadBranding = async () => {
+    const loadBranding = async ({ force = false } = {}) => {
       try {
         const endpoint = subdomain
           ? `${apiUrl}/api/partner-site/${encodeURIComponent(subdomain)}`
@@ -142,6 +145,28 @@ export function PartnerBrandingProvider({ children }) {
         }
 
         if (response.ok && data.isPartnerSite) {
+          const cached = readCachedPartnerBranding(hostname);
+          const cachedPricingAt = cached?.pricingUpdatedAt
+            ? new Date(cached.pricingUpdatedAt).getTime()
+            : 0;
+          const nextPricingAt = data.pricingUpdatedAt
+            ? new Date(data.pricingUpdatedAt).getTime()
+            : 0;
+
+          if (
+            !force &&
+            cached?.packagePricing &&
+            Object.keys(cached.packagePricing).length > 0 &&
+            cachedPricingAt >= nextPricingAt
+          ) {
+            const nextBranding = buildBrandingState(
+              { ...cached, isPartnerSite: true },
+              { loading: false }
+            );
+            setBranding(nextBranding);
+            return;
+          }
+
           const nextBranding = buildBrandingState(data, { loading: false });
           setBranding(nextBranding);
           writeCachedPartnerBranding(nextBranding, hostname);
@@ -165,8 +190,15 @@ export function PartnerBrandingProvider({ children }) {
 
     loadBranding();
 
+    const handlePricingUpdated = () => {
+      loadBranding({ force: true });
+    };
+
+    window.addEventListener('partner-pricing-updated', handlePricingUpdated);
+
     return () => {
       cancelled = true;
+      window.removeEventListener('partner-pricing-updated', handlePricingUpdated);
     };
   }, [apiUrl, subdomain, hostname, isMainHost]);
 

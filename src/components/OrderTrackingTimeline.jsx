@@ -1,4 +1,8 @@
-import { PROJECT_STATUS_LABELS, buildTrackingSteps } from '../data/orderTracking';
+import {
+  PROJECT_STATUS_LABELS,
+  buildTrackingSteps,
+  resolveCurrentTrackingLabel,
+} from '../data/orderTracking';
 import './OrderTrackingTimeline.css';
 
 function formatWhen(value) {
@@ -12,31 +16,30 @@ function formatWhen(value) {
   });
 }
 
-export default function OrderTrackingTimeline({ tracking, paymentStatus, compact = false, showHistory = true }) {
-  if (!tracking && paymentStatus !== 'paid') {
-    return (
-      <p className="order-tracking-note">
-        Order progress will appear here once your payment is confirmed.
-      </p>
-    );
-  }
-
-  const steps = buildTrackingSteps(tracking);
-  const showPaymentPending = paymentStatus && paymentStatus !== 'paid';
-  const currentLabel =
-    tracking?.projectStatusLabel ||
-    PROJECT_STATUS_LABELS[tracking?.projectStatus] ||
-    null;
+export default function OrderTrackingTimeline({
+  tracking,
+  paymentStatus,
+  paymentGateway,
+  compact = false,
+  showHistory = true,
+}) {
+  const steps = buildTrackingSteps(tracking, { paymentStatus, paymentGateway });
+  const currentLabel = resolveCurrentTrackingLabel(tracking, { paymentStatus, paymentGateway });
+  const isBankAwaiting =
+    paymentGateway === 'bank_transfer' && paymentStatus && paymentStatus !== 'paid';
 
   return (
     <div className={`order-tracking${compact ? ' order-tracking-compact' : ''}`}>
-      {showPaymentPending ? (
-        <p className="order-tracking-note order-tracking-note-pending">
-          Payment pending — progress updates begin after payment is confirmed.
-        </p>
-      ) : currentLabel ? (
+      {currentLabel ? (
         <p className="order-tracking-current" aria-live="polite">
           You are here: <strong>{currentLabel}</strong>
+        </p>
+      ) : null}
+
+      {isBankAwaiting ? (
+        <p className="order-tracking-note order-tracking-note-pending">
+          We received your payment claim and are verifying your bank transfer. The next stages begin
+          once payment is confirmed.
         </p>
       ) : null}
 

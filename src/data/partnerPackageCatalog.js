@@ -254,7 +254,7 @@ export function buildDefaultPackagePricing() {
       entry.id,
       {
         basePriceNgn: entry.basePriceNgn,
-        sellingPriceNgn: Math.round(entry.basePriceNgn * 1.25),
+        sellingPriceNgn: entry.basePriceNgn,
         enabled: true,
       },
     ])
@@ -283,11 +283,14 @@ export function buildPartnerPackagePricingRows(storedPricing = {}) {
   return PARTNER_PACKAGE_CATALOG.map((entry) => {
     const value = pricing[entry.id] || {};
     const base = Number(value.basePriceNgn) || entry.basePriceNgn;
-    const selling = Number(value.sellingPriceNgn) || Math.round(base * 1.25);
+    const storedSelling = Number(value.sellingPriceNgn);
+    const selling = Number.isFinite(storedSelling) && storedSelling > 0
+      ? Math.max(base, storedSelling)
+      : base;
     return {
       ...entry,
       basePriceNgn: base,
-      sellingPriceNgn: Math.max(base, selling),
+      sellingPriceNgn: selling,
       partnerProfit: Math.max(0, selling - base),
       enabled: value.enabled !== false,
     };
@@ -295,15 +298,24 @@ export function buildPartnerPackagePricingRows(storedPricing = {}) {
 }
 
 export function buildPublicPackagePricing(storedPricing = {}) {
-  const pricing = mergePackagePricing(storedPricing);
+  const extracted = extractPackagePricingFromServicePricing(storedPricing);
   return Object.fromEntries(
-    Object.entries(pricing).map(([id, value]) => [
-      id,
-      {
-        sellingPriceNgn: value.sellingPriceNgn,
-        basePriceNgn: value.basePriceNgn,
-      },
-    ])
+    Object.entries(extracted).map(([id, value]) => {
+      const entry = getPackageCatalogEntry(id);
+      const base = Number(value.basePriceNgn) || entry?.basePriceNgn || 0;
+      const storedSelling = Number(value.sellingPriceNgn);
+      const selling =
+        Number.isFinite(storedSelling) && storedSelling > 0
+          ? Math.max(base, storedSelling)
+          : base;
+      return [
+        id,
+        {
+          sellingPriceNgn: selling,
+          basePriceNgn: base,
+        },
+      ];
+    })
   );
 }
 
@@ -312,8 +324,11 @@ export function resolvePackageSellingPrice(packageId, storedPricing = {}) {
   if (!entry) return null;
   const stored = storedPricing[packageId];
   const base = Number(stored?.basePriceNgn) || entry.basePriceNgn;
-  const selling = Number(stored?.sellingPriceNgn) || Math.round(base * 1.25);
-  return Math.max(base, selling);
+  const storedSelling = Number(stored?.sellingPriceNgn);
+  if (Number.isFinite(storedSelling) && storedSelling > 0) {
+    return Math.max(base, storedSelling);
+  }
+  return base;
 }
 
 export function extractPackagePricingFromServicePricing(servicePricing = {}) {

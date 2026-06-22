@@ -405,6 +405,9 @@ function CheckoutPage() {
       } catch (cartError) {
         console.error('Error updating cart after bank transfer claim:', cartError);
       }
+
+      const orderQuery = data.orderId ? `&order=${encodeURIComponent(data.orderId)}` : '';
+      navigate(`/account?section=orders${orderQuery}`, { replace: true, state: { orderId: data.orderId } });
     } catch (error) {
       setPaymentError(error.message || 'Unable to submit payment claim.');
     } finally {

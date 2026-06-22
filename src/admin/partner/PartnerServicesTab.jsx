@@ -8,11 +8,13 @@ function buildPackageRows(pricingRows) {
   return PARTNER_PACKAGE_CATALOG.map((entry) => {
     const row = pricingMap[entry.id];
     const base = row?.basePriceNgn ?? entry.basePriceNgn;
-    const selling = row?.sellingPriceNgn ?? Math.round(base * 1.25);
+    const storedSelling = Number(row?.sellingPriceNgn);
+    const selling =
+      Number.isFinite(storedSelling) && storedSelling > 0 ? Math.max(base, storedSelling) : base;
     return {
       ...entry,
       basePriceNgn: base,
-      sellingPriceNgn: Math.max(base, selling),
+      sellingPriceNgn: selling,
       partnerProfit: Math.max(0, selling - base),
     };
   });
@@ -126,6 +128,7 @@ export default function PartnerServicesTab({ api, onMessage }) {
       );
       await api.updateServices(pricing);
       onMessage?.({ type: 'success', text: 'Package pricing saved.' });
+      window.dispatchEvent(new CustomEvent('partner-pricing-updated'));
       await load();
     } catch (err) {
       onMessage?.({ type: 'error', text: err.message });

@@ -497,6 +497,12 @@
   border-radius: 12px;
 }
 
+.my-account-order-card.is-highlighted {
+  border-color: rgba(37, 99, 235, 0.45);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  background: #f8fbff;
+}
+
 .my-account-order-top {
   display: flex;
   justify-content: space-between;

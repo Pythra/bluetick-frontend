@@ -26,6 +26,8 @@ import {
 import Navbar from '../components/Navbar';
 import { usePartnerText } from '../utils/partnerText';
 import { useCurrency } from '../contexts/CurrencyContext.jsx';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { resolvePartnerPackagePrice } from '../hooks/usePartnerPackagePrice';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
@@ -365,6 +367,7 @@ const packages = [
 const additionalPublicationServices = [
   {
     id: 'backdate',
+    packageId: 'publication.backdate',
     title: 'Backdating an article',
     price: '₦50,000',
     priceValue: 50000,
@@ -376,6 +379,7 @@ const additionalPublicationServices = [
   },
   {
     id: 'links',
+    packageId: 'publication.links',
     title: 'Including links in an article',
     price: '₦100,000',
     priceValue: 100000,
@@ -387,6 +391,7 @@ const additionalPublicationServices = [
   },
   {
     id: 'reputation',
+    packageId: 'publication.reputation',
     title: 'Deleting an existing article',
     subtitle: 'Reputation management',
     price: '₦500,000',
@@ -497,17 +502,24 @@ function PublicationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { shortBrandName } = usePartnerText();
+  const { isPartnerSite, packagePricing } = usePartnerBranding();
   const [showCartNotification, setShowCartNotification] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef(null);
   const { format } = useCurrency();
 
+  const resolvePublicationPrice = (item) => {
+    const base = item.priceValue || parsePriceToNumber(item.price);
+    if (!isPartnerSite || !item.packageId) return base;
+    return resolvePartnerPackagePrice(item.packageId, base, packagePricing);
+  };
+
   const handleAddToCart = async (item) => {
-    const priceValue = item.priceValue || parsePriceToNumber(item.price);
+    const priceValue = resolvePublicationPrice(item);
     const formattedPrice = format(priceValue);
     
     const result = await addToCart({
-      itemId: item.id || `${item.title}-${Date.now()}`,
+      itemId: item.packageId || item.id || `${item.title}-${Date.now()}`,
       title: item.title || item.name,
       price: formattedPrice,
       priceValue: priceValue,
@@ -764,7 +776,9 @@ function PublicationServicesPage() {
                   </div>
                   <footer className="publication-addon-card-footer">
                     <div className="publication-addon-card-pricing">
-                      <span className="publication-addon-price">{service.priceValue ? format(service.priceValue) : service.price}</span>
+                      <span className="publication-addon-price">
+                        {format(resolvePublicationPrice(service))}
+                      </span>
                       <span className="publication-addon-unit">{service.unit}</span>
                     </div>
                     <Button
@@ -773,7 +787,9 @@ function PublicationServicesPage() {
                       onClick={() =>
                         handleAddToCart({
                           id: `publication-addon-${service.id}`,
+                          packageId: service.packageId,
                           title: service.title,
+                          priceValue: service.priceValue,
                           price: service.priceValue || service.price,
                           description: service.description,
                         })

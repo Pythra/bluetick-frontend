@@ -3,9 +3,15 @@ import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 
 export function resolvePartnerPackagePrice(packageId, defaultPrice, packagePricing) {
   if (!packageId || defaultPrice == null) return defaultPrice;
-  const stored = packagePricing?.[packageId];
-  if (!stored?.sellingPriceNgn) return defaultPrice;
-  return stored.sellingPriceNgn;
+  if (!packagePricing || !Object.prototype.hasOwnProperty.call(packagePricing, packageId)) {
+    return defaultPrice;
+  }
+  const stored = packagePricing[packageId];
+  const selling = Number(stored?.sellingPriceNgn);
+  if (Number.isFinite(selling) && selling > 0) {
+    return selling;
+  }
+  return defaultPrice;
 }
 
 export function usePartnerPackagePrice(packageId, defaultPrice) {

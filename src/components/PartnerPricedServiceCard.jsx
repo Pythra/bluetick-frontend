@@ -14,7 +14,8 @@ export default function PartnerPricedServiceCard({
   const handleAdd = () => {
     onAddToCart?.({
       ...service,
-      price,
+      price: format(price),
+      priceValue: price,
     });
   };
 

@@ -6,6 +6,8 @@ export const PROJECT_STATUS_LABELS = {
   completed: 'Completed',
 };
 
+export const AWAITING_PAYMENT_LABEL = 'Awaiting payment confirmation';
+
 export const PROJECT_STATUS_ORDER = [
   'requirements_received',
   'planning',
@@ -14,16 +16,56 @@ export const PROJECT_STATUS_ORDER = [
   'completed',
 ];
 
-export function buildTrackingSteps(tracking) {
-  if (tracking?.steps?.length) {
-    return tracking.steps;
+export function buildCustomerTrackingSteps({
+  paymentGateway,
+  paymentStatus,
+  projectStatus,
+  steps: prebuiltSteps,
+}) {
+  if (prebuiltSteps?.length) {
+    return prebuiltSteps;
   }
-  const current = tracking?.projectStatus || 'requirements_received';
-  const currentIndex = PROJECT_STATUS_ORDER.indexOf(current);
-  return PROJECT_STATUS_ORDER.map((id, index) => ({
-    id,
-    label: PROJECT_STATUS_LABELS[id],
-    complete: index <= currentIndex,
-    current: id === current,
-  }));
+
+  const normalizedStatus = PROJECT_STATUS_ORDER.includes(projectStatus)
+    ? projectStatus
+    : 'requirements_received';
+  const projectIndex = PROJECT_STATUS_ORDER.indexOf(normalizedStatus);
+  const isBankTransfer = paymentGateway === 'bank_transfer';
+  const isPaid = paymentStatus === 'paid';
+  const isBankAwaiting = isBankTransfer && !isPaid;
+  const steps = [];
+
+  if (isBankTransfer) {
+    steps.push({
+      id: 'awaiting_payment_confirmation',
+      label: AWAITING_PAYMENT_LABEL,
+      complete: isPaid,
+      current: isBankAwaiting,
+    });
+  }
+
+  PROJECT_STATUS_ORDER.forEach((id, index) => {
+    steps.push({
+      id,
+      label: PROJECT_STATUS_LABELS[id],
+      complete: !isBankAwaiting && index <= projectIndex,
+      current: !isBankAwaiting && id === normalizedStatus,
+    });
+  });
+
+  return steps;
+}
+
+export function buildTrackingSteps(tracking, options = {}) {
+  return buildCustomerTrackingSteps({
+    paymentGateway: options.paymentGateway || tracking?.paymentGateway,
+    paymentStatus: options.paymentStatus ?? tracking?.paymentStatus,
+    projectStatus: tracking?.projectStatus,
+    steps: tracking?.steps,
+  });
+}
+
+export function resolveCurrentTrackingLabel(tracking, options = {}) {
+  const steps = buildTrackingSteps(tracking, options);
+  return steps.find((step) => step.current)?.label || tracking?.projectStatusLabel || null;
 }

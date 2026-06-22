@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   IoBagOutline,
   IoCartOutline,
@@ -20,7 +20,7 @@ import Button from '../components/Button';
 import AccountMessagesPanel from '../components/account/AccountMessagesPanel';
 import UserInvoiceModal, { orderToInvoice } from '../components/account/UserInvoiceModal';
 import OrderTrackingTimeline from '../components/OrderTrackingTimeline';
-import { PROJECT_STATUS_LABELS } from '../data/orderTracking';
+import { AWAITING_PAYMENT_LABEL, PROJECT_STATUS_LABELS } from '../data/orderTracking';
 import { usePartnerText } from '../utils/partnerText';
 import './MyAccountPage.css';
 
@@ -64,7 +64,7 @@ function getPaymentStatusLabel(order) {
     return { text: 'Failed', tone: 'failed' };
   }
   if (order.paymentGateway === 'bank_transfer') {
-    return { text: 'Pending verification', tone: 'pending' };
+    return { text: 'Awaiting confirmation', tone: 'pending' };
   }
   if (order.paymentStatus === 'pending') {
     return { text: 'Pending', tone: 'pending' };
@@ -98,12 +98,26 @@ function resolveOrderTracking(order) {
     projectStatus,
     projectStatusLabel: PROJECT_STATUS_LABELS[projectStatus] || projectStatus,
     customerNote: '',
-    history: [],
+    paymentStatus: order.paymentStatus,
+    paymentGateway: order.paymentGateway,
+    history: order.metadata?.trackingHistory || [],
   };
+}
+
+function resolveOrderStageLabel(order, tracking) {
+  if (order.paymentGateway === 'bank_transfer' && order.paymentStatus === 'pending') {
+    return AWAITING_PAYMENT_LABEL;
+  }
+  if (order.paymentStatus === 'paid') {
+    return tracking.currentStageLabel || tracking.projectStatusLabel;
+  }
+  return null;
 }
 
 function MyAccountPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { shortBrandName, supportEmail } = usePartnerText();
   const { brandName, subdomain: brandingSubdomain, contactEmail, isPartnerSite } = usePartnerBranding();
   const hostSubdomain = getPartnerSubdomainFromHost();
@@ -121,6 +135,29 @@ function MyAccountPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const highlightOrderId = searchParams.get('order') || location.state?.orderId || null;
+
+  useEffect(() => {
+    const section = searchParams.get('section');
+    if (section && Object.values(SECTIONS).includes(section)) {
+      setActiveSection(section);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!highlightOrderId || activeSection !== SECTIONS.orders || ordersLoading) {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      document.getElementById(`order-${highlightOrderId}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 150);
+
+    return () => window.clearTimeout(timer);
+  }, [highlightOrderId, activeSection, ordersLoading, orders]);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -376,16 +413,22 @@ function MyAccountPage() {
             const tracking = resolveOrderTracking(order);
             const showOnboardingLink =
               order.paymentStatus === 'paid' && !order.onboardingComplete;
+            const stageLabel = resolveOrderStageLabel(order, tracking);
+            const isHighlighted = highlightOrderId && String(orderId) === String(highlightOrderId);
 
             return (
-              <li key={orderId} className="my-account-order-card">
+              <li
+                key={orderId}
+                id={`order-${orderId}`}
+                className={`my-account-order-card${isHighlighted ? ' is-highlighted' : ''}`}
+              >
                 <div className="my-account-order-top">
                   <div>
                     <h3 className="my-account-order-name">{order.productName}</h3>
                     <p className="my-account-order-date">Placed {formatOrderDate(order.createdAt)}</p>
-                    {order.paymentStatus === 'paid' ? (
+                    {stageLabel ? (
                       <p className="my-account-order-stage">
-                        Current stage: <strong>{tracking.projectStatusLabel}</strong>
+                        Current stage: <strong>{stageLabel}</strong>
                       </p>
                     ) : null}
                   </div>
@@ -408,13 +451,6 @@ function MyAccountPage() {
                   </ul>
                 )}
 
-                {order.paymentGateway === 'bank_transfer' && order.paymentStatus === 'pending' && (
-                  <p className="my-account-order-note">
-                    We received your payment claim and are verifying your bank transfer. You will get an email once
-                    it is confirmed.
-                  </p>
-                )}
-
                 {showOnboardingLink && (
                   <Button
                     type="button"
@@ -432,6 +468,7 @@ function MyAccountPage() {
                   <OrderTrackingTimeline
                     tracking={tracking}
                     paymentStatus={order.paymentStatus}
+                    paymentGateway={order.paymentGateway}
                   />
                 </div>
               </li>
