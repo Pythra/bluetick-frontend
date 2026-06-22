@@ -903,10 +903,6 @@ function PartnerAdminApp({ subdomain }) {
 
     return (
       <>
-        {saveMessage ? (
-          <div className={`pdash-alert ${saveMessage.type}`}>{saveMessage.text}</div>
-        ) : null}
-
         <div className="pdash-panel">
           <h2>Brand Identity</h2>
           <p className="pdash-panel-lead">Logo, colors, and contact details shown across your white-label site.</p>
@@ -1568,6 +1564,10 @@ function PartnerAdminApp({ subdomain }) {
             ) : null}
           </div>
         </div>
+
+        {saveMessage ? (
+          <div className={`pdash-alert ${saveMessage.type}`}>{saveMessage.text}</div>
+        ) : null}
 
         {loading ? (
           <div className="pdash-panel" style={{ textAlign: 'center', padding: '48px 24px' }}>

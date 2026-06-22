@@ -9,22 +9,40 @@ import { formatAmount } from '../../data/partnerServiceCatalog';
 export default function PartnerWithdrawalsTab({ api, onMessage }) {
   const [withdrawals, setWithdrawals] = useState([]);
   const [payoutData, setPayoutData] = useState(null);
+  const [availableBalance, setAvailableBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [amount, setAmount] = useState('');
   const [selectedMethodId, setSelectedMethodId] = useState('');
   const [showAddMethod, setShowAddMethod] = useState(false);
   const [newMethod, setNewMethod] = useState({ type: 'bank' });
   const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+
+  const showFeedback = (message) => {
+    setFeedback(message);
+    onMessage?.(message);
+  };
 
   const load = async () => {
     try {
-      const [w, p] = await Promise.all([api.getWithdrawals(), api.getPayoutMethods()]);
+      const [w, p, earnings] = await Promise.all([
+        api.getWithdrawals(),
+        api.getPayoutMethods(),
+        api.getEarnings().catch(() => null),
+      ]);
       setWithdrawals(w.withdrawals || []);
       setPayoutData(p);
-      if (!selectedMethodId && p.savedMethods?.length) {
-        const defaultMethod = p.savedMethods.find((m) => m.isDefault) || p.savedMethods[0];
-        setSelectedMethodId(defaultMethod.id);
+      setAvailableBalance(earnings?.summary?.availableBalance || 0);
+
+      const methods = p.savedMethods || [];
+      if (methods.length) {
+        const defaultMethod = methods.find((m) => m.isDefault) || methods[0];
+        if (defaultMethod?.id) {
+          setSelectedMethodId((current) => current || defaultMethod.id);
+        }
       }
+    } catch (err) {
+      showFeedback({ type: 'error', text: err.message || 'Failed to load withdrawals.' });
     } finally {
       setLoading(false);
     }
@@ -37,32 +55,50 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
   const handleAddMethod = async () => {
     try {
       await api.savePayoutMethod(newMethod);
-      onMessage?.({ type: 'success', text: 'Payout method saved.' });
+      showFeedback({ type: 'success', text: 'Payout method saved.' });
       setShowAddMethod(false);
       setNewMethod({ type: 'bank' });
       await load();
     } catch (err) {
-      onMessage?.({ type: 'error', text: err.message });
+      showFeedback({ type: 'error', text: err.message });
     }
   };
 
   const handleWithdraw = async () => {
+    const withdrawAmount = Number(amount);
+    if (!withdrawAmount || withdrawAmount <= 0) {
+      showFeedback({ type: 'error', text: 'Enter a valid withdrawal amount.' });
+      return;
+    }
+    if (!selectedMethodId) {
+      showFeedback({ type: 'error', text: 'Select a payout method first.' });
+      return;
+    }
+    if (withdrawAmount > availableBalance) {
+      showFeedback({
+        type: 'error',
+        text: `Insufficient balance. Available: ${formatAmount(availableBalance, payoutData?.currency || 'NGN')}`,
+      });
+      return;
+    }
+
     try {
       setSubmitting(true);
+      setFeedback(null);
       const result = await api.requestWithdrawal({
-        amount: Number(amount),
+        amount: withdrawAmount,
         payoutMethodId: selectedMethodId,
       });
-      onMessage?.({
-        type: 'success',
-        text: result.autoPayout
-          ? 'Withdrawal submitted and Paystack transfer initiated.'
-          : 'Withdrawal request submitted.',
-      });
+      const successText = result.autoPayout
+        ? 'Withdrawal submitted and Paystack transfer initiated.'
+        : result.autoPayoutError
+          ? `Withdrawal submitted (pending review). Paystack note: ${result.autoPayoutError}`
+          : 'Withdrawal request submitted and is pending review.';
+      showFeedback({ type: 'success', text: successText });
       setAmount('');
       await load();
     } catch (err) {
-      onMessage?.({ type: 'error', text: err.message });
+      showFeedback({ type: 'error', text: err.message || 'Withdrawal request failed.' });
     } finally {
       setSubmitting(false);
     }
@@ -79,9 +115,15 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
 
   return (
     <>
+      {feedback ? <div className={`pdash-alert ${feedback.type}`}>{feedback.text}</div> : null}
+
       <div className="pdash-grid-2">
         <div className="pdash-panel">
           <h2>Request Withdrawal</h2>
+          <p className="pdash-panel-lead">
+            Available balance:{' '}
+            <strong>{formatAmount(availableBalance, payoutData?.currency || 'NGN')}</strong>
+          </p>
           {payoutData?.paystackTransfersEnabled && (
             <p className="pdash-panel-lead">
               Nigerian bank withdrawals are paid via Paystack
@@ -110,11 +152,14 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
               ))}
             </select>
           </div>
+          {(payoutData?.savedMethods || []).length === 0 && (
+            <p className="pdash-panel-lead">Add a payout method before requesting a withdrawal.</p>
+          )}
           <button
             type="button"
             className="pdash-btn pdash-btn-primary"
             onClick={handleWithdraw}
-            disabled={submitting || !amount || !selectedMethodId}
+            disabled={submitting || !amount || !selectedMethodId || availableBalance <= 0}
           >
             {submitting ? 'Submitting...' : 'Request Withdrawal'}
           </button>
