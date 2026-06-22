@@ -1,298 +1,62 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import Button from '../components/Button';
-import { IoCheckmarkCircle, IoTime } from 'react-icons/io5';
-import punchLogo from '../assets/punch.png';
-import guardianLogo from '../assets/guardian.png';
-import pulseLogo from '../assets/pulse.png';
-import forbesLogo from '../assets/forbes.png';
-import foxLogo from '../assets/fox.png';
-import bbcNewsLogo from '../assets/platforms/bbc news.png';
-import bloombergNewsLogo from '../assets/platforms/bloomberg.png';
-import hardcoreLogo from '../assets/platforms/hardcore.png';
-import blueprintLogo from '../assets/platforms/blueprint.jpeg';
-import businessDayLogo from '../assets/platforms/buisnessday.png';
-import cableLogo from '../assets/platforms/cable.jpg';
-import championLogo from '../assets/platforms/champion.png';
-import dailyPostLogo from '../assets/platforms/dailypost.jpg';
-import dailyTrustLogo from '../assets/platforms/dailytrust.png';
-import ghanaWebLogo from '../assets/platforms/ghanaweb.png';
-import independentLogo from '../assets/platforms/independent.jpg';
-import leadershipLogo from '../assets/platforms/leadership.png';
-import legitLogo from '../assets/platforms/legit.jpeg';
-import nairametricsLogo from '../assets/platforms/nairametrics.png';
-import peoplesDailyLogo from '../assets/platforms/PEOPLES-DAILY.png';
-import sunOnlineLogo from '../assets/platforms/sun.webp';
-import techCabalLogo from '../assets/platforms/techcabal.png';
-import techpointLogo from '../assets/platforms/Techpoint-logo.jpg';
-import telegraphLogo from '../assets/platforms/telegraph.png';
-import theNationLogo from '../assets/platforms/thenation.png';
-import thisDayLogo from '../assets/platforms/thisday.jpg';
-import tribuneLogo from '../assets/platforms/tribune.png';
-import vanguardLogo from '../assets/platforms/Vanguard.png';
 import PlatformLogo from '../components/PlatformLogo';
+import { IoCheckmarkCircle, IoTime } from 'react-icons/io5';
 import { getPublicationPlatformLogo } from '../utils/publicationPlatformLogos';
+import {
+  getPublicationCategoryPlatforms,
+  PUBLICATION_PACKAGE_DETAILS,
+  resolvePublicationPlatformPrice,
+} from '../utils/publicationPricing';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import './PublicationServicesPage.editorial.css';
 import './PackageDetailPage.css';
 
-const packageMeta = {
-  1: { delivery: '6–24 Hours', listTitle: 'African outlets' },
-  2: { delivery: '6–24 Hours', listTitle: 'Tech & startup outlets' },
-  3: { delivery: '24–48 Hours', listTitle: 'UK outlets' },
-  4: { delivery: '24–48 Hours', listTitle: 'Google News outlets' },
-  5: { delivery: '2–7 Working Days', listTitle: 'Global outlets' },
-};
+function PublicationPlatformCard({ categoryId, platform, onAddToCart }) {
+  const { isPartnerSite, packagePricing } = usePartnerBranding();
+  const { format } = useCurrency();
+  const { packageId, priceValue } = resolvePublicationPlatformPrice({
+    categoryId,
+    platformName: platform.name,
+    priceValue: platform.priceValue,
+    packagePricing,
+    isPartnerSite,
+  });
+  const platformForLogo = { name: platform.name, logo: getPublicationPlatformLogo({ name: platform.name }) };
+  const hasLogo = Boolean(platformForLogo.logo);
 
-function resolvePlatformLogo(platform) {
-  return getPublicationPlatformLogo(platform) || logoMap[platform.name] || null;
+  return (
+    <article className="package-platform-card">
+      <div className="package-platform-media">
+        {hasLogo ? <PlatformLogo platform={platformForLogo} /> : null}
+        <h3 className="package-platform-name">{platform.name}</h3>
+      </div>
+      <footer className="package-platform-footer">
+        <span className="package-platform-price">{format(priceValue)}</span>
+        <Button
+          type="button"
+          className="package-platform-order-btn"
+          onClick={() =>
+            onAddToCart({
+              name: platform.name,
+              packageId,
+              priceValue,
+              formattedPrice: format(priceValue),
+            })
+          }
+        >
+          Place order
+        </Button>
+      </footer>
+    </article>
+  );
 }
-
-const logoMap = {
-  Punch: punchLogo,
-  Vanguard: vanguardLogo,
-  Guardian: guardianLogo,
-  'The Nation': theNationLogo,
-  ThisDay: thisDayLogo,
-  BusinessDay: businessDayLogo,
-  'Daily Trust': dailyTrustLogo,
-  Leadership: leadershipLogo,
-  Tribune: tribuneLogo,
-  SunOnline: sunOnlineLogo,
-  'Daily Telegraph': telegraphLogo,
-  Independent: independentLogo,
-  Champion: championLogo,
-  "People's Daily": peoplesDailyLogo,
-  Blueprint: blueprintLogo,
-  Legit: legitLogo,
-  GhanaWeb: ghanaWebLogo,
-  Nairametrics: nairametricsLogo,
-  Techpoint: techpointLogo,
-  Techcabal: techCabalLogo,
-  Forbes: forbesLogo,
-  'Fox News': foxLogo,
-  'BBC News': bbcNewsLogo,
-  Bloomberg: bloombergNewsLogo,
-  'Hardcore News': hardcoreLogo,
-};
-
-const packageDetails = {
-  1: {
-    title: 'African News Platforms',
-    description: 'Punch, Vanguard, Guardian Nigeria + multiple African authority sites and movie platforms. Perfect for local and regional market penetration with guaranteed publication.',
-    platforms: [
-      // News Platforms
-      { name: 'Punch', price: '₦80,000', logo: punchLogo },
-      { name: 'BusinessDay', price: '₦80,000', logo: businessDayLogo },
-      { name: 'Legit', price: '₦300,000', logo: legitLogo },
-      { name: 'The Nation', price: '₦60,000', logo: theNationLogo },
-      { name: 'Vanguard', price: '₦30,000', logo: vanguardLogo },
-      { name: 'ThisDay', price: '₦30,000', logo: thisDayLogo },
-      { name: 'The Guardian', price: '₦70,000', logo: guardianLogo },
-      { name: 'The Cable', price: '₦300,000', logo: cableLogo },
-      { name: 'Leadership', price: '₦60,000', logo: leadershipLogo },
-      { name: 'Daily Trust', price: '₦30,000', logo: dailyTrustLogo },
-      { name: 'Daily Post', price: '₦30,000', logo: dailyPostLogo },
-      { name: 'The Sun', price: '₦30,000', logo: sunOnlineLogo },
-      { name: 'The Telegraph', price: '₦20,000', logo: telegraphLogo },
-      { name: 'Tribune', price: '₦30,000', logo: tribuneLogo },
-      { name: 'Champion', price: '₦20,000', logo: championLogo },
-      { name: 'Blueprint', price: '₦30,000', logo: blueprintLogo },
-      { name: 'Peoples Daily', price: '₦20,000', logo: peoplesDailyLogo },
-      { name: 'GhanaWeb', price: '₦100,000', logo: ghanaWebLogo },
-      { name: 'Pulse', price: '₦300,000', logo: pulseLogo },
-      
-      // Tech & Business
-      { name: 'Techpoint', price: '₦300,000', logo: techpointLogo },
-      { name: 'TechCabal', price: '₦300,000', logo: techCabalLogo },
-      
-      // Movie Platforms
-      { name: 'Nollywire', price: '₦300,000', logo: null },
-      { name: 'The Nollywood Reporter', price: '₦400,000', logo: null },
-      { name: 'WKMup', price: '₦300,000', logo: null },
-      { name: 'Nolly Critic', price: '₦300,000', logo: null },
-      { name: 'Nigerian Movies Review', price: '₦500,000', logo: null },
-       
-      // Africa & Global Platforms
-      { name: 'OkayAfrican', price: '₦2,500,000', logo: null },
-      { name: 'GQ', price: '₦2,500,000', logo: null },
-      { name: 'AP', price: '₦700,000', logo: null },
-      { name: 'Benzinga', price: '₦700,000', logo: null },
-      { name: 'Joy Online', price: '₦700,000', logo: null },
-      { name: 'PeaceFm Online', price: '₦800,000', logo: null },
-      { name: 'B&FT Online', price: '₦800,000', logo: null },
-    ],
-    note: 'These platforms accept 2–3 images, branded graphics, backlinks, and other promotional materials to enhance your story placement.'
-  },
-  2: {
-    title: 'Tech & Startups',
-    description: 'Focused tech PR on leading African and international tech platforms.',
-    platforms: [
-      // African Tech
-      { name: 'Techpoint', price: '₦300,000', logo: techpointLogo },
-      { name: 'TechCabal', price: '₦300,000', logo: techCabalLogo },
-      
-      // Cybersecurity
-      { name: 'Cybersecurity Insiders', price: '₦700,000', logo: null },
-      { name: 'CyberNews', price: '₦1,600,000', logo: null },
-      { name: 'Influence', price: '₦700,000', logo: null },
-      
-      // Tech News & Analysis
-      { name: 'TechRound', price: '₦1,600,000', logo: null },
-      { name: 'Startup Observer', price: '₦500,000', logo: null },
-      { name: 'Technology Dispatch', price: '₦1,000,000', logo: null },
-      { name: 'Tech News Vision', price: '₦600,000', logo: null },
-      { name: 'Esports News UK', price: '₦1,000,000', logo: null },
-      
-      // Crypto & Blockchain
-      { name: 'Coin Journal', price: '₦1,000,000', logo: null },
-      { name: 'Tech Bullion', price: '₦600,000', logo: null },
-      { name: 'Crypto Daily', price: '₦1,800,000', logo: null },
-      { name: 'The Crypto Week', price: 'Contact for pricing', logo: null },
-      { name: 'The Coins Herald', price: 'Contact for pricing', logo: null },
-      { name: 'The Coins Wire', price: 'Contact for pricing', logo: null },
-      
-      // Business & Finance Tech
-      { name: 'Finsmes', price: '₦1,000,000', logo: null },
-      { name: 'Brands Journal', price: '₦600,000', logo: null },
-      { name: 'Business Matters', price: '₦1,400,000', logo: null },
-      { name: 'Finance Digest', price: '₦600,000', logo: null },
-      { name: 'Financial News', price: '₦500,000', logo: null },
-      { name: 'Wealth Tribune', price: '₦500,000', logo: null },
-      { name: 'Trading Herald', price: '₦500,000', logo: null },
-      { name: 'Investment Guide', price: '₦600,000', logo: null },
-      { name: 'Investing.com', price: '₦1,200,000', logo: null },
-      { name: 'StreetInsiders.com', price: '₦400,000', logo: null },
-      
-      // Additional Platforms
-      { name: 'Palm Bay Herald', price: '₦600,000', logo: null },
-      { name: 'Property Development', price: '₦600,000', logo: null },
-      { name: 'Online World News', price: '₦600,000', logo: null },
-      { name: 'International Releases', price: '₦600,000', logo: null },
-    ],
-    note: 'Ideal for product launches, funding announcements, and startup thought leadership in the tech ecosystem.'
-  },
-  3: {
-    title: 'UK News Platforms',
-    description: 'Comprehensive coverage across UK media outlets, business publications, and regional news platforms for maximum UK market penetration.',
-    platforms: [
-      // UK Regional News
-      { name: 'London Journal', price: '₦200,000', logo: null },
-      { name: 'Glasgow Report', price: '₦200,000', logo: null },
-      { name: 'Manchester Times', price: '₦200,000', logo: null },
-      { name: 'UkHerald', price: '₦200,000', logo: null },
-      { name: 'Birmingham Times', price: '₦200,000', logo: null },
-      { name: 'UkReporter', price: '₦200,000', logo: null },
-      { name: 'The Bristol Press', price: '₦200,000', logo: null },
-      { name: 'Uk Wire', price: '₦200,000', logo: null },
-      
-      // Major UK News Outlets
-      { name: 'Manchester Evening News', price: '₦3,800,000', logo: null },
-      { name: 'Wales Online', price: '₦3,800,000', logo: null },
-      { name: 'MyLondon', price: '₦3,800,000', logo: null },
-      { name: 'Chronicle Live', price: '₦3,800,000', logo: null },
-      { name: 'Edinburgh Live', price: '₦3,800,000', logo: null },
-      { name: 'Galway Beo', price: '₦3,800,000', logo: null },
-      { name: 'InYourArea', price: '₦3,800,000', logo: null },
-      { name: 'Daily Records', price: '₦4,500,000', logo: null },
-      { name: 'Echo', price: '₦3,800,000', logo: null },
-      
-      // UK Business & Finance
-      { name: 'Business Live', price: '₦3,800,000', logo: null },
-      { name: 'Business Cheshire', price: '₦500,000', logo: null },
-      { name: 'Business Lancashire', price: '₦400,000', logo: null },
-      { name: 'Business Manchester', price: '₦400,000', logo: null },
-      { name: 'Calculator UK Business News', price: '₦500,000', logo: null },
-      { name: 'Talk Business', price: '₦1,100,000', logo: null },
-      
-      // Sports & Entertainment
-      { name: 'The Sporting News', price: '₦3,100,000', logo: null },
-      { name: 'Football.London', price: '₦3,800,000', logo: null },
-      { name: 'Female First', price: '₦1,400,000', logo: null },
-      { name: 'Funeral Notices', price: '₦3,800,000', logo: null },
-      
-      // Lifestyle & Luxury
-      { name: 'Luxury Adviser', price: '₦500,000', logo: null },
-      
-      // Finance & Investment
-      { name: 'Financial News', price: '₦500,000', logo: null },
-      { name: 'Wealth Tribune', price: '₦500,000', logo: null },
-      { name: 'Trading Herald', price: '₦500,000', logo: null },
-      { name: 'Investment Guide', price: '₦600,000', logo: null },
-      
-      // Technology & Crypto
-      { name: 'TechRound', price: '₦1,600,000', logo: null },
-      { name: 'Startup Observer', price: '₦500,000', logo: null },
-      { name: 'Coin Journal', price: '₦1,000,000', logo: null },
-      { name: 'Tech Bullion', price: '₦600,000', logo: null },
-      { name: 'Crypto Daily', price: '₦1,800,000', logo: null },
-      
-      // Other Platforms
-      { name: 'BusinessMole', price: '₦400,000', logo: null },
-      { name: 'Economy Standard', price: '₦600,000', logo: null },
-      { name: 'DeadLine', price: '₦900,000', logo: null },
-      { name: 'Finsmes', price: '₦1,000,000', logo: null },
-      { name: 'Brands Journal', price: '₦600,000', logo: null },
-      { name: 'Business Matters', price: '₦1,400,000', logo: null },
-      { name: 'Technology Dispatch', price: '₦1,000,000', logo: null },
-      { name: 'Finance Digest', price: '₦600,000', logo: null },
-    ],
-    note: 'Extensive UK media coverage across news, business, sports, and lifestyle publications for comprehensive market reach.'
-  },
-  4: {
-    title: 'Google News Platforms',
-    description: 'Get featured on Google News approved platforms for maximum visibility and SEO benefits with our network of trusted news sources.',
-    platforms: [
-      { name: 'The Open News', price: '₦600,000', logo: null },
-      { name: 'Verna Magazine', price: '₦600,000', logo: null },
-      { name: 'AllNewsBuzz', price: '₦600,000', logo: null },
-      { name: 'Entertainment Paper', price: '₦600,000', logo: null },
-      { name: 'FabWorldToday', price: '₦600,000', logo: null },
-      { name: 'Resident Weekly', price: '₦600,000', logo: null },
-      { name: 'Sportz Weekly', price: '₦600,000', logo: null },
-      { name: 'Data Source Hub', price: '₦600,000', logo: null },
-      { name: 'GlobeStats', price: '₦600,000', logo: null },
-      { name: 'Stats Globe', price: '₦600,000', logo: null },
-      { name: 'Apsters Media', price: '₦600,000', logo: null },
-      { name: 'Coverage Log', price: '₦600,000', logo: null },
-      { name: 'Time Bulletin', price: '₦600,000', logo: null },
-      { name: 'Tech News Vision', price: '₦600,000', logo: null },
-      { name: 'The Nashville Post', price: '₦600,000', logo: null },
-      { name: 'Industry Today', price: '₦600,000', logo: null },
-      { name: 'California Times', price: '₦600,000', logo: null },
-      { name: 'Feature Weekly', price: '₦600,000', logo: null },
-      { name: 'Infuse News', price: '₦600,000', logo: null },
-    ],
-    note: 'All platforms are Google News approved, ensuring maximum visibility and SEO benefits for your content.'
-  },
-  5: {
-    title: 'Global Premium Authority',
-    description: 'Forbes, Fox News, BBC News, Bloomberg, Business Insider, Yahoo Finance and premium international platforms. Maximum authority and credibility with international market access.',
-    platforms: [
-      // Premium News Outlets
-      { name: 'Forbes', price: '₦9,730,000', logo: forbesLogo },
-      { name: 'Fox News', price: '₦5,250,000', logo: foxLogo },
-      { name: 'BBC News', price: '₦7,950,000', logo: bbcNewsLogo },
-      { name: 'Bloomberg', price: '₦3,525,000', logo: bloombergNewsLogo },
-      { name: 'Business Insider', price: 'Contact for pricing', logo: null },
-      { name: 'Yahoo Finance', price: 'Contact for pricing', logo: null },
-      { name: 'Hardcore News', price: '₦1,890,000', logo: hardcoreLogo },
-      
-      // Other International Platforms
-      { name: 'NewYork Weekly', price: '₦1,000,000', logo: null },
-      { name: 'USA Wire', price: '₦900,000', logo: null },
-      { name: 'AsiaOne', price: '₦700,000', logo: null },
-      { name: 'MSN', price: '₦800,000', logo: null },
-      { name: 'International Business Times', price: '₦1,500,000', logo: null },
-      { name: 'IGB', price: '₦4,600,000', logo: null },
-      { name: 'Casino Life', price: '₦3,100,000', logo: null },
-    ],
-    note: 'Premium international platforms that provide maximum credibility and global reach for your brand story.'
-  },
-};
 
 function PackageDetailPage() {
   const { id } = useParams();
@@ -300,8 +64,8 @@ function PackageDetailPage() {
   const { addToCart } = useCart();
   const [showCartNotification, setShowCartNotification] = useState(false);
   const packageId = parseInt(id, 10);
-  const packageData = packageDetails[packageId];
-  const meta = packageMeta[packageId];
+  const packageData = PUBLICATION_PACKAGE_DETAILS[packageId];
+  const platforms = packageData ? getPublicationCategoryPlatforms(packageData.categoryId) : [];
 
   if (!packageData) {
     return (
@@ -319,9 +83,11 @@ function PackageDetailPage() {
 
   const handleAddToCart = async (platform) => {
     const result = await addToCart({
-      itemId: `${packageData.title}-${platform.name}-${Date.now()}`,
+      itemId: platform.packageId || `${packageData.title}-${platform.name}`,
+      packageId: platform.packageId,
       title: `${platform.name} — ${packageData.title}`,
-      price: platform.price,
+      price: platform.formattedPrice,
+      priceValue: platform.priceValue,
       description: packageData.description,
       category: 'publication',
       quantity: 1,
@@ -336,28 +102,25 @@ function PackageDetailPage() {
   const scrollToSection = (sectionId) => {
     navigate('/');
     setTimeout(() => {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
   };
 
   return (
     <div className="publication-page package-detail-page">
-      {showCartNotification && (
+      {showCartNotification ? (
         <div className="publication-toast" role="status">
           Item added to cart!
         </div>
-      )}
+      ) : null}
       <Navbar onScrollToSection={scrollToSection} />
       <div className="package-detail-shell">
         <header className="package-detail-header">
           <p className="publication-section-kicker">Publication package</p>
-          {meta?.delivery ? (
+          {packageData.delivery ? (
             <p className="package-detail-delivery">
               <IoTime aria-hidden="true" />
-              Typical delivery: {meta.delivery}
+              Typical delivery: {packageData.delivery}
             </p>
           ) : null}
           <h1 className="package-detail-title">{packageData.title}</h1>
@@ -365,31 +128,16 @@ function PackageDetailPage() {
         </header>
 
         <section className="package-platforms-panel">
-          <h2 className="publication-section-title">
-            {meta?.listTitle ?? 'Select outlets'}
-          </h2>
+          <h2 className="publication-section-title">{packageData.listTitle ?? 'Select outlets'}</h2>
           <div className="package-platforms-grid">
-            {packageData.platforms.map((platform) => {
-              const hasLogo = Boolean(resolvePlatformLogo(platform));
-              return (
-                <article key={platform.name} className="package-platform-card">
-                  <div className="package-platform-media">
-                    {hasLogo ? <PlatformLogo platform={platform} /> : null}
-                    <h3 className="package-platform-name">{platform.name}</h3>
-                  </div>
-                  <footer className="package-platform-footer">
-                    <span className="package-platform-price">{platform.price}</span>
-                    <Button
-                      type="button"
-                      className="package-platform-order-btn"
-                      onClick={() => handleAddToCart(platform)}
-                    >
-                      Place order
-                    </Button>
-                  </footer>
-                </article>
-              );
-            })}
+            {platforms.map((platform) => (
+              <PublicationPlatformCard
+                key={platform.name}
+                categoryId={packageData.categoryId}
+                platform={platform}
+                onAddToCart={handleAddToCart}
+              />
+            ))}
           </div>
         </section>
 

@@ -18,7 +18,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import AccountMessagesPanel from '../components/account/AccountMessagesPanel';
-import UserInvoiceModal, { orderToInvoice } from '../components/account/UserInvoiceModal';
+import UserInvoiceModal, { buildInvoiceFromOrder } from '../components/account/UserInvoiceModal';
 import OrderTrackingTimeline from '../components/OrderTrackingTimeline';
 import { AWAITING_PAYMENT_LABEL, PROJECT_STATUS_LABELS } from '../data/orderTracking';
 import { usePartnerText } from '../utils/partnerText';
@@ -119,7 +119,7 @@ function MyAccountPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { shortBrandName, supportEmail } = usePartnerText();
-  const { brandName, subdomain: brandingSubdomain, contactEmail, isPartnerSite } = usePartnerBranding();
+  const { brandName, subdomain: brandingSubdomain, contactEmail, contactPhone, contactWebsite, contactWhatsapp, logoUrl, primaryColor, tagline, isPartnerSite } = usePartnerBranding();
   const hostSubdomain = getPartnerSubdomainFromHost();
   const messageSubdomain = (brandingSubdomain || hostSubdomain || '').trim().toLowerCase();
   const isMainSiteAccount = !messageSubdomain;
@@ -338,7 +338,28 @@ function MyAccountPage() {
     { id: SECTIONS.account, label: 'Account info', icon: IoPersonOutline },
   ];
 
-  const invoiceBrandName = isPartnerSite ? brandName : shortBrandName;
+
+  const invoiceBranding = isPartnerSite
+    ? {
+        brandName,
+        logoUrl,
+        contactEmail,
+        contactPhone,
+        contactWebsite: contactWebsite || (brandingSubdomain ? `https://${brandingSubdomain}.bluetickgeng.com` : ''),
+        contactWhatsapp,
+        primaryColor,
+        tagline,
+      }
+    : undefined;
+
+  const openOrderInvoice = (order) => {
+    setSelectedInvoice(
+      buildInvoiceFromOrder(order, {
+        user,
+        branding: invoiceBranding,
+      })
+    );
+  };
 
   const dashboardCards = [
     {
@@ -518,7 +539,7 @@ function MyAccountPage() {
                 <button
                   type="button"
                   className="my-account-invoice-link"
-                  onClick={() => setSelectedInvoice(orderToInvoice(order, invoiceBrandName, user.email))}
+                  onClick={() => openOrderInvoice(order)}
                 >
                   <IoReceiptOutline aria-hidden="true" />
                   Download invoice
@@ -728,7 +749,7 @@ function MyAccountPage() {
                     <button
                       type="button"
                       className="my-account-invoice-link"
-                      onClick={() => setSelectedInvoice(orderToInvoice(order, invoiceBrandName, user.email))}
+                      onClick={() => openOrderInvoice(order)}
                     >
                       Download
                     </button>

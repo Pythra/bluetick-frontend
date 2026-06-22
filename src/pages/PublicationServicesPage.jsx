@@ -27,7 +27,7 @@ import Navbar from '../components/Navbar';
 import { usePartnerText } from '../utils/partnerText';
 import { useCurrency } from '../contexts/CurrencyContext.jsx';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
-import { resolvePartnerPackagePrice } from '../hooks/usePartnerPackagePrice';
+import { resolvePublicationPlatformPrice } from '../utils/publicationPricing';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
@@ -510,8 +510,15 @@ function PublicationServicesPage() {
 
   const resolvePublicationPrice = (item) => {
     const base = item.priceValue || parsePriceToNumber(item.price);
-    if (!isPartnerSite || !item.packageId) return base;
-    return resolvePartnerPackagePrice(item.packageId, base, packagePricing);
+    if (!isPartnerSite) return base;
+    return resolvePublicationPlatformPrice({
+      categoryId: item.categoryId,
+      platformName: item.name,
+      priceValue: base,
+      packageId: item.packageId,
+      packagePricing,
+      isPartnerSite,
+    }).priceValue;
   };
 
   const handleAddToCart = async (item) => {
@@ -789,8 +796,8 @@ function PublicationServicesPage() {
                           id: `publication-addon-${service.id}`,
                           packageId: service.packageId,
                           title: service.title,
-                          priceValue: service.priceValue,
-                          price: service.priceValue || service.price,
+                          priceValue: resolvePublicationPrice(service),
+                          price: resolvePublicationPrice(service),
                           description: service.description,
                         })
                       }

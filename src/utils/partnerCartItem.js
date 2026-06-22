@@ -1,5 +1,9 @@
 export function buildPartnerCartItem(service, { title, description, category, tier, price, formatPrice }) {
-  const resolvedPrice = price ?? service.priceValue ?? service.price;
+  const resolvedPrice =
+    service.priceValue ??
+    (typeof price === 'number' ? price : undefined) ??
+    price ??
+    service.price;
   const formattedPrice =
     typeof resolvedPrice === 'number'
       ? (formatPrice ? formatPrice(resolvedPrice) : String(resolvedPrice))

@@ -19,7 +19,9 @@ import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import { appDevelopmentServices } from '../data/developmentServices';
+import { getPackagesByGroup } from '../data/partnerPackageCatalog';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
+import { usePartnerPackagePrice } from '../hooks/usePartnerPackagePrice';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import appHeroImage from '../assets/app.png';
 import appHeroVideo from '../assets/app.mp4';
@@ -57,12 +59,17 @@ const appServices = appDevelopmentServices.map((service) => ({
   description: appDescriptions[service.title] || '',
 }));
 
+const appStartingPackage = getPackagesByGroup('app-packages').reduce((lowest, entry) =>
+  entry.basePriceNgn < lowest.basePriceNgn ? entry : lowest
+);
+
 const customAppInfo = {
   title: 'Custom App Development',
   meta: 'Custom build',
   description:
     'For clients with new app ideas, we offer tailored solutions. Schedule a meeting with us to discuss your unique needs.',
-  startingPrice: 3750000,
+  packageId: appStartingPackage.id,
+  startingPrice: appStartingPackage.basePriceNgn,
   icon: IoRocketOutline,
 };
 
@@ -70,6 +77,10 @@ function AppServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { format } = useCurrency();
+  const customAppStartingPrice = usePartnerPackagePrice(
+    customAppInfo.packageId,
+    customAppInfo.startingPrice
+  );
   const [showCartNotification, setShowCartNotification] = useState(false);
 
   const handleAddToCart = async (service) => {
@@ -141,7 +152,7 @@ function AppServicesPage() {
             title={customAppInfo.title}
             meta={customAppInfo.meta}
             description={customAppInfo.description}
-            price={format(customAppInfo.startingPrice)}
+            price={format(customAppStartingPrice)}
             icon={customAppInfo.icon}
             feature
           />

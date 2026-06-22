@@ -15,6 +15,7 @@ import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
+import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
