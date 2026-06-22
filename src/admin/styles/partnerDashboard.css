@@ -1210,6 +1210,72 @@
   gap: 4px;
 }
 
+.pdash-payout-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pdash-payout-delete {
+  border: none;
+  background: transparent;
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.pdash-payout-delete:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.pdash-payout-delete:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.pdash-payout-delete-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pdash-soft);
+}
+
+.pdash-payout-verified {
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pdash-payout-unverified {
+  color: #b45309;
+  font-size: 13px;
+}
+
+.pdash-payout-verifying {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px 16px;
+  text-align: center;
+}
+
+.pdash-payout-verifying p {
+  margin: 0;
+  color: var(--pdash-soft);
+  font-size: 14px;
+}
+
+.pdash-spinner-inline {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
 .pdash-notifications {
   display: flex;
   flex-direction: column;

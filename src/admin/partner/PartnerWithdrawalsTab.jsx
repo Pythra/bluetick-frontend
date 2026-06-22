@@ -16,6 +16,8 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
   const [showAddMethod, setShowAddMethod] = useState(false);
   const [newMethod, setNewMethod] = useState({ type: 'bank' });
   const [submitting, setSubmitting] = useState(false);
+  const [savingMethod, setSavingMethod] = useState(false);
+  const [deletingMethodId, setDeletingMethodId] = useState('');
   const [feedback, setFeedback] = useState(null);
 
   const showFeedback = (message) => {
@@ -54,13 +56,51 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
 
   const handleAddMethod = async () => {
     try {
+      setSavingMethod(true);
+      setFeedback(null);
+      const verifyingBank =
+        newMethod.type === 'bank' && payoutData?.paystackTransfersEnabled;
+      if (verifyingBank) {
+        showFeedback({
+          type: 'info',
+          text: 'Verifying your bank account with Paystack. This may take a few seconds…',
+        });
+      }
       await api.savePayoutMethod(newMethod);
-      showFeedback({ type: 'success', text: 'Payout method saved.' });
+      showFeedback({
+        type: 'success',
+        text: verifyingBank
+          ? 'Bank account verified and saved with Paystack.'
+          : 'Payout method saved.',
+      });
       setShowAddMethod(false);
       setNewMethod({ type: 'bank' });
       await load();
     } catch (err) {
       showFeedback({ type: 'error', text: err.message });
+    } finally {
+      setSavingMethod(false);
+    }
+  };
+
+  const handleDeleteMethod = async (methodId) => {
+    if (!methodId) return;
+    const confirmed = window.confirm('Remove this payout method?');
+    if (!confirmed) return;
+
+    try {
+      setDeletingMethodId(methodId);
+      setFeedback(null);
+      await api.deletePayoutMethod(methodId);
+      if (selectedMethodId === methodId) {
+        setSelectedMethodId('');
+      }
+      showFeedback({ type: 'success', text: 'Payout method removed.' });
+      await load();
+    } catch (err) {
+      showFeedback({ type: 'error', text: err.message || 'Failed to remove payout method.' });
+    } finally {
+      setDeletingMethodId('');
     }
   };
 
@@ -173,10 +213,34 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
           </p>
           {(payoutData?.savedMethods || []).map((m) => (
             <div key={m.id} className="pdash-payout-card">
-              <strong>{PAYOUT_METHOD_LABELS[m.type]}</strong>
+              <div className="pdash-payout-card-head">
+                <strong>{PAYOUT_METHOD_LABELS[m.type]}</strong>
+                <button
+                  type="button"
+                  className="pdash-payout-delete"
+                  onClick={() => handleDeleteMethod(m.id)}
+                  disabled={Boolean(deletingMethodId) || savingMethod}
+                  aria-label="Remove payout method"
+                >
+                  {deletingMethodId === m.id ? (
+                    <span className="pdash-payout-delete-loading">
+                      <span className="pdash-spinner pdash-spinner-inline" aria-hidden="true" />
+                      Removing…
+                    </span>
+                  ) : (
+                    'Remove'
+                  )}
+                </button>
+              </div>
               <span>{m.bankName || m.email || m.network}</span>
               <span>{m.accountNumber || m.walletAddress || ''}</span>
-              {m.paystackRecipientCode && <span>Paystack verified</span>}
+              {m.type === 'bank' && payoutData?.paystackTransfersEnabled ? (
+                m.paystackRecipientCode ? (
+                  <span className="pdash-payout-verified">Paystack verified</span>
+                ) : (
+                  <span className="pdash-payout-unverified">Not verified with Paystack</span>
+                )
+              ) : null}
             </div>
           ))}
           {!showAddMethod ? (
@@ -185,11 +249,23 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
             </button>
           ) : (
             <div className="pdash-payout-form">
+              {savingMethod ? (
+                <div className="pdash-payout-verifying" role="status" aria-live="polite">
+                  <div className="pdash-spinner" />
+                  <p>
+                    {newMethod.type === 'bank' && payoutData?.paystackTransfersEnabled
+                      ? 'Verifying bank account with Paystack…'
+                      : 'Saving payout method…'}
+                  </p>
+                </div>
+              ) : (
+                <>
               <div className="pdash-field">
                 <label>Method Type</label>
                 <select
                   value={newMethod.type}
                   onChange={(e) => setNewMethod({ type: e.target.value })}
+                  disabled={savingMethod}
                 >
                   {(payoutData?.availableMethods || []).map((m) => (
                     <option key={m.type} value={m.type}>{m.label}</option>
@@ -203,6 +279,7 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
                     <select
                       value={newMethod[f.key] || ''}
                       onChange={(e) => setNewMethod({ ...newMethod, [f.key]: e.target.value })}
+                      disabled={savingMethod}
                     >
                       <option value="">Select</option>
                       {f.options.map((o) => <option key={o} value={o}>{o}</option>)}
@@ -212,18 +289,31 @@ export default function PartnerWithdrawalsTab({ api, onMessage }) {
                       type={f.type}
                       value={newMethod[f.key] || ''}
                       onChange={(e) => setNewMethod({ ...newMethod, [f.key]: e.target.value })}
+                      disabled={savingMethod}
                     />
                   )}
                 </div>
               ))}
               <div style={{ display: 'flex', gap: 8 }}>
-                <button type="button" className="pdash-btn pdash-btn-primary" onClick={handleAddMethod}>
+                <button
+                  type="button"
+                  className="pdash-btn pdash-btn-primary"
+                  onClick={handleAddMethod}
+                  disabled={savingMethod}
+                >
                   Save Method
                 </button>
-                <button type="button" className="pdash-btn pdash-btn-ghost" onClick={() => setShowAddMethod(false)}>
+                <button
+                  type="button"
+                  className="pdash-btn pdash-btn-ghost"
+                  onClick={() => setShowAddMethod(false)}
+                  disabled={savingMethod}
+                >
                   Cancel
                 </button>
               </div>
+                </>
+              )}
             </div>
           )}
         </div>
