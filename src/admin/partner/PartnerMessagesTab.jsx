@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MdSupportAgent, MdPeople, MdAdd, MdSearch, MdClose } from 'react-icons/md';
 import ChatComposeBar from '../../components/chat/ChatComposeBar';
 import MessageBubbleContent from '../../components/chat/MessageBubbleContent';
+import useMessageSocket from '../../hooks/useMessageSocket';
 import { messagePreviewText } from '../../utils/chatMedia';
 
 function ClientPicker({ clients, onSelect }) {
@@ -76,7 +77,14 @@ function ClientPicker({ clients, onSelect }) {
   );
 }
 
-export default function PartnerMessagesTab({ api, initialCategory = 'support', initialClient = null }) {
+export default function PartnerMessagesTab({
+  api,
+  apiUrl,
+  token,
+  subdomain,
+  initialCategory = 'support',
+  initialClient = null,
+}) {
   const [threads, setThreads] = useState([]);
   const [clients, setClients] = useState([]);
   const [activeThread, setActiveThread] = useState(null);
@@ -87,6 +95,8 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
   const [composingNew, setComposingNew] = useState(Boolean(initialClient));
   const [selectedClient, setSelectedClient] = useState(initialClient);
   const [newSubject, setNewSubject] = useState('');
+  const activeThreadIdRef = useRef(null);
+  activeThreadIdRef.current = activeThread?.threadId;
 
   const loadThreads = async () => {
     try {
@@ -101,6 +111,24 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
     loadThreads();
     refreshClients();
   }, [api]);
+
+  const handleRealtimeMessage = useCallback(async (payload) => {
+    await loadThreads();
+    if (activeThreadIdRef.current === payload.threadId) {
+      try {
+        const data = await api.getThread(payload.threadId);
+        setActiveThread(data.thread);
+      } catch { /* silent */ }
+    }
+  }, [api]);
+
+  useMessageSocket({
+    apiUrl,
+    token,
+    subdomain,
+    enabled: Boolean(apiUrl && token),
+    onEvent: handleRealtimeMessage,
+  });
 
   const refreshClients = () => {
     api.getClients().then((d) => setClients(d.clients || [])).catch(() => {});

@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { MdChat, MdClose } from 'react-icons/md';
 import { useAuth } from '../contexts/AuthContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain';
+import useMessageSocket from '../hooks/useMessageSocket';
 import ChatComposeBar from './chat/ChatComposeBar';
 import MessageBubbleContent from './chat/MessageBubbleContent';
 import { messagePreviewText } from '../utils/chatMedia';
@@ -29,6 +30,8 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
   const [loadError, setLoadError] = useState('');
   const [sendError, setSendError] = useState('');
   const [composingNew, setComposingNew] = useState(false);
+  const activeThreadIdRef = useRef(null);
+  activeThreadIdRef.current = activeThread?.threadId;
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -54,6 +57,31 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
   }, [apiUrl, subdomain, token, onUnreadChange]);
 
   useEffect(() => { loadThreads(); }, [loadThreads]);
+
+  const handleRealtimeMessage = useCallback(async (payload) => {
+    await loadThreads();
+    if (activeThreadIdRef.current === payload.threadId) {
+      try {
+        const siteSlug = encodeURIComponent(String(subdomain).trim().toLowerCase());
+        const res = await fetch(
+          `${apiUrl}/api/partner-site/${siteSlug}/client-messages/${payload.threadId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const data = await res.json();
+        if (res.ok && data.success) {
+          setActiveThread(data.thread);
+        }
+      } catch { /* silent */ }
+    }
+  }, [apiUrl, subdomain, token, loadThreads]);
+
+  useMessageSocket({
+    apiUrl,
+    token,
+    subdomain,
+    enabled: Boolean(apiUrl && token && subdomain),
+    onEvent: handleRealtimeMessage,
+  });
 
   const openThread = async (threadId) => {
     try {
@@ -243,11 +271,19 @@ export default function ClientMessagesFab() {
   useEffect(() => {
     if (isPartnerSite && token && subdomain && !isAdminRoute) {
       fetchUnread();
-      const interval = setInterval(fetchUnread, 30000);
+      const interval = setInterval(fetchUnread, 60000);
       return () => clearInterval(interval);
     }
     return undefined;
   }, [isPartnerSite, token, subdomain, isAdminRoute, fetchUnread]);
+
+  useMessageSocket({
+    apiUrl,
+    token,
+    subdomain,
+    enabled: isPartnerSite && Boolean(token && subdomain) && !isAdminRoute,
+    onEvent: fetchUnread,
+  });
 
   if (!isPartnerSite || !token || isAdminRoute || typeof document === 'undefined') {
     return null;

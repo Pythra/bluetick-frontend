@@ -1,8 +1,9 @@
 import { createPortal } from 'react-dom';
 import { MdChat, MdClose, MdHandshake, MdApps } from 'react-icons/md';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ChatComposeBar from './chat/ChatComposeBar';
 import MessageBubbleContent from './chat/MessageBubbleContent';
+import useMessageSocket from '../hooks/useMessageSocket';
 import { messagePreviewText } from '../utils/chatMedia';
 import './AdminMessagesFab.css';
 
@@ -29,6 +30,8 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [category, setCategory] = useState('all');
+  const activeThreadRef = useRef(null);
+  activeThreadRef.current = activeThread;
 
   const headers = {
     Authorization: `Bearer ${token}`,
@@ -56,6 +59,29 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
   useEffect(() => {
     loadInbox();
   }, [loadInbox]);
+
+  const handleRealtimeMessage = useCallback(async (payload) => {
+    await loadInbox();
+    const current = activeThreadRef.current;
+    if (current?.threadId !== payload.threadId) return;
+    try {
+      const response = await fetch(
+        `${apiUrl}/api/admin/partnerships/${current.partnerId}/messages/${payload.threadId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setActiveThread(data.thread);
+      }
+    } catch { /* silent */ }
+  }, [apiUrl, token, loadInbox]);
+
+  useMessageSocket({
+    apiUrl,
+    token,
+    enabled: Boolean(apiUrl && token),
+    onEvent: handleRealtimeMessage,
+  });
 
   useEffect(() => {
     setActiveThread(null);

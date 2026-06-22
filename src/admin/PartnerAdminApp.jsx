@@ -1616,6 +1616,9 @@ function PartnerAdminApp({ subdomain }) {
               <PartnerMessagesTab
                 key={messagesIntent?.key || 'messages-default'}
                 api={partnerApi}
+                apiUrl={apiUrl}
+                token={token}
+                subdomain={subdomain}
                 initialCategory={messagesIntent?.category || 'support'}
                 initialClient={messagesIntent?.client || null}
               />

@@ -76,7 +76,7 @@ export default function ChatComposeBar({
         }
       };
       mediaRecorderRef.current = recorder;
-      recorder.start();
+      recorder.start(250);
       setRecording(true);
     } catch (micError) {
       setError(micError.message || 'Microphone access denied');

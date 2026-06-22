@@ -8,12 +8,6 @@ function InstitutionalNavbar({ onScrollToSection }) {
 
   return (
     <header className="tpl-nav tpl-nav--institutional">
-      <div className="tpl-nav-inst-top">
-        <div className="tpl-nav-inst-top-inner">
-          {nav.contactEmail ? <a href={`mailto:${nav.contactEmail}`}>{nav.contactEmail}</a> : null}
-          {nav.contactPhone ? <a href={`tel:${nav.contactPhone.replace(/\s/g, '')}`}>{nav.contactPhone}</a> : null}
-        </div>
-      </div>
       <nav className="tpl-nav-inst-main">
         <div className="tpl-nav-inst-main-inner">
           <div className="tpl-nav-inst-logo-wrap">
