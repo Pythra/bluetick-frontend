@@ -1,46 +1,35 @@
-export default function MessageBubbleContent({ message, brandName }) {
+import { useAuth } from '../../contexts/AuthContext';
+import { resolveChatMediaUrl } from '../../utils/chatMedia';
+import VoiceNotePlayer, { ChatMediaImage, ChatMediaVideo } from './VoiceNotePlayer';
+
+export default function MessageBubbleContent({ message }) {
+  const { apiUrl } = useAuth();
+
   if (!message) return null;
 
   const body = message.body?.trim();
-  const attachments = message.attachments || [];
-  const voiceFromAttachment = attachments.find((item) => item.type === 'voice');
-  const voiceUrl = message.voiceNoteUrl || voiceFromAttachment?.url || null;
-  const nonVoiceAttachments = attachments.filter(
-    (item) => item.type !== 'voice' || (voiceUrl && item.url !== voiceUrl)
-  );
+  const attachments = (message.attachments || []).filter((item) => item.type !== 'voice');
 
   return (
     <>
       {body ? <p className="chat-bubble-body">{message.body}</p> : null}
-      {voiceUrl ? (
-        <audio className="chat-bubble-audio" src={voiceUrl} controls preload="metadata" />
-      ) : null}
-      {nonVoiceAttachments.map((attachment, index) => {
+      <VoiceNotePlayer message={message} />
+      {attachments.map((attachment, index) => {
         const key = `${attachment.url || attachment.name}-${index}`;
         if (attachment.type === 'image') {
-          return (
-            <a key={key} href={attachment.url} target="_blank" rel="noopener noreferrer" className="chat-bubble-media-link">
-              <img src={attachment.url} alt={attachment.name || 'Image'} className="chat-bubble-image" />
-            </a>
-          );
+          return <ChatMediaImage key={key} attachment={attachment} apiUrl={apiUrl} />;
         }
         if (attachment.type === 'video') {
-          return (
-            <video key={key} className="chat-bubble-video" src={attachment.url} controls playsInline preload="metadata" />
-          );
+          return <ChatMediaVideo key={key} attachment={attachment} apiUrl={apiUrl} />;
         }
-        if (attachment.type === 'voice') {
-          return (
-            <audio key={key} className="chat-bubble-audio" src={attachment.url} controls preload="metadata" />
-          );
-        }
+        const fileUrl = resolveChatMediaUrl(attachment.url, apiUrl);
         return (
-          <a key={key} href={attachment.url} target="_blank" rel="noopener noreferrer" className="chat-bubble-file">
+          <a key={key} href={fileUrl || attachment.url} target="_blank" rel="noopener noreferrer" className="chat-bubble-file">
             {attachment.name || 'Download file'}
           </a>
         );
       })}
-      {!body && !voiceUrl && !nonVoiceAttachments.length ? (
+      {!body && !message.voiceNoteUrl && !attachments.length && !(message.attachments || []).some((item) => item.type === 'voice') ? (
         <p className="chat-bubble-body chat-bubble-muted">Sent an attachment</p>
       ) : null}
     </>

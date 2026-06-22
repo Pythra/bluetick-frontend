@@ -59,3 +59,50 @@ export function messagePreviewText(message) {
   if (first) return 'Attachment';
   return '—';
 }
+
+export function resolveChatMediaUrl(url, apiUrl) {
+  const trimmed = String(url || '').trim();
+  if (!trimmed) return null;
+
+  if (trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith('//')) {
+    return `https:${trimmed}`;
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed.replace(/^http:\/\//i, 'https://');
+  }
+
+  if (trimmed.startsWith('/')) {
+    const base = String(apiUrl || import.meta.env.VITE_API_URL || 'https://bluetick.fly.dev').replace(/\/$/, '');
+    return `${base}${trimmed}`;
+  }
+
+  if (
+    trimmed.includes('.cloudfront.net/') ||
+    trimmed.includes('amazonaws.com/') ||
+    /^[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(trimmed)
+  ) {
+    return `https://${trimmed.replace(/^\/+/, '')}`;
+  }
+
+  return trimmed;
+}
+
+export function getVoiceNoteSource(message, apiUrl) {
+  const attachments = message?.attachments || [];
+  const voiceAttachment = attachments.find((item) => item.type === 'voice');
+  const rawUrl = message?.voiceNoteUrl || voiceAttachment?.url || null;
+  const url = resolveChatMediaUrl(rawUrl, apiUrl);
+
+  if (!url) return null;
+
+  return {
+    url,
+    mimeType: voiceAttachment?.mimeType || 'audio/webm',
+    name: voiceAttachment?.name || 'Voice note',
+  };
+}

@@ -75,7 +75,7 @@
 
 .admin-messages-page-wrap {
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .admin-messages-page {
@@ -282,7 +282,9 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  min-width: 0;
   padding: 16px 20px 20px;
+  overflow: visible;
 }
 
 .admin-messages-drawer-chat h3 {
@@ -290,10 +292,12 @@
   font-size: 1rem;
 }
 
-.admin-messages-drawer-messages {
+.admin-messages-drawer-messages,
+.admin-messages-drawer-messages.chat-messages-pane {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: visible;
   margin-bottom: 12px;
 }
 
