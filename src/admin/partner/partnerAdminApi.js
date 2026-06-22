@@ -53,7 +53,7 @@ export function createPartnerAdminApi(apiUrl, subdomain, token) {
       request('/support', { method: 'POST', body: JSON.stringify(payload) }),
     getAnalytics: () => request('/analytics'),
     getProgressReport: () => request('/reports/progress'),
-    resendVerification: () =>
-      request('/resend-verification', { method: 'POST' }),
+    updateOrderTracking: (orderId, payload) =>
+      request(`/orders/${orderId}/tracking`, { method: 'PATCH', body: JSON.stringify(payload) }),
   };
 }

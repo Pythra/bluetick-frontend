@@ -1,0 +1,125 @@
+.order-tracking {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.order-tracking-compact {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+}
+
+.order-tracking-note {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.order-tracking-note-pending {
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.order-tracking-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.order-tracking-step {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.order-tracking-step.is-complete {
+  color: #334155;
+}
+
+.order-tracking-step.is-current {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.order-tracking-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  background: #fff;
+  justify-self: center;
+}
+
+.order-tracking-step.is-complete .order-tracking-dot {
+  border-color: #22c55e;
+  background: #22c55e;
+}
+
+.order-tracking-step.is-current .order-tracking-dot {
+  border-color: #2563eb;
+  background: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.order-tracking-customer-note,
+.order-tracking-history {
+  margin-top: 0.85rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.order-tracking-customer-note strong,
+.order-tracking-history strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.order-tracking-customer-note p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: #0f172a;
+}
+
+.order-tracking-history ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.order-tracking-history li {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.order-tracking-history-status {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.order-tracking-history-note {
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.order-tracking-history-when {
+  font-size: 0.74rem;
+  color: #94a3b8;
+}

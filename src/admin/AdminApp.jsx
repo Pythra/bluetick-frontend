@@ -145,12 +145,58 @@ function AdminApp() {
     }
   }
 
-  const handleUpdateOrderStatus = (orderId, newStatus) => {
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    const response = await fetch(`${apiUrl}/api/admin/orders/${orderId}/status`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status: newStatus }),
+    })
+    const data = await response.json()
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to update order status')
+    }
+
     setUsers(prevUsers =>
       prevUsers.map(user => ({
         ...user,
         orders: user.orders?.map(order =>
-          order.id === orderId ? { ...order, status: newStatus } : order
+          order.id === orderId
+            ? { ...order, status: data.order.status, projectStatus: data.order.projectStatus }
+            : order
+        ) || []
+      }))
+    )
+  }
+
+  const handleUpdateOrderTracking = async (orderId, payload) => {
+    const response = await fetch(`${apiUrl}/api/admin/orders/${orderId}/tracking`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${adminToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+    const data = await response.json()
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to update order tracking')
+    }
+
+    setUsers(prevUsers =>
+      prevUsers.map(user => ({
+        ...user,
+        orders: user.orders?.map(order =>
+          order.id === orderId
+            ? {
+                ...order,
+                status: data.order.status,
+                projectStatus: data.order.projectStatus,
+                tracking: data.order.tracking,
+              }
+            : order
         ) || []
       }))
     )
@@ -259,7 +305,11 @@ function AdminApp() {
         ) : activeTab === 'carts' ? (
           <CartManagement users={users} />
         ) : activeTab === 'orders' ? (
-          <OrderManagement users={users} onUpdateOrder={handleUpdateOrderStatus} />
+          <OrderManagement
+            users={users}
+            onUpdateOrder={handleUpdateOrderStatus}
+            onUpdateTracking={handleUpdateOrderTracking}
+          />
         ) : activeTab === 'submissions' ? (
           <SubmissionManagement users={users} />
         ) : activeTab === 'partnerships' ? (

@@ -19,12 +19,14 @@ import Footer from '../components/Footer';
 import Button from '../components/Button';
 import AccountMessagesPanel from '../components/account/AccountMessagesPanel';
 import UserInvoiceModal, { orderToInvoice } from '../components/account/UserInvoiceModal';
+import OrderTrackingTimeline from '../components/OrderTrackingTimeline';
 import { usePartnerText } from '../utils/partnerText';
 import './MyAccountPage.css';
 
 const SECTIONS = {
   dashboard: 'dashboard',
   orders: 'orders',
+  invoices: 'invoices',
   account: 'account',
   messages: 'messages',
 };
@@ -276,8 +278,9 @@ function MyAccountPage() {
   const navItems = [
     { id: SECTIONS.dashboard, label: 'Dashboard', icon: IoGridOutline },
     { id: SECTIONS.orders, label: 'Orders', icon: IoBagOutline },
-    { id: SECTIONS.account, label: 'Account info', icon: IoPersonOutline },
+    { id: SECTIONS.invoices, label: 'Invoices', icon: IoReceiptOutline },
     { id: SECTIONS.messages, label: 'Messages', icon: IoChatbubbleOutline, badge: unreadMessages },
+    { id: SECTIONS.account, label: 'Account info', icon: IoPersonOutline },
   ];
 
   const invoiceBrandName = isPartnerSite ? brandName : shortBrandName;
@@ -293,9 +296,25 @@ function MyAccountPage() {
     {
       key: 'orders',
       title: 'Orders',
-      description: 'Check your order history, payment status, and article submissions',
+      description: 'Check your order history, payment status, and progress tracking',
       icon: IoBagOutline,
       onClick: () => goToSection(SECTIONS.orders),
+    },
+    {
+      key: 'invoices',
+      title: 'Invoices',
+      description: 'Download receipts and invoices for your paid orders',
+      icon: IoReceiptOutline,
+      onClick: () => goToSection(SECTIONS.invoices),
+    },
+    {
+      key: 'messages',
+      title: 'Messages',
+      description: messageSubdomain
+        ? `Chat with ${brandName || shortBrandName} about your orders`
+        : `Contact ${shortBrandName} support about your account`,
+      icon: IoChatbubbleOutline,
+      onClick: () => goToSection(SECTIONS.messages),
     },
     {
       key: 'checkout',
@@ -323,7 +342,7 @@ function MyAccountPage() {
           Your orders
         </h2>
         <p className="my-account-panel-lead">
-          Services you have paid for or claimed via bank transfer appear here. Paid orders include downloadable receipts.
+          Services you have paid for or claimed via bank transfer appear here, with live progress tracking.
         </p>
       </header>
 
@@ -388,16 +407,60 @@ function MyAccountPage() {
                   </Button>
                 )}
 
-                {order.paymentStatus === 'paid' && (
-                  <button
-                    type="button"
-                    className="my-account-invoice-link"
-                    onClick={() => setSelectedInvoice(orderToInvoice(order, invoiceBrandName, user.email))}
-                  >
-                    <IoReceiptOutline aria-hidden="true" />
-                    Download receipt / invoice
-                  </button>
+                {(order.paymentStatus === 'paid' || order.tracking) && (
+                  <OrderTrackingTimeline
+                    tracking={order.tracking}
+                    paymentStatus={order.paymentStatus}
+                  />
                 )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+
+  const paidOrders = orders.filter((order) => order.paymentStatus === 'paid');
+
+  const renderInvoicesPanel = () => (
+    <section className="my-account-panel" aria-labelledby="my-account-invoices-heading">
+      <header className="my-account-panel-head">
+        <h2 id="my-account-invoices-heading" className="my-account-panel-title">
+          Invoices & receipts
+        </h2>
+        <p className="my-account-panel-lead">
+          Download printable receipts and invoices for orders that have been paid or confirmed.
+        </p>
+      </header>
+
+      {ordersLoading ? (
+        <p className="my-account-orders-empty">Loading your invoices…</p>
+      ) : ordersError ? (
+        <p className="my-account-orders-error" role="alert">
+          {ordersError}
+        </p>
+      ) : paidOrders.length === 0 ? (
+        <p className="my-account-orders-empty">No paid orders yet. Invoices appear here after payment is confirmed.</p>
+      ) : (
+        <ul className="my-account-invoice-list">
+          {paidOrders.map((order) => {
+            const orderId = order._id;
+            return (
+              <li key={orderId} className="my-account-invoice-card">
+                <div>
+                  <h3 className="my-account-order-name">{order.productName}</h3>
+                  <p className="my-account-order-date">Paid {formatOrderDate(order.createdAt)}</p>
+                  <p className="my-account-invoice-amount">{formatOrderAmount(order)}</p>
+                </div>
+                <button
+                  type="button"
+                  className="my-account-invoice-link"
+                  onClick={() => setSelectedInvoice(orderToInvoice(order, invoiceBrandName, user.email))}
+                >
+                  <IoReceiptOutline aria-hidden="true" />
+                  Download invoice
+                </button>
               </li>
             );
           })}
@@ -415,7 +478,7 @@ function MyAccountPage() {
         <p className="my-account-panel-lead">
           {messageSubdomain
             ? `Send and receive messages with ${brandName || shortBrandName} about your orders.`
-            : `Contact ${shortBrandName} about your account or orders.`}
+            : `Send a message to the ${shortBrandName} team about your account or orders.`}
         </p>
       </header>
 
@@ -616,6 +679,7 @@ function MyAccountPage() {
           <div className="my-account-content">
             {activeSection === SECTIONS.dashboard && renderDashboard()}
             {activeSection === SECTIONS.orders && renderOrdersPanel()}
+            {activeSection === SECTIONS.invoices && renderInvoicesPanel()}
             {activeSection === SECTIONS.account && renderAccountPanel()}
             {activeSection === SECTIONS.messages && renderMessagesPanel()}
           </div>

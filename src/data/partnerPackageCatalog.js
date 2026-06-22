@@ -1,5 +1,7 @@
 /** Individual sellable packages — partners set selling prices per package. */
 
+import { PUBLICATION_CATEGORIES } from './publicationPackageCatalog.js';
+
 function slugify(value) {
   return String(value || '')
     .toLowerCase()
@@ -203,6 +205,20 @@ const publicationAddons = [
   pkg('publication.reputation', 'publication', 'publication-addons', 'Publication add-ons', PUB, 'Deleting an existing article', 500000),
 ];
 
+const publicationPlatformPackages = PUBLICATION_CATEGORIES.flatMap((category) =>
+  category.platforms.map((platform) =>
+    titlePkg(
+      `publication.${category.id}`,
+      'publication',
+      `publication-${category.id}`,
+      category.title,
+      PUB,
+      platform.name,
+      platform.priceValue
+    )
+  )
+);
+
 export const PARTNER_PACKAGE_CATALOG = [
   ...verificationNonNotable,
   ...verificationNotable,
@@ -218,6 +234,7 @@ export const PARTNER_PACKAGE_CATALOG = [
   ...wikipediaPackages,
   ...appPackages,
   ...websitePackages,
+  ...publicationPlatformPackages,
   ...publicationAddons,
 ];
 

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MdExpandLess, MdExpandMore, MdSave } from 'react-icons/md';
+import { MdArrowBack, MdChevronRight, MdSave } from 'react-icons/md';
 import { formatNgn } from '../../data/partnerServiceCatalog';
 import { PARTNER_PACKAGE_CATALOG } from '../../data/partnerPackageCatalog';
 
@@ -18,12 +18,23 @@ function buildPackageRows(pricingRows) {
   });
 }
 
+const SERVICE_ORDER = [
+  'websiteDevelopment',
+  'appDevelopment',
+  'publication',
+  'socialMedia',
+  'musicStreaming',
+  'tiktokArtist',
+  'instagram',
+  'wikipedia',
+];
+
 export default function PartnerServicesTab({ api, onMessage }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [packages, setPackages] = useState([]);
-  const [expandedServices, setExpandedServices] = useState({});
-  const [expandedGroups, setExpandedGroups] = useState({});
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
 
   const load = async () => {
     try {
@@ -62,29 +73,29 @@ export default function PartnerServicesTab({ api, onMessage }) {
       }
       service.groups.get(pkg.groupId).packages.push(pkg);
     });
-    return Array.from(byService.values()).map((service) => ({
-      ...service,
-      groups: Array.from(service.groups.values()),
-    }));
+
+    return Array.from(byService.values())
+      .map((service) => ({
+        ...service,
+        groups: Array.from(service.groups.values()),
+        packageCount: Array.from(service.groups.values()).reduce(
+          (sum, group) => sum + group.packages.length,
+          0
+        ),
+      }))
+      .sort((a, b) => {
+        const aIndex = SERVICE_ORDER.indexOf(a.serviceId);
+        const bIndex = SERVICE_ORDER.indexOf(b.serviceId);
+        if (aIndex === -1 && bIndex === -1) return a.serviceLabel.localeCompare(b.serviceLabel);
+        if (aIndex === -1) return 1;
+        if (bIndex === -1) return -1;
+        return aIndex - bIndex;
+      });
   }, [packages]);
 
-  useEffect(() => {
-    if (!grouped.length) return;
-    setExpandedServices((prev) => {
-      if (Object.keys(prev).length) return prev;
-      return Object.fromEntries(grouped.map((service) => [service.serviceId, true]));
-    });
-    setExpandedGroups((prev) => {
-      if (Object.keys(prev).length) return prev;
-      const next = {};
-      grouped.forEach((service) => {
-        service.groups.forEach((group) => {
-          next[group.groupId] = true;
-        });
-      });
-      return next;
-    });
-  }, [grouped]);
+  const selectedService = grouped.find((service) => service.serviceId === selectedServiceId) || null;
+  const selectedGroup =
+    selectedService?.groups.find((group) => group.groupId === selectedGroupId) || null;
 
   const updatePrice = (id, value) => {
     setPackages((prev) =>
@@ -123,91 +134,146 @@ export default function PartnerServicesTab({ api, onMessage }) {
     }
   };
 
-  const toggleService = (serviceId) => {
-    setExpandedServices((prev) => ({ ...prev, [serviceId]: !prev[serviceId] }));
+  const resetSelection = () => {
+    setSelectedServiceId(null);
+    setSelectedGroupId(null);
   };
 
-  const toggleGroup = (groupId) => {
-    setExpandedGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+  const handleSelectService = (serviceId) => {
+    const service = grouped.find((entry) => entry.serviceId === serviceId);
+    if (!service) return;
+    setSelectedServiceId(serviceId);
+    if (service.groups.length === 1) {
+      setSelectedGroupId(service.groups[0].groupId);
+    } else {
+      setSelectedGroupId(null);
+    }
+  };
+
+  const handleSelectGroup = (groupId) => {
+    setSelectedGroupId(groupId);
+  };
+
+  const handleBack = () => {
+    if (selectedGroupId) {
+      if (selectedService?.groups.length === 1) {
+        resetSelection();
+      } else {
+        setSelectedGroupId(null);
+      }
+      return;
+    }
+    resetSelection();
   };
 
   if (loading) {
-    return <div className="pdash-panel"><div className="pdash-spinner" /></div>;
+    return (
+      <div className="pdash-panel">
+        <div className="pdash-spinner" />
+      </div>
+    );
   }
+
+  const renderPricingTable = (rows) => (
+    <div className="pdash-pricing-table pdash-pricing-table-packages">
+      <div className="pdash-pricing-head">
+        <span>Package</span>
+        <span>Base price</span>
+        <span>Your selling price</span>
+        <span>Your profit</span>
+      </div>
+      {rows.map((pkg) => (
+        <div key={pkg.id} className="pdash-pricing-row">
+          <span>
+            <strong>{pkg.label}</strong>
+          </span>
+          <span>{formatNgn(pkg.basePriceNgn)}</span>
+          <span>
+            <input
+              type="number"
+              min={pkg.basePriceNgn}
+              value={pkg.sellingPriceNgn}
+              onChange={(event) => updatePrice(pkg.id, event.target.value)}
+            />
+          </span>
+          <span className="pdash-profit">{formatNgn(pkg.partnerProfit)}</span>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderServiceList = () => (
+    <div className="pdash-pricing-picker">
+      {grouped.map((service) => (
+        <button
+          key={service.serviceId}
+          type="button"
+          className="pdash-pricing-picker-card"
+          onClick={() => handleSelectService(service.serviceId)}
+        >
+          <span className="pdash-pricing-picker-text">
+            <strong>{service.serviceLabel}</strong>
+            <span>
+              {service.groups.length > 1
+                ? `${service.groups.length} categories · ${service.packageCount} packages`
+                : `${service.packageCount} packages`}
+            </span>
+          </span>
+          <MdChevronRight size={20} aria-hidden="true" />
+        </button>
+      ))}
+    </div>
+  );
+
+  const renderGroupList = () => (
+    <div className="pdash-pricing-picker">
+      {selectedService?.groups.map((group) => (
+        <button
+          key={group.groupId}
+          type="button"
+          className="pdash-pricing-picker-card"
+          onClick={() => handleSelectGroup(group.groupId)}
+        >
+          <span className="pdash-pricing-picker-text">
+            <strong>{group.groupLabel}</strong>
+            <span>{group.packages.length} packages</span>
+          </span>
+          <MdChevronRight size={20} aria-hidden="true" />
+        </button>
+      ))}
+    </div>
+  );
+
+  const breadcrumb =
+    !selectedServiceId
+      ? 'Choose a service to edit package prices'
+      : !selectedGroupId && selectedService?.groups.length > 1
+        ? selectedService.serviceLabel
+        : selectedGroup
+          ? `${selectedService.serviceLabel} · ${selectedGroup.groupLabel}`
+          : selectedService?.serviceLabel;
 
   return (
     <div className="pdash-panel">
       <h2>Service package pricing</h2>
       <p className="pdash-panel-lead">
-        Set your selling price for every individual package — verification tiers, monetization options,
-        app and website packages, publications add-ons, and more. Base prices are fixed by Bluetickgeng;
-        your profit is the difference between your price and the base.
+        Select a service, then choose a category or package group to set your selling prices. Base prices
+        are fixed by Bluetickgeng — your profit is the difference between your price and the base.
       </p>
 
-      <div className="pdash-package-pricing">
-        {grouped.map((service) => (
-          <section key={service.serviceId} className="pdash-package-service">
-            <button
-              type="button"
-              className="pdash-package-service-toggle"
-              onClick={() => toggleService(service.serviceId)}
-              aria-expanded={expandedServices[service.serviceId] !== false}
-            >
-              <span>
-                <strong>{service.serviceLabel}</strong>
-                <span className="pdash-package-count">
-                  {service.groups.reduce((sum, group) => sum + group.packages.length, 0)} packages
-                </span>
-              </span>
-              {expandedServices[service.serviceId] !== false ? <MdExpandLess size={20} /> : <MdExpandMore size={20} />}
-            </button>
-
-            {expandedServices[service.serviceId] !== false ? (
-              <div className="pdash-package-service-body">
-                {service.groups.map((group) => (
-                  <div key={group.groupId} className="pdash-package-group">
-                    <button
-                      type="button"
-                      className="pdash-package-group-toggle"
-                      onClick={() => toggleGroup(group.groupId)}
-                      aria-expanded={expandedGroups[group.groupId] !== false}
-                    >
-                      <span>{group.groupLabel}</span>
-                      {expandedGroups[group.groupId] !== false ? <MdExpandLess size={18} /> : <MdExpandMore size={18} />}
-                    </button>
-
-                    {expandedGroups[group.groupId] !== false ? (
-                      <div className="pdash-pricing-table pdash-pricing-table-packages">
-                        <div className="pdash-pricing-head">
-                          <span>Package</span>
-                          <span>Base price</span>
-                          <span>Your selling price</span>
-                          <span>Your profit</span>
-                        </div>
-                        {group.packages.map((pkg) => (
-                          <div key={pkg.id} className="pdash-pricing-row">
-                            <span><strong>{pkg.label}</strong></span>
-                            <span>{formatNgn(pkg.basePriceNgn)}</span>
-                            <span>
-                              <input
-                                type="number"
-                                min={pkg.basePriceNgn}
-                                value={pkg.sellingPriceNgn}
-                                onChange={(e) => updatePrice(pkg.id, e.target.value)}
-                              />
-                            </span>
-                            <span className="pdash-profit">{formatNgn(pkg.partnerProfit)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </section>
-        ))}
+      <div className="pdash-pricing-nav">
+        {selectedServiceId ? (
+          <button type="button" className="pdash-pricing-back" onClick={handleBack}>
+            <MdArrowBack size={18} aria-hidden="true" />
+            Back
+          </button>
+        ) : null}
+        <p className="pdash-pricing-crumb">{breadcrumb}</p>
       </div>
+
+      {!selectedServiceId && renderServiceList()}
+      {selectedServiceId && !selectedGroupId && selectedService?.groups.length > 1 && renderGroupList()}
+      {selectedGroup ? renderPricingTable(selectedGroup.packages) : null}
 
       <button type="button" className="pdash-btn pdash-btn-primary" onClick={handleSave} disabled={saving}>
         <MdSave size={16} /> {saving ? 'Saving...' : 'Save all package pricing'}

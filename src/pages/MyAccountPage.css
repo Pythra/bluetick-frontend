@@ -617,6 +617,33 @@
   align-items: center;
 }
 
+.my-account-invoice-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.my-account-invoice-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.my-account-invoice-amount {
+  margin: 0.35rem 0 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
 .my-account-invoice-link {
   display: inline-flex;
   align-items: center;

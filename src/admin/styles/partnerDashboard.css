@@ -863,6 +863,17 @@
   gap: 10px;
 }
 
+.pdash-order-foot-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.pdash-order-card.expanded {
+  grid-column: 1 / -1;
+}
+
 .pdash-order-amount {
   font-size: 1.1rem;
   font-weight: 800;
@@ -1192,6 +1203,77 @@
 .pdash-package-group .pdash-pricing-table {
   margin-top: 8px;
   margin-bottom: 0;
+}
+
+.pdash-pricing-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pdash-pricing-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--pdash-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--pdash-text);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pdash-pricing-crumb {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--pdash-text);
+}
+
+.pdash-pricing-picker {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.pdash-pricing-picker-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--pdash-border);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--pdash-text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pdash-pricing-picker-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+}
+
+.pdash-pricing-picker-text {
+  display: grid;
+  gap: 4px;
+}
+
+.pdash-pricing-picker-text strong {
+  font-size: 0.95rem;
+}
+
+.pdash-pricing-picker-text span {
+  font-size: 0.78rem;
+  color: var(--pdash-soft);
 }
 
 .pdash-messages-layout {

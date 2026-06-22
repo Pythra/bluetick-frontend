@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { MdChat } from 'react-icons/md';
-import { formatAmount, PROJECT_STATUS_LABELS } from '../../data/partnerServiceCatalog';
+import { formatAmount } from '../../data/partnerServiceCatalog';
 import { getOrderServiceLabel } from '../utils/orderServices';
+import OrderTrackingControl from '../../components/OrderTrackingControl';
 
 const STATUS_LABELS = {
   completed: 'Completed',
@@ -16,13 +17,36 @@ function formatDate(dateString) {
   });
 }
 
-export default function PartnerOrdersTab({ orders = [], overviewOrders }) {
-  const list = orders.length ? orders : overviewOrders || [];
+export default function PartnerOrdersTab({ orders = [], overviewOrders, api }) {
+  const initialList = orders.length ? orders : overviewOrders || [];
+  const [list, setList] = useState(initialList);
+  const [expandedOrders, setExpandedOrders] = useState({});
+
+  useEffect(() => {
+    setList(orders.length ? orders : overviewOrders || []);
+  }, [orders, overviewOrders]);
+
+  const toggleOrder = (orderId) => {
+    setExpandedOrders((prev) => ({ ...prev, [orderId]: !prev[orderId] }));
+  };
+
+  const handleSaveTracking = async (orderId, payload) => {
+    if (!api?.updateOrderTracking) {
+      throw new Error('Tracking updates are unavailable. Redeploy the backend to enable this feature.');
+    }
+    const data = await api.updateOrderTracking(orderId, payload);
+    const updated = data.order;
+    setList((prev) =>
+      prev.map((order) => (order.id === orderId ? { ...order, ...updated } : order))
+    );
+  };
 
   return (
     <div className="pdash-panel">
       <h2>Orders</h2>
-      <p className="pdash-panel-lead">Track all orders placed on your white-label storefront.</p>
+      <p className="pdash-panel-lead">
+        Track orders placed on your storefront and share progress updates with your clients.
+      </p>
 
       {!list.length ? (
         <div className="adm-empty" style={{ border: 'none' }}>
@@ -31,34 +55,54 @@ export default function PartnerOrdersTab({ orders = [], overviewOrders }) {
         </div>
       ) : (
         <div className="pdash-orders-grid">
-          {list.map((order) => (
-            <div key={order.id} className="pdash-order-card">
-              <div className="pdash-order-top">
-                <h3>{order.email}</h3>
-                <span className={`adm-badge ${order.status}`}>
-                  {STATUS_LABELS[order.status] || order.status}
-                </span>
-              </div>
-              {order.projectStatus ? (
-                <div className="pdash-order-project">
-                  Project: {PROJECT_STATUS_LABELS[order.projectStatus] || order.projectStatus}
+          {list.map((order) => {
+            const isExpanded = expandedOrders[order.id];
+            return (
+              <div key={order.id} className={`pdash-order-card${isExpanded ? ' expanded' : ''}`}>
+                <div className="pdash-order-top">
+                  <h3>{order.email}</h3>
+                  <span className={`adm-badge ${order.status}`}>
+                    {STATUS_LABELS[order.status] || order.status}
+                  </span>
                 </div>
-              ) : null}
-              <div className="pdash-order-services">{getOrderServiceLabel(order)}</div>
-              <div className="pdash-order-foot">
-                <div>
-                  <div className="pdash-order-amount">{formatAmount(order.totalAmount, order.currency)}</div>
-                  {order.partnerProfit != null ? (
-                    <div className="pdash-order-profit">Profit: {formatAmount(order.partnerProfit, order.currency)}</div>
-                  ) : null}
-                  <div className="pdash-order-date">{formatDate(order.createdAt)}</div>
+                {order.tracking?.projectStatusLabel ? (
+                  <div className="pdash-order-project">
+                    Project: {order.tracking.projectStatusLabel}
+                  </div>
+                ) : null}
+                <div className="pdash-order-services">{getOrderServiceLabel(order)}</div>
+                <div className="pdash-order-foot">
+                  <div>
+                    <div className="pdash-order-amount">{formatAmount(order.totalAmount, order.currency)}</div>
+                    {order.partnerProfit != null ? (
+                      <div className="pdash-order-profit">Profit: {formatAmount(order.partnerProfit, order.currency)}</div>
+                    ) : null}
+                    <div className="pdash-order-date">{formatDate(order.createdAt)}</div>
+                  </div>
+                  <div className="pdash-order-foot-actions">
+                    <span className={`adm-badge ${order.paymentStatus === 'paid' ? 'completed' : 'pending'}`}>
+                      {order.paymentStatus === 'paid' ? 'Paid' : 'Payment Pending'}
+                    </span>
+                    <button
+                      type="button"
+                      className="pdash-btn pdash-btn-ghost"
+                      style={{ padding: '4px 10px', fontSize: '0.78rem' }}
+                      onClick={() => toggleOrder(order.id)}
+                    >
+                      {isExpanded ? 'Hide tracking' : 'Manage tracking'}
+                    </button>
+                  </div>
                 </div>
-                <span className={`adm-badge ${order.paymentStatus === 'paid' ? 'completed' : 'pending'}`}>
-                  {order.paymentStatus === 'paid' ? 'Paid' : 'Payment Pending'}
-                </span>
+
+                {isExpanded ? (
+                  <OrderTrackingControl
+                    order={order}
+                    onSave={(payload) => handleSaveTracking(order.id, payload)}
+                  />
+                ) : null}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

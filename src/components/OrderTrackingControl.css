@@ -1,0 +1,85 @@
+.order-tracking-control {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.order-tracking-control-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.order-tracking-control-head strong {
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.order-tracking-partner-badge {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.order-tracking-partner-badge-direct {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.order-tracking-control-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+}
+
+.order-tracking-control-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.order-tracking-control-select,
+.order-tracking-control-textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  color: #0f172a;
+  background: #fff;
+}
+
+.order-tracking-control-textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.order-tracking-control-save {
+  justify-self: start;
+  padding: 0.55rem 0.9rem;
+  border: none;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.order-tracking-control-save:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.order-tracking-control-error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #b91c1c;
+}

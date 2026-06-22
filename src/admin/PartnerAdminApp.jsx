@@ -1458,7 +1458,7 @@ function PartnerAdminApp({ subdomain }) {
   };
 
   const renderOrders = () => (
-    <PartnerOrdersTab orders={dashboard?.orders} overviewOrders={overview?.orders} />
+    <PartnerOrdersTab orders={dashboard?.orders} overviewOrders={overview?.orders} api={partnerApi} />
   );
 
   const tabTitles = {

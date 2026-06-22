@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { MdCheckCircle, MdAccessTime, MdCancel } from 'react-icons/md'
 import { getOrderServiceLabel, orderMatchesServiceSearch } from '../utils/orderServices'
+import OrderTrackingControl from '../../components/OrderTrackingControl'
 import '../styles/admin.css'
 
 const STATUS_CONFIG = {
@@ -10,7 +11,7 @@ const STATUS_CONFIG = {
   cancelled: { icon: MdCancel, label: 'Cancelled' },
 }
 
-export const OrderManagement = ({ users, onUpdateOrder }) => {
+export const OrderManagement = ({ users, onUpdateOrder, onUpdateTracking }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [expandedOrders, setExpandedOrders] = useState({})
@@ -58,10 +59,22 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
     setExpandedOrders(prev => ({ ...prev, [orderId]: !prev[orderId] }))
   }
 
-  const handleStatusUpdate = (orderId, newStatus) => {
+  const handleStatusUpdate = async (orderId, newStatus) => {
     setUpdatingOrderId(orderId)
-    onUpdateOrder?.(orderId, newStatus)
-    setTimeout(() => setUpdatingOrderId(null), 500)
+    try {
+      await onUpdateOrder?.(orderId, newStatus)
+    } catch (err) {
+      console.error('Failed to update order status:', err)
+      window.alert(err.message || 'Failed to update order status')
+    } finally {
+      setUpdatingOrderId(null)
+    }
+  }
+
+  const handleSaveTracking = async (orderId, payload) => {
+    if (onUpdateTracking) {
+      await onUpdateTracking(orderId, payload)
+    }
   }
 
   return (
@@ -246,10 +259,12 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                       </div>
                     )}
 
-                    {order.metadata && Object.keys(order.metadata).length > 0 && (
+                    {(order.metadata && Object.keys(order.metadata).length > 0) && (
                       <div>
                         <div className="adm-detail-label" style={{ marginBottom: 10 }}>Additional Information</div>
-                        {Object.entries(order.metadata).map(([key, value]) => (
+                        {Object.entries(order.metadata)
+                          .filter(([key]) => !['trackingHistory', 'trackingNote', 'projectStatus'].includes(key))
+                          .map(([key, value]) => (
                           <div key={key} style={{ marginBottom: 8, fontSize: 13 }}>
                             <strong style={{ color: 'var(--adm-text-soft)' }}>{key}:</strong>
                             <pre className="adm-pre" style={{ marginTop: 4 }}>{String(value)}</pre>
@@ -257,6 +272,12 @@ export const OrderManagement = ({ users, onUpdateOrder }) => {
                         ))}
                       </div>
                     )}
+
+                    <OrderTrackingControl
+                      order={order}
+                      showPartnerBadge
+                      onSave={(payload) => handleSaveTracking(order.id, payload)}
+                    />
 
                     {order.status !== 'completed' && (
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
