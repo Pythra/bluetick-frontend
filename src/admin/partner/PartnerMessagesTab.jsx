@@ -203,6 +203,12 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
             </div>
           )}
 
+          {isClientMode && selectedClient && (
+            <p className="pdash-panel-lead" style={{ fontSize: '0.82rem', marginBottom: 12 }}>
+              This message goes to <strong>{selectedClient.email}</strong>. They will see it on your site when signed in with that email or an account linked to that order.
+            </p>
+          )}
+
           {(!isClientMode || selectedClient) && (
             <>
               <div className="pdash-field" style={{ marginBottom: 10 }}>
@@ -266,7 +272,9 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
         <>
           <h2>{title}</h2>
           <div className="pdash-chat-messages">
-            {(activeThread?.messages || []).map((m) => (
+            {(activeThread?.messages || [])
+              .filter((m) => (activeThread.channel === 'partner-client' ? m.senderType !== 'admin' : true))
+              .map((m) => (
               <div key={m.id} className={`pdash-chat-bubble ${m.senderType}`}>
                 <strong>{m.senderName}</strong>
                 <p>{m.body}</p>

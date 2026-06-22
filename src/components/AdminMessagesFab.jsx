@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import { MdChat, MdClose, MdSend, MdHandshake, MdPeople, MdApps } from 'react-icons/md';
+import { MdChat, MdClose, MdSend, MdHandshake, MdApps } from 'react-icons/md';
 import { useCallback, useEffect, useState } from 'react';
 import './AdminMessagesFab.css';
 
@@ -16,7 +16,6 @@ function formatWhen(dateString) {
 const CATEGORIES = [
   { id: 'all', label: 'All', icon: MdApps },
   { id: 'partners', label: 'Partners', icon: MdHandshake },
-  { id: 'clients', label: 'Clients', icon: MdPeople },
 ];
 
 function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
@@ -113,24 +112,17 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
 
   const filteredThreads = threads.filter((thread) => {
     if (category === 'partners') return thread.channel === 'partner-admin';
-    if (category === 'clients') return thread.channel === 'partner-client';
-    return true;
+    return thread.channel === 'partner-admin';
   });
 
   const partnerCount = threads.filter((t) => t.channel === 'partner-admin').length;
-  const clientCount = threads.filter((t) => t.channel === 'partner-client').length;
 
   const getCategoryCount = (cat) => {
     if (cat === 'partners') return partnerCount;
-    if (cat === 'clients') return clientCount;
-    return threads.length;
+    return partnerCount;
   };
 
-  const getCategoryDescription = () => {
-    if (category === 'partners') return 'Threads with your partner admins';
-    if (category === 'clients') return 'Threads with partner end-clients';
-    return 'Partners, clients, and platform support threads';
-  };
+  const getCategoryDescription = () => 'Partner support threads only — client conversations stay on partner sites';
 
   return (
     <div className="admin-messages-drawer-backdrop" onClick={onClose} role="presentation">
@@ -175,11 +167,7 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
               <div className="adm-spinner" style={{ margin: '24px auto' }} />
             ) : !filteredThreads.length ? (
               <p className="admin-messages-drawer-empty">
-                {category === 'partners'
-                  ? 'No partner threads yet.'
-                  : category === 'clients'
-                    ? 'No client threads yet.'
-                    : 'No conversations yet.'}
+                No partner support threads yet.
               </p>
             ) : (
               filteredThreads.map((thread) => (

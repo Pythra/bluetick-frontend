@@ -16,12 +16,13 @@ function formatWhen(dateString) {
   });
 }
 
-function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, onClose, onUnreadChange }) {
+function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmail, onClose, onUnreadChange }) {
   const [threads, setThreads] = useState([]);
   const [activeThread, setActiveThread] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [matchedEmails, setMatchedEmails] = useState([]);
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -31,6 +32,7 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, onClose, on
       const data = await res.json();
       if (res.ok && data.success) {
         setThreads(data.threads || []);
+        setMatchedEmails(data.matchedEmails || []);
         onUnreadChange?.(data.unreadCount || 0);
       }
     } catch {
@@ -82,6 +84,9 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, onClose, on
           <div>
             <h2>Messages</h2>
             <p>Messages from {brandName}</p>
+            {accountEmail ? (
+              <p className="cmsg-account-email">Signed in as {accountEmail}</p>
+            ) : null}
           </div>
           <button type="button" className="cmsg-close" onClick={onClose} aria-label="Close">
             <MdClose size={20} />
@@ -93,7 +98,20 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, onClose, on
             {loading ? (
               <div style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>Loading…</div>
             ) : !threads.length ? (
-              <p className="cmsg-empty">No messages yet.</p>
+              <div className="cmsg-empty-wrap">
+                <p className="cmsg-empty">No messages yet.</p>
+                {matchedEmails.length > 1 ? (
+                  <p className="cmsg-empty-hint">
+                    We also check order emails linked to your account:
+                    {' '}
+                    {matchedEmails.filter((e) => e !== accountEmail).join(', ')}
+                  </p>
+                ) : (
+                  <p className="cmsg-empty-hint">
+                    Messages are delivered here when {brandName} contacts the email on your orders or account.
+                  </p>
+                )}
+              </div>
             ) : (
               threads.map((t) => (
                 <button
@@ -120,7 +138,7 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, onClose, on
                 <div className="cmsg-messages">
                   {(activeThread.messages || []).map((m) => (
                     <div key={m.id} className={`cmsg-bubble ${m.senderType === 'client' ? 'mine' : 'theirs'}`}>
-                      <div className="cmsg-bubble-meta">{m.senderName} · {formatWhen(m.createdAt)}</div>
+                      <div className="cmsg-bubble-meta">{m.senderName || brandName} · {formatWhen(m.createdAt)}</div>
                       <p>{m.body}</p>
                     </div>
                   ))}
@@ -153,7 +171,7 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, onClose, on
 }
 
 export default function ClientMessagesFab() {
-  const { apiUrl, token } = useAuth();
+  const { apiUrl, token, user } = useAuth();
   const { isPartnerSite, brandName, subdomain: brandingSubdomain } = usePartnerBranding();
   const location = useLocation();
   const hostSubdomain = getPartnerSubdomainFromHost();
@@ -207,6 +225,7 @@ export default function ClientMessagesFab() {
           token={token}
           subdomain={subdomain}
           brandName={brandName}
+          accountEmail={user?.email}
           onClose={() => { setDrawerOpen(false); fetchUnread(); }}
           onUnreadChange={setUnreadCount}
         />
