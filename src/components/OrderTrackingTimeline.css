@@ -23,6 +23,16 @@
   color: #92400e;
 }
 
+.order-tracking-current {
+  margin: 0 0 0.75rem;
+  font-size: 0.84rem;
+  color: #475569;
+}
+
+.order-tracking-current strong {
+  color: #1d4ed8;
+}
+
 .order-tracking-steps {
   list-style: none;
   margin: 0;

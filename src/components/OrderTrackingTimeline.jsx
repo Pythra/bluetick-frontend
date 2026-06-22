@@ -12,23 +12,31 @@ function formatWhen(value) {
   });
 }
 
-export default function OrderTrackingTimeline({ tracking, paymentStatus, compact = false }) {
+export default function OrderTrackingTimeline({ tracking, paymentStatus, compact = false, showHistory = true }) {
   if (!tracking && paymentStatus !== 'paid') {
     return (
       <p className="order-tracking-note">
-        Tracking will appear once your payment is confirmed.
+        Order progress will appear here once your payment is confirmed.
       </p>
     );
   }
 
   const steps = buildTrackingSteps(tracking);
   const showPaymentPending = paymentStatus && paymentStatus !== 'paid';
+  const currentLabel =
+    tracking?.projectStatusLabel ||
+    PROJECT_STATUS_LABELS[tracking?.projectStatus] ||
+    null;
 
   return (
     <div className={`order-tracking${compact ? ' order-tracking-compact' : ''}`}>
       {showPaymentPending ? (
         <p className="order-tracking-note order-tracking-note-pending">
           Payment pending — progress updates begin after payment is confirmed.
+        </p>
+      ) : currentLabel ? (
+        <p className="order-tracking-current" aria-live="polite">
+          You are here: <strong>{currentLabel}</strong>
         </p>
       ) : null}
 
@@ -51,7 +59,7 @@ export default function OrderTrackingTimeline({ tracking, paymentStatus, compact
         </div>
       ) : null}
 
-      {!compact && tracking?.history?.length > 0 ? (
+      {!compact && showHistory && tracking?.history?.length > 0 ? (
         <div className="order-tracking-history">
           <strong>Activity</strong>
           <ul>

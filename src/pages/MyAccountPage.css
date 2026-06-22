@@ -518,6 +518,40 @@
   color: #64748b;
 }
 
+.my-account-order-stage {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.my-account-order-stage strong {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.my-account-order-tracking {
+  margin-top: 0.85rem;
+  padding: 0.9rem 0.95rem;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+.my-account-order-tracking-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.my-account-order-tracking .order-tracking {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
 .my-account-order-meta {
   display: flex;
   flex-direction: column;

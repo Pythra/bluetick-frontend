@@ -20,6 +20,7 @@ import Button from '../components/Button';
 import AccountMessagesPanel from '../components/account/AccountMessagesPanel';
 import UserInvoiceModal, { orderToInvoice } from '../components/account/UserInvoiceModal';
 import OrderTrackingTimeline from '../components/OrderTrackingTimeline';
+import { PROJECT_STATUS_LABELS } from '../data/orderTracking';
 import { usePartnerText } from '../utils/partnerText';
 import './MyAccountPage.css';
 
@@ -86,6 +87,19 @@ function getDisplayName(user) {
     return fullName;
   }
   return user.email?.split('@')[0] || 'Account';
+}
+
+function resolveOrderTracking(order) {
+  if (order.tracking) {
+    return order.tracking;
+  }
+  const projectStatus = order.projectStatus || 'requirements_received';
+  return {
+    projectStatus,
+    projectStatusLabel: PROJECT_STATUS_LABELS[projectStatus] || projectStatus,
+    customerNote: '',
+    history: [],
+  };
 }
 
 function MyAccountPage() {
@@ -359,6 +373,7 @@ function MyAccountPage() {
           {orders.map((order) => {
             const paymentStatus = getPaymentStatusLabel(order);
             const orderId = order._id;
+            const tracking = resolveOrderTracking(order);
             const showOnboardingLink =
               order.paymentStatus === 'paid' && !order.onboardingComplete;
 
@@ -368,6 +383,11 @@ function MyAccountPage() {
                   <div>
                     <h3 className="my-account-order-name">{order.productName}</h3>
                     <p className="my-account-order-date">Placed {formatOrderDate(order.createdAt)}</p>
+                    {order.paymentStatus === 'paid' ? (
+                      <p className="my-account-order-stage">
+                        Current stage: <strong>{tracking.projectStatusLabel}</strong>
+                      </p>
+                    ) : null}
                   </div>
                   <div className="my-account-order-meta">
                     <span className="my-account-order-amount">{formatOrderAmount(order)}</span>
@@ -407,12 +427,13 @@ function MyAccountPage() {
                   </Button>
                 )}
 
-                {(order.paymentStatus === 'paid' || order.tracking) && (
+                <div className="my-account-order-tracking">
+                  <h4 className="my-account-order-tracking-title">Order progress</h4>
                   <OrderTrackingTimeline
-                    tracking={order.tracking}
+                    tracking={tracking}
                     paymentStatus={order.paymentStatus}
                   />
-                )}
+                </div>
               </li>
             );
           })}
