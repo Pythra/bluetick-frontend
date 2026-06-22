@@ -27,6 +27,8 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
   const [sending, setSending] = useState(false);
   const [matchedEmails, setMatchedEmails] = useState([]);
   const [loadError, setLoadError] = useState('');
+  const [sendError, setSendError] = useState('');
+  const [composingNew, setComposingNew] = useState(false);
 
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -58,32 +60,44 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
       const data = await res.json();
       if (res.ok && data.success) {
         setActiveThread(data.thread);
+        setComposingNew(false);
         await loadThreads();
       }
     } catch { /* silent */ }
   };
 
   const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
-    if (!activeThread || (!body?.trim() && !attachment)) return;
+    if (!body?.trim() && !attachment) return;
     setSending(true);
+    setSendError('');
     try {
-      const res = await fetch(
-        `${apiUrl}/api/partner-site/${subdomain}/client-messages/${activeThread.threadId}/reply`,
-        {
-          method: 'POST',
-          headers: { ...headers, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ body, attachment, attachmentType, attachmentName }),
-        }
-      );
+      const payload = { body, attachment, attachmentType, attachmentName };
+      const url = activeThread
+        ? `${apiUrl}/api/partner-site/${subdomain}/client-messages/${activeThread.threadId}/reply`
+        : `${apiUrl}/api/partner-site/${subdomain}/client-messages`;
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
       const data = await res.json();
       if (res.ok && data.success) {
         setActiveThread(data.thread);
         setMessage('');
+        setComposingNew(false);
+        await loadThreads();
+      } else {
+        setSendError(data.error || 'Failed to send message');
       }
-    } catch { /* silent */ } finally {
+    } catch {
+      setSendError('Failed to send message');
+    } finally {
       setSending(false);
     }
   };
+
+  const showCompose = composingNew || activeThread || !threads.length;
 
   return (
     <div className="cmsg-backdrop" onClick={onClose} role="presentation">
@@ -120,12 +134,26 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
                   </p>
                 ) : (
                   <p className="cmsg-empty-hint">
-                    Messages are delivered here when {brandName} contacts the email on your orders or account.
+                    No conversations yet. Use the compose box on the right to send {brandName} your first message.
                   </p>
                 )}
               </div>
             ) : (
-              threads.map((t) => (
+              <>
+                {threads.length ? (
+                  <button
+                    type="button"
+                    className="cmsg-new-btn"
+                    onClick={() => {
+                      setActiveThread(null);
+                      setComposingNew(true);
+                      setMessage('');
+                    }}
+                  >
+                    New message
+                  </button>
+                ) : null}
+                {threads.map((t) => (
                 <button
                   key={t.threadId}
                   type="button"
@@ -139,33 +167,46 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
                   <span className="cmsg-preview">{messagePreviewText(t.lastMessage)}</span>
                   <span className="cmsg-when">{formatWhen(t.lastMessageAt)}</span>
                 </button>
-              ))
+              ))}
+              </>
             )}
           </div>
 
           <div className="cmsg-chat">
-            {activeThread ? (
+            {showCompose ? (
               <>
-                <h3>{activeThread.subject || brandName}</h3>
-                <div className="cmsg-messages">
-                  {(activeThread.messages || []).map((m) => (
-                    <div key={m.id} className={`cmsg-bubble ${m.senderType === 'client' ? 'mine' : 'theirs'}`}>
-                      <div className="cmsg-bubble-meta">{m.senderName || brandName} · {formatWhen(m.createdAt)}</div>
-                      <MessageBubbleContent message={m} />
-                    </div>
-                  ))}
-                </div>
+                <h3>
+                  {activeThread?.subject || (composingNew || !threads.length
+                    ? `Message ${brandName}`
+                    : 'Select a conversation')}
+                </h3>
+                {activeThread ? (
+                  <div className="cmsg-messages">
+                    {(activeThread.messages || []).map((m) => (
+                      <div key={m.id} className={`cmsg-bubble ${m.senderType === 'client' ? 'mine' : 'theirs'}`}>
+                        <div className="cmsg-bubble-meta">{m.senderName || brandName} · {formatWhen(m.createdAt)}</div>
+                        <MessageBubbleContent message={m} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="cmsg-empty">
+                    Send a message to {brandName}. They will see it in their partner dashboard.
+                  </p>
+                )}
+                {sendError ? <p className="cmsg-compose-error">{sendError}</p> : null}
                 <ChatComposeBar
                   message={message}
                   onMessageChange={setMessage}
                   onSend={handleSend}
                   sending={sending}
-                  placeholder="Type your reply…"
+                  placeholder={activeThread ? 'Type your reply…' : `Write to ${brandName}…`}
+                  sendLabel={activeThread ? 'Send' : 'Send message'}
                   variant="drawer"
                 />
               </>
             ) : (
-              <p className="cmsg-empty">Select a conversation to read and reply.</p>
+              <p className="cmsg-empty">Select a conversation to read and reply, or start a new message.</p>
             )}
           </div>
         </div>

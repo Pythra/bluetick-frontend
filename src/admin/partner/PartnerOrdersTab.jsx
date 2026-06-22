@@ -94,9 +94,9 @@ export function PartnerClientsTab({ api, onMessageClient }) {
   return (
     <div className="pdash-panel">
       <h2>Clients</h2>
-      <p className="pdash-panel-lead">Customers who have placed orders on your site.</p>
+      <p className="pdash-panel-lead">Everyone who signed up, logged in, or ordered on your site.</p>
       {!clients.length ? (
-        <p className="pdash-panel-lead">No clients yet.</p>
+        <p className="pdash-panel-lead">No site users yet. Users appear here after they create an account or place an order.</p>
       ) : (
         <div className="pdash-table-wrap">
           <table className="pdash-table">

@@ -11,7 +11,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const { isPartnerSite, brandName, logoUrl, primaryColor } = usePartnerBranding();
+  const { isPartnerSite, brandName, logoUrl, primaryColor, subdomain: brandingSubdomain } = usePartnerBranding();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -39,7 +39,7 @@ function LoginPage() {
     }
 
     try {
-      await login(formData.email, formData.password);
+      await login(formData.email, formData.password, brandingSubdomain);
       const redirectTo = location.state?.from || '/account';
       navigate(redirectTo, { replace: true });
     } catch (err) {

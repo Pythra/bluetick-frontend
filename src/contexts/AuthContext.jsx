@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain';
 
 const AuthContext = createContext();
 
@@ -147,7 +148,18 @@ export const AuthProvider = ({ children }) => {
     return () => clearInterval(intervalId);
   }, [token, refreshAuth]);
 
-  const signup = async (email, password, passwordConfirmation, firstName, lastName, phone) => {
+  const resolvePartnerSubdomain = (explicitSubdomain) =>
+    explicitSubdomain || getPartnerSubdomainFromHost() || undefined;
+
+  const signup = async (
+    email,
+    password,
+    passwordConfirmation,
+    firstName,
+    lastName,
+    phone,
+    partnerSubdomain
+  ) => {
     try {
       const response = await fetch(`${apiUrl}/api/auth/signup`, {
         method: 'POST',
@@ -161,6 +173,7 @@ export const AuthProvider = ({ children }) => {
           firstName,
           lastName,
           phone,
+          partnerSubdomain: resolvePartnerSubdomain(partnerSubdomain),
         }),
       });
 
@@ -178,14 +191,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
+  const login = async (email, password, partnerSubdomain) => {
     try {
       const response = await fetch(`${apiUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          email,
+          password,
+          partnerSubdomain: resolvePartnerSubdomain(partnerSubdomain),
+        }),
       });
 
       const data = await response.json();
@@ -202,14 +219,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = async (credential) => {
+  const loginWithGoogle = async (credential, partnerSubdomain) => {
     try {
       const response = await fetch(`${apiUrl}/api/auth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ credential }),
+        body: JSON.stringify({
+          credential,
+          partnerSubdomain: resolvePartnerSubdomain(partnerSubdomain),
+        }),
       });
 
       const data = await response.json();

@@ -8,13 +8,19 @@ function ClientPicker({ clients, onSelect }) {
   const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return clients.filter(
-      (c) =>
-        !q ||
+    const q = search.toLowerCase().trim();
+    return clients.filter((c) => {
+      if (!q) return true;
+      const fullName = `${c.firstName || ''} ${c.lastName || ''}`.trim().toLowerCase();
+      return (
         c.email?.toLowerCase().includes(q) ||
-        c.name?.toLowerCase().includes(q)
-    );
+        c.name?.toLowerCase().includes(q) ||
+        fullName.includes(q) ||
+        c.firstName?.toLowerCase().includes(q) ||
+        c.lastName?.toLowerCase().includes(q) ||
+        c.phone?.toLowerCase().includes(q)
+      );
+    });
   }, [clients, search]);
 
   return (
@@ -25,7 +31,7 @@ function ClientPicker({ clients, onSelect }) {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search clients…"
+          placeholder="Search by name, email, or phone…"
           style={{ width: '100%', paddingLeft: 32, paddingRight: 10 }}
           autoFocus
         />
@@ -33,7 +39,9 @@ function ClientPicker({ clients, onSelect }) {
       <div style={{ maxHeight: 260, overflowY: 'auto', border: '1px solid var(--pdash-border)', borderRadius: 8 }}>
         {!filtered.length ? (
           <p style={{ padding: '12px 14px', color: 'var(--pdash-soft)', fontSize: '0.85rem', margin: 0 }}>
-            {clients.length === 0 ? 'No clients yet — clients appear once they place an order.' : 'No clients match your search.'}
+            {clients.length === 0
+              ? 'No site users yet — users appear here when they sign up, log in, or place an order on your site.'
+              : 'No users match your search.'}
           </p>
         ) : (
           filtered.map((c) => (
@@ -51,9 +59,13 @@ function ClientPicker({ clients, onSelect }) {
             >
               <strong style={{ fontSize: '0.88rem' }}>{c.name || c.email}</strong>
               {c.name && <span style={{ fontSize: '0.78rem', color: 'var(--pdash-soft)' }}>{c.email}</span>}
-              {c.orderCount > 0 && (
+              {c.orderCount > 0 ? (
                 <span style={{ fontSize: '0.72rem', color: 'var(--pdash-soft)', marginTop: 2 }}>
                   {c.orderCount} order{c.orderCount !== 1 ? 's' : ''}
+                </span>
+              ) : (
+                <span style={{ fontSize: '0.72rem', color: 'var(--pdash-soft)', marginTop: 2 }}>
+                  Signed up on your site
                 </span>
               )}
             </button>
@@ -87,8 +99,12 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
 
   useEffect(() => {
     loadThreads();
-    api.getClients().then((d) => setClients(d.clients || [])).catch(() => {});
+    refreshClients();
   }, [api]);
+
+  const refreshClients = () => {
+    api.getClients().then((d) => setClients(d.clients || [])).catch(() => {});
+  };
 
   useEffect(() => {
     if (initialClient) {
@@ -152,6 +168,7 @@ export default function PartnerMessagesTab({ api, initialCategory = 'support', i
         setNewSubject('');
       }
       setMessage('');
+      refreshClients();
     } finally {
       setSending(false);
     }

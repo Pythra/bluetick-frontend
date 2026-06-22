@@ -302,6 +302,26 @@
   cursor: not-allowed;
 }
 
+.cmsg-new-btn {
+  display: block;
+  width: calc(100% - 16px);
+  margin: 8px;
+  padding: 10px 12px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: var(--brand-primary, #2563eb);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cmsg-compose-error {
+  margin: 0 0 8px;
+  color: #b91c1c;
+  font-size: 0.82rem;
+}
+
 @media (max-width: 640px) {
   .cmsg-drawer {
     left: 8px;

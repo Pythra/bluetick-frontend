@@ -63,6 +63,7 @@ import PartnerVideoServiceSection from './components/PartnerVideoServiceSection'
 import { isPartnerHomepageServiceEnabled, PARTNER_HOMEPAGE_SERVICES, getCustomServiceDefinitions, isVideoFirstPartnerSite, getServiceVideoUrl } from './config/partnerSiteConfig';
 import { subscribeToPushNotifications } from './utils/pushNotifications';
 import ClientMessagesFab from './components/ClientMessagesFab';
+import RegisterPartnerSiteUser from './components/RegisterPartnerSiteUser';
 import './App.css';
 import './styles/partnerTemplates.css';
 import './styles/brandTheme.css';
@@ -318,6 +319,7 @@ function App() {
               <Route path="/blog/:slug" element={<BlogPostPage />} />
             </Routes>
             <CartIcon />
+            <RegisterPartnerSiteUser />
             <ClientMessagesFab />
           </div>
           </Router>

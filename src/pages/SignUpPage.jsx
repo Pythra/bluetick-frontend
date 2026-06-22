@@ -10,7 +10,7 @@ import './AuthPage.css';
 function SignUpPage() {
   const navigate = useNavigate();
   const { signup } = useAuth();
-  const { isPartnerSite, brandName, logoUrl, primaryColor } = usePartnerBranding();
+  const { isPartnerSite, brandName, logoUrl, primaryColor, subdomain: brandingSubdomain } = usePartnerBranding();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -68,7 +68,8 @@ function SignUpPage() {
       formData.passwordConfirmation,
       formData.firstName,
       formData.lastName,
-      formData.phone
+      formData.phone,
+      brandingSubdomain
     );
       navigate('/');
     } catch (err) {
