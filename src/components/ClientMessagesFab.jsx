@@ -7,7 +7,9 @@ import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain';
 import useMessageSocket from '../hooks/useMessageSocket';
 import ChatComposeBar from './chat/ChatComposeBar';
-import MessageBubbleContent from './chat/MessageBubbleContent';
+import ChatMessageRow from './chat/ChatMessageRow';
+import ChatMessagesPane from './chat/ChatMessagesPane';
+import { isOwnMessage } from '../utils/chatDisplay';
 import { messagePreviewText } from '../utils/chatMedia';
 import './ClientMessagesFab.css';
 
@@ -212,14 +214,20 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, accountEmai
                     : 'Select a conversation')}
                 </h3>
                 {activeThread ? (
-                  <div className="cmsg-messages">
+                  <ChatMessagesPane
+                    className="cmsg-messages"
+                    threadKey={activeThread.threadId}
+                    messageCount={activeThread.messages?.length || 0}
+                  >
                     {(activeThread.messages || []).map((m) => (
-                      <div key={m.id} className={`cmsg-bubble ${m.senderType === 'client' ? 'mine' : 'theirs'}`}>
-                        <div className="cmsg-bubble-meta">{m.senderName || brandName} · {formatWhen(m.createdAt)}</div>
-                        <MessageBubbleContent message={m} />
-                      </div>
+                      <ChatMessageRow
+                        key={m.id}
+                        message={m}
+                        isMine={isOwnMessage(m.senderType, 'client')}
+                        tone="client"
+                      />
                     ))}
-                  </div>
+                  </ChatMessagesPane>
                 ) : (
                   <p className="cmsg-empty">
                     Send a message to {brandName}. They will see it in their partner dashboard.

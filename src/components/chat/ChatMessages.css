@@ -1,0 +1,117 @@
+.chat-messages-pane {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 2px 8px;
+  scroll-behavior: smooth;
+}
+
+.chat-msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  max-width: min(88%, 520px);
+  margin-bottom: 10px;
+}
+
+.chat-msg-row.mine {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-msg-row.theirs {
+  align-self: flex-start;
+}
+
+.chat-msg-avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+  user-select: none;
+}
+
+.chat-msg-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+
+.chat-msg-row.mine .chat-msg-col {
+  align-items: flex-end;
+}
+
+.chat-msg-name {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--pdash-soft, #64748b);
+  padding: 0 6px;
+}
+
+.chat-msg-bubble {
+  padding: 10px 14px;
+  border-radius: 18px;
+  line-height: 1.45;
+}
+
+.chat-msg-row.theirs .chat-msg-bubble {
+  border-bottom-left-radius: 6px;
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.chat-msg-row.mine .chat-msg-bubble {
+  border-bottom-right-radius: 6px;
+  background: rgba(var(--brand-primary-rgb, 37, 99, 235), 0.12);
+  color: #0f172a;
+}
+
+.chat-msg-row-client.mine .chat-msg-bubble {
+  background: var(--brand-primary, #2563eb);
+  color: #fff;
+}
+
+.chat-msg-row-client.mine .chat-bubble-muted {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.chat-msg-row-client.mine .chat-bubble-file {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+.chat-msg-time {
+  font-size: 0.66rem;
+  color: #94a3b8;
+  padding: 0 6px;
+}
+
+.chat-msg-row.mine .chat-msg-time {
+  text-align: right;
+}
+
+.chat-msg-bubble .chat-bubble-body {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.875rem;
+}
+
+.chat-msg-bubble .chat-bubble-image {
+  margin-top: 6px;
+}
+
+.chat-msg-bubble .chat-bubble-audio,
+.chat-msg-bubble .chat-bubble-video {
+  margin-top: 6px;
+}

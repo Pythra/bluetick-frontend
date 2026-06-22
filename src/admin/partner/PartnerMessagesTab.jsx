@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MdSupportAgent, MdPeople, MdAdd, MdSearch, MdClose } from 'react-icons/md';
 import ChatComposeBar from '../../components/chat/ChatComposeBar';
-import MessageBubbleContent from '../../components/chat/MessageBubbleContent';
+import ChatMessageRow from '../../components/chat/ChatMessageRow';
+import ChatMessagesPane from '../../components/chat/ChatMessagesPane';
 import useMessageSocket from '../../hooks/useMessageSocket';
+import { isOwnMessage } from '../../utils/chatDisplay';
 import { messagePreviewText } from '../../utils/chatMedia';
 
 function ClientPicker({ clients, onSelect }) {
@@ -309,16 +311,25 @@ export default function PartnerMessagesTab({
       return (
         <>
           <h2>{title}</h2>
-          <div className="pdash-chat-messages">
+          <ChatMessagesPane
+            className="pdash-chat-messages"
+            threadKey={activeThread.threadId}
+            messageCount={
+              (activeThread.messages || []).filter(
+                (m) => (activeThread.channel === 'partner-client' ? m.senderType !== 'admin' : true)
+              ).length
+            }
+          >
             {(activeThread?.messages || [])
               .filter((m) => (activeThread.channel === 'partner-client' ? m.senderType !== 'admin' : true))
               .map((m) => (
-              <div key={m.id} className={`pdash-chat-bubble ${m.senderType}`}>
-                <strong>{m.senderName}</strong>
-                <MessageBubbleContent message={m} />
-              </div>
-            ))}
-          </div>
+                <ChatMessageRow
+                  key={m.id}
+                  message={m}
+                  isMine={isOwnMessage(m.senderType, 'partner')}
+                />
+              ))}
+          </ChatMessagesPane>
           <ChatComposeBar
             message={message}
             onMessageChange={setMessage}

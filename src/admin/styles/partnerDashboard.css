@@ -1162,27 +1162,7 @@
 .pdash-chat-messages {
   min-height: 300px;
   max-height: 420px;
-  overflow-y: auto;
   margin-bottom: 16px;
-}
-
-.pdash-chat-bubble {
-  padding: 10px 14px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  max-width: 80%;
-  background: var(--pdash-bg);
-}
-
-.pdash-chat-bubble.partner {
-  margin-left: auto;
-  background: rgba(var(--brand-primary-rgb, 37, 99, 235), 0.1);
-}
-
-.pdash-chat-bubble.admin {
-  margin-right: auto;
-  background: #eef2ff;
-  border: 1px solid rgba(29, 78, 216, 0.15);
 }
 
 .pdash-thread-badge {

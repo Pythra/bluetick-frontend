@@ -2,8 +2,10 @@ import { createPortal } from 'react-dom';
 import { MdChat, MdClose, MdHandshake, MdApps } from 'react-icons/md';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ChatComposeBar from './chat/ChatComposeBar';
-import MessageBubbleContent from './chat/MessageBubbleContent';
+import ChatMessageRow from './chat/ChatMessageRow';
+import ChatMessagesPane from './chat/ChatMessagesPane';
 import useMessageSocket from '../hooks/useMessageSocket';
+import { isOwnMessage } from '../utils/chatDisplay';
 import { messagePreviewText } from '../utils/chatMedia';
 import './AdminMessagesFab.css';
 
@@ -246,17 +248,19 @@ function AdminMessagesDrawer({ apiUrl, token, onClose, onUnreadChange }) {
                     ? `Partner thread · ${activeThread.partnerEmail || ''}`
                     : `Client of ${activeThread.partnerName || 'partner'} · ${activeThread.participantEmail || ''}`}
                 </p>
-                <div className="admin-messages-drawer-messages">
+                <ChatMessagesPane
+                  className="admin-messages-drawer-messages"
+                  threadKey={activeThread.threadId}
+                  messageCount={activeThread.messages?.length || 0}
+                >
                   {(activeThread.messages || []).map((entry) => (
-                    <div key={entry.id} className={`adm-comm-bubble ${entry.senderType}`}>
-                      <div className="adm-comm-bubble-head">
-                        <strong>{entry.senderName}</strong>
-                        <span>{formatWhen(entry.createdAt)}</span>
-                      </div>
-                      <MessageBubbleContent message={entry} />
-                    </div>
+                    <ChatMessageRow
+                      key={entry.id}
+                      message={entry}
+                      isMine={isOwnMessage(entry.senderType, 'admin')}
+                    />
                   ))}
-                </div>
+                </ChatMessagesPane>
                 <ChatComposeBar
                   message={message}
                   onMessageChange={setMessage}

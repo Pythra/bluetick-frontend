@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import ChatComposeBar from '../../components/chat/ChatComposeBar'
-import MessageBubbleContent from '../../components/chat/MessageBubbleContent'
+import ChatMessageRow from '../../components/chat/ChatMessageRow'
+import ChatMessagesPane from '../../components/chat/ChatMessagesPane'
+import { isOwnMessage } from '../../utils/chatDisplay'
 import { messagePreviewText } from '../../utils/chatMedia'
 
 function formatWhen(dateString) {
@@ -279,20 +281,23 @@ export default function PartnershipCommunications({ apiUrl, adminToken, partner 
             <p className="adm-comm-empty">Choose a client from the list to start messaging.</p>
           ) : (
             <>
-              <div className="adm-comm-messages">
+              <ChatMessagesPane
+                className="adm-comm-messages"
+                threadKey={activeThread?.threadId}
+                messageCount={activeThread?.messages?.length || 0}
+              >
                 {(activeThread?.messages || []).map((entry) => (
-                  <div key={entry.id} className={`adm-comm-bubble ${entry.senderType}`}>
-                    <div className="adm-comm-bubble-head">
-                      <strong>{entry.senderName}</strong>
-                      <span>{formatWhen(entry.createdAt)}</span>
-                    </div>
-                    <MessageBubbleContent message={entry} />
-                  </div>
+                  <ChatMessageRow
+                    key={entry.id}
+                    message={entry}
+                    isMine={isOwnMessage(entry.senderType, 'admin')}
+                  />
                 ))}
-                {!activeThread?.messages?.length ? (
-                  <p className="adm-comm-empty">Start a new conversation below.</p>
-                ) : null}
-              </div>
+              </ChatMessagesPane>
+
+              {!activeThread?.messages?.length ? (
+                <p className="adm-comm-empty">Start a new conversation below.</p>
+              ) : null}
 
               {!activeThread && subject !== undefined ? (
                 <input
