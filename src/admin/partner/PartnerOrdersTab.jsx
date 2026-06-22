@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { MdChat } from 'react-icons/md';
 import { formatAmount, PROJECT_STATUS_LABELS } from '../../data/partnerServiceCatalog';
 import { getOrderServiceLabel } from '../utils/orderServices';
 
@@ -64,7 +65,7 @@ export default function PartnerOrdersTab({ orders = [], overviewOrders }) {
   );
 }
 
-export function PartnerClientsTab({ api }) {
+export function PartnerClientsTab({ api, onMessageClient }) {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -105,15 +106,26 @@ export function PartnerClientsTab({ api }) {
                 <th>Orders</th>
                 <th>Total Spent</th>
                 <th>Last Order</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {clients.map((c) => (
                 <tr key={c.email}>
-                  <td>{c.email}</td>
+                  <td>{c.name || c.email}</td>
                   <td>{c.orderCount}</td>
                   <td>{formatAmount(c.totalSpent)}</td>
                   <td>{c.lastOrderAt ? formatDate(c.lastOrderAt) : '—'}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="pdash-btn pdash-btn-ghost"
+                      style={{ padding: '4px 10px', fontSize: '0.78rem' }}
+                      onClick={() => onMessageClient?.(c)}
+                    >
+                      <MdChat size={14} /> Message
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

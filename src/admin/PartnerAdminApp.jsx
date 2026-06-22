@@ -146,6 +146,7 @@ function PartnerAdminApp({ subdomain }) {
   const [domainMessage, setDomainMessage] = useState(null);
   const [activeEditor, setActiveEditor] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [messagesIntent, setMessagesIntent] = useState(null);
   const pdashRootRef = useRef(null);
 
   const authHeaders = useMemo(
@@ -1602,8 +1603,23 @@ function PartnerAdminApp({ subdomain }) {
               <PartnerServicesTab api={partnerApi} onMessage={setSaveMessage} />
             )}
             {activeTab === 'orders' && renderOrders()}
-            {activeTab === 'clients' && partnerApi && <PartnerClientsTab api={partnerApi} />}
-            {activeTab === 'messages' && partnerApi && <PartnerMessagesTab api={partnerApi} />}
+            {activeTab === 'clients' && partnerApi && (
+              <PartnerClientsTab
+                api={partnerApi}
+                onMessageClient={(client) => {
+                  setMessagesIntent({ category: 'clients', client, key: Date.now() });
+                  setActiveTab('messages');
+                }}
+              />
+            )}
+            {activeTab === 'messages' && partnerApi && (
+              <PartnerMessagesTab
+                key={messagesIntent?.key || 'messages-default'}
+                api={partnerApi}
+                initialCategory={messagesIntent?.category || 'support'}
+                initialClient={messagesIntent?.client || null}
+              />
+            )}
             {activeTab === 'earnings' && partnerApi && <PartnerEarningsTab api={partnerApi} />}
             {activeTab === 'withdrawals' && partnerApi && (
               <PartnerWithdrawalsTab api={partnerApi} onMessage={setSaveMessage} />
@@ -1636,7 +1652,10 @@ function PartnerAdminApp({ subdomain }) {
         token={token}
         mode="partner"
         subdomain={subdomain}
-        onNavigate={() => setActiveTab('messages')}
+        onNavigate={() => {
+          setMessagesIntent({ category: 'clients', key: Date.now() });
+          setActiveTab('messages');
+        }}
         refreshKey={activeTab}
       />
     </div>

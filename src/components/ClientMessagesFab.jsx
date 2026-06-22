@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { MdChat, MdClose, MdSend } from 'react-icons/md';
 import { useAuth } from '../contexts/AuthContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain';
 import './ClientMessagesFab.css';
+
+const ADMIN_PATH_PREFIXES = ['/admin', '/admin-dashboard'];
 
 function formatWhen(dateString) {
   if (!dateString) return '';
@@ -150,9 +154,14 @@ function ClientMessagesDrawer({ apiUrl, token, subdomain, brandName, onClose, on
 
 export default function ClientMessagesFab() {
   const { apiUrl, token } = useAuth();
-  const { isPartnerSite, brandName, subdomain } = usePartnerBranding();
+  const { isPartnerSite, brandName, subdomain: brandingSubdomain } = usePartnerBranding();
+  const location = useLocation();
+  const hostSubdomain = getPartnerSubdomainFromHost();
+  const subdomain = brandingSubdomain || hostSubdomain;
   const [unreadCount, setUnreadCount] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const isAdminRoute = ADMIN_PATH_PREFIXES.some((prefix) => location.pathname.startsWith(prefix));
 
   const fetchUnread = useCallback(async () => {
     if (!token || !subdomain) return;
@@ -166,23 +175,25 @@ export default function ClientMessagesFab() {
   }, [apiUrl, token, subdomain]);
 
   useEffect(() => {
-    if (isPartnerSite && token && subdomain) {
+    if (isPartnerSite && token && subdomain && !isAdminRoute) {
       fetchUnread();
-      const interval = setInterval(fetchUnread, 60000);
+      const interval = setInterval(fetchUnread, 30000);
       return () => clearInterval(interval);
     }
     return undefined;
-  }, [isPartnerSite, token, subdomain, fetchUnread]);
+  }, [isPartnerSite, token, subdomain, isAdminRoute, fetchUnread]);
 
-  if (!isPartnerSite || !token || !subdomain) return null;
+  if (!isPartnerSite || !token || !subdomain || isAdminRoute || typeof document === 'undefined') {
+    return null;
+  }
 
-  return (
+  return createPortal(
     <>
       <button
         type="button"
         className="cmsg-fab"
         onClick={() => { setDrawerOpen(true); }}
-        aria-label="Open messages"
+        aria-label={unreadCount ? `${unreadCount} unread messages` : 'Open messages'}
       >
         <MdChat size={22} />
         {unreadCount > 0 && (
@@ -190,7 +201,7 @@ export default function ClientMessagesFab() {
         )}
       </button>
 
-      {drawerOpen && createPortal(
+      {drawerOpen ? (
         <ClientMessagesDrawer
           apiUrl={apiUrl}
           token={token}
@@ -198,9 +209,9 @@ export default function ClientMessagesFab() {
           brandName={brandName}
           onClose={() => { setDrawerOpen(false); fetchUnread(); }}
           onUnreadChange={setUnreadCount}
-        />,
-        document.body
-      )}
-    </>
+        />
+      ) : null}
+    </>,
+    document.body
   );
 }

@@ -61,16 +61,16 @@ function ClientPicker({ clients, onSelect }) {
   );
 }
 
-export default function PartnerMessagesTab({ api }) {
+export default function PartnerMessagesTab({ api, initialCategory = 'support', initialClient = null }) {
   const [threads, setThreads] = useState([]);
   const [clients, setClients] = useState([]);
   const [activeThread, setActiveThread] = useState(null);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [category, setCategory] = useState('support');
-  const [composingNew, setComposingNew] = useState(false);
-  const [selectedClient, setSelectedClient] = useState(null);
+  const [category, setCategory] = useState(initialCategory);
+  const [composingNew, setComposingNew] = useState(Boolean(initialClient));
+  const [selectedClient, setSelectedClient] = useState(initialClient);
   const [newSubject, setNewSubject] = useState('');
 
   const loadThreads = async () => {
@@ -85,7 +85,18 @@ export default function PartnerMessagesTab({ api }) {
   useEffect(() => {
     loadThreads();
     api.getClients().then((d) => setClients(d.clients || [])).catch(() => {});
-  }, []);
+  }, [api]);
+
+  useEffect(() => {
+    if (initialClient) {
+      setCategory('clients');
+      setSelectedClient(initialClient);
+      setComposingNew(true);
+      setActiveThread(null);
+    } else if (initialCategory) {
+      setCategory(initialCategory);
+    }
+  }, [initialCategory, initialClient]);
 
   useEffect(() => {
     if (activeThread?.threadId) {
@@ -93,13 +104,14 @@ export default function PartnerMessagesTab({ api }) {
     }
   }, [activeThread?.threadId, api]);
 
-  useEffect(() => {
+  const handleCategoryChange = (nextCategory) => {
+    setCategory(nextCategory);
     setActiveThread(null);
     setComposingNew(false);
     setMessage('');
     setSelectedClient(null);
     setNewSubject('');
-  }, [category]);
+  };
 
   const openThread = async (threadId) => {
     const data = await api.getThread(threadId);
@@ -112,12 +124,12 @@ export default function PartnerMessagesTab({ api }) {
     setSending(true);
     try {
       if (activeThread) {
-        await api.sendMessage({ threadId: activeThread.threadId, body: message });
+        await api.sendMessage({ threadId: activeThread.threadId, channel: activeThread.channel, body: message });
         const data = await api.getThread(activeThread.threadId);
         setActiveThread(data.thread);
       } else {
         const channel = category === 'support' ? 'partner-admin' : 'partner-client';
-        await api.sendMessage({
+        const result = await api.sendMessage({
           channel,
           subject: newSubject.trim() || (channel === 'partner-admin'
             ? 'Message to Bluetickgeng Support'
@@ -127,6 +139,10 @@ export default function PartnerMessagesTab({ api }) {
           participantName: channel === 'partner-client' ? selectedClient?.name : undefined,
         });
         await loadThreads();
+        if (result?.thread?.threadId) {
+          const data = await api.getThread(result.thread.threadId);
+          setActiveThread(data.thread);
+        }
         setComposingNew(false);
         setSelectedClient(null);
         setNewSubject('');
@@ -296,7 +312,7 @@ export default function PartnerMessagesTab({ api }) {
           <button
             type="button"
             className={`pdash-subnav-item${category === 'support' ? ' active' : ''}`}
-            onClick={() => setCategory('support')}
+            onClick={() => handleCategoryChange('support')}
           >
             <MdSupportAgent size={14} />
             Support
@@ -305,7 +321,7 @@ export default function PartnerMessagesTab({ api }) {
           <button
             type="button"
             className={`pdash-subnav-item${category === 'clients' ? ' active' : ''}`}
-            onClick={() => setCategory('clients')}
+            onClick={() => handleCategoryChange('clients')}
           >
             <MdPeople size={14} />
             Clients
@@ -321,7 +337,18 @@ export default function PartnerMessagesTab({ api }) {
             type="button"
             className="pdash-btn pdash-btn-secondary"
             style={{ padding: '4px 10px', fontSize: '0.78rem', gap: 4 }}
-            onClick={() => { setComposingNew(true); setActiveThread(null); setMessage(''); }}
+            onClick={() => {
+              if (category === 'support') {
+                setComposingNew(true);
+                setActiveThread(null);
+                setMessage('');
+                return;
+              }
+              handleCategoryChange('clients');
+              setComposingNew(true);
+              setActiveThread(null);
+              setMessage('');
+            }}
           >
             <MdAdd size={14} /> New
           </button>

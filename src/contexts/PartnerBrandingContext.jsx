@@ -182,7 +182,7 @@ export function PartnerBrandingProvider({ children }) {
   }, [branding]);
 
   return (
-    <PartnerBrandingContext.Provider value={branding}>
+    <PartnerBrandingContext.Provider value={{ ...branding, subdomain: branding.subdomain || subdomain }}>
       {children}
     </PartnerBrandingContext.Provider>
   );
