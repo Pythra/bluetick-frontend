@@ -341,8 +341,9 @@ function MyAccountPage() {
 
   const invoiceBranding = isPartnerSite
     ? {
+        partnerSite: true,
         brandName,
-        logoUrl,
+        logoUrl: logoUrl || null,
         contactEmail,
         contactPhone,
         contactWebsite: contactWebsite || (brandingSubdomain ? `https://${brandingSubdomain}.bluetickgeng.com` : ''),

@@ -19,7 +19,7 @@ export function formatClientDisplayName({ firstName, lastName, email } = {}) {
   return 'Customer';
 }
 
-export function resolveInvoiceLogoUrl(logoUrl) {
+export function resolveInvoiceLogoUrl(logoUrl, { partnerSite = false } = {}) {
   const normalized = normalizeMediaUrl(logoUrl);
   if (normalized) {
     if (/^https?:\/\//i.test(normalized) || normalized.startsWith('data:')) {
@@ -31,6 +31,9 @@ export function resolveInvoiceLogoUrl(logoUrl) {
     }
     return normalized;
   }
+  if (partnerSite) {
+    return null;
+  }
   if (typeof window !== 'undefined') {
     return `${window.location.origin}/bluelogo.png`;
   }
@@ -39,12 +42,28 @@ export function resolveInvoiceLogoUrl(logoUrl) {
 
 export function resolveInvoiceBranding(branding) {
   if (!branding?.brandName) {
-    return { ...MAIN_SITE_INVOICE_BRANDING };
+    return { ...MAIN_SITE_INVOICE_BRANDING, partnerSite: false };
   }
+
+  if (branding.partnerSite) {
+    return {
+      partnerSite: true,
+      brandName: branding.brandName,
+      logoUrl: normalizeMediaUrl(branding.logoUrl) || null,
+      contactEmail: branding.contactEmail || '',
+      contactPhone: branding.contactPhone || '',
+      contactWebsite: branding.contactWebsite || '',
+      contactWhatsapp: branding.contactWhatsapp || '',
+      primaryColor: branding.primaryColor || '#2563eb',
+      tagline: branding.tagline || '',
+    };
+  }
+
   return {
+    partnerSite: false,
     ...MAIN_SITE_INVOICE_BRANDING,
     ...branding,
-    logoUrl: branding.logoUrl || MAIN_SITE_INVOICE_BRANDING.logoUrl,
+    logoUrl: normalizeMediaUrl(branding.logoUrl) || MAIN_SITE_INVOICE_BRANDING.logoUrl,
   };
 }
 
@@ -109,8 +128,9 @@ export function buildPartnerInvoiceFromOrder(order, branding) {
     {
       branding: branding
         ? {
+            partnerSite: true,
             brandName: branding.brandName,
-            logoUrl: branding.logoUrl,
+            logoUrl: branding.logoUrl || null,
             contactEmail: branding.contactEmail,
             contactPhone: branding.contactPhone,
             contactWebsite: branding.contactWebsite || branding.siteUrl,

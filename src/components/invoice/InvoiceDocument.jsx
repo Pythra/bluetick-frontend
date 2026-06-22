@@ -25,7 +25,7 @@ function ContactItem({ label, value, href }) {
 
 export default function InvoiceDocument({ invoice }) {
   const branding = resolveInvoiceBranding(invoice.branding || { brandName: invoice.brandName });
-  const logoUrl = resolveInvoiceLogoUrl(branding.logoUrl);
+  const logoUrl = resolveInvoiceLogoUrl(branding.logoUrl, { partnerSite: branding.partnerSite });
   const accentColor = branding.primaryColor || '#2563eb';
   const clientName = formatClientDisplayName({
     firstName: invoice.clientFirstName,
