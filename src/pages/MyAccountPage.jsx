@@ -3,17 +3,22 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   IoBagOutline,
   IoCartOutline,
+  IoChatbubbleOutline,
   IoGridOutline,
   IoLogOutOutline,
-  IoNewspaperOutline,
   IoPersonOutline,
+  IoReceiptOutline,
   IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
+import AccountMessagesPanel from '../components/account/AccountMessagesPanel';
+import UserInvoiceModal, { orderToInvoice } from '../components/account/UserInvoiceModal';
 import { usePartnerText } from '../utils/partnerText';
 import './MyAccountPage.css';
 
@@ -21,6 +26,7 @@ const SECTIONS = {
   dashboard: 'dashboard',
   orders: 'orders',
   account: 'account',
+  messages: 'messages',
 };
 
 function formatField(value) {
@@ -83,7 +89,10 @@ function getDisplayName(user) {
 function MyAccountPage() {
   const navigate = useNavigate();
   const { shortBrandName, supportEmail } = usePartnerText();
-  const { user, isAuthenticated, loading, logout, apiUrl, authFetch } = useAuth();
+  const { brandName, subdomain: brandingSubdomain, contactEmail, isPartnerSite } = usePartnerBranding();
+  const hostSubdomain = getPartnerSubdomainFromHost();
+  const messageSubdomain = (brandingSubdomain || hostSubdomain || '').trim().toLowerCase();
+  const { user, isAuthenticated, loading, logout, apiUrl, authFetch, token } = useAuth();
   const { cartItemCount, fetchCart } = useCart();
   const [activeSection, setActiveSection] = useState(SECTIONS.dashboard);
   const [orders, setOrders] = useState([]);
@@ -94,6 +103,8 @@ function MyAccountPage() {
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -143,6 +154,35 @@ function MyAccountPage() {
       cancelled = true;
     };
   }, [isAuthenticated, apiUrl, authFetch]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !token || !apiUrl || !messageSubdomain) {
+      return undefined;
+    }
+
+    let cancelled = false;
+
+    const loadUnread = async () => {
+      try {
+        const siteSlug = encodeURIComponent(messageSubdomain);
+        const response = await fetch(`${apiUrl}/api/partner-site/${siteSlug}/client-messages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (!cancelled && response.ok && data.success) {
+          setUnreadMessages(data.unreadCount || 0);
+        }
+      } catch {
+        /* silent */
+      }
+    };
+
+    loadUnread();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, token, apiUrl, messageSubdomain]);
 
   const scrollToSection = (sectionId) => {
     navigate('/');
@@ -237,7 +277,10 @@ function MyAccountPage() {
     { id: SECTIONS.dashboard, label: 'Dashboard', icon: IoGridOutline },
     { id: SECTIONS.orders, label: 'Orders', icon: IoBagOutline },
     { id: SECTIONS.account, label: 'Account info', icon: IoPersonOutline },
+    { id: SECTIONS.messages, label: 'Messages', icon: IoChatbubbleOutline, badge: unreadMessages },
   ];
+
+  const invoiceBrandName = isPartnerSite ? brandName : shortBrandName;
 
   const dashboardCards = [
     {
@@ -280,7 +323,7 @@ function MyAccountPage() {
           Your orders
         </h2>
         <p className="my-account-panel-lead">
-          Services you have paid for or claimed via bank transfer appear here.
+          Services you have paid for or claimed via bank transfer appear here. Paid orders include downloadable receipts.
         </p>
       </header>
 
@@ -344,11 +387,48 @@ function MyAccountPage() {
                       : 'Submit project details'}
                   </Button>
                 )}
+
+                {order.paymentStatus === 'paid' && (
+                  <button
+                    type="button"
+                    className="my-account-invoice-link"
+                    onClick={() => setSelectedInvoice(orderToInvoice(order, invoiceBrandName, user.email))}
+                  >
+                    <IoReceiptOutline aria-hidden="true" />
+                    Download receipt / invoice
+                  </button>
+                )}
               </li>
             );
           })}
         </ul>
       )}
+    </section>
+  );
+
+  const renderMessagesPanel = () => (
+    <section className="my-account-panel my-account-panel-messages" aria-labelledby="my-account-messages-heading">
+      <header className="my-account-panel-head">
+        <h2 id="my-account-messages-heading" className="my-account-panel-title">
+          Messages
+        </h2>
+        <p className="my-account-panel-lead">
+          {messageSubdomain
+            ? `Send and receive messages with ${brandName || shortBrandName} about your orders.`
+            : `Contact ${shortBrandName} about your account or orders.`}
+        </p>
+      </header>
+
+      <AccountMessagesPanel
+        apiUrl={apiUrl}
+        token={token}
+        subdomain={messageSubdomain}
+        brandName={brandName || shortBrandName}
+        accountEmail={user.email}
+        supportEmail={contactEmail || supportEmail}
+        variant="inline"
+        onUnreadChange={setUnreadMessages}
+      />
     </section>
   );
 
@@ -513,20 +593,13 @@ function MyAccountPage() {
                       >
                         <Icon aria-hidden="true" />
                         {item.label}
+                        {item.badge > 0 ? (
+                          <span className="my-account-nav-badge">{item.badge > 99 ? '99+' : item.badge}</span>
+                        ) : null}
                       </button>
                     </li>
                   );
                 })}
-                <li>
-                  <button
-                    type="button"
-                    className="my-account-nav-link"
-                    onClick={() => navigate('/services/publications')}
-                  >
-                    <IoNewspaperOutline aria-hidden="true" />
-                    Our services
-                  </button>
-                </li>
                 <li>
                   <button type="button" className="my-account-nav-link" onClick={() => navigate('/checkout')}>
                     <IoCartOutline aria-hidden="true" />
@@ -544,8 +617,13 @@ function MyAccountPage() {
             {activeSection === SECTIONS.dashboard && renderDashboard()}
             {activeSection === SECTIONS.orders && renderOrdersPanel()}
             {activeSection === SECTIONS.account && renderAccountPanel()}
+            {activeSection === SECTIONS.messages && renderMessagesPanel()}
           </div>
         </div>
+
+        {selectedInvoice ? (
+          <UserInvoiceModal invoice={selectedInvoice} onClose={() => setSelectedInvoice(null)} />
+        ) : null}
 
         <p className="my-account-back">
           <Link to="/">← Back to home</Link>

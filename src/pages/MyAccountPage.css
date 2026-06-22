@@ -610,6 +610,275 @@
   background: #1e293b;
 }
 
+.my-account-order-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.my-account-invoice-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.my-account-invoice-link:hover {
+  background: #dbeafe;
+  border-color: rgba(37, 99, 235, 0.45);
+}
+
+.my-account-panel-messages {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+.my-account-messages {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.my-account-messages .cmsg-body-inline {
+  flex: 1;
+  min-height: 360px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.my-account-messages-loading {
+  text-align: center;
+  padding: 24px;
+  color: #94a3b8;
+  font-size: 0.88rem;
+}
+
+.my-account-messages-fallback {
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.my-account-messages-fallback a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.my-account-messages-fallback a:hover {
+  text-decoration: underline;
+}
+
+.my-account-invoice-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.my-account-invoice-modal {
+  width: min(780px, 100%);
+  max-height: 92vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+}
+
+.my-account-invoice-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.my-account-invoice-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.my-account-invoice-btn,
+.my-account-invoice-close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 8px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.my-account-invoice-btn {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #0f172a;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.my-account-invoice-btn:hover {
+  background: #f8fafc;
+}
+
+.my-account-invoice-close {
+  padding: 0.35rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+}
+
+.my-account-invoice-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.my-account-invoice-body {
+  padding: 32px 36px;
+}
+
+.my-account-invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 28px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.my-account-invoice-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.my-account-invoice-meta {
+  text-align: right;
+  font-size: 0.82rem;
+  color: #475569;
+  line-height: 1.8;
+}
+
+.my-account-invoice-status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.my-account-invoice-parties {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 24px;
+}
+
+.my-account-invoice-party-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.my-account-invoice-party-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.my-account-invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.my-account-invoice-table th,
+.my-account-invoice-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.88rem;
+}
+
+.my-account-invoice-table th {
+  background: #f8fafc;
+  text-align: left;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.my-account-invoice-table th:last-child,
+.my-account-invoice-table td:last-child {
+  text-align: right;
+}
+
+.my-account-invoice-table th:nth-child(2),
+.my-account-invoice-table td:nth-child(2) {
+  text-align: right;
+  width: 72px;
+}
+
+.my-account-invoice-totals {
+  text-align: right;
+}
+
+.my-account-invoice-total-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 3rem;
+  padding: 4px 0;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.my-account-invoice-total-row--grand {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 2px solid #e2e8f0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.my-account-invoice-footer {
+  margin-top: 36px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
 @media (max-width: 900px) {
   .my-account-dashboard-grid {
     gap: 1.25rem;
@@ -668,5 +937,13 @@
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
+  }
+
+  .my-account-invoice-parties {
+    grid-template-columns: 1fr;
+  }
+
+  .my-account-invoice-body {
+    padding: 24px 20px;
   }
 }
