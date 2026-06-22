@@ -119,7 +119,12 @@ function PartnerAdminApp({ subdomain }) {
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = new URLSearchParams(window.location.search).get('tab');
+    if (tab === 'earnings' || tab === 'withdrawals') return 'wallet';
+    if (tab && NAV_ITEMS.some((item) => item.id === tab)) return tab;
+    return 'overview';
+  });
   const [websiteSubTab, setWebsiteSubTab] = useState('customize');
   const [dashboard, setDashboard] = useState(null);
   const [overview, setOverview] = useState(null);
