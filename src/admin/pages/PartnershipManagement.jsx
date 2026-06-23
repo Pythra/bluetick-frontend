@@ -49,6 +49,8 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
   const [expandedId, setExpandedId] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
+  const [kycRejectTarget, setKycRejectTarget] = useState(null)
+  const [kycRejectReason, setKycRejectReason] = useState('')
 
   const loadApplications = useCallback(async () => {
     if (!adminToken) return
@@ -98,11 +100,35 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
           prev.map((item) => (item.id === id ? { ...item, ...data.application, id: data.application.id || id } : item))
         )
       }
+      showToast({
+        message: body.kycStatus === 'approved'
+          ? 'KYC approved. Partner notified by email.'
+          : body.kycStatus === 'rejected'
+            ? 'KYC rejected. Partner notified by email.'
+            : 'Partner updated successfully.',
+        type: 'success',
+      })
     } catch (updateError) {
-      setError(updateError.message || 'Failed to update partner')
+      const message = updateError.message || 'Failed to update partner'
+      setError(message)
+      showToast({ message, type: 'error' })
     } finally {
       setUpdatingId(null)
     }
+  }
+
+  const submitKycRejection = async () => {
+    if (!kycRejectTarget) return
+    if (!kycRejectReason.trim()) {
+      showToast({ message: 'Enter a reason for rejection.', type: 'error' })
+      return
+    }
+    await handlePartnerAction(kycRejectTarget.id, {
+      kycStatus: 'rejected',
+      kycNotes: kycRejectReason.trim(),
+    })
+    setKycRejectTarget(null)
+    setKycRejectReason('')
   }
 
   const handleStatusUpdate = async (id, newStatus, app = null) => {
@@ -157,7 +183,7 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
         if (expandedId === id) {
           setExpandedId(null)
         }
-        showToast({ message: 'Partnership application removed', type: 'success' })
+        showToast({ message: 'Partnership application removed. Partner notified by email.', type: 'success' })
         return
       }
 
@@ -166,7 +192,12 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
           item.id === id ? { ...item, status: newStatus, updatedAt: data.application.updatedAt } : item
         )
       )
-      showToast({ message: 'Application status updated', type: 'success' })
+      showToast({
+        message: newStatus === 'approved'
+          ? 'Partnership approved. Partner notified by email.'
+          : 'Application status updated',
+        type: 'success',
+      })
     } catch (updateError) {
       const message = updateError.message || 'Failed to update application'
       setError(message)
@@ -463,7 +494,10 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
                             type="button"
                             className="adm-btn adm-btn-danger"
                             disabled={updatingId === app.id}
-                            onClick={() => handlePartnerAction(app.id, { kycStatus: 'rejected', kycNotes: 'Rejected by admin' })}
+                            onClick={() => {
+                              setKycRejectReason('')
+                              setKycRejectTarget(app)
+                            }}
                           >
                             Reject KYC
                           </button>
@@ -572,6 +606,56 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
         Showing {filteredApplications.length} of {applications.length} partnership application
         {applications.length !== 1 ? 's' : ''}
       </div>
+
+      {kycRejectTarget ? (
+        <div className="adm-kyc-review-overlay" role="presentation" onClick={() => setKycRejectTarget(null)}>
+          <div
+            className="adm-kyc-review-modal"
+            role="dialog"
+            aria-modal="true"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header className="adm-kyc-review-head">
+              <h2>Reject KYC</h2>
+              <button
+                type="button"
+                className="adm-kyc-review-close"
+                onClick={() => setKycRejectTarget(null)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </header>
+            <p>
+              Reject KYC for <strong>{kycRejectTarget.company || kycRejectTarget.fullName}</strong>?
+              The partner will receive this reason by email.
+            </p>
+            <div className="adm-kyc-review-field">
+              <label htmlFor="partnership-kyc-reject-reason">Reason for rejection *</label>
+              <textarea
+                id="partnership-kyc-reject-reason"
+                rows={4}
+                value={kycRejectReason}
+                onChange={(event) => setKycRejectReason(event.target.value)}
+                placeholder="Explain what needs to be corrected before resubmitting."
+              />
+            </div>
+            <div className="adm-kyc-review-actions">
+              <button
+                type="button"
+                className="adm-btn adm-btn-danger"
+                disabled={updatingId === kycRejectTarget.id}
+                onClick={submitKycRejection}
+              >
+                {updatingId === kycRejectTarget.id ? 'Submitting…' : 'Reject & notify partner'}
+              </button>
+              <button type="button" className="adm-btn adm-btn-secondary" onClick={() => setKycRejectTarget(null)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

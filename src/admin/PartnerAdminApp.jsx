@@ -912,6 +912,8 @@ function PartnerAdminApp({ subdomain }) {
       siteUrl={siteUrl}
       setupChecklist={setupChecklist}
       completionPercent={completionPercent}
+      kycStatus={dashboard?.profile?.kycStatus || 'not_started'}
+      onCompleteKyc={() => setActiveTab('settings')}
     />
   );
 
@@ -1442,12 +1444,24 @@ function PartnerAdminApp({ subdomain }) {
   const renderDomain = () => {
     if (!draft) return null;
 
+    const kycStatus = dashboard?.profile?.kycStatus || 'not_started';
+    const kycApproved = kycStatus === 'approved';
+
     return (
       <div className="pdash-panel">
         <h2>Custom Domain</h2>
         <p className="pdash-panel-lead">
           Connect your own domain so customers visit your brand directly instead of the subdomain.
         </p>
+
+        {!kycApproved ? (
+          <div className="pdash-alert info">
+            Complete your KYC verification and get it approved before you can connect a custom domain.{' '}
+            <button type="button" className="pdash-link-btn" onClick={() => setActiveTab('settings')}>
+              Go to Settings
+            </button>
+          </div>
+        ) : null}
 
         {domainMessage ? (
           <div className={`pdash-alert ${domainMessage.type}`}>{domainMessage.text}</div>
@@ -1459,6 +1473,7 @@ function PartnerAdminApp({ subdomain }) {
             value={draft.customDomain}
             onChange={(e) => updateDraft({ customDomain: e.target.value })}
             placeholder="www.yourbrand.com"
+            disabled={!kycApproved}
           />
           <small>Enter without https:// — e.g. www.yourbrand.com or yourbrand.com</small>
         </div>
@@ -1474,14 +1489,19 @@ function PartnerAdminApp({ subdomain }) {
         </div>
 
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <button type="button" className="pdash-btn pdash-btn-secondary" onClick={handleSaveSettings} disabled={saving}>
+          <button
+            type="button"
+            className="pdash-btn pdash-btn-secondary"
+            onClick={handleSaveSettings}
+            disabled={saving || !kycApproved}
+          >
             Save Domain
           </button>
           <button
             type="button"
             className="pdash-btn pdash-btn-primary"
             onClick={handleVerifyDomain}
-            disabled={verifyingDomain || !draft.customDomain}
+            disabled={verifyingDomain || !draft.customDomain || !kycApproved}
           >
             {verifyingDomain ? 'Verifying...' : 'Verify DNS'}
           </button>
@@ -1623,6 +1643,19 @@ function PartnerAdminApp({ subdomain }) {
           <div className={`pdash-alert ${saveMessage.type}`}>{saveMessage.text}</div>
         ) : null}
 
+        {!loading && !error && dashboard?.profile?.kycStatus && dashboard.profile.kycStatus !== 'approved' && activeTab !== 'overview' && activeTab !== 'settings' ? (
+          <div className="pdash-kyc-banner pdash-kyc-banner--compact">
+            <span>
+              {dashboard.profile.kycStatus === 'pending'
+                ? 'KYC under review — custom domains unlock after approval.'
+                : 'Complete your KYC in Settings to unlock custom domains.'}
+            </span>
+            <button type="button" className="pdash-link-btn" onClick={() => setActiveTab('settings')}>
+              {dashboard.profile.kycStatus === 'pending' ? 'View status' : 'Complete KYC'}
+            </button>
+          </div>
+        ) : null}
+
         {loading ? (
           <div className="pdash-panel" style={{ textAlign: 'center', padding: '48px 24px' }}>
             <div className="pdash-spinner" />
@@ -1700,7 +1733,7 @@ function PartnerAdminApp({ subdomain }) {
               <PartnerProgressReportTab api={partnerApi} />
             )}
             {activeTab === 'settings' && partnerApi && (
-              <PartnerSettingsTab api={partnerApi} onMessage={setSaveMessage} />
+              <PartnerSettingsTab api={partnerApi} onMessage={setSaveMessage} onKycUpdated={loadDashboard} />
             )}
           </>
         )}

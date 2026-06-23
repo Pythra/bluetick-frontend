@@ -35,7 +35,7 @@ function validateKycFile(file, label) {
   return null;
 }
 
-export default function PartnerSettingsTab({ api, onMessage }) {
+export default function PartnerSettingsTab({ api, onMessage, onKycUpdated }) {
   const [profile, setProfile] = useState(null);
   const [settings, setSettings] = useState({});
   const [businessAddress, setBusinessAddress] = useState({});
@@ -123,6 +123,7 @@ export default function PartnerSettingsTab({ api, onMessage }) {
       setKycFiles({ idDocument: '', businessDocument: '' });
       setKycFileNames({ idDocument: '', businessDocument: '' });
       onMessage?.({ type: 'success', text: data.message || 'KYC documents submitted for review.' });
+      onKycUpdated?.();
     } catch (err) {
       const message = err.message || 'Could not submit KYC. Check your files and try again.';
       setKycError(message);
@@ -228,24 +229,34 @@ export default function PartnerSettingsTab({ api, onMessage }) {
 
       <div className="pdash-panel">
         <h2>KYC Verification</h2>
+        {kycApproved ? (
+          <div className="pdash-kyc-status pdash-kyc-status--approved">
+            <strong>KYC completed</strong>
+            <span>Your identity verification is approved. You can connect a custom domain from My Website → Domain.</span>
+          </div>
+        ) : kycPending ? (
+          <div className="pdash-kyc-status pdash-kyc-status--pending">
+            <strong>KYC under review</strong>
+            <span>Your documents were submitted and are awaiting approval from the Bluetick team.</span>
+          </div>
+        ) : kycRejected ? (
+          <div className="pdash-kyc-status pdash-kyc-status--rejected">
+            <strong>KYC rejected</strong>
+            <span>
+              {profile.kyc?.notes
+                ? profile.kyc.notes
+                : 'Your previous submission was rejected. Upload updated documents and submit again.'}
+            </span>
+          </div>
+        ) : (
+          <div className="pdash-kyc-status pdash-kyc-status--action">
+            <strong>Complete your KYC</strong>
+            <span>Upload your government ID so we can verify your identity and unlock custom domains.</span>
+          </div>
+        )}
         <p className="pdash-panel-lead">
           Status: <strong>{formatKycStatus(kycStatus)}</strong>
         </p>
-        {kycPending ? (
-          <p className="pdash-panel-lead" style={{ color: '#1d4ed8' }}>
-            Your documents were submitted and are awaiting review by the Bluetick team.
-          </p>
-        ) : null}
-        {kycRejected ? (
-          <p className="pdash-panel-lead" style={{ color: '#b45309' }}>
-            Your previous submission was rejected{profile.kyc?.notes ? `: ${profile.kyc.notes}` : ''}. Upload updated documents and submit again.
-          </p>
-        ) : null}
-        {kycApproved ? (
-          <p className="pdash-panel-lead" style={{ color: '#047857' }}>
-            Your identity verification is approved.
-          </p>
-        ) : null}
         {canSubmitKyc ? (
           <>
             <p className="pdash-panel-lead">

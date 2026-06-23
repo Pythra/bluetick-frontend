@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Sidebar } from './components/layout/Sidebar'
 import { Header } from './components/layout/Header'
 import { useToast, ToastProvider } from '../contexts/ToastContext'
+import KycReviewModal from './components/KycReviewModal'
 import { Dashboard } from './pages/Dashboard'
 import { UserManagement } from './pages/UserManagement'
 import { CartManagement } from './pages/CartManagement'
@@ -24,6 +26,7 @@ import './styles/partnerDashboard.css'
 function AdminApp() {
   const { apiUrl } = useAuth()
   const { showToast, confirm } = useToast()
+  const [searchParams] = useSearchParams()
   const partnerSubdomain = useMemo(() => getPartnerSubdomainFromHost(), [])
 
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -141,6 +144,13 @@ function AdminApp() {
       fetchBroadcastAudience()
     }
   }, [adminToken, partnerSubdomain, activeTab, fetchBroadcastAudience])
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'partnerships' && adminToken && !partnerSubdomain) {
+      setActiveTab('partnerships')
+    }
+  }, [searchParams, adminToken, partnerSubdomain])
 
   // Partner subdomains get their own white-label dashboard
   if (partnerSubdomain) {
@@ -396,6 +406,9 @@ function AdminApp() {
       </div>
 
       <AdminMessagesFab apiUrl={apiUrl} token={adminToken} mode="admin" refreshKey={activeTab} />
+      {isLoggedIn ? (
+        <KycReviewModal apiUrl={apiUrl} adminToken={adminToken} />
+      ) : null}
     </div>
   )
 }

@@ -10,11 +10,44 @@ import {
 } from 'react-icons/md';
 import { formatAmount } from '../../data/partnerServiceCatalog';
 
-export default function PartnerDashboardTab({ dashboard, overview, siteSettings, siteUrl, setupChecklist, completionPercent }) {
+export default function PartnerDashboardTab({
+  dashboard,
+  overview,
+  siteSettings,
+  siteUrl,
+  setupChecklist,
+  completionPercent,
+  kycStatus = 'not_started',
+  onCompleteKyc,
+}) {
   const stats = dashboard?.stats || overview?.stats || {};
 
   return (
     <>
+      {kycStatus === 'approved' ? (
+        <div className="pdash-kyc-banner pdash-kyc-banner--complete">
+          <strong>KYC completed</strong>
+          <span>Your identity verification is approved. You can connect a custom domain from My Website → Domain.</span>
+        </div>
+      ) : kycStatus === 'pending' ? (
+        <div className="pdash-kyc-banner pdash-kyc-banner--pending">
+          <strong>KYC under review</strong>
+          <span>Your documents were submitted and are awaiting approval from the Bluetick team.</span>
+        </div>
+      ) : (
+        <div className="pdash-kyc-banner pdash-kyc-banner--action">
+          <div>
+            <strong>Complete your KYC</strong>
+            <span>Submit identity verification from Settings before you can connect a custom domain.</span>
+          </div>
+          {onCompleteKyc ? (
+            <button type="button" className="pdash-btn pdash-btn-primary" onClick={onCompleteKyc}>
+              Complete KYC
+            </button>
+          ) : null}
+        </div>
+      )}
+
       <div className="pdash-stats pdash-stats--wide">
         <div className="pdash-stat">
           <div className="pdash-stat-icon"><MdInventory2 size={22} /></div>
