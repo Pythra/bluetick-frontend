@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { IoDocumentTextOutline, IoDownloadOutline, IoPrintOutline } from 'react-icons/io5';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
+import { printAgreementHtml } from '../../utils/printAgreement';
 import Button from '../Button';
 
 const STATUS_LABELS = {
@@ -61,19 +62,13 @@ export default function AccountAgreementsPanel() {
   }, [loadAgreements]);
 
   const handlePrint = (agreement) => {
-    const printWindow = window.open('', '_blank', 'noopener,noreferrer');
-    if (!printWindow) {
+    const opened = printAgreementHtml(
+      agreement.renderedHtml,
+      agreement.agreementNumber || 'Service Agreement'
+    );
+    if (!opened) {
       showToast({ message: 'Please allow pop-ups to print agreements', type: 'error' });
-      return;
     }
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html><head><title>${agreement.agreementNumber || 'Service Agreement'}</title></head>
-      <body>${agreement.renderedHtml || '<p>Agreement content unavailable.</p>'}</body></html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
   };
 
   const handleDecline = async (agreement) => {

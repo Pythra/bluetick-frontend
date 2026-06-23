@@ -146,11 +146,18 @@ export default function PartnerServicesTab({ api, onMessage, pricingMode = 'part
   const selectedGroup =
     selectedService?.groups.find((group) => group.groupId === selectedGroupId) || null;
 
-  const bulkScopeLabel = selectedGroup
-    ? `${selectedGroup.groupLabel} packages`
-    : selectedService
-      ? `${selectedService.serviceLabel} packages`
-      : 'all packages';
+  const bulkScopeLabel = (() => {
+    const withPackagesSuffix = (label) => {
+      const text = String(label || '').trim();
+      if (!text) return 'packages';
+      if (/\bpackages$/i.test(text)) return text;
+      return `${text} packages`;
+    };
+
+    if (selectedGroup) return withPackagesSuffix(selectedGroup.groupLabel);
+    if (selectedService) return withPackagesSuffix(selectedService.serviceLabel);
+    return 'all packages';
+  })();
 
   const updatePrice = (id, value) => {
     const parsed = Number(value);

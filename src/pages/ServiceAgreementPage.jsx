@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AgreementSignaturePad from '../components/agreements/AgreementSignaturePad';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import { printAgreementHtml } from '../utils/printAgreement';
 import './ServiceAgreementPage.css';
 
 const CONFIRMATIONS = [
@@ -13,11 +15,27 @@ const CONFIRMATIONS = [
   { key: 'informationAccurate', label: 'I confirm that all information provided during this order process is accurate.' },
 ];
 
+function getSignValidationError({ allConfirmed, method, signatureData, typedName }) {
+  if (!allConfirmed) {
+    return 'Please check all four confirmation boxes before signing.';
+  }
+  if (method === 'type' && !String(typedName || '').trim()) {
+    return 'Please type your full legal name as your signature.';
+  }
+  if ((method === 'draw' || method === 'upload') && !signatureData) {
+    return method === 'draw'
+      ? 'Please draw your signature in the box provided.'
+      : 'Please upload an image of your signature.';
+  }
+  return '';
+}
+
 export default function ServiceAgreementPage() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
   const navigate = useNavigate();
   const { isAuthenticated, authFetch, apiUrl } = useAuth();
+  const { showToast } = useToast();
   const [agreement, setAgreement] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,6 +44,9 @@ export default function ServiceAgreementPage() {
   const [typedName, setTypedName] = useState('');
   const [confirmations, setConfirmations] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [signAttempted, setSignAttempted] = useState(false);
+  const signCardRef = useRef(null);
+  const iframeRef = useRef(null);
 
   const loadAgreement = useCallback(async () => {
     if (!orderId) {
@@ -65,6 +86,33 @@ export default function ServiceAgreementPage() {
     [confirmations]
   );
 
+  const signValidationError = useMemo(
+    () => getSignValidationError({ allConfirmed, method, signatureData, typedName }),
+    [allConfirmed, method, signatureData, typedName]
+  );
+
+  const resizeAgreementFrame = useCallback(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      const height = doc?.documentElement?.scrollHeight || doc?.body?.scrollHeight;
+      if (height && Number.isFinite(height)) {
+        iframe.style.height = `${Math.max(height + 24, 900)}px`;
+      }
+    } catch {
+      iframe.style.height = '900px';
+    }
+  }, []);
+
+  useEffect(() => {
+    resizeAgreementFrame();
+  }, [agreement?.renderedHtml, resizeAgreementFrame]);
+
+  const scrollToSignSection = () => {
+    signCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const handleUpload = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -73,11 +121,28 @@ export default function ServiceAgreementPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleSign = async () => {
-    if (!allConfirmed) {
-      setError('Please confirm all required statements.');
+  const handlePrint = () => {
+    if (!agreement?.renderedHtml) {
+      showToast({ message: 'Agreement content is not available to print yet.', type: 'error' });
       return;
     }
+    const opened = printAgreementHtml(
+      agreement.renderedHtml,
+      agreement.agreementNumber || 'Service Agreement'
+    );
+    if (!opened) {
+      showToast({ message: 'Please allow pop-ups to print the agreement.', type: 'error' });
+    }
+  };
+
+  const handleSign = async () => {
+    setSignAttempted(true);
+    if (signValidationError) {
+      setError(signValidationError);
+      scrollToSignSection();
+      return;
+    }
+
     setSubmitting(true);
     setError('');
     try {
@@ -100,9 +165,12 @@ export default function ServiceAgreementPage() {
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to sign agreement');
       }
+      showToast({ message: 'Agreement signed successfully.', type: 'success' });
       navigate(data.redirectUrl || `/project-onboarding?orderId=${orderId}`, { replace: true });
     } catch (signError) {
-      setError(signError.message || 'Unable to sign agreement');
+      const message = signError.message || 'Unable to sign agreement';
+      setError(message);
+      scrollToSignSection();
     } finally {
       setSubmitting(false);
     }
@@ -179,19 +247,36 @@ export default function ServiceAgreementPage() {
             </div>
 
             <div className="agreement-document-card">
-              <h2>Agreement Terms</h2>
-              {agreement.renderedHtml ? (
-                <iframe
-                  title="Service Agreement"
-                  srcDoc={agreement.renderedHtml}
-                  className="agreement-document-html"
-                />
-              ) : null}
+              <div className="agreement-document-toolbar">
+                <h2>Agreement document</h2>
+                {agreement.renderedHtml ? (
+                  <button type="button" className="agreement-secondary-btn" onClick={handlePrint}>
+                    Print agreement
+                  </button>
+                ) : null}
+              </div>
+              <div className="agreement-a4-frame">
+                {agreement.renderedHtml ? (
+                  <iframe
+                    ref={iframeRef}
+                    title="Service Agreement"
+                    srcDoc={agreement.renderedHtml}
+                    className="agreement-document-html"
+                    onLoad={resizeAgreementFrame}
+                  />
+                ) : (
+                  <p className="agreement-document-empty">Agreement document is loading…</p>
+                )}
+              </div>
             </div>
 
             {agreement.status === 'awaiting_signature' ? (
-              <div className="agreement-sign-card">
+              <div className="agreement-sign-card" ref={signCardRef}>
                 <h2>Sign Agreement</h2>
+                <p className="agreement-sign-lead">
+                  Check all confirmations, provide your signature, then click Accept &amp; Sign.
+                </p>
+
                 <div className="agreement-sign-methods">
                   {['draw', 'type', 'upload'].map((value) => (
                     <button
@@ -233,8 +318,17 @@ export default function ServiceAgreementPage() {
                   ))}
                 </div>
 
+                {signAttempted && signValidationError && !submitting ? (
+                  <p className="agreement-sign-hint" role="status">{signValidationError}</p>
+                ) : null}
+
                 <div className="agreement-actions">
-                  <button type="button" className="agreement-primary-btn" onClick={handleSign} disabled={submitting}>
+                  <button
+                    type="button"
+                    className="agreement-primary-btn"
+                    onClick={handleSign}
+                    disabled={submitting}
+                  >
                     {submitting ? 'Signing…' : 'Accept & Sign Agreement'}
                   </button>
                   <button type="button" className="agreement-danger-btn" onClick={handleDecline} disabled={submitting}>
@@ -246,8 +340,12 @@ export default function ServiceAgreementPage() {
 
             {agreement.pdfUrl ? (
               <div className="agreement-actions">
-                <a className="agreement-primary-btn" href={agreement.pdfUrl} target="_blank" rel="noopener noreferrer">Download Signed PDF</a>
-                <button type="button" className="agreement-secondary-btn" onClick={() => window.print()}>Print Agreement</button>
+                <a className="agreement-primary-btn" href={agreement.pdfUrl} target="_blank" rel="noopener noreferrer">
+                  Download Signed PDF
+                </a>
+                <button type="button" className="agreement-secondary-btn" onClick={handlePrint}>
+                  Print Agreement
+                </button>
               </div>
             ) : null}
           </>

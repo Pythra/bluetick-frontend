@@ -1,12 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function AgreementSignaturePad({ onChange }) {
   const canvasRef = useRef(null);
   const drawingRef = useRef(false);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
+
     const ctx = canvas.getContext('2d');
     ctx.strokeStyle = '#0f172a';
     ctx.lineWidth = 2;
@@ -16,9 +22,11 @@ export default function AgreementSignaturePad({ onChange }) {
       const rect = canvas.getBoundingClientRect();
       const clientX = event.touches ? event.touches[0].clientX : event.clientX;
       const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
       return {
-        x: clientX - rect.left,
-        y: clientY - rect.top,
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY,
       };
     };
 
@@ -41,7 +49,7 @@ export default function AgreementSignaturePad({ onChange }) {
     const stop = () => {
       if (!drawingRef.current) return;
       drawingRef.current = false;
-      onChange?.(canvas.toDataURL('image/png'));
+      onChangeRef.current?.(canvas.toDataURL('image/png'));
     };
 
     canvas.addEventListener('mousedown', start);
@@ -61,20 +69,22 @@ export default function AgreementSignaturePad({ onChange }) {
       canvas.removeEventListener('touchmove', draw);
       canvas.removeEventListener('touchend', stop);
     };
-  }, [onChange]);
+  }, []);
 
   const clear = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    onChange?.('');
+    onChangeRef.current?.('');
   };
 
   return (
     <div className="agreement-signature-pad">
       <canvas ref={canvasRef} width={640} height={180} className="agreement-signature-canvas" />
-      <button type="button" className="agreement-secondary-btn" onClick={clear}>Clear signature</button>
+      <button type="button" className="agreement-secondary-btn" onClick={clear}>
+        Clear signature
+      </button>
     </div>
   );
 }
