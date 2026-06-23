@@ -92,29 +92,51 @@ export const PARTNER_SERVICE_SECTION_DEFAULTS = {
 };
 
 export const PARTNER_TESTIMONIALS_DEFAULTS = {
-  titleBlack: 'HEAR FROM OUR',
-  titleBlue: 'CLIENTS',
+  title: 'Testimonials',
+  subtitle: 'Real Clients. Real Results. Google Verified.',
+  sideTagline: 'Hear It Directly From Our Clients',
+  titleBlack: 'Testimonials',
+  titleBlue: '',
   items: [
     {
       name: 'Michael Adebayo',
+      timeAgo: '4 months ago',
       role: 'Founder, FinTech startup',
       content:
-        'Our release went live on Punch and Vanguard the next day. Simple checkout and no back-and-forth.',
+        'Huge thanks to the Bluetickgeng team for an amazing experience. Our release went live on Punch and Vanguard the next day — wonderful job.',
+      rating: 5,
     },
     {
       name: 'Chiamaka Okafor',
+      timeAgo: '3 months ago',
       role: 'Marketing lead',
-      content: 'They sent every publication link in one report. Made it easy to share proof with our client.',
+      content:
+        'Bluetickgeng is hands down one of the most professional PR firms I\'ve worked with. Their team is sharp, responsive, and really knows how to deliver placements that match what you pick.',
+      rating: 5,
     },
     {
       name: 'David Thompson',
+      timeAgo: '2 months ago',
       role: 'Brand manager',
-      content: 'Second campaign with them. Same quick turnaround and the outlets matched what we picked.',
+      content:
+        'Second campaign with them. Same quick turnaround and the outlets matched what we selected. They sent every publication link in one report.',
+      rating: 5,
     },
     {
       name: 'Amina Hassan',
+      timeAgo: '1 month ago',
       role: 'PR consultant',
-      content: 'Responsive on WhatsApp and clear about timelines. Placements landed as promised.',
+      content:
+        'Responsive on WhatsApp and clear about timelines. Placements landed as promised. The attention to detail is top notch and services are handled with precision.',
+      rating: 5,
+    },
+    {
+      name: 'Oluwatomisin Olakehin',
+      timeAgo: '3 weeks ago',
+      role: 'Business owner',
+      content:
+        'Professional from start to finish. Verification and publication services were handled with care. I would recommend Bluetickgeng to any brand looking for credible growth.',
+      rating: 5,
     },
   ],
 };

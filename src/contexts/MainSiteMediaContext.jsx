@@ -9,7 +9,11 @@ import {
 const MainSiteMediaContext = createContext({
   loaded: false,
   media: null,
+  getHeroVideo: (_fallback) => _fallback,
+  getServiceVideo: (_slot, fallback) => fallback,
   getServiceImage: (_slot, fallback) => fallback,
+  getClientLogos: () => [],
+  getCelebrityLogos: () => [],
   getPublicationCarouselLogos: () => DEFAULT_PUBLICATION_CAROUSEL_LOGOS,
   getPublicationCategoryLogos: (_categoryId, fallback = []) => fallback,
   getPublicationCategoryPlatformLogo: (_categoryId, _platformName) => null,
@@ -59,6 +63,37 @@ export function MainSiteMediaProvider({ children }) {
     },
     [isPartnerSite, media]
   );
+
+  const getHeroVideo = useCallback(
+    (fallback = null) => {
+      if (isPartnerSite) return fallback;
+      return media?.heroVideo || fallback;
+    },
+    [isPartnerSite, media]
+  );
+
+  const getServiceVideo = useCallback(
+    (slot, fallback = null) => {
+      if (isPartnerSite) return fallback;
+      const override = media?.serviceVideos?.[slot];
+      return override || fallback;
+    },
+    [isPartnerSite, media]
+  );
+
+  const getClientLogos = useCallback(() => {
+    if (isPartnerSite) return [];
+    const configured = media?.clientLogos;
+    if (!Array.isArray(configured)) return [];
+    return configured.filter((logo) => logo?.imageUrl);
+  }, [isPartnerSite, media]);
+
+  const getCelebrityLogos = useCallback(() => {
+    if (isPartnerSite) return [];
+    const configured = media?.celebrityLogos;
+    if (!Array.isArray(configured)) return [];
+    return configured.filter((entry) => entry?.imageUrl);
+  }, [isPartnerSite, media]);
 
   const getPublicationCarouselLogos = useCallback(() => {
     if (isPartnerSite) {
@@ -137,7 +172,11 @@ export function MainSiteMediaProvider({ children }) {
     () => ({
       loaded,
       media,
+      getHeroVideo,
+      getServiceVideo,
       getServiceImage,
+      getClientLogos,
+      getCelebrityLogos,
       getPublicationCarouselLogos,
       getPublicationCategoryLogos,
       getPublicationCategoryPlatformLogo,
@@ -145,7 +184,11 @@ export function MainSiteMediaProvider({ children }) {
     [
       loaded,
       media,
+      getHeroVideo,
+      getServiceVideo,
       getServiceImage,
+      getClientLogos,
+      getCelebrityLogos,
       getPublicationCarouselLogos,
       getPublicationCategoryLogos,
       getPublicationCategoryPlatformLogo,

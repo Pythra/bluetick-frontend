@@ -7,6 +7,8 @@ import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import tiktokArtistHeroImage from '../assets/social/tiktok-artist.jpg';
 import {
   tiktokArtistTermsFooter,
@@ -29,6 +31,11 @@ function TikTokArtistServicesPage() {
   const { addToCart } = useCart();
   const { format } = useCurrency();
   const { t, brandName, shortBrandName } = usePartnerText();
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'tiktokArtistVideo',
+    imageSlot: 'tiktokArtistImage',
+    fallbackPoster: tiktokArtistHeroImage,
+  });
 
   const handleAddToCart = (service) =>
     addToCart(
@@ -54,24 +61,13 @@ function TikTokArtistServicesPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero">
-          <img
-            src={tiktokArtistHeroImage}
-            alt="Person scrolling TikTok on a phone — artist promotion and sound campaigns"
-            className="service-detail-hero-image"
-          />
-          <div className="service-detail-hero-overlay" aria-hidden="true" />
-          <div className="service-detail-hero-content">
-            <h1 className="service-detail-title">
-              <span className="services-summary-title-black">TIKTOK FOR ARTIST</span>
-              <span className="services-summary-title-blue">SERVICES & PACKAGES</span>
-            </h1>
-            <p className="service-detail-lead">
-              Song claiming, micro influencer sound campaigns, and full terms for{' '}
-              {shortBrandName.toUpperCase()} DISTRIBUTION &amp; MARKETING — powered by {brandName}.
-            </p>
-          </div>
-        </header>
+        <ServiceDetailVideoHero
+          titleBlack="TIKTOK FOR ARTIST"
+          titleBlue="SERVICES & PACKAGES"
+          lead={`Song claiming, micro influencer sound campaigns, and full terms for ${shortBrandName.toUpperCase()} DISTRIBUTION & MARKETING — powered by ${brandName}.`}
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
         <main className="service-detail-main">
           <section className="service-detail-section">

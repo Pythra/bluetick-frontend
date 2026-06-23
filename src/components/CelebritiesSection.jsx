@@ -1,36 +1,12 @@
-import donjazzImage from '../assets/donjazz.jpeg';
-import blordImage from '../assets/blord.jpg';
-import eniolaImage from '../assets/eniola.jpg';
-import sandraImage from '../assets/sandra.jpg';
-import clintianooImage from '../assets/clintianoo.jpg';
-import reekadoImage from '../assets/reekado.jpg';
-import skibiiImage from '../assets/skibii.jpg';
-import kenzyImage from '../assets/kenzy.jpg';
-import oxladeImage from '../assets/oxlade.jpg';
-import joblaqImage from '../assets/joblaq.jpg';
-import mayorkunImage from '../assets/mayorkun.jpg';
 import SectionHeader from './SectionHeader';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteMedia } from '../contexts/MainSiteMediaContext';
+import { DEFAULT_CELEBRITIES, mapCelebrityEntries } from '../data/defaultCelebrities';
 import './CelebritiesSection.css';
 
-const celebrities = [
-  { name: 'Don Jazzy', image: donjazzImage },
-  { name: 'Blord', image: blordImage },
-  { name: 'Eniola', image: eniolaImage },
-  { name: 'Sandra', image: sandraImage },
-  { name: 'Clintianoo', image: clintianooImage },
-  { name: 'Reekado', image: reekadoImage },
-  { name: 'Skibii', image: skibiiImage },
-  { name: 'Kenzy', image: kenzyImage },
-  { name: 'Oxlade', image: oxladeImage },
-  { name: 'Joblaq', image: joblaqImage },
-  { name: 'Mayorkun', image: mayorkunImage },
-];
-
-const rowSplitIndex = Math.ceil(celebrities.length / 2);
-const topRowCelebrities = celebrities.slice(0, rowSplitIndex);
-const bottomRowCelebrities = celebrities.slice(rowSplitIndex);
-
 function CelebrityMarqueeRow({ items, direction }) {
+  if (!items.length) return null;
+
   const duplicatedItems = [...items, ...items];
 
   return (
@@ -41,7 +17,7 @@ function CelebrityMarqueeRow({ items, direction }) {
       >
         {duplicatedItems.map((celebrity, index) => (
           <article
-            key={`${celebrity.name}-${index}`}
+            key={`${celebrity.id || celebrity.name}-${index}`}
             className="celebrity-marquee-item"
             aria-hidden={index >= items.length}
           >
@@ -60,6 +36,19 @@ function CelebrityMarqueeRow({ items, direction }) {
 }
 
 function CelebritiesSection() {
+  const { isPartnerSite } = usePartnerBranding();
+  const { getCelebrityLogos } = useMainSiteMedia();
+  const configured = isPartnerSite ? [] : mapCelebrityEntries(getCelebrityLogos());
+  const celebrities = configured.length ? configured : DEFAULT_CELEBRITIES;
+
+  const rowSplitIndex = Math.ceil(celebrities.length / 2);
+  const topRowCelebrities = celebrities.slice(0, rowSplitIndex);
+  const bottomRowCelebrities = celebrities.slice(rowSplitIndex);
+
+  if (!celebrities.length) {
+    return null;
+  }
+
   return (
     <section className="celebrities-section" aria-label="Celebrities we have worked with">
       <div className="container">

@@ -1106,6 +1106,32 @@
   object-fit: cover;
 }
 
+.adm-media-preview--video {
+  min-height: 180px;
+}
+
+.adm-media-preview--video video {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  background: #0f172a;
+}
+
+.adm-media-card--wide {
+  max-width: 640px;
+}
+
+.adm-media-preview--portrait {
+  min-height: 200px;
+}
+
+.adm-media-preview--portrait img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  object-position: center top;
+}
+
 .adm-media-preview--logo img {
   object-fit: contain;
   padding: 12px;

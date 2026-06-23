@@ -1,5 +1,5 @@
 .clients-section {
-  padding: 24px 0 40px;
+  padding: 48px 0 64px;
   background: #ffffff;
 }
 
@@ -11,9 +11,67 @@
   box-sizing: border-box;
 }
 
-.clients-section-visual {
+.clients-section-layout {
+  display: grid;
+  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+  gap: 2rem 2.5rem;
+  align-items: start;
+}
+
+.clients-section-header {
+  margin: 0;
+  text-align: left;
+}
+
+.clients-section-title {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.08em;
+  margin: 0;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  background: none;
+  -webkit-text-fill-color: unset;
+}
+
+.clients-section-title > .services-summary-title-black,
+.clients-section-title > .services-summary-title-blue {
+  display: block;
+}
+
+.clients-section-logos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.1rem 1.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: center;
+}
+
+.clients-section-logo {
+  display: flex;
+  align-items: center;
   justify-content: center;
+  min-height: 64px;
+  padding: 0.35rem 0.25rem;
+}
+
+.clients-section-logo img {
+  display: block;
+  width: 100%;
+  max-width: 132px;
+  max-height: 52px;
+  object-fit: contain;
+}
+
+.clients-section-layout--legacy .clients-section-visual {
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
   overflow: hidden;
@@ -23,22 +81,51 @@
   display: block;
   width: 100%;
   height: auto;
-  object-fit: cover;
-  /* Crop whitespace baked into the JPEG (top/bottom margins) */
-  margin-top: -16%;
-  margin-bottom: -9%;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .service-detail-page .clients-section {
   background: #f8fafc;
 }
 
+.landing-page.clients-section,
 .landing-page .clients-section {
   background: #ffffff;
 }
 
+@media (max-width: 900px) {
+  .clients-section-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .clients-section-logos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 640px) {
   .clients-section {
-    padding: 48px 0 64px;
+    padding: 40px 0 56px;
+  }
+
+  .clients-section-logos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 1rem;
+  }
+
+  .clients-section-logo {
+    min-height: 56px;
+  }
+
+  .clients-section-logo img {
+    max-height: 44px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .clients-section-logos {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }

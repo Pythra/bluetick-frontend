@@ -51,8 +51,43 @@
   width: 100%;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  min-height: 420px;
+  min-height: 720px;
   background: #fff;
+}
+
+.agreement-delivery-summary {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.agreement-delivery-summary h4 {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.agreement-delivery-summary ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.agreement-delivery-summary li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+.agreement-delivery-summary li strong {
+  color: #1d4ed8;
+  white-space: nowrap;
 }
 
 .agreement-sign-methods {

@@ -7,6 +7,8 @@ import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import instagramHeroImage from '../assets/online.jpg';
 import {
   getInstagramCartTitle,
@@ -25,6 +27,11 @@ function InstagramServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { format } = useCurrency();
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'instagramVideo',
+    imageSlot: 'instagramImage',
+    fallbackPoster: instagramHeroImage,
+  });
 
   const handleAddToCart = (item, section) =>
     addToCart(
@@ -64,20 +71,13 @@ function InstagramServicesPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero">
-          <img src={instagramHeroImage} alt="" className="service-detail-hero-image" />
-          <div className="service-detail-hero-overlay" aria-hidden="true" />
-          <div className="service-detail-hero-content">
-            <h1 className="service-detail-title">
-              <span className="services-summary-title-black">INSTAGRAM BLOG</span>
-              <span className="services-summary-title-blue">PROMOTION</span>
-            </h1>
-            <p className="service-detail-lead">
-              Get your content featured on Nigeria&apos;s most popular Instagram pages — from
-              entertainment blogs to celebrity news platforms with millions of followers.
-            </p>
-          </div>
-        </header>
+        <ServiceDetailVideoHero
+          titleBlack="INSTAGRAM BLOG"
+          titleBlue="PROMOTION"
+          lead="Get your content featured on Nigeria's most popular Instagram pages — from entertainment blogs to celebrity news platforms with millions of followers."
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
         <main className="service-detail-main">
           <section className="service-detail-section">

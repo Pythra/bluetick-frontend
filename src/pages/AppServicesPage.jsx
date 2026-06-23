@@ -22,6 +22,8 @@ import { getPackagesByGroup } from '../data/partnerPackageCatalog';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import { usePartnerPackagePrice } from '../hooks/usePartnerPackagePrice';
 import ServiceDetailCard from '../components/ServiceDetailCard';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import appHeroImage from '../assets/app.png';
 import appHeroVideo from '../assets/app.mp4';
 import './ServiceDetailPage.css';
@@ -80,6 +82,12 @@ function AppServicesPage() {
     customAppInfo.packageId,
     customAppInfo.startingPrice
   );
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'appDevelopmentVideo',
+    imageSlot: 'appDevelopmentImage',
+    fallbackVideo: appHeroVideo,
+    fallbackPoster: appHeroImage,
+  });
 
   const handleAddToCart = (service) =>
     addToCart(
@@ -104,28 +112,13 @@ function AppServicesPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero service-detail-hero--app">
-          <video
-            className="service-detail-hero-image"
-            src={appHeroVideo}
-            poster={appHeroImage}
-            autoPlay
-            loop
-            playsInline
-            controls
-            preload="metadata"
-          />
-          <div className="service-detail-hero-overlay" aria-hidden="true" />
-          <div className="service-detail-hero-content">
-            <h1 className="service-detail-title">
-              <span className="services-summary-title-black">APP DEVELOPMENT</span>
-              <span className="services-summary-title-blue">SERVICES</span>
-            </h1>
-            <p className="service-detail-lead">
-              Popular app types and starting prices — add any package to your cart or book a custom build.
-            </p>
-          </div>
-        </header>
+        <ServiceDetailVideoHero
+          titleBlack="APP DEVELOPMENT"
+          titleBlue="SERVICES"
+          lead="Popular app types and starting prices — add any package to your cart or book a custom build."
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
         <main className="service-detail-main">
           <div className="service-detail-grid">

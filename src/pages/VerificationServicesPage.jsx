@@ -17,6 +17,8 @@ import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import verificationHeroImage from '../assets/social/verification.jpg';
 import {
   metaSubscriptionService,
@@ -60,6 +62,11 @@ function getVerificationIcon(title) {
 function VerificationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'verificationVideo',
+    imageSlot: 'socialMediaImage',
+    fallbackPoster: verificationHeroImage,
+  });
 
   const handleAddToCart = (service, tier) =>
     addToCart(
@@ -103,20 +110,13 @@ function VerificationServicesPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero">
-          <img src={verificationHeroImage} alt="" className="service-detail-hero-image" />
-          <div className="service-detail-hero-overlay" aria-hidden="true" />
-          <div className="service-detail-hero-content">
-            <h1 className="service-detail-title">
-              <span className="services-summary-title-black">SOCIAL MEDIA</span>
-              <span className="services-summary-title-blue">VERIFICATION</span>
-            </h1>
-            <p className="service-detail-lead">
-              Establish credibility with permanent verification for notable and non-notable accounts
-              across every major platform we support.
-            </p>
-          </div>
-        </header>
+        <ServiceDetailVideoHero
+          titleBlack="SOCIAL MEDIA"
+          titleBlue="VERIFICATION"
+          lead="Establish credibility with permanent verification for notable and non-notable accounts across every major platform we support."
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
         <main className="service-detail-main">
           <section className="service-detail-section">

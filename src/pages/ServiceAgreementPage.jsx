@@ -162,6 +162,19 @@ export default function ServiceAgreementPage() {
                 <p>Invoice: <strong>{agreement.orderDetails?.invoiceNumber}</strong></p>
                 <p>Service: {agreement.orderDetails?.services}</p>
                 <p>Amount: <strong>{agreement.orderDetails?.amountPaid}</strong></p>
+                {agreement.orderDetails?.deliveryItems?.length ? (
+                  <div className="agreement-delivery-summary">
+                    <h4>Estimated delivery</h4>
+                    <ul>
+                      {agreement.orderDetails.deliveryItems.map((item) => (
+                        <li key={`${item.packageId || item.displayTitle}-${item.delivery}`}>
+                          <span>{item.displayTitle || item.title}</span>
+                          <strong>{item.delivery}</strong>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
               </div>
             </div>
 

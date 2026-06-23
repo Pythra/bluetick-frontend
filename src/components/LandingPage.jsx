@@ -16,6 +16,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import { getCurrencyByCode } from '../data/flutterwaveCurrencies';
 import heroVideo from '../assets/vid.mp4';
 import { usePartnerAsset } from '../utils/partnerMedia';
+import { useMainSiteLandingHeroVideo } from '../hooks/useMainSiteServiceHero';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './LandingPage.css';
 
@@ -69,7 +70,10 @@ function LandingPage({ onScrollToSection }) {
   const { src: partnerHeroVideo, isPartnerSite: onPartnerSite } = usePartnerAsset('heroVideo', heroVideo);
   const { src: partnerHeroImage } = usePartnerAsset('heroImage', null);
   const { src: heroPoster } = usePartnerAsset('heroPoster', null);
-  const heroMediaSrc = onPartnerSite ? (partnerHeroImage || partnerHeroVideo) : heroVideo;
+  const mainSiteHeroVideo = useMainSiteLandingHeroVideo(heroVideo);
+  const heroMediaSrc = onPartnerSite
+    ? partnerHeroImage || partnerHeroVideo
+    : partnerHeroImage || mainSiteHeroVideo;
   const heroMediaType = onPartnerSite && partnerHeroImage ? 'image' : 'video';
   const displayName = shortName || brandName;
   const { currency, setCurrency, currencies } = useCurrency();

@@ -5,7 +5,10 @@ import { useMainAdminPricingApi } from '../mainAdminPricingApi';
 
 const VIEWS = {
   pricing: 'pricing',
+  videos: 'videos',
   backgrounds: 'backgrounds',
+  clientLogos: 'client-logos',
+  celebrityLogos: 'celebrity-logos',
   carousel: 'carousel',
   categoryLogos: 'category-logos',
 };
@@ -30,10 +33,31 @@ export default function MainServicesPricingTab({ apiUrl, adminToken, onMessage }
         </button>
         <button
           type="button"
+          className={`adm-services-tab${view === VIEWS.videos ? ' is-active' : ''}`}
+          onClick={() => setView(VIEWS.videos)}
+        >
+          Hero videos
+        </button>
+        <button
+          type="button"
           className={`adm-services-tab${view === VIEWS.backgrounds ? ' is-active' : ''}`}
           onClick={() => setView(VIEWS.backgrounds)}
         >
           Service backgrounds
+        </button>
+        <button
+          type="button"
+          className={`adm-services-tab${view === VIEWS.celebrityLogos ? ' is-active' : ''}`}
+          onClick={() => setView(VIEWS.celebrityLogos)}
+        >
+          Celebrity photos
+        </button>
+        <button
+          type="button"
+          className={`adm-services-tab${view === VIEWS.clientLogos ? ' is-active' : ''}`}
+          onClick={() => setView(VIEWS.clientLogos)}
+        >
+          Client logos
         </button>
         <button
           type="button"

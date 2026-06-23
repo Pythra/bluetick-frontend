@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { usePartnerBranding } from '../../contexts/PartnerBrandingContext';
 import { usePartnerAsset } from '../../utils/partnerMedia';
 import { usePartnerSectionContent } from '../../utils/partnerSectionContent';
+import { useMainSiteLandingHeroVideo } from '../../hooks/useMainSiteServiceHero';
 import heroVideo from '../../assets/vid.mp4';
 
 export const heroSlides = [
@@ -42,8 +43,8 @@ export function useLandingHero() {
   const { src: partnerHeroVideo, isPartnerSite: onPartnerSite } = usePartnerAsset('heroVideo', heroVideo);
   const { src: partnerHeroImage } = usePartnerAsset('heroImage', null);
   const { src: heroPoster } = usePartnerAsset('heroPoster', null);
-
-  const heroMediaSrc = onPartnerSite ? partnerHeroImage || partnerHeroVideo : heroVideo;
+  const mainSiteHeroVideo = useMainSiteLandingHeroVideo(heroVideo);
+  const heroMediaSrc = onPartnerSite ? partnerHeroImage || partnerHeroVideo : partnerHeroImage || mainSiteHeroVideo;
   const heroMediaType = onPartnerSite && partnerHeroImage ? 'image' : 'video';
   const displayName = shortName || brandName;
 

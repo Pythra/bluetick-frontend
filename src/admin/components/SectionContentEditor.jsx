@@ -51,6 +51,9 @@ function buildInitialState(editorType, sectionKey, sectionContent = {}, siteCont
   if (editorType === 'testimonials') {
     const defaults = PARTNER_TESTIMONIALS_DEFAULTS;
     return {
+      title: stored.title ?? defaults.title,
+      subtitle: stored.subtitle ?? defaults.subtitle,
+      sideTagline: stored.sideTagline ?? defaults.sideTagline,
       titleBlack: stored.titleBlack ?? defaults.titleBlack,
       titleBlue: stored.titleBlue ?? defaults.titleBlue,
       items: (stored.items?.length ? stored.items : defaults.items).map((item) => ({ ...item })),
@@ -114,6 +117,13 @@ function serializeState(editorType, state) {
   if (editorType === 'testimonials' || editorType === 'faq') {
     return {
       sectionPatch: {
+        ...(editorType === 'testimonials'
+          ? {
+              title: state.title,
+              subtitle: state.subtitle,
+              sideTagline: state.sideTagline,
+            }
+          : {}),
         titleBlack: state.titleBlack,
         titleBlue: state.titleBlue,
         items: state.items,
@@ -297,16 +307,33 @@ function SectionContentEditor({
 
           {(editorType === 'testimonials' || editorType === 'faq') ? (
             <>
-              <div className="pdash-grid-2">
-                <div className="pdash-field">
-                  <label>Section title — first line</label>
-                  <input value={form.titleBlack || ''} onChange={(e) => updateField('titleBlack', e.target.value)} />
+              {editorType === 'testimonials' ? (
+                <>
+                  <div className="pdash-field">
+                    <label>Section title</label>
+                    <input value={form.title || ''} onChange={(e) => updateField('title', e.target.value)} />
+                  </div>
+                  <div className="pdash-field">
+                    <label>Subtitle</label>
+                    <input value={form.subtitle || ''} onChange={(e) => updateField('subtitle', e.target.value)} />
+                  </div>
+                  <div className="pdash-field">
+                    <label>Side tagline</label>
+                    <input value={form.sideTagline || ''} onChange={(e) => updateField('sideTagline', e.target.value)} />
+                  </div>
+                </>
+              ) : (
+                <div className="pdash-grid-2">
+                  <div className="pdash-field">
+                    <label>Section title — first line</label>
+                    <input value={form.titleBlack || ''} onChange={(e) => updateField('titleBlack', e.target.value)} />
+                  </div>
+                  <div className="pdash-field">
+                    <label>Section title — accent line</label>
+                    <input value={form.titleBlue || ''} onChange={(e) => updateField('titleBlue', e.target.value)} />
+                  </div>
                 </div>
-                <div className="pdash-field">
-                  <label>Section title — accent line</label>
-                  <input value={form.titleBlue || ''} onChange={(e) => updateField('titleBlue', e.target.value)} />
-                </div>
-              </div>
+              )}
               <div className="pdash-editor-list">
                 {listItems.map((item, index) => (
                   <div key={`${editorType}-${index}`} className="pdash-editor-list-item">
@@ -324,8 +351,26 @@ function SectionContentEditor({
                             <input value={item.name} onChange={(e) => updateListItem(index, 'name', e.target.value)} />
                           </div>
                           <div className="pdash-field">
-                            <label>Role / company</label>
-                            <input value={item.role} onChange={(e) => updateListItem(index, 'role', e.target.value)} />
+                            <label>Time ago</label>
+                            <input
+                              value={item.timeAgo || ''}
+                              onChange={(e) => updateListItem(index, 'timeAgo', e.target.value)}
+                              placeholder="e.g. 4 months ago"
+                            />
+                          </div>
+                        </div>
+                        <div className="pdash-grid-2">
+                          <div className="pdash-field">
+                            <label>Role / company (fallback)</label>
+                            <input value={item.role || ''} onChange={(e) => updateListItem(index, 'role', e.target.value)} />
+                          </div>
+                          <div className="pdash-field">
+                            <label>Avatar image URL (optional)</label>
+                            <input
+                              value={item.avatarUrl || ''}
+                              onChange={(e) => updateListItem(index, 'avatarUrl', e.target.value)}
+                              placeholder="https://..."
+                            />
                           </div>
                         </div>
                         <div className="pdash-field">
@@ -355,7 +400,7 @@ function SectionContentEditor({
                   addListItem(
                     editorType === 'faq'
                       ? { question: '', answer: '' }
-                      : { name: '', role: '', content: '' }
+                      : { name: '', timeAgo: '', role: '', content: '', rating: 5 }
                   )
                 }
               >

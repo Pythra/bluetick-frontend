@@ -1,4 +1,3 @@
- import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   IoBookOutline,
@@ -9,13 +8,14 @@ import {
   IoShieldCheckmarkOutline,
 } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { formatPrice } from '../utils/priceFormatter';
 import Navbar from '../components/Navbar';
 import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import ServiceDetailCard from '../components/ServiceDetailCard';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
 import Footer from '../components/Footer';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import ClientsSection from '../components/ClientsSection';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import wikipediaHeroVideo from '../assets/wiki.mp4';
 import {
   googleKnowledgePanelPackages,
@@ -34,34 +34,11 @@ function buildPackageDescription(pkg) {
 function WikipediaServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const wikiVideoRef = useRef(null);
-
-  useEffect(() => {
-    const video = wikiVideoRef.current;
-    if (!video) return undefined;
-
-    const showFirstFrame = () => {
-      try {
-        if (video.readyState >= 1 && video.currentTime < 0.05) {
-          video.currentTime = 0.01;
-        }
-      } catch {
-        // Some browsers block seek until enough data is loaded
-      }
-    };
-
-    video.addEventListener('loadeddata', showFirstFrame);
-    video.addEventListener('loadedmetadata', showFirstFrame);
-
-    if (video.readyState >= 1) {
-      showFirstFrame();
-    }
-
-    return () => {
-      video.removeEventListener('loadeddata', showFirstFrame);
-      video.removeEventListener('loadedmetadata', showFirstFrame);
-    };
-  }, []);
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'wikipediaVideo',
+    imageSlot: 'wikipediaImage',
+    fallbackVideo: wikipediaHeroVideo,
+  });
 
   const handleAddToCart = (item, category) =>
     addToCart(
@@ -89,45 +66,24 @@ function WikipediaServicesPage() {
     <div className="service-detail-page">
       <Navbar onScrollToSection={scrollToSection} />
 
-      <main className="service-detail-main wikipedia-page-main" aria-label="Wikipedia Page Services">
-        <div className="wikipedia-page-shell">
-          <div className="wikipedia-page-split">
-            <aside className="wikipedia-page-video" aria-label="Wikipedia services overview video">
-              <video
-                ref={wikiVideoRef}
-                className="wikipedia-page-video-player"
-                src={wikipediaHeroVideo}
-                controls
-                playsInline
-                preload="auto"
-              />
-            </aside>
+      <div className="service-detail-shell wikipedia-page-shell">
+        <ServiceDetailVideoHero
+          titleBlack="WIKIPEDIA PAGE"
+          titleBlue="SERVICES"
+          lead="Establish credibility on the world's most trusted encyclopedia — professional content creation, publications, and quality assurance for individuals and companies."
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
-            <div className="wikipedia-page-content">
-              <header className="wikipedia-page-intro">
-                <h1 className="wikipedia-page-title">
-                  <span className="services-summary-title-black">WIKIPEDIA PAGE</span>
-                  <span className="services-summary-title-blue">SERVICES</span>
-                </h1>
-                <p className="wikipedia-page-lead">
-                  Establish credibility on the world&apos;s most trusted encyclopedia — professional
-                  content creation, publications, and quality assurance for individuals and companies.
-                </p>
-              </header>
-
-              <div className="wikipedia-page-packages-intro">
-                <h2 className="service-detail-section-title">Wikipedia Page Packages</h2>
-                <p className="service-detail-section-lead">
-                  Professional Wikipedia page creation for individuals and companies — comprehensive
-                  content development, quality assurance, and compliance with Wikipedia standards.
-                  Company pages include stricter notability assessment, media sourcing, and detailed
-                  business coverage.
-                </p>
-              </div>
-            </div>
-          </div>
-
+        <main className="service-detail-main wikipedia-page-main" aria-label="Wikipedia Page Services">
           <section className="service-detail-section wikipedia-page-packages" aria-label="Wikipedia package options">
+            <h2 className="service-detail-section-title">Wikipedia Page Packages</h2>
+            <p className="service-detail-section-lead">
+              Professional Wikipedia page creation for individuals and companies — comprehensive
+              content development, quality assurance, and compliance with Wikipedia standards.
+              Company pages include stricter notability assessment, media sourcing, and detailed
+              business coverage.
+            </p>
             <div className="service-detail-grid wikipedia-page-packages-grid">
               {wikipediaPagePackages.map((pkg) => (
                 <PartnerPricedServiceCard
@@ -143,8 +99,7 @@ function WikipediaServicesPage() {
             </div>
           </section>
 
-          <div className="wikipedia-page-full">
-            <section className="service-detail-section">
+          <section className="service-detail-section">
             <h2 className="service-detail-section-title">Scope of Services</h2>
             <p className="service-detail-section-lead">
               What we handle as part of every Wikipedia engagement.
@@ -195,9 +150,8 @@ function WikipediaServicesPage() {
             icon={IoInformationCircleOutline}
             feature
           />
-          </div>
-        </div>
-      </main>
+        </main>
+      </div>
 
       <ClientsSection />
       <Footer onScrollToSection={scrollToSection} />

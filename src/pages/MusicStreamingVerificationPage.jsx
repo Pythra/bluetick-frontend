@@ -9,6 +9,8 @@ import StreamingPlatformLogo from '../components/StreamingPlatformLogo';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import musicHeroImage from '../assets/mayorkun.jpg';
 import {
   musicProfilePlacements,
@@ -16,20 +18,6 @@ import {
   streamingPlatformVerifications,
 } from '../data/musicStreamingVerificationServices';
 import './ServiceDetailPage.css';
-
-const verificationMeta = {
-  'Boomplay Verification': 'Streaming verification',
-  'Spotify Verification': 'Streaming verification',
-  'Audiomack Verification': 'Streaming verification',
-  'Apple Music Verification': 'Streaming verification',
-  'YouTube Official Artist Channel (OAC) Verification': 'YouTube OAC',
-  'Deezer Verification': 'Streaming verification',
-  'TIDAL Artist Verification': 'Streaming verification',
-  'Amazon Music Artist Verification': 'Streaming verification',
-  'Pandora AMP Verification': 'Streaming verification',
-  'SoundCloud Verification': 'Streaming verification',
-  'Shazam Artist Profile Verification': 'Streaming verification',
-};
 
 const verificationDescriptions = {
   'Boomplay Verification':
@@ -73,6 +61,11 @@ function renderPlatformIcon(title) {
 function MusicStreamingVerificationPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'musicStreamingVideo',
+    imageSlot: 'musicStreamingImage',
+    fallbackPoster: musicHeroImage,
+  });
 
   const handleAddToCart = (service, tier) =>
     addToCart(
@@ -117,20 +110,13 @@ function MusicStreamingVerificationPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero">
-          <img src={musicHeroImage} alt="" className="service-detail-hero-image" />
-          <div className="service-detail-hero-overlay" aria-hidden="true" />
-          <div className="service-detail-hero-content">
-            <h1 className="service-detail-title">
-              <span className="services-summary-title-black">MUSIC ARTIST STREAMING</span>
-              <span className="services-summary-title-blue">VERIFICATION</span>
-            </h1>
-            <p className="service-detail-lead">
-              Official verified artist profiles on Spotify, Apple Music, Boomplay, YouTube OAC, and
-              every major streaming platform we support.
-            </p>
-          </div>
-        </header>
+        <ServiceDetailVideoHero
+          titleBlack="MUSIC ARTIST STREAMING"
+          titleBlue="VERIFICATION"
+          lead="Official verified artist profiles on Spotify, Apple Music, Boomplay, YouTube OAC, and every major streaming platform we support."
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
         <main className="service-detail-main">
           <section className="service-detail-section">

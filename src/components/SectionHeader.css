@@ -169,7 +169,8 @@
 .testimonials-section .section-title,
 .faq-section .section-title,
 .custom-requests-section .section-title,
-.home-impact-section .section-title {
+.home-impact-section .section-title,
+.clients-section .section-title {
   font-family: 'Poppins', 'Inter', sans-serif;
   font-size: 3rem;
   font-weight: 600;
@@ -354,7 +355,8 @@
   .celebrities-section .section-title,
   .testimonials-section .section-title,
   .faq-section .section-title,
-  .home-impact-section .section-title {
+  .home-impact-section .section-title,
+  .clients-section .section-title {
     font-size: 2.65rem;
     text-align: left;
   }

@@ -11,13 +11,14 @@ import {
   IoWalletOutline,
 } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
-import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import PartnerPricedServiceCard from '../components/PartnerPricedServiceCard';
 import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import verificationHeroImage from '../assets/social/verification.jpg';
 import {
   monetizationImportantNotice,
@@ -64,6 +65,11 @@ function getMonetizationIcon(title) {
 function MonetizationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'monetizationVideo',
+    imageSlot: 'socialMediaImage',
+    fallbackPoster: verificationHeroImage,
+  });
 
   const handleAddToCart = (service, tier) =>
     addToCart(
@@ -106,20 +112,13 @@ function MonetizationServicesPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero">
-          <img src={verificationHeroImage} alt="" className="service-detail-hero-image" />
-          <div className="service-detail-hero-overlay" aria-hidden="true" />
-          <div className="service-detail-hero-content">
-            <h1 className="service-detail-title">
-              <span className="services-summary-title-black">SOCIAL MEDIA</span>
-              <span className="services-summary-title-blue">MONETIZATION</span>
-            </h1>
-            <p className="service-detail-lead">
-              Turn your audience into revenue across Facebook, Instagram, YouTube, TikTok, Snapchat,
-              and X — we handle eligibility, setup, and approval end to end.
-            </p>
-          </div>
-        </header>
+        <ServiceDetailVideoHero
+          titleBlack="SOCIAL MEDIA"
+          titleBlue="MONETIZATION"
+          lead="Turn your audience into revenue across Facebook, Instagram, YouTube, TikTok, Snapchat, and X — we handle eligibility, setup, and approval end to end."
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
         <main className="service-detail-main">
           <section className="service-detail-section">

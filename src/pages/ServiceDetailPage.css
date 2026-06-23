@@ -88,12 +88,14 @@
 }
 
 /* App development hero: text sits higher; room for video controls at bottom */
-.service-detail-hero--app .service-detail-hero-content {
+.service-detail-hero--app .service-detail-hero-content,
+.service-detail-hero--video .service-detail-hero-content {
   justify-content: flex-end;
   padding: 2rem 1.5rem 5.75rem;
 }
 
-.service-detail-hero--app .service-detail-hero-image {
+.service-detail-hero--app .service-detail-hero-image,
+.service-detail-hero--video .service-detail-hero-image {
   object-position: center 22%;
 }
 
@@ -398,7 +400,8 @@
     padding: 1.35rem 1.1rem 1.75rem;
   }
 
-  .service-detail-hero--app .service-detail-hero-content {
+  .service-detail-hero--app .service-detail-hero-content,
+  .service-detail-hero--video .service-detail-hero-content {
     padding: 1.35rem 1.1rem 4.25rem;
   }
 }

@@ -11,8 +11,8 @@ import { websiteDevelopmentServices } from '../data/developmentServices';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import websiteHeroImage from '../assets/tech.jpg';
-import { usePartnerAsset } from '../utils/partnerMedia';
-import PartnerMediaFrame from '../components/PartnerMediaFrame';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import { companyWhatsappSessionUrl } from '../config/companyContact';
 import { usePartnerText } from '../utils/partnerText';
 import './ServiceDetailPage.css';
@@ -52,7 +52,12 @@ function WebsiteServicesPage() {
   const { format } = useCurrency();
   const { t } = usePartnerText();
   const { isPartnerSite } = usePartnerBranding();
-  const { src: heroImageSrc } = usePartnerAsset('websiteServicesImage', websiteHeroImage);
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'websiteServicesVideo',
+    imageSlot: 'websiteServicesImage',
+    fallbackPoster: websiteHeroImage,
+    partnerImageKey: 'websiteServicesImage',
+  });
 
   const handleAddToCart = (service) =>
     addToCart(
@@ -77,23 +82,13 @@ function WebsiteServicesPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero">
-          <PartnerMediaFrame
-            src={heroImageSrc}
-            alt=""
-            className="service-detail-hero-image-frame"
-          />
-          <div className="service-detail-hero-overlay" aria-hidden="true" />
-          <div className="service-detail-hero-content">
-            <h1 className="service-detail-title">
-              <span className="services-summary-title-black">WEBSITE DEVELOPMENT</span>
-              <span className="services-summary-title-blue">SERVICES</span>
-            </h1>
-            <p className="service-detail-lead">
-              Responsive, SEO-friendly websites that are easy to manage — pick a package and add it to your cart.
-            </p>
-          </div>
-        </header>
+        <ServiceDetailVideoHero
+          titleBlack="WEBSITE DEVELOPMENT"
+          titleBlue="SERVICES"
+          lead="Responsive, SEO-friendly websites that are easy to manage — pick a package and add it to your cart."
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
         <main className="service-detail-main">
           <div className="service-detail-grid">

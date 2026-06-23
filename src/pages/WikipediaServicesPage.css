@@ -6,11 +6,6 @@
   box-sizing: border-box;
 }
 
-.wikipedia-page-split {
-  width: 100%;
-  margin-bottom: 2rem;
-}
-
 .wikipedia-page-packages {
   margin-bottom: 0;
   padding-top: 0.25rem;

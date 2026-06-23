@@ -9,6 +9,8 @@ import ServiceDetailCard from '../components/ServiceDetailCard';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import { buildPartnerCartItem } from '../utils/partnerCartItem';
+import ServiceDetailVideoHero from '../components/ServiceDetailVideoHero';
+import { useMainSiteServiceHero } from '../hooks/useMainSiteServiceHero';
 import verificationHeroImage from '../assets/social/verification.jpg';
 import { twitterTrendNotice, twitterTrendPackages } from '../data/twitterTrendPackages';
 import './ServiceDetailPage.css';
@@ -22,6 +24,11 @@ function TwitterTrendServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { format } = useCurrency();
+  const { videoSrc, posterSrc } = useMainSiteServiceHero({
+    videoSlot: 'twitterTrendsVideo',
+    imageSlot: 'socialMediaImage',
+    fallbackPoster: verificationHeroImage,
+  });
 
   const handleAddToCart = (pkg) =>
     addToCart(
@@ -47,20 +54,13 @@ function TwitterTrendServicesPage() {
       <Navbar onScrollToSection={scrollToSection} />
 
       <div className="service-detail-shell">
-        <header className="service-detail-hero">
-          <img src={verificationHeroImage} alt="" className="service-detail-hero-image" />
-          <div className="service-detail-hero-overlay" aria-hidden="true" />
-          <div className="service-detail-hero-content">
-            <h1 className="service-detail-title">
-              <span className="services-summary-title-black">TWITTER (X)</span>
-              <span className="services-summary-title-blue">TREND SERVICES</span>
-            </h1>
-            <p className="service-detail-lead">
-              Premium trend promotion packages for brands, artists, campaigns, and announcements across
-              Nigeria, Uganda, South Africa, Kenya, and Ghana.
-            </p>
-          </div>
-        </header>
+        <ServiceDetailVideoHero
+          titleBlack="TWITTER (X)"
+          titleBlue="TREND SERVICES"
+          lead="Premium trend promotion packages for brands, artists, campaigns, and announcements across Nigeria, Uganda, South Africa, Kenya, and Ghana."
+          videoSrc={videoSrc}
+          posterSrc={posterSrc}
+        />
 
         <main className="service-detail-main">
           <section className="service-detail-section">
