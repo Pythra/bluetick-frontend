@@ -7,6 +7,7 @@ const VIEWS = {
   pricing: 'pricing',
   videos: 'videos',
   backgrounds: 'backgrounds',
+  partnerSection: 'partner-section',
   clientLogos: 'client-logos',
   celebrityLogos: 'celebrity-logos',
   carousel: 'carousel',
@@ -44,6 +45,13 @@ export default function MainServicesPricingTab({ apiUrl, adminToken, onMessage }
           onClick={() => setView(VIEWS.backgrounds)}
         >
           Service backgrounds
+        </button>
+        <button
+          type="button"
+          className={`adm-services-tab${view === VIEWS.partnerSection ? ' is-active' : ''}`}
+          onClick={() => setView(VIEWS.partnerSection)}
+        >
+          Partner section
         </button>
         <button
           type="button"

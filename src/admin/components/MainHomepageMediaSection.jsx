@@ -25,6 +25,11 @@ const SERVICE_SLOTS = [
   { key: 'wikipediaImage', label: 'Wikipedia Page Services' },
 ];
 
+const PARTNER_SECTION_SLOTS = [
+  { key: 'partnerWithUsImage', label: 'Desktop background (wide screens)' },
+  { key: 'partnerWithUsMobileImage', label: 'Mobile background (640px and below)' },
+];
+
 function readFileAsDataUrl(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -140,6 +145,16 @@ export default function MainHomepageMediaSection({
 
   const removeServiceImage = async (slot) => {
     await saveMedia({ serviceImages: { [slot]: null } });
+  };
+
+  const uploadPartnerSectionImage = async (slot, file) => {
+    if (!file) return;
+    const dataUrl = await readFileAsDataUrl(file);
+    await saveMedia({ imageUploads: { [slot]: dataUrl } });
+  };
+
+  const removePartnerSectionImage = async (slot) => {
+    await saveMedia({ [slot]: null });
   };
 
   const addCarouselLogo = async () => {
@@ -567,6 +582,57 @@ export default function MainHomepageMediaSection({
             );
           })}
         </div>
+      ) : null}
+
+      {view === 'partner-section' ? (
+        <>
+          <p className="pdash-panel-lead" style={{ marginBottom: 12 }}>
+            Background images for the &quot;Partner With Industry Leaders&quot; section on the main site homepage.
+          </p>
+          <div className="adm-media-grid">
+            {PARTNER_SECTION_SLOTS.map((slot) => {
+              const currentUrl = media?.[slot.key] || null;
+              return (
+                <article key={slot.key} className="adm-media-card">
+                  <h3>{slot.label}</h3>
+                  <div className="adm-media-preview">
+                    {currentUrl ? (
+                      <img src={currentUrl} alt={slot.label} />
+                    ) : (
+                      <span>No image saved</span>
+                    )}
+                  </div>
+                  <div className="adm-btn-group">
+                    <label className="adm-btn adm-btn-ghost">
+                      {currentUrl ? 'Replace' : 'Upload'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        disabled={saving}
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          uploadPartnerSectionImage(slot.key, file);
+                          event.target.value = '';
+                        }}
+                      />
+                    </label>
+                    {currentUrl ? (
+                      <button
+                        type="button"
+                        className="adm-btn adm-btn-ghost danger"
+                        disabled={saving}
+                        onClick={() => removePartnerSectionImage(slot.key)}
+                      >
+                        Delete
+                      </button>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </>
       ) : null}
 
       {view === 'carousel' ? (

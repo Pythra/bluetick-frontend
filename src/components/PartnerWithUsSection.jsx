@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaArrowRight, FaCheckCircle } from 'react-icons/fa';
 import partnerImage from '../assets/partner.png';
 import portraitPartnerImage from '../assets/potraitpartner.png';
+import { useMainSiteMedia } from '../contexts/MainSiteMediaContext';
 import './PartnerWithUsSection.css';
 
 const partnerHighlights = [
@@ -12,14 +13,17 @@ const partnerHighlights = [
 
 function PartnerWithUsSection() {
   const navigate = useNavigate();
+  const { getPartnerWithUsImage, getPartnerWithUsMobileImage } = useMainSiteMedia();
+  const desktopBackground = getPartnerWithUsImage(partnerImage);
+  const mobileBackground = getPartnerWithUsMobileImage(portraitPartnerImage);
 
   return (
     <section className="partner-section" aria-label="Partner with us">
       <div className="partner-bg-overlay" aria-hidden="true">
         <picture className="partner-bg-picture">
-          <source media="(max-width: 640px)" srcSet={portraitPartnerImage} />
+          <source media="(max-width: 640px)" srcSet={mobileBackground} />
           <img
-            src={partnerImage}
+            src={desktopBackground}
             alt=""
             className="partner-bg-image"
             loading="lazy"

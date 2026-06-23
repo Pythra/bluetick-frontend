@@ -17,6 +17,8 @@ const MainSiteMediaContext = createContext({
   getPublicationCarouselLogos: () => DEFAULT_PUBLICATION_CAROUSEL_LOGOS,
   getPublicationCategoryLogos: (_categoryId, fallback = []) => fallback,
   getPublicationCategoryPlatformLogo: (_categoryId, _platformName) => null,
+  getPartnerWithUsImage: (_fallback) => _fallback,
+  getPartnerWithUsMobileImage: (_fallback) => _fallback,
 });
 
 export function MainSiteMediaProvider({ children }) {
@@ -168,6 +170,22 @@ export function MainSiteMediaProvider({ children }) {
     [isPartnerSite, media]
   );
 
+  const getPartnerWithUsImage = useCallback(
+    (fallback = null) => {
+      if (isPartnerSite) return fallback;
+      return media?.partnerWithUsImage || fallback;
+    },
+    [isPartnerSite, media]
+  );
+
+  const getPartnerWithUsMobileImage = useCallback(
+    (fallback = null) => {
+      if (isPartnerSite) return fallback;
+      return media?.partnerWithUsMobileImage || fallback;
+    },
+    [isPartnerSite, media]
+  );
+
   const value = useMemo(
     () => ({
       loaded,
@@ -180,6 +198,8 @@ export function MainSiteMediaProvider({ children }) {
       getPublicationCarouselLogos,
       getPublicationCategoryLogos,
       getPublicationCategoryPlatformLogo,
+      getPartnerWithUsImage,
+      getPartnerWithUsMobileImage,
     }),
     [
       loaded,
@@ -192,6 +212,8 @@ export function MainSiteMediaProvider({ children }) {
       getPublicationCarouselLogos,
       getPublicationCategoryLogos,
       getPublicationCategoryPlatformLogo,
+      getPartnerWithUsImage,
+      getPartnerWithUsMobileImage,
     ]
   );
 
