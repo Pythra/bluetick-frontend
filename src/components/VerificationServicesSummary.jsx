@@ -10,6 +10,7 @@ import ServicesSummaryLayout from './ServicesSummaryLayout';
 import socialVerificationImage from '../assets/social/verification.jpg';
 import { usePartnerAsset } from '../utils/partnerMedia';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
+import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
 import './VerificationSection.css';
