@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Sidebar } from './components/layout/Sidebar'
 import { Header } from './components/layout/Header'
-import { useToast } from '../contexts/ToastContext'
+import { useToast, ToastProvider } from '../contexts/ToastContext'
 import { Dashboard } from './pages/Dashboard'
 import { UserManagement } from './pages/UserManagement'
 import { CartManagement } from './pages/CartManagement'
@@ -144,7 +144,11 @@ function AdminApp() {
 
   // Partner subdomains get their own white-label dashboard
   if (partnerSubdomain) {
-    return <PartnerAdminApp subdomain={partnerSubdomain} />
+    return (
+      <ToastProvider>
+        <PartnerAdminApp subdomain={partnerSubdomain} />
+      </ToastProvider>
+    )
   }
 
   const handleLogin = async (e) => {

@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import AppToast from '../components/AppToast';
 import ConfirmModal from '../components/ConfirmModal';
 
@@ -82,26 +83,33 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={{ showToast, hideToast, confirm }}>
       {children}
-      {confirmState ? (
-        <ConfirmModal
-          key={confirmState.id}
-          title={confirmState.title}
-          message={confirmState.message}
-          confirmLabel={confirmState.confirmLabel}
-          cancelLabel={confirmState.cancelLabel}
-          tone={confirmState.tone}
-          onConfirm={() => closeConfirm(true)}
-          onCancel={() => closeConfirm(false)}
-        />
-      ) : null}
-      {toast ? (
-        <AppToast
-          key={toast.id}
-          message={toast.message}
-          type={toast.type}
-          onDismiss={hideToast}
-        />
-      ) : null}
+      {typeof document !== 'undefined'
+        ? createPortal(
+            <>
+              {confirmState ? (
+                <ConfirmModal
+                  key={confirmState.id}
+                  title={confirmState.title}
+                  message={confirmState.message}
+                  confirmLabel={confirmState.confirmLabel}
+                  cancelLabel={confirmState.cancelLabel}
+                  tone={confirmState.tone}
+                  onConfirm={() => closeConfirm(true)}
+                  onCancel={() => closeConfirm(false)}
+                />
+              ) : null}
+              {toast ? (
+                <AppToast
+                  key={toast.id}
+                  message={toast.message}
+                  type={toast.type}
+                  onDismiss={hideToast}
+                />
+              ) : null}
+            </>,
+            document.body
+          )
+        : null}
     </ToastContext.Provider>
   );
 };
