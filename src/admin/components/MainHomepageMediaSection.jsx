@@ -156,6 +156,7 @@ export default function MainHomepageMediaSection({
     if (!item) return;
 
     if (isCatalogPublicationPlatform(categoryId, item.name)) {
+      if (!item.imageUrl) return;
       merged[index] = { ...item, imageUrl: null };
       await saveMedia({ publicationCategoryLogos: { [categoryId]: merged } });
       return;
@@ -315,63 +316,52 @@ export default function MainHomepageMediaSection({
         <div className="adm-media-stack">
           {Object.entries(PUBLICATION_CATEGORY_LABELS).map(([categoryId, label]) => {
             const categoryLogos = getMergedCategoryLogos(categoryId);
-            const withImages = categoryLogos.filter((logo) => logo.imageUrl).length;
             return (
               <section key={categoryId} className="adm-media-category">
                 <div className="adm-panel-head-row">
-                  <div>
-                    <h3>{label}</h3>
-                    <p className="pdash-panel-lead" style={{ margin: '4px 0 0' }}>
-                      {categoryLogos.length} platforms · {withImages} with logos uploaded
-                    </p>
-                  </div>
+                  <h3>{label}</h3>
                   <button
                     type="button"
                     className="adm-btn adm-btn-ghost"
                     disabled={saving}
                     onClick={() => addCategoryLogo(categoryId)}
                   >
-                    Add custom outlet
+                    Add logo
                   </button>
                 </div>
-                <div className="adm-media-platform-list">
+                <div className="adm-media-grid">
                   {categoryLogos.map((logo, index) => {
                     const isCatalog = isCatalogPublicationPlatform(categoryId, logo.name);
                     return (
-                      <article key={logo.id || `${categoryId}-${index}`} className="adm-media-platform-row">
-                        <div className="adm-media-platform-main">
-                          {isCatalog ? (
-                            <strong className="adm-media-platform-name">{logo.name}</strong>
+                      <article key={logo.id || `${categoryId}-${index}`} className="adm-media-card">
+                        <input
+                          className="adm-input"
+                          value={logo.name || ''}
+                          readOnly={isCatalog}
+                          disabled={saving || isCatalog}
+                          onChange={(event) =>
+                            setMedia((prev) => {
+                              const merged = mergeCategoryLogosWithCatalog(
+                                categoryId,
+                                prev?.publicationCategoryLogos?.[categoryId]
+                              );
+                              merged[index] = { ...merged[index], name: event.target.value };
+                              const next = { ...prev };
+                              next.publicationCategoryLogos = {
+                                ...next.publicationCategoryLogos,
+                                [categoryId]: merged,
+                              };
+                              return next;
+                            })
+                          }
+                          onBlur={(event) => updateCategoryLogoName(categoryId, index, event.target.value)}
+                        />
+                        <div className="adm-media-preview adm-media-preview--logo">
+                          {logo.imageUrl ? (
+                            <img src={logo.imageUrl} alt={logo.name} />
                           ) : (
-                            <input
-                              className="adm-input adm-media-platform-name-input"
-                              value={logo.name || ''}
-                              disabled={saving}
-                              onChange={(event) =>
-                                setMedia((prev) => {
-                                  const merged = mergeCategoryLogosWithCatalog(
-                                    categoryId,
-                                    prev?.publicationCategoryLogos?.[categoryId]
-                                  );
-                                  merged[index] = { ...merged[index], name: event.target.value };
-                                  const next = { ...prev };
-                                  next.publicationCategoryLogos = {
-                                    ...next.publicationCategoryLogos,
-                                    [categoryId]: merged,
-                                  };
-                                  return next;
-                                })
-                              }
-                              onBlur={(event) => updateCategoryLogoName(categoryId, index, event.target.value)}
-                            />
+                            <span>No logo uploaded</span>
                           )}
-                          <div className="adm-media-preview adm-media-preview--logo adm-media-preview--compact">
-                            {logo.imageUrl ? (
-                              <img src={logo.imageUrl} alt={logo.name} />
-                            ) : (
-                              <span>No logo</span>
-                            )}
-                          </div>
                         </div>
                         <div className="adm-btn-group">
                           <label className="adm-btn adm-btn-ghost">
@@ -388,16 +378,14 @@ export default function MainHomepageMediaSection({
                               }}
                             />
                           </label>
-                          {logo.imageUrl ? (
-                            <button
-                              type="button"
-                              className="adm-btn adm-btn-ghost danger"
-                              disabled={saving}
-                              onClick={() => removeCategoryLogo(categoryId, index)}
-                            >
-                              {isCatalog ? 'Remove logo' : 'Delete'}
-                            </button>
-                          ) : null}
+                          <button
+                            type="button"
+                            className="adm-btn adm-btn-ghost danger"
+                            disabled={saving}
+                            onClick={() => removeCategoryLogo(categoryId, index)}
+                          >
+                            Delete
+                          </button>
                         </div>
                       </article>
                     );

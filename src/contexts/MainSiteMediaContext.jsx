@@ -87,16 +87,32 @@ export function MainSiteMediaProvider({ children }) {
   const getPublicationCategoryLogos = useCallback(
     (categoryId, fallback = []) => {
       if (isPartnerSite) return fallback;
+
       const configured = media?.publicationCategoryLogos?.[categoryId];
       if (!Array.isArray(configured) || !configured.length) {
         return fallback;
       }
-      return configured
-        .map((logo) => ({
-          src: logo.imageUrl || null,
-          alt: logo.name || 'Publication outlet',
-        }))
-        .filter((logo) => logo.src);
+
+      const fallbackByName = new Map(
+        fallback
+          .filter((logo) => logo?.src)
+          .map((logo) => [String(logo.alt || '').trim().toLowerCase(), logo])
+      );
+
+      const resolved = configured
+        .map((logo) => {
+          const name = String(logo?.name || '').trim();
+          const fallbackLogo = name ? fallbackByName.get(name.toLowerCase()) : null;
+          const src = logo?.imageUrl || fallbackLogo?.src || null;
+          if (!src) return null;
+          return {
+            src,
+            alt: name || fallbackLogo?.alt || 'Publication outlet',
+          };
+        })
+        .filter(Boolean);
+
+      return resolved.length ? resolved : fallback;
     },
     [isPartnerSite, media]
   );
