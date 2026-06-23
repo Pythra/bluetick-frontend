@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MdArrowBack, MdAdd, MdChevronRight, MdSave } from 'react-icons/md';
 import {
   PARTNER_PACKAGE_CATALOG,
