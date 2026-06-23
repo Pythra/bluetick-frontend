@@ -4,6 +4,10 @@ import {
   PUBLICATION_CATEGORY_LABELS,
   resolvePublicationCarouselLogo,
 } from '../../data/defaultPublicationLogos';
+import {
+  isCatalogPublicationPlatform,
+  mergeCategoryLogosWithCatalog,
+} from '../../data/publicationCategoryLogoCatalog';
 
 const SERVICE_SLOTS = [
   { key: 'appDevelopmentImage', label: 'App Development' },
@@ -96,10 +100,15 @@ export default function MainHomepageMediaSection({
     await saveMedia({ imageUploads: { [`publicationCarouselLogos.${index}`]: dataUrl } });
   };
 
+  const getMergedCategoryLogos = (categoryId) =>
+    mergeCategoryLogosWithCatalog(categoryId, media?.publicationCategoryLogos?.[categoryId]);
+
   const uploadCategoryLogo = async (categoryId, index, file) => {
     if (!file) return;
+    const merged = getMergedCategoryLogos(categoryId);
     const dataUrl = await readFileAsDataUrl(file);
     await saveMedia({
+      publicationCategoryLogos: { [categoryId]: merged },
       imageUploads: { [`publicationCategoryLogos.${categoryId}.${index}`]: dataUrl },
     });
   };
@@ -122,35 +131,38 @@ export default function MainHomepageMediaSection({
   };
 
   const addCategoryLogo = async (categoryId) => {
-    const next = {
-      ...(media?.publicationCategoryLogos || {}),
-      [categoryId]: [
-        ...(media?.publicationCategoryLogos?.[categoryId] || []),
-        { id: `logo-${Date.now()}`, name: 'New outlet', imageUrl: null },
-      ],
-    };
-    await saveMedia({ publicationCategoryLogos: next });
+    const merged = getMergedCategoryLogos(categoryId);
+    merged.push({ id: `logo-${Date.now()}`, name: 'New outlet', imageUrl: null });
+    await saveMedia({ publicationCategoryLogos: { [categoryId]: merged } });
   };
 
   const updateCategoryLogoName = async (categoryId, index, name) => {
-    const logos = [...(media?.publicationCategoryLogos?.[categoryId] || [])];
-    logos[index] = { ...logos[index], name };
+    const merged = getMergedCategoryLogos(categoryId);
+    if (!merged[index] || isCatalogPublicationPlatform(categoryId, merged[index].name)) {
+      return;
+    }
+    merged[index] = { ...merged[index], name };
     await saveMedia({
       publicationCategoryLogos: {
         ...(media?.publicationCategoryLogos || {}),
-        [categoryId]: logos,
+        [categoryId]: merged,
       },
     });
   };
 
   const removeCategoryLogo = async (categoryId, index) => {
-    const logos = (media?.publicationCategoryLogos?.[categoryId] || []).filter((_, i) => i !== index);
-    await saveMedia({
-      publicationCategoryLogos: {
-        ...(media?.publicationCategoryLogos || {}),
-        [categoryId]: logos,
-      },
-    });
+    const merged = getMergedCategoryLogos(categoryId);
+    const item = merged[index];
+    if (!item) return;
+
+    if (isCatalogPublicationPlatform(categoryId, item.name)) {
+      merged[index] = { ...item, imageUrl: null };
+      await saveMedia({ publicationCategoryLogos: { [categoryId]: merged } });
+      return;
+    }
+
+    const next = merged.filter((_, i) => i !== index);
+    await saveMedia({ publicationCategoryLogos: { [categoryId]: next } });
   };
 
   const carouselLogos = media?.publicationCarouselLogos || [];
@@ -302,51 +314,64 @@ export default function MainHomepageMediaSection({
       {view === 'category-logos' ? (
         <div className="adm-media-stack">
           {Object.entries(PUBLICATION_CATEGORY_LABELS).map(([categoryId, label]) => {
-            const categoryLogos = media?.publicationCategoryLogos?.[categoryId] || [];
+            const categoryLogos = getMergedCategoryLogos(categoryId);
+            const withImages = categoryLogos.filter((logo) => logo.imageUrl).length;
             return (
               <section key={categoryId} className="adm-media-category">
                 <div className="adm-panel-head-row">
-                  <h3>{label}</h3>
+                  <div>
+                    <h3>{label}</h3>
+                    <p className="pdash-panel-lead" style={{ margin: '4px 0 0' }}>
+                      {categoryLogos.length} platforms · {withImages} with logos uploaded
+                    </p>
+                  </div>
                   <button
                     type="button"
                     className="adm-btn adm-btn-ghost"
                     disabled={saving}
                     onClick={() => addCategoryLogo(categoryId)}
                   >
-                    Add logo
+                    Add custom outlet
                   </button>
                 </div>
-                {!categoryLogos.length ? (
-                  <p className="pdash-panel-lead">No logos for this category yet. Add one to get started.</p>
-                ) : (
-                  <div className="adm-media-grid">
-                    {categoryLogos.map((logo, index) => (
-                      <article key={logo.id || index} className="adm-media-card">
-                        <input
-                          className="adm-input"
-                          value={logo.name || ''}
-                          onChange={(event) =>
-                            setMedia((prev) => {
-                              const next = { ...prev };
-                              next.publicationCategoryLogos = { ...next.publicationCategoryLogos };
-                              next.publicationCategoryLogos[categoryId] = [
-                                ...next.publicationCategoryLogos[categoryId],
-                              ];
-                              next.publicationCategoryLogos[categoryId][index] = {
-                                ...next.publicationCategoryLogos[categoryId][index],
-                                name: event.target.value,
-                              };
-                              return next;
-                            })
-                          }
-                          onBlur={(event) => updateCategoryLogoName(categoryId, index, event.target.value)}
-                        />
-                        <div className="adm-media-preview adm-media-preview--logo">
-                          {logo.imageUrl ? (
-                            <img src={logo.imageUrl} alt={logo.name} />
+                <div className="adm-media-platform-list">
+                  {categoryLogos.map((logo, index) => {
+                    const isCatalog = isCatalogPublicationPlatform(categoryId, logo.name);
+                    return (
+                      <article key={logo.id || `${categoryId}-${index}`} className="adm-media-platform-row">
+                        <div className="adm-media-platform-main">
+                          {isCatalog ? (
+                            <strong className="adm-media-platform-name">{logo.name}</strong>
                           ) : (
-                            <span>No logo uploaded</span>
+                            <input
+                              className="adm-input adm-media-platform-name-input"
+                              value={logo.name || ''}
+                              disabled={saving}
+                              onChange={(event) =>
+                                setMedia((prev) => {
+                                  const merged = mergeCategoryLogosWithCatalog(
+                                    categoryId,
+                                    prev?.publicationCategoryLogos?.[categoryId]
+                                  );
+                                  merged[index] = { ...merged[index], name: event.target.value };
+                                  const next = { ...prev };
+                                  next.publicationCategoryLogos = {
+                                    ...next.publicationCategoryLogos,
+                                    [categoryId]: merged,
+                                  };
+                                  return next;
+                                })
+                              }
+                              onBlur={(event) => updateCategoryLogoName(categoryId, index, event.target.value)}
+                            />
                           )}
+                          <div className="adm-media-preview adm-media-preview--logo adm-media-preview--compact">
+                            {logo.imageUrl ? (
+                              <img src={logo.imageUrl} alt={logo.name} />
+                            ) : (
+                              <span>No logo</span>
+                            )}
+                          </div>
                         </div>
                         <div className="adm-btn-group">
                           <label className="adm-btn adm-btn-ghost">
@@ -363,19 +388,21 @@ export default function MainHomepageMediaSection({
                               }}
                             />
                           </label>
-                          <button
-                            type="button"
-                            className="adm-btn adm-btn-ghost danger"
-                            disabled={saving}
-                            onClick={() => removeCategoryLogo(categoryId, index)}
-                          >
-                            Delete
-                          </button>
+                          {logo.imageUrl ? (
+                            <button
+                              type="button"
+                              className="adm-btn adm-btn-ghost danger"
+                              disabled={saving}
+                              onClick={() => removeCategoryLogo(categoryId, index)}
+                            >
+                              {isCatalog ? 'Remove logo' : 'Delete'}
+                            </button>
+                          ) : null}
                         </div>
                       </article>
-                    ))}
-                  </div>
-                )}
+                    );
+                  })}
+                </div>
               </section>
             );
           })}

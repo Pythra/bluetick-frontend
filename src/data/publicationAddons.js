@@ -50,7 +50,7 @@ export const PUBLICATION_ARTICLE_ADDONS = [
       'Headlines That Grab Attention',
     ],
     image: copywritingImage,
-    priceValue: 40000,
+    priceValue: 10000,
     unit: 'per article',
     accent: 'copywriting',
   },

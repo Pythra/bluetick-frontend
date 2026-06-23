@@ -64,7 +64,7 @@ export default function PublicationArticleAddons({
   return (
     <section className={`publication-article-addons ${className}`.trim()}>
       {showHeading ? (
-        <header className="publication-article-addons-head">
+        <header className="publication-section-head publication-article-addons-head">
           <p className="publication-section-kicker">Optional extras</p>
           <h2 className="publication-section-title">Add to your article publication</h2>
           <p className="publication-section-lead">
