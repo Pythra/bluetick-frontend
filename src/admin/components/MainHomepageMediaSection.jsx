@@ -25,9 +25,13 @@ function readFileAsDataUrl(file) {
   });
 }
 
-export default function MainHomepageMediaSection({ apiUrl, adminToken }) {
+export default function MainHomepageMediaSection({
+  apiUrl,
+  adminToken,
+  view = 'backgrounds',
+  hideHeader = false,
+}) {
   const { showToast } = useToast();
-  const [view, setView] = useState('services');
   const [media, setMedia] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -100,7 +104,7 @@ export default function MainHomepageMediaSection({ apiUrl, adminToken }) {
     });
   };
 
-  const resetServiceImage = async (slot) => {
+  const removeServiceImage = async (slot) => {
     await saveMedia({ serviceImages: { [slot]: null } });
   };
 
@@ -151,48 +155,29 @@ export default function MainHomepageMediaSection({ apiUrl, adminToken }) {
 
   const carouselLogos = media?.publicationCarouselLogos || [];
 
-  return (
-    <section className="pdash-panel pdash-homepage-media">
-      <div className="adm-panel-head-row">
-        <div>
-          <h2 className="adm-panel-title">Homepage images &amp; logos</h2>
-          <p className="pdash-panel-lead">
-            Edit service section backgrounds on the main homepage, publication carousel logos, and
-            category sliding logos. Logos are stored in the database — delete any outlet and upload a
-            replacement.
-          </p>
-        </div>
-        <div className="adm-btn-group">
-          <button
-            type="button"
-            className={`adm-btn ${view === 'services' ? 'adm-btn-primary' : 'adm-btn-ghost'}`}
-            onClick={() => setView('services')}
-          >
-            Service backgrounds
-          </button>
-          <button
-            type="button"
-            className={`adm-btn ${view === 'carousel' ? 'adm-btn-primary' : 'adm-btn-ghost'}`}
-            onClick={() => setView('carousel')}
-          >
-            Publication logos
-          </button>
-          <button
-            type="button"
-            className={`adm-btn ${view === 'categories' ? 'adm-btn-primary' : 'adm-btn-ghost'}`}
-            onClick={() => setView('categories')}
-          >
-            Category sliders
-          </button>
-        </div>
+  if (loading) {
+    return (
+      <div className="adm-empty">
+        <div className="adm-spinner" />
+        <p>Loading homepage media…</p>
       </div>
+    );
+  }
 
-      {loading ? (
-        <div className="adm-empty">
-          <div className="adm-spinner" />
-          <p>Loading homepage media…</p>
-        </div>
-      ) : view === 'services' ? (
+  return (
+    <section className={`pdash-homepage-media${hideHeader ? ' pdash-homepage-media--embedded' : ''}`}>
+      {!hideHeader ? (
+        <header className="adm-panel-head-row">
+          <div>
+            <h2 className="adm-panel-title">Homepage images &amp; logos</h2>
+            <p className="pdash-panel-lead">
+              Edit service section backgrounds, publication carousel logos, and publication category logos.
+            </p>
+          </div>
+        </header>
+      ) : null}
+
+      {view === 'backgrounds' ? (
         <div className="adm-media-grid">
           {SERVICE_SLOTS.map((slot) => {
             const currentUrl = media?.serviceImages?.[slot.key] || null;
@@ -200,11 +185,15 @@ export default function MainHomepageMediaSection({ apiUrl, adminToken }) {
               <article key={slot.key} className="adm-media-card">
                 <h3>{slot.label}</h3>
                 <div className="adm-media-preview">
-                  {currentUrl ? <img src={currentUrl} alt={slot.label} /> : <span>Using default site image</span>}
+                  {currentUrl ? (
+                    <img src={currentUrl} alt={slot.label} />
+                  ) : (
+                    <span>No image saved</span>
+                  )}
                 </div>
                 <div className="adm-btn-group">
                   <label className="adm-btn adm-btn-ghost">
-                    Upload
+                    {currentUrl ? 'Replace' : 'Upload'}
                     <input
                       type="file"
                       accept="image/*"
@@ -222,9 +211,9 @@ export default function MainHomepageMediaSection({ apiUrl, adminToken }) {
                       type="button"
                       className="adm-btn adm-btn-ghost danger"
                       disabled={saving}
-                      onClick={() => resetServiceImage(slot.key)}
+                      onClick={() => removeServiceImage(slot.key)}
                     >
-                      Reset
+                      Delete
                     </button>
                   ) : null}
                 </div>
@@ -232,7 +221,9 @@ export default function MainHomepageMediaSection({ apiUrl, adminToken }) {
             );
           })}
         </div>
-      ) : view === 'carousel' ? (
+      ) : null}
+
+      {view === 'carousel' ? (
         <>
           <div className="adm-panel-head-row" style={{ marginBottom: 12 }}>
             <p className="pdash-panel-lead" style={{ margin: 0 }}>
@@ -306,75 +297,90 @@ export default function MainHomepageMediaSection({ apiUrl, adminToken }) {
             </div>
           )}
         </>
-      ) : (
+      ) : null}
+
+      {view === 'category-logos' ? (
         <div className="adm-media-stack">
-          {Object.entries(PUBLICATION_CATEGORY_LABELS).map(([categoryId, label]) => (
-            <section key={categoryId} className="adm-media-category">
-              <div className="adm-panel-head-row">
-                <h3>{label}</h3>
-                <button
-                  type="button"
-                  className="adm-btn adm-btn-ghost"
-                  disabled={saving}
-                  onClick={() => addCategoryLogo(categoryId)}
-                >
-                  Add logo
-                </button>
-              </div>
-              <div className="adm-media-grid">
-                {(media?.publicationCategoryLogos?.[categoryId] || []).map((logo, index) => (
-                  <article key={logo.id || index} className="adm-media-card">
-                    <input
-                      className="adm-input"
-                      value={logo.name || ''}
-                      onChange={(event) =>
-                        setMedia((prev) => {
-                          const next = { ...prev };
-                          next.publicationCategoryLogos = { ...next.publicationCategoryLogos };
-                          next.publicationCategoryLogos[categoryId] = [...next.publicationCategoryLogos[categoryId]];
-                          next.publicationCategoryLogos[categoryId][index] = {
-                            ...next.publicationCategoryLogos[categoryId][index],
-                            name: event.target.value,
-                          };
-                          return next;
-                        })
-                      }
-                      onBlur={(event) => updateCategoryLogoName(categoryId, index, event.target.value)}
-                    />
-                    <div className="adm-media-preview adm-media-preview--logo">
-                      {logo.imageUrl ? <img src={logo.imageUrl} alt={logo.name} /> : <span>No logo uploaded</span>}
-                    </div>
-                    <div className="adm-btn-group">
-                      <label className="adm-btn adm-btn-ghost">
-                        Upload
+          {Object.entries(PUBLICATION_CATEGORY_LABELS).map(([categoryId, label]) => {
+            const categoryLogos = media?.publicationCategoryLogos?.[categoryId] || [];
+            return (
+              <section key={categoryId} className="adm-media-category">
+                <div className="adm-panel-head-row">
+                  <h3>{label}</h3>
+                  <button
+                    type="button"
+                    className="adm-btn adm-btn-ghost"
+                    disabled={saving}
+                    onClick={() => addCategoryLogo(categoryId)}
+                  >
+                    Add logo
+                  </button>
+                </div>
+                {!categoryLogos.length ? (
+                  <p className="pdash-panel-lead">No logos for this category yet. Add one to get started.</p>
+                ) : (
+                  <div className="adm-media-grid">
+                    {categoryLogos.map((logo, index) => (
+                      <article key={logo.id || index} className="adm-media-card">
                         <input
-                          type="file"
-                          accept="image/*"
-                          hidden
-                          disabled={saving}
-                          onChange={(event) => {
-                            const file = event.target.files?.[0];
-                            uploadCategoryLogo(categoryId, index, file);
-                            event.target.value = '';
-                          }}
+                          className="adm-input"
+                          value={logo.name || ''}
+                          onChange={(event) =>
+                            setMedia((prev) => {
+                              const next = { ...prev };
+                              next.publicationCategoryLogos = { ...next.publicationCategoryLogos };
+                              next.publicationCategoryLogos[categoryId] = [
+                                ...next.publicationCategoryLogos[categoryId],
+                              ];
+                              next.publicationCategoryLogos[categoryId][index] = {
+                                ...next.publicationCategoryLogos[categoryId][index],
+                                name: event.target.value,
+                              };
+                              return next;
+                            })
+                          }
+                          onBlur={(event) => updateCategoryLogoName(categoryId, index, event.target.value)}
                         />
-                      </label>
-                      <button
-                        type="button"
-                        className="adm-btn adm-btn-ghost danger"
-                        disabled={saving}
-                        onClick={() => removeCategoryLogo(categoryId, index)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-          ))}
+                        <div className="adm-media-preview adm-media-preview--logo">
+                          {logo.imageUrl ? (
+                            <img src={logo.imageUrl} alt={logo.name} />
+                          ) : (
+                            <span>No logo uploaded</span>
+                          )}
+                        </div>
+                        <div className="adm-btn-group">
+                          <label className="adm-btn adm-btn-ghost">
+                            {logo.imageUrl ? 'Replace' : 'Upload'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              hidden
+                              disabled={saving}
+                              onChange={(event) => {
+                                const file = event.target.files?.[0];
+                                uploadCategoryLogo(categoryId, index, file);
+                                event.target.value = '';
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            className="adm-btn adm-btn-ghost danger"
+                            disabled={saving}
+                            onClick={() => removeCategoryLogo(categoryId, index)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })}
         </div>
-      )}
+      ) : null}
     </section>
   );
 }

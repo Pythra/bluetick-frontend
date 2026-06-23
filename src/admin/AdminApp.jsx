@@ -312,7 +312,7 @@ function AdminApp() {
       'users': 'User Management',
       'carts': 'Shopping Carts',
       'orders': 'Orders',
-      'services': 'Service Pricing',
+      'services': 'Services',
       'invoices': 'Invoices',
       'submissions': 'Article Submissions',
       'partnerships': 'Partnership Applications',

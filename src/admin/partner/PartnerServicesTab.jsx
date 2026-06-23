@@ -76,7 +76,7 @@ function getBulkScopePackages(packages, { selectedService, selectedGroup }) {
   return packages;
 }
 
-export default function PartnerServicesTab({ api, onMessage, pricingMode = 'partner' }) {
+export default function PartnerServicesTab({ api, onMessage, pricingMode = 'partner', embedded = false }) {
   const isMainPricing = pricingMode === 'main';
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -274,7 +274,7 @@ export default function PartnerServicesTab({ api, onMessage, pricingMode = 'part
 
   if (loading) {
     return (
-      <div className="pdash-panel">
+      <div className={embedded ? 'pdash-pricing-embedded' : 'pdash-panel'}>
         <div className="pdash-spinner" />
       </div>
     );
@@ -359,13 +359,21 @@ export default function PartnerServicesTab({ api, onMessage, pricingMode = 'part
           : selectedService?.serviceLabel;
 
   return (
-    <div className="pdash-panel">
-      <h2>{isMainPricing ? 'Main site service pricing' : 'Service package pricing'}</h2>
-      <p className="pdash-panel-lead">
-        {isMainPricing
-          ? 'Set the base prices shown on the main Bluetick site. You can enter any amount — partner websites inherit these prices and can add markup on top.'
-          : 'Select a service, then choose a category or package group to set the prices shown on your public site. Your minimum is the current main site price for each package.'}
-      </p>
+    <div className={embedded ? 'pdash-pricing-embedded' : 'pdash-panel'}>
+      {!embedded ? (
+        <>
+          <h2>{isMainPricing ? 'Main site service pricing' : 'Service package pricing'}</h2>
+          <p className="pdash-panel-lead">
+            {isMainPricing
+              ? 'Set the base prices shown on the main Bluetick site. You can enter any amount — partner websites inherit these prices and can add markup on top.'
+              : 'Select a service, then choose a category or package group to set the prices shown on your public site. Your minimum is the current main site price for each package.'}
+          </p>
+        </>
+      ) : (
+        <p className="pdash-panel-lead">
+          Set the base prices shown on the main Bluetick site. Partner websites inherit these prices and can add markup on top.
+        </p>
+      )}
 
       <div className="pdash-pricing-bulk">
         <div className="pdash-pricing-bulk-copy">
