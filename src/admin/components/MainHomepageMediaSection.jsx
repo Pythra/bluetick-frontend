@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useToast } from '../../contexts/ToastContext';
 import {
-  DEFAULT_PUBLICATION_CAROUSEL_LOGOS,
   PUBLICATION_CATEGORY_LABELS,
   resolvePublicationCarouselLogo,
 } from '../../data/defaultPublicationLogos';
@@ -26,7 +25,7 @@ function readFileAsDataUrl(file) {
   });
 }
 
-export default function MainHomepageMediaTab({ apiUrl, adminToken }) {
+export default function MainHomepageMediaSection({ apiUrl, adminToken }) {
   const { showToast } = useToast();
   const [view, setView] = useState('services');
   const [media, setMedia] = useState(null);
@@ -105,6 +104,19 @@ export default function MainHomepageMediaTab({ apiUrl, adminToken }) {
     await saveMedia({ serviceImages: { [slot]: null } });
   };
 
+  const addCarouselLogo = async () => {
+    const next = [
+      ...(media?.publicationCarouselLogos || []),
+      { id: `logo-${Date.now()}`, name: 'New outlet', imageUrl: null },
+    ];
+    await saveMedia({ publicationCarouselLogos: next });
+  };
+
+  const removeCarouselLogo = async (index) => {
+    const next = (media?.publicationCarouselLogos || []).filter((_, i) => i !== index);
+    await saveMedia({ publicationCarouselLogos: next });
+  };
+
   const addCategoryLogo = async (categoryId) => {
     const next = {
       ...(media?.publicationCategoryLogos || {}),
@@ -137,18 +149,17 @@ export default function MainHomepageMediaTab({ apiUrl, adminToken }) {
     });
   };
 
-  const carouselLogos = media?.publicationCarouselLogos?.length
-    ? media.publicationCarouselLogos
-    : DEFAULT_PUBLICATION_CAROUSEL_LOGOS.map(({ id, name }) => ({ id, name, imageUrl: null }));
+  const carouselLogos = media?.publicationCarouselLogos || [];
 
   return (
-    <div className="adm-panel">
+    <section className="pdash-panel pdash-homepage-media">
       <div className="adm-panel-head-row">
         <div>
-          <h2 className="adm-panel-title">Homepage media</h2>
-          <p className="adm-panel-lead">
-            Manage homepage service backgrounds, publication carousel logos, and category sliding logos for the main
-            Bluetick site only.
+          <h2 className="adm-panel-title">Homepage images &amp; logos</h2>
+          <p className="pdash-panel-lead">
+            Edit service section backgrounds on the main homepage, publication carousel logos, and
+            category sliding logos. Logos are stored in the database — delete any outlet and upload a
+            replacement.
           </p>
         </div>
         <div className="adm-btn-group">
@@ -157,7 +168,7 @@ export default function MainHomepageMediaTab({ apiUrl, adminToken }) {
             className={`adm-btn ${view === 'services' ? 'adm-btn-primary' : 'adm-btn-ghost'}`}
             onClick={() => setView('services')}
           >
-            Service images
+            Service backgrounds
           </button>
           <button
             type="button"
@@ -189,7 +200,7 @@ export default function MainHomepageMediaTab({ apiUrl, adminToken }) {
               <article key={slot.key} className="adm-media-card">
                 <h3>{slot.label}</h3>
                 <div className="adm-media-preview">
-                  {currentUrl ? <img src={currentUrl} alt={slot.label} /> : <span>No custom image</span>}
+                  {currentUrl ? <img src={currentUrl} alt={slot.label} /> : <span>Using default site image</span>}
                 </div>
                 <div className="adm-btn-group">
                   <label className="adm-btn adm-btn-ghost">
@@ -222,33 +233,79 @@ export default function MainHomepageMediaTab({ apiUrl, adminToken }) {
           })}
         </div>
       ) : view === 'carousel' ? (
-        <div className="adm-media-grid">
-          {carouselLogos.map((logo, index) => {
-            const preview = resolvePublicationCarouselLogo(logo);
-            return (
-              <article key={logo.id || index} className="adm-media-card">
-                <h3>{logo.name}</h3>
-                <div className="adm-media-preview adm-media-preview--logo">
-                  {preview ? <img src={preview} alt={logo.name} /> : <span>No logo</span>}
-                </div>
-                <label className="adm-btn adm-btn-ghost">
-                  Replace logo
-                  <input
-                    type="file"
-                    accept="image/*"
-                    hidden
-                    disabled={saving}
-                    onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      uploadCarouselLogo(index, file);
-                      event.target.value = '';
-                    }}
-                  />
-                </label>
-              </article>
-            );
-          })}
-        </div>
+        <>
+          <div className="adm-panel-head-row" style={{ marginBottom: 12 }}>
+            <p className="pdash-panel-lead" style={{ margin: 0 }}>
+              Logos shown in the publication section on the homepage carousel.
+            </p>
+            <button type="button" className="adm-btn adm-btn-ghost" disabled={saving} onClick={addCarouselLogo}>
+              Add logo
+            </button>
+          </div>
+          {!carouselLogos.length ? (
+            <div className="adm-empty">
+              <p>No publication logos saved yet. Add a logo to get started.</p>
+            </div>
+          ) : (
+            <div className="adm-media-grid">
+              {carouselLogos.map((logo, index) => {
+                const preview = resolvePublicationCarouselLogo(logo);
+                return (
+                  <article key={logo.id || index} className="adm-media-card">
+                    <input
+                      className="adm-input"
+                      value={logo.name || ''}
+                      disabled={saving}
+                      onChange={(event) =>
+                        setMedia((prev) => {
+                          const next = { ...prev };
+                          next.publicationCarouselLogos = [...next.publicationCarouselLogos];
+                          next.publicationCarouselLogos[index] = {
+                            ...next.publicationCarouselLogos[index],
+                            name: event.target.value,
+                          };
+                          return next;
+                        })
+                      }
+                      onBlur={async (event) => {
+                        const logos = [...(media?.publicationCarouselLogos || [])];
+                        logos[index] = { ...logos[index], name: event.target.value };
+                        await saveMedia({ publicationCarouselLogos: logos });
+                      }}
+                    />
+                    <div className="adm-media-preview adm-media-preview--logo">
+                      {preview ? <img src={preview} alt={logo.name} /> : <span>No image uploaded</span>}
+                    </div>
+                    <div className="adm-btn-group">
+                      <label className="adm-btn adm-btn-ghost">
+                        {logo.imageUrl ? 'Replace' : 'Upload'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          disabled={saving}
+                          onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            uploadCarouselLogo(index, file);
+                            event.target.value = '';
+                          }}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="adm-btn adm-btn-ghost danger"
+                        disabled={saving}
+                        onClick={() => removeCarouselLogo(index)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </>
       ) : (
         <div className="adm-media-stack">
           {Object.entries(PUBLICATION_CATEGORY_LABELS).map(([categoryId, label]) => (
@@ -308,7 +365,7 @@ export default function MainHomepageMediaTab({ apiUrl, adminToken }) {
                         disabled={saving}
                         onClick={() => removeCategoryLogo(categoryId, index)}
                       >
-                        Remove
+                        Delete
                       </button>
                     </div>
                   </article>
@@ -318,6 +375,6 @@ export default function MainHomepageMediaTab({ apiUrl, adminToken }) {
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }

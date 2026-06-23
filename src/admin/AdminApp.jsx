@@ -16,8 +16,6 @@ import AdminMessages from './pages/AdminMessages'
 import AdminReports from './pages/AdminReports'
 import AdminInvoicesTab from './pages/AdminInvoicesTab'
 import MainServicesPricingTab from './pages/MainServicesPricingTab'
-import AgreementManagement from './pages/AgreementManagement'
-import MainHomepageMediaTab from './pages/MainHomepageMediaTab'
 import PartnerAdminApp from './PartnerAdminApp'
 import AdminMessagesFab from '../components/AdminMessagesFab'
 import { useAuth } from '../contexts/AuthContext'
@@ -314,9 +312,7 @@ function AdminApp() {
       'users': 'User Management',
       'carts': 'Shopping Carts',
       'orders': 'Orders',
-      'agreements': 'Agreement Management',
       'services': 'Service Pricing',
-      'homepage-media': 'Homepage Media',
       'invoices': 'Invoices',
       'submissions': 'Article Submissions',
       'partnerships': 'Partnership Applications',
@@ -376,8 +372,6 @@ function AdminApp() {
             onUpdateOrder={handleUpdateOrderStatus}
             onUpdateTracking={handleUpdateOrderTracking}
           />
-        ) : activeTab === 'agreements' ? (
-          <AgreementManagement apiUrl={apiUrl} adminToken={adminToken} />
         ) : activeTab === 'services' ? (
           <>
             {saveMessage ? (
@@ -389,8 +383,6 @@ function AdminApp() {
               onMessage={setSaveMessage}
             />
           </>
-        ) : activeTab === 'homepage-media' ? (
-          <MainHomepageMediaTab apiUrl={apiUrl} adminToken={adminToken} />
         ) : activeTab === 'invoices' ? (
           <AdminInvoicesTab users={users} />
         ) : activeTab === 'submissions' ? (

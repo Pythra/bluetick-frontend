@@ -65,6 +65,15 @@ export function MainSiteMediaProvider({ children }) {
     }
 
     const configured = media?.publicationCarouselLogos;
+    if (media?.seeded && Array.isArray(configured)) {
+      return configured
+        .filter((logo) => logo.imageUrl)
+        .map((logo) => ({
+          ...logo,
+          image: logo.imageUrl,
+        }));
+    }
+
     if (!Array.isArray(configured) || !configured.length) {
       return DEFAULT_PUBLICATION_CAROUSEL_LOGOS;
     }

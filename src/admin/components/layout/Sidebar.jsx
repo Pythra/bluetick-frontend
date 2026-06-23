@@ -1,4 +1,4 @@
-import { MdDashboard, MdPeople, MdShoppingCart, MdInventory2, MdArticle, MdEditNote, MdEmail, MdHandshake, MdLogout, MdChat, MdInsertChart, MdReceipt, MdStorefront, MdGavel, MdImage } from 'react-icons/md'
+import { MdDashboard, MdPeople, MdShoppingCart, MdInventory2, MdArticle, MdEditNote, MdEmail, MdHandshake, MdLogout, MdChat, MdInsertChart, MdReceipt, MdStorefront } from 'react-icons/md'
 import '../../styles/admin.css'
 
 const menuItems = [
@@ -6,9 +6,7 @@ const menuItems = [
 	{ id: 'users', label: 'User Management', icon: MdPeople },
 	{ id: 'carts', label: 'Shopping Carts', icon: MdShoppingCart },
 	{ id: 'orders', label: 'Orders', icon: MdInventory2 },
-	{ id: 'agreements', label: 'Agreements', icon: MdGavel },
 	{ id: 'services', label: 'Services', icon: MdStorefront },
-	{ id: 'homepage-media', label: 'Homepage Media', icon: MdImage },
 	{ id: 'invoices', label: 'Invoices', icon: MdReceipt },
 	{ id: 'submissions', label: 'Submissions', icon: MdArticle },
 	{ id: 'partnerships', label: 'Partnerships', icon: MdHandshake },

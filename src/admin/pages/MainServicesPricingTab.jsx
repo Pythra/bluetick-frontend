@@ -1,4 +1,5 @@
 import PartnerServicesTab from '../partner/PartnerServicesTab';
+import MainHomepageMediaSection from '../components/MainHomepageMediaSection';
 import { useMainAdminPricingApi } from '../mainAdminPricingApi';
 
 export default function MainServicesPricingTab({ apiUrl, adminToken, onMessage }) {
@@ -9,10 +10,9 @@ export default function MainServicesPricingTab({ apiUrl, adminToken, onMessage }
   }
 
   return (
-    <PartnerServicesTab
-      api={api}
-      onMessage={onMessage}
-      pricingMode="main"
-    />
+    <>
+      <MainHomepageMediaSection apiUrl={apiUrl} adminToken={adminToken} />
+      <PartnerServicesTab api={api} onMessage={onMessage} pricingMode="main" />
+    </>
   );
 }
