@@ -95,13 +95,12 @@ function MusicStreamingVerificationPage() {
     }, 100);
   };
 
-  const renderCards = (services, tier, defaultMeta) =>
+  const renderCards = (services, tier) =>
     services.map((service) => (
       <PartnerPricedServiceCard
         key={service.packageId || service.title}
         service={service}
         title={service.title}
-        meta={verificationMeta[service.title] || defaultMeta}
         description={
           verificationDescriptions[service.title] ||
           'Full verification workflow from eligibility review through platform approval.'
@@ -137,7 +136,7 @@ function MusicStreamingVerificationPage() {
           <section className="service-detail-section">
             <h2 className="service-detail-section-title">Streaming Platform Verifications</h2>
             <div className="service-detail-grid">
-              {renderCards(streamingPlatformVerifications, 'verification', 'Streaming verification')}
+              {renderCards(streamingPlatformVerifications, 'verification')}
             </div>
           </section>
 
@@ -149,7 +148,6 @@ function MusicStreamingVerificationPage() {
                   key={service.packageId || service.title}
                   service={service}
                   title={service.title}
-                  meta="Profile placement"
                   description="Strategic placement and optimization so your music profile reaches the right audience on platform discovery surfaces."
                   pricePrefix=""
                   iconNode={renderPlatformIcon(service.title)}

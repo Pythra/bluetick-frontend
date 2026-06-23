@@ -1,6 +1,7 @@
 /** Individual sellable packages — partners set selling prices per package. */
 
 import { PUBLICATION_CATEGORIES } from './publicationPackageCatalog.js';
+import { attachPackageDelivery } from './packageDeliveryTimelines.js';
 
 function slugify(value) {
   return String(value || '')
@@ -479,10 +480,12 @@ export function getPackagesByServiceId(serviceId) {
 }
 
 export function toServiceListEntries(packages) {
-  return packages.map((entry) => ({
-    id: entry.id,
-    packageId: entry.id,
-    title: entry.label,
-    price: entry.basePriceNgn,
-  }));
+  return packages.map((entry) =>
+    attachPackageDelivery({
+      id: entry.id,
+      packageId: entry.id,
+      title: entry.label,
+      price: entry.basePriceNgn,
+    })
+  );
 }

@@ -1,4 +1,5 @@
 import { getPackagesByGroup, toServiceListEntries, PARTNER_PACKAGE_CATALOG } from './partnerPackageCatalog';
+import { getPackageDelivery } from './packageDeliveryTimelines';
 
 function getPackageEntry(packageId) {
   return PARTNER_PACKAGE_CATALOG.find((entry) => entry.id === packageId);
@@ -6,11 +7,13 @@ function getPackageEntry(packageId) {
 
 export const tiktokSongClaimService = (() => {
   const entry = getPackageEntry('tiktok.song-claim');
+  const delivery = getPackageDelivery(entry) || '24 to 72 Hours';
   return {
     id: entry.id,
     packageId: entry.id,
     title: entry.label,
-    meta: 'Setup & Claiming · $5 USD',
+    delivery,
+    meta: `Delivery: ${delivery}`,
     price: entry.basePriceNgn,
     description:
       'Securing official recognition for your track under your artist TikTok profile enhances visibility and allows you to access usage data—such as how many creators are using your sound. This boosts credibility and enables you to track and potentially monetize your music on the platform.',
@@ -41,7 +44,6 @@ const influencerDescriptions = {
 export const tiktokInfluencerPackages = toServiceListEntries(getPackagesByGroup('tiktok-influencer')).map(
   (entry) => ({
     ...entry,
-    meta: entry.title.includes('Micro') ? 'Micro influencer package' : 'Growth package',
     description: influencerDescriptions[entry.packageId] || '',
   })
 );

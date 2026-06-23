@@ -15,6 +15,7 @@ import {
 } from '../utils/publicationPricing';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import { useMainSiteMedia } from '../contexts/MainSiteMediaContext';
+import { getPublicationPlatformDelivery } from '../data/packageDeliveryTimelines';
 import { getPublicationPlatformLogo } from '../utils/publicationPlatformLogos';
 import './PublicationServicesPage.editorial.css';
 import './PackageDetailPage.css';
@@ -32,12 +33,14 @@ function PublicationPlatformCard({ categoryId, platform, onAddToCart }) {
   });
   const adminLogo = !isPartnerSite ? getPublicationCategoryPlatformLogo(categoryId, platform.name) : null;
   const hasLogo = Boolean(adminLogo || getPublicationPlatformLogo({ name: platform.name }));
+  const delivery = getPublicationPlatformDelivery(categoryId, platform.name);
 
   return (
     <article className="package-platform-card">
       <div className="package-platform-media">
         {hasLogo ? <PlatformLogo platform={{ name: platform.name }} categoryId={categoryId} /> : null}
         <h3 className="package-platform-name">{platform.name}</h3>
+        <p className="package-platform-delivery">Delivery: {delivery}</p>
       </div>
       <footer className="package-platform-footer">
         <span className="package-platform-price">{format(priceValue)}</span>

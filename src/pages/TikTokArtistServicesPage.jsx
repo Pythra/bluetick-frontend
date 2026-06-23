@@ -83,7 +83,6 @@ function TikTokArtistServicesPage() {
               <PartnerPricedServiceCard
                 service={tiktokSongClaimService}
                 title={tiktokSongClaimService.title}
-                meta={tiktokSongClaimService.meta}
                 description={buildSongClaimDescription(tiktokSongClaimService)}
                 pricePrefix=""
                 icon={IoMusicalNoteOutline}
@@ -108,7 +107,6 @@ function TikTokArtistServicesPage() {
                   key={pkg.packageId || pkg.id}
                   service={pkg}
                   title={pkg.title}
-                  meta={pkg.meta}
                   description={pkg.description}
                   pricePrefix=""
                   icon={IoPeopleOutline}

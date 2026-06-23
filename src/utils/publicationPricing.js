@@ -53,7 +53,7 @@ export const PUBLICATION_PACKAGE_DETAILS = {
     description:
       'Punch, Vanguard, Guardian Nigeria + multiple African authority sites and movie platforms. Perfect for local and regional market penetration with guaranteed publication.',
     categoryId: 'african',
-    delivery: '6–24 Hours',
+    delivery: '24 to 48 Hours',
     listTitle: 'African outlets',
     note: 'These platforms accept 2–3 images, branded graphics, backlinks, and other promotional materials to enhance your story placement.',
   },
@@ -61,7 +61,7 @@ export const PUBLICATION_PACKAGE_DETAILS = {
     title: 'Tech & Startups',
     description: 'Focused tech PR on leading African and international tech platforms.',
     categoryId: 'tech',
-    delivery: '6–24 Hours',
+    delivery: '24 to 48 Hours',
     listTitle: 'Tech & startup outlets',
     note: 'Ideal for product launches, funding announcements, and startup thought leadership in the tech ecosystem.',
   },
@@ -70,7 +70,7 @@ export const PUBLICATION_PACKAGE_DETAILS = {
     description:
       'Comprehensive coverage across UK media outlets, business publications, and regional news platforms for maximum UK market penetration.',
     categoryId: 'uk',
-    delivery: '24–48 Hours',
+    delivery: '24 to 48 Hours',
     listTitle: 'UK outlets',
     note: 'Extensive UK media coverage across news, business, sports, and lifestyle publications for comprehensive market reach.',
   },
@@ -79,7 +79,7 @@ export const PUBLICATION_PACKAGE_DETAILS = {
     description:
       'Get featured on Google News approved platforms for maximum visibility and SEO benefits with our network of trusted news sources.',
     categoryId: 'google-news',
-    delivery: '24–48 Hours',
+    delivery: '24 to 48 Hours',
     listTitle: 'Google News outlets',
     note: 'All platforms are Google News approved, ensuring maximum visibility and SEO benefits for your content.',
   },
@@ -88,7 +88,7 @@ export const PUBLICATION_PACKAGE_DETAILS = {
     description:
       'Forbes, Fox News, BBC News, Bloomberg, Business Insider, Yahoo Finance and premium international platforms. Maximum authority and credibility with international market access.',
     categoryId: 'international',
-    delivery: '2–7 Working Days',
+    delivery: '2 to 7 Working Days',
     listTitle: 'Global outlets',
     note: 'Premium international platforms that provide maximum credibility and global reach for your brand story.',
   },

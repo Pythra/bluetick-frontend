@@ -140,6 +140,7 @@ export default function PublicationArticleAddons({
                 <div className="publication-article-addon-price">
                   <span>+ {format(priceValue)}</span>
                   {addon.unit ? <small>{addon.unit}</small> : null}
+                  {addon.delivery ? <small className="publication-article-addon-delivery">Delivery: {addon.delivery}</small> : null}
                 </div>
                 <button
                   type="button"

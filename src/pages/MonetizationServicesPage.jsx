@@ -85,13 +85,12 @@ function MonetizationServicesPage() {
     }, 100);
   };
 
-  const renderCards = (services, tier, metaLabel) =>
+  const renderCards = (services, tier) =>
     services.map((service) => (
       <PartnerPricedServiceCard
         key={`${tier}-${service.packageId || service.title}`}
         service={service}
         title={service.title}
-        meta={metaLabel}
         description={
           monetizationDescriptions[service.title] ||
           'End-to-end monetization support from eligibility through approval and payout setup.'
@@ -126,14 +125,14 @@ function MonetizationServicesPage() {
           <section className="service-detail-section">
             <h2 className="service-detail-section-title">Platform Monetization Packages</h2>
             <div className="service-detail-grid">
-              {renderCards(monetizationPackages, 'package', 'Monetization package')}
+              {renderCards(monetizationPackages, 'package')}
             </div>
           </section>
 
           <section className="service-detail-section">
             <h2 className="service-detail-section-title">Creator Revenue Setup Services</h2>
             <div className="service-detail-grid">
-              {renderCards(monetizationSetupServices, 'setup', 'Setup service')}
+              {renderCards(monetizationSetupServices, 'setup')}
             </div>
           </section>
 

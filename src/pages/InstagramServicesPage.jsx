@@ -52,7 +52,6 @@ function InstagramServicesPage() {
         key={item.packageId || item.id}
         service={item}
         title={item.title}
-        meta={item.note ? `${sectionLabel} · ${item.note}` : sectionLabel}
         description={description}
         pricePrefix=""
         icon={IoLogoInstagram}

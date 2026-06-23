@@ -64,7 +64,7 @@ const appStartingPackage = getPackagesByGroup('app-packages').reduce((lowest, en
 
 const customAppInfo = {
   title: 'Custom App Development',
-  meta: 'Custom build',
+  meta: 'Delivery: 6 to 12 Weeks',
   description:
     'For clients with new app ideas, we offer tailored solutions. Schedule a meeting with us to discuss your unique needs.',
   packageId: appStartingPackage.id,
@@ -134,7 +134,6 @@ function AppServicesPage() {
                 key={service.packageId || service.title}
                 service={service}
                 title={service.title}
-                meta="Mobile app"
                 description={service.description}
                 icon={service.icon}
                 onAddToCart={handleAddToCart}

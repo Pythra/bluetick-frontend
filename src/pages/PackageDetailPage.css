@@ -120,6 +120,16 @@
   color: var(--pub-ink);
 }
 
+.package-platform-delivery {
+  margin: 0.35rem 0 0;
+  padding: 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--pub-muted, #64748b);
+}
+
 .package-platform-footer {
   display: flex;
   flex-direction: column;

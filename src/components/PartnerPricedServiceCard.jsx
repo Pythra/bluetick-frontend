@@ -1,11 +1,13 @@
 import ServiceDetailCard from './ServiceDetailCard';
 import { useCurrency } from '../contexts/CurrencyContext';
 import { usePartnerPackagePrice } from '../hooks/usePartnerPackagePrice';
+import { formatDeliveryMeta } from '../utils/serviceDeliveryMeta';
 
 export default function PartnerPricedServiceCard({
   service,
   onAddToCart,
   priceSuffix = '',
+  meta,
   ...props
 }) {
   const { format } = useCurrency();
@@ -22,6 +24,7 @@ export default function PartnerPricedServiceCard({
   return (
     <ServiceDetailCard
       {...props}
+      meta={formatDeliveryMeta(service, meta)}
       price={`${format(price)}${priceSuffix}`}
       onAddToCart={handleAdd}
     />

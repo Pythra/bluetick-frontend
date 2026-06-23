@@ -82,13 +82,12 @@ function VerificationServicesPage() {
     }, 100);
   };
 
-  const renderTierCards = (services, tier, metaLabel) =>
+  const renderTierCards = (services, tier) =>
     services.map((service) => (
       <PartnerPricedServiceCard
         key={`${tier}-${service.packageId || service.title}`}
         service={service}
         title={service.title}
-        meta={metaLabel}
         description={
           verificationDescriptions[service.title] ||
           'Full verification workflow from eligibility review through platform approval.'
@@ -126,7 +125,7 @@ function VerificationServicesPage() {
               {verificationTierNotes.nonNotable.lead} {verificationTierNotes.nonNotable.permanent}
             </p>
             <div className="service-detail-grid">
-              {renderTierCards(nonNotableVerificationServices, 'non-notable', 'Non-notable account')}
+              {renderTierCards(nonNotableVerificationServices, 'non-notable')}
             </div>
           </section>
 
@@ -136,7 +135,7 @@ function VerificationServicesPage() {
               {verificationTierNotes.notable.lead} {verificationTierNotes.notable.permanent}
             </p>
             <div className="service-detail-grid">
-              {renderTierCards(notableVerificationServices, 'notable', 'Notable account')}
+              {renderTierCards(notableVerificationServices, 'notable')}
             </div>
           </section>
 
@@ -145,7 +144,6 @@ function VerificationServicesPage() {
             <PartnerPricedServiceCard
               service={metaSubscriptionService}
               title={metaSubscriptionService.title}
-              meta="Monthly subscription"
               description={metaSubscriptionService.description}
               priceSuffix="/month"
               pricePrefix=""

@@ -6,17 +6,17 @@ function getPackageEntry(packageId) {
 
 export const wikipediaPagePackages = ['wikipedia.individual', 'wikipedia.company'].map((packageId) => {
   const entry = getPackageEntry(packageId);
-  const isIndividual = packageId === 'wikipedia.individual';
   return {
     id: entry.id,
     packageId: entry.id,
     title: entry.label,
     price: entry.basePriceNgn,
-    deliveryTime: isIndividual ? '48 hours' : '72 hours',
-    description: isIndividual
+    delivery: '48 Hours',
+    deliveryTime: '48 Hours',
+    description: packageId === 'wikipedia.individual'
       ? 'Professional Wikipedia page creation for individuals with comprehensive content development and quality assurance.'
       : 'Specialized Wikipedia page creation for businesses and organizations with stricter notability and sourcing requirements.',
-    features: isIndividual
+    features: packageId === 'wikipedia.individual'
       ? [
           'Content creation and publication',
           'Up to 12 news publications',
@@ -68,7 +68,8 @@ export const googleKnowledgePanelPackages = ['google-knowledge.individual', 'goo
       packageId: entry.id,
       title: entry.label,
       price: entry.basePriceNgn,
-      deliveryTime: '72 hours',
+      delivery: '7 to 30 Days',
+      deliveryTime: '7 to 30 Days',
       description: isIndividual
         ? 'Enhance personal credibility with a Google Knowledge Panel alongside your Wikipedia presence.'
         : 'Establish your brand in Google search with a Knowledge Panel built to complement your Wikipedia page.',

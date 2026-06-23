@@ -102,7 +102,6 @@ function WebsiteServicesPage() {
                 key={service.packageId || service.title}
                 service={service}
                 title={service.title}
-                meta="Website package"
                 description={service.description}
                 icon={service.icon}
                 onAddToCart={handleAddToCart}

@@ -134,7 +134,6 @@ function WikipediaServicesPage() {
                   key={pkg.packageId || pkg.id}
                   service={pkg}
                   title={pkg.title}
-                  meta={`Delivery: ${pkg.deliveryTime}`}
                   description={buildPackageDescription(pkg)}
                   pricePrefix=""
                   icon={pkg.packageId === 'wikipedia.company' ? IoBusinessOutline : IoBookOutline}
@@ -179,7 +178,6 @@ function WikipediaServicesPage() {
                   key={pkg.packageId || pkg.id}
                   service={pkg}
                   title={pkg.title}
-                  meta={`Delivery: ${pkg.deliveryTime}`}
                   description={pkg.description}
                   pricePrefix=""
                   icon={pkg.packageId === 'google-knowledge.company' ? IoBusinessOutline : IoBookOutline}

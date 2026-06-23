@@ -74,7 +74,6 @@ function TwitterTrendServicesPage() {
                   key={pkg.packageId || pkg.id}
                   service={pkg}
                   title={pkg.title}
-                  meta={`Delivery: ${pkg.delivery}`}
                   description={buildTrendDescription(pkg)}
                   pricePrefix=""
                   iconNode={<CountryFlag code={pkg.countryCode} alt={`${pkg.title} flag`} />}

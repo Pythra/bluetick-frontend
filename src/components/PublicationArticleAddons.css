@@ -159,6 +159,10 @@ html[data-partner-site='true'] .publication-page {
   color: var(--pub-muted, #64748b);
 }
 
+.publication-article-addon-delivery {
+  margin-top: 0.1rem;
+}
+
 .publication-article-addon-select {
   min-width: 108px;
   padding: 0.7rem 1.15rem;

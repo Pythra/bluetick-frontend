@@ -4,6 +4,13 @@ import {
   IoTrashOutline,
 } from 'react-icons/io5';
 import copywritingImage from '../assets/about/connect-dm.jpg';
+import { getPackageDelivery } from './packageDeliveryTimelines';
+import { PARTNER_PACKAGE_CATALOG } from './partnerPackageCatalog';
+
+function addonDelivery(packageId) {
+  const entry = PARTNER_PACKAGE_CATALOG.find((item) => item.id === packageId);
+  return getPackageDelivery(entry) || '24 Hours';
+}
 
 export const PUBLICATION_ARTICLE_ADDONS = [
   {
@@ -16,6 +23,7 @@ export const PUBLICATION_ARTICLE_ADDONS = [
     priceValue: 100000,
     unit: 'per article',
     accent: 'formats',
+    delivery: addonDelivery('publication.content-formats'),
   },
   {
     id: 'full-enhancement',
@@ -35,6 +43,7 @@ export const PUBLICATION_ARTICLE_ADDONS = [
     priceValue: 250000,
     unit: 'per article',
     accent: 'enhancement',
+    delivery: addonDelivery('publication.full-enhancement'),
   },
   {
     id: 'copywriting',
@@ -53,6 +62,7 @@ export const PUBLICATION_ARTICLE_ADDONS = [
     priceValue: 10000,
     unit: 'per article',
     accent: 'copywriting',
+    delivery: addonDelivery('publication.copywriting'),
   },
   {
     id: 'backdate',
@@ -65,6 +75,7 @@ export const PUBLICATION_ARTICLE_ADDONS = [
     unit: 'per article',
     icon: IoCalendarOutline,
     accent: 'calendar',
+    delivery: addonDelivery('publication.backdate'),
   },
   {
     id: 'links',
@@ -77,6 +88,7 @@ export const PUBLICATION_ARTICLE_ADDONS = [
     unit: 'per article',
     icon: IoLinkOutline,
     accent: 'links',
+    delivery: addonDelivery('publication.links'),
   },
   {
     id: 'reputation',
@@ -90,5 +102,6 @@ export const PUBLICATION_ARTICLE_ADDONS = [
     unit: 'per article',
     icon: IoTrashOutline,
     accent: 'reputation',
+    delivery: addonDelivery('publication.reputation'),
   },
 ];

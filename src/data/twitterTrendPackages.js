@@ -1,11 +1,11 @@
 import { getPackagesByGroup, toServiceListEntries } from './partnerPackageCatalog';
 
 const trendMeta = {
-  'twitter-trend.nigeria-trend': { countryCode: 'NG', delivery: '24–48 Hours' },
-  'twitter-trend.uganda-trend': { countryCode: 'UG', delivery: '24–48 Hours' },
-  'twitter-trend.south-africa-trend': { countryCode: 'ZA', delivery: '24–48 Hours' },
-  'twitter-trend.kenya-trend': { countryCode: 'KE', delivery: '24–48 Hours' },
-  'twitter-trend.ghana-trend': { countryCode: 'GH', delivery: '24–48 Hours' },
+  'twitter-trend.nigeria-trend': { countryCode: 'NG', delivery: '24 Hours' },
+  'twitter-trend.uganda-trend': { countryCode: 'UG', delivery: '24 Hours' },
+  'twitter-trend.south-africa-trend': { countryCode: 'ZA', delivery: '24 Hours' },
+  'twitter-trend.kenya-trend': { countryCode: 'KE', delivery: '24 Hours' },
+  'twitter-trend.ghana-trend': { countryCode: 'GH', delivery: '24 Hours' },
 };
 
 const trendCopy = {
@@ -39,6 +39,7 @@ const trendCopy = {
 export const twitterTrendPackages = toServiceListEntries(getPackagesByGroup('twitter-trends')).map((entry) => ({
   ...entry,
   title: entry.title.replace(' Trend', ' Trend').replace('Nigeria Trend', 'Nigeria Trend'),
+  delivery: '24 Hours',
   ...trendMeta[entry.packageId],
   ...(trendCopy[entry.packageId] || {}),
 }));
