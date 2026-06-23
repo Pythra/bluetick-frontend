@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   IoAirplaneOutline,
@@ -81,19 +80,14 @@ function AppServicesPage() {
     customAppInfo.packageId,
     customAppInfo.startingPrice
   );
-  const [showCartNotification, setShowCartNotification] = useState(false);
 
-  const handleAddToCart = async (service) => {
-    const result = await addToCart(buildPartnerCartItem(service, {
-      category: 'app',
-      price: service.price,
-    }));
-
-    if (result.success) {
-      setShowCartNotification(true);
-      setTimeout(() => setShowCartNotification(false), 3000);
-    }
-  };
+  const handleAddToCart = (service) =>
+    addToCart(
+      buildPartnerCartItem(service, {
+        category: 'app',
+        price: service.price,
+      })
+    );
 
   const scrollToSection = (sectionId) => {
     navigate('/');
@@ -158,12 +152,6 @@ function AppServicesPage() {
           />
         </main>
       </div>
-
-      {showCartNotification && (
-        <div className="service-detail-cart-notification" role="status">
-          Item added to cart!
-        </div>
-      )}
 
       <ClientsSection />
       <Footer />

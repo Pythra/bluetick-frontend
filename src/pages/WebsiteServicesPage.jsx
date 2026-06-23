@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoCodeSlashOutline, IoGlobeOutline, IoRocketOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
@@ -54,19 +53,14 @@ function WebsiteServicesPage() {
   const { t } = usePartnerText();
   const { isPartnerSite } = usePartnerBranding();
   const { src: heroImageSrc } = usePartnerAsset('websiteServicesImage', websiteHeroImage);
-  const [showCartNotification, setShowCartNotification] = useState(false);
 
-  const handleAddToCart = async (service) => {
-    const result = await addToCart(buildPartnerCartItem(service, {
-      category: 'website',
-      price: service.price,
-    }));
-
-    if (result.success) {
-      setShowCartNotification(true);
-      setTimeout(() => setShowCartNotification(false), 3000);
-    }
-  };
+  const handleAddToCart = (service) =>
+    addToCart(
+      buildPartnerCartItem(service, {
+        category: 'website',
+        price: service.price,
+      })
+    );
 
   const scrollToSection = (sectionId) => {
     navigate('/');
@@ -128,12 +122,6 @@ function WebsiteServicesPage() {
           />
         </main>
       </div>
-
-      {showCartNotification && (
-        <div className="service-detail-cart-notification" role="status">
-          Item added to cart!
-        </div>
-      )}
 
       {!isPartnerSite ? <ClientsSection /> : null}
       <Footer />

@@ -34,7 +34,6 @@ function buildPackageDescription(pkg) {
 function WikipediaServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [showCartNotification, setShowCartNotification] = useState(false);
   const wikiVideoRef = useRef(null);
 
   useEffect(() => {
@@ -64,19 +63,15 @@ function WikipediaServicesPage() {
     };
   }, []);
 
-  const handleAddToCart = async (item, category) => {
-    const result = await addToCart(buildPartnerCartItem(item, {
-      description: item.description || item.deliveryTime || '',
-      category: 'wikipedia',
-      tier: category,
-      price: item.price,
-    }));
-
-    if (result.success) {
-      setShowCartNotification(true);
-      setTimeout(() => setShowCartNotification(false), 3000);
-    }
-  };
+  const handleAddToCart = (item, category) =>
+    addToCart(
+      buildPartnerCartItem(item, {
+        description: item.description || item.deliveryTime || '',
+        category: 'wikipedia',
+        tier: category,
+        price: item.price,
+      })
+    );
 
   const scrollToSection = (sectionId) => {
     navigate('/');
@@ -205,12 +200,6 @@ function WikipediaServicesPage() {
           </div>
         </div>
       </main>
-
-      {showCartNotification && (
-        <div className="service-detail-cart-notification" role="status">
-          Item added to cart!
-        </div>
-      )}
 
       <ClientsSection />
       <Footer onScrollToSection={scrollToSection} />

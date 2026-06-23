@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -10,6 +11,7 @@ import './AuthPage.css';
 function SignUpPage() {
   const navigate = useNavigate();
   const { signup } = useAuth();
+  const { showToast } = useToast();
   const { isPartnerSite, brandName, subdomain: brandingSubdomain } = usePartnerBranding();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -70,9 +72,12 @@ function SignUpPage() {
         formData.phone,
         brandingSubdomain
       );
+      showToast({ message: 'Account created successfully!', type: 'success' });
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Failed to sign up. Please try again.');
+      const message = err.message || 'Failed to sign up. Please try again.';
+      setError(message);
+      showToast({ message, type: 'error' });
     } finally {
       setLoading(false);
     }

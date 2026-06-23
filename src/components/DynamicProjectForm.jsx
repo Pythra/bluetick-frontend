@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Button from './Button';
+import { useToast } from '../contexts/ToastContext';
 import { getFormSchema } from '../data/projectOnboardingForms';
 
 function emptyValues(fields) {
@@ -28,6 +29,7 @@ function DynamicProjectForm({
   onCancel,
 }) {
   const schema = getFormSchema(formType);
+  const { showToast } = useToast();
   const [values, setValues] = useState(() => ({
     ...emptyValues(schema.fields),
     ...(initialValues || {}),
@@ -80,7 +82,9 @@ function DynamicProjectForm({
         }));
       }
     } catch (uploadError) {
-      setError(uploadError.message || 'File upload failed');
+      const message = uploadError.message || 'File upload failed';
+      setError(message);
+      showToast({ message, type: 'error' });
     } finally {
       setUploadingField('');
     }
@@ -126,9 +130,12 @@ function DynamicProjectForm({
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Unable to save project details');
       }
+      showToast({ message: data.message || 'Saved successfully.', type: 'success' });
       onSuccess?.(data);
     } catch (submitError) {
-      setError(submitError.message || 'Submission failed');
+      const message = submitError.message || 'Submission failed';
+      setError(message);
+      showToast({ message, type: 'error' });
     } finally {
       setIsSubmitting(false);
     }

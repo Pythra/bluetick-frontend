@@ -12,11 +12,13 @@ import { PartnershipManagement } from './pages/PartnershipManagement'
 import AdminMessages from './pages/AdminMessages'
 import AdminReports from './pages/AdminReports'
 import AdminInvoicesTab from './pages/AdminInvoicesTab'
+import MainServicesPricingTab from './pages/MainServicesPricingTab'
 import PartnerAdminApp from './PartnerAdminApp'
 import AdminMessagesFab from '../components/AdminMessagesFab'
 import { useAuth } from '../contexts/AuthContext'
 import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain'
 import './styles/admin.css'
+import './styles/partnerDashboard.css'
 
 function AdminApp() {
   const { apiUrl } = useAuth()
@@ -33,6 +35,7 @@ function AdminApp() {
   const [broadcastAudience, setBroadcastAudience] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [saveMessage, setSaveMessage] = useState(null)
   const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken'))
 
   const handleLogout = useCallback((requireConfirmation = true) => {
@@ -289,6 +292,7 @@ function AdminApp() {
       'users': 'User Management',
       'carts': 'Shopping Carts',
       'orders': 'Orders',
+      'services': 'Service Pricing',
       'invoices': 'Invoices',
       'submissions': 'Article Submissions',
       'partnerships': 'Partnership Applications',
@@ -348,6 +352,17 @@ function AdminApp() {
             onUpdateOrder={handleUpdateOrderStatus}
             onUpdateTracking={handleUpdateOrderTracking}
           />
+        ) : activeTab === 'services' ? (
+          <>
+            {saveMessage ? (
+              <div className={`pdash-alert ${saveMessage.type}`}>{saveMessage.text}</div>
+            ) : null}
+            <MainServicesPricingTab
+              apiUrl={apiUrl}
+              adminToken={adminToken}
+              onMessage={setSaveMessage}
+            />
+          </>
         ) : activeTab === 'invoices' ? (
           <AdminInvoicesTab users={users} />
         ) : activeTab === 'submissions' ? (

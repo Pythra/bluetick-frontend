@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useCurrency } from '../contexts/CurrencyContext';
@@ -62,7 +61,6 @@ function PackageDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [showCartNotification, setShowCartNotification] = useState(false);
   const packageId = parseInt(id, 10);
   const packageData = PUBLICATION_PACKAGE_DETAILS[packageId];
   const platforms = packageData ? getPublicationCategoryPlatforms(packageData.categoryId) : [];
@@ -81,8 +79,8 @@ function PackageDetailPage() {
     );
   }
 
-  const handleAddToCart = async (platform) => {
-    const result = await addToCart({
+  const handleAddToCart = (platform) =>
+    addToCart({
       itemId: platform.packageId || `${packageData.title}-${platform.name}`,
       packageId: platform.packageId,
       title: `${platform.name} — ${packageData.title}`,
@@ -93,12 +91,6 @@ function PackageDetailPage() {
       quantity: 1,
     });
 
-    if (result.success) {
-      setShowCartNotification(true);
-      setTimeout(() => setShowCartNotification(false), 3000);
-    }
-  };
-
   const scrollToSection = (sectionId) => {
     navigate('/');
     setTimeout(() => {
@@ -108,11 +100,6 @@ function PackageDetailPage() {
 
   return (
     <div className="publication-page package-detail-page">
-      {showCartNotification ? (
-        <div className="publication-toast" role="status">
-          Item added to cart!
-        </div>
-      ) : null}
       <Navbar onScrollToSection={scrollToSection} />
       <div className="package-detail-shell">
         <header className="package-detail-header">

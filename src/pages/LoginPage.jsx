@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -11,6 +12,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { showToast } = useToast();
   const { isPartnerSite, brandName, subdomain: brandingSubdomain } = usePartnerBranding();
   const [formData, setFormData] = useState({
     email: '',
@@ -40,10 +42,13 @@ function LoginPage() {
 
     try {
       await login(formData.email, formData.password, brandingSubdomain);
+      showToast({ message: 'Logged in successfully', type: 'success' });
       const redirectTo = location.state?.from || '/account';
       navigate(redirectTo, { replace: true });
     } catch (err) {
-      setError(err.message || 'Failed to login. Please check your credentials.');
+      const message = err.message || 'Failed to login. Please check your credentials.';
+      setError(message);
+      showToast({ message, type: 'error' });
     } finally {
       setLoading(false);
     }

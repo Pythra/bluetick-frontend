@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   IoCheckmarkCircleOutline,
@@ -61,22 +60,17 @@ function getVerificationIcon(title) {
 function VerificationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [showCartNotification, setShowCartNotification] = useState(false);
 
-  const handleAddToCart = async (service, tier) => {
-    const result = await addToCart(buildPartnerCartItem(service, {
-      title: `${service.title} (${tier})`,
-      description: tier === 'notable' ? 'Notable account' : tier === 'meta' ? 'Meta subscription' : 'Non-notable account',
-      category: 'verification',
-      tier,
-      price: service.price,
-    }));
-
-    if (result.success) {
-      setShowCartNotification(true);
-      setTimeout(() => setShowCartNotification(false), 3000);
-    }
-  };
+  const handleAddToCart = (service, tier) =>
+    addToCart(
+      buildPartnerCartItem(service, {
+        title: `${service.title} (${tier})`,
+        description: tier === 'notable' ? 'Notable account' : tier === 'meta' ? 'Meta subscription' : 'Non-notable account',
+        category: 'verification',
+        tier,
+        price: service.price,
+      })
+    );
 
   const scrollToSection = (sectionId) => {
     navigate('/');
@@ -166,12 +160,6 @@ function VerificationServicesPage() {
           </section>
         </main>
       </div>
-
-      {showCartNotification && (
-        <div className="service-detail-cart-notification" role="status">
-          Item added to cart!
-        </div>
-      )}
 
       <ClientsSection />
       <Footer />

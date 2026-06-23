@@ -9,6 +9,7 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { previewPartnerSiteUrl } from '../utils/partnerSubdomain';
 import bluego from '../assets/bluego.png';
 import './PartnerApplicationPage.css';
@@ -41,6 +42,7 @@ const MAX_LOGO_BYTES = 2 * 1024 * 1024;
 function PartnerApplicationPage() {
   const navigate = useNavigate();
   const { apiUrl, token, user } = useAuth();
+  const { showToast } = useToast();
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -165,18 +167,23 @@ function PartnerApplicationPage() {
     e.preventDefault();
     setError('');
 
-    if (!form.fullName.trim()) return setError('Please enter your full name.');
+    const reportError = (message) => {
+      setError(message);
+      showToast({ message, type: 'error' });
+    };
+
+    if (!form.fullName.trim()) return reportError('Please enter your full name.');
     if (!form.email.trim() || !/^\S+@\S+\.\S+$/.test(form.email)) {
-      return setError('Please enter a valid email address.');
+      return reportError('Please enter a valid email address.');
     }
-    if (!form.phone.trim()) return setError('Please enter your phone number.');
-    if (!form.country.trim()) return setError('Please enter your country.');
-    if (!form.partnershipType) return setError('Please select a partnership type.');
+    if (!form.phone.trim()) return reportError('Please enter your phone number.');
+    if (!form.country.trim()) return reportError('Please enter your country.');
+    if (!form.partnershipType) return reportError('Please select a partnership type.');
     if (brandCheck.status === 'taken') {
-      return setError(brandCheck.message || 'This brand name is already taken. Please choose a different name.');
+      return reportError(brandCheck.message || 'This brand name is already taken. Please choose a different name.');
     }
     if (brandCheck.status === 'checking') {
-      return setError('Please wait while we verify your brand name availability.');
+      return reportError('Please wait while we verify your brand name availability.');
     }
 
     setLoading(true);
@@ -212,9 +219,12 @@ function PartnerApplicationPage() {
 
       setReservedSiteUrl(data.siteUrl || '');
       setSubmitted(true);
+      showToast({ message: 'Application submitted successfully!', type: 'success' });
     } catch (err) {
       console.error('Submit error:', err);
-      setError(err.message || 'Failed to submit application. Please try again.');
+      const message = err.message || 'Failed to submit application. Please try again.';
+      setError(message);
+      showToast({ message, type: 'error' });
     } finally {
       setLoading(false);
     }

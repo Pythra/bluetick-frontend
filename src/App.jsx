@@ -4,6 +4,7 @@ import { createBrowserHistory } from 'history';
 import { AuthProvider } from './contexts/AuthContext';
 import { PartnerBrandingProvider, usePartnerBranding } from './contexts/PartnerBrandingContext';
 import { CartProvider } from './contexts/CartContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
 import { useAuth } from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
@@ -67,6 +68,7 @@ import RegisterPartnerSiteUser from './components/RegisterPartnerSiteUser';
 import './App.css';
 import './styles/partnerTemplates.css';
 import './styles/brandTheme.css';
+import './styles/partnerFormFields.css';
 
 const HOMEPAGE_SERVICE_COMPONENTS = [
   ['appDevelopment', AppServicesSummary],
@@ -279,6 +281,7 @@ function App() {
       <PartnerBrandingProvider>
       <PartnerBrandingGate>
       <CurrencyProvider>
+        <ToastProvider>
         <CartProvider>
           <Router history={history}>
           <PushSubscriptionBootstrap />
@@ -324,6 +327,7 @@ function App() {
           </div>
           </Router>
         </CartProvider>
+        </ToastProvider>
       </CurrencyProvider>
       </PartnerBrandingGate>
       </PartnerBrandingProvider>

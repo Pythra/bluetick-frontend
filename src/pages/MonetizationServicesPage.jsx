@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   IoCashOutline,
@@ -65,21 +64,16 @@ function getMonetizationIcon(title) {
 function MonetizationServicesPage() {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const [showCartNotification, setShowCartNotification] = useState(false);
 
-  const handleAddToCart = async (service, tier) => {
-    const result = await addToCart(buildPartnerCartItem(service, {
-      description: tier === 'setup' ? 'Monetization setup service' : 'Full monetization package',
-      category: 'monetization',
-      tier,
-      price: service.price,
-    }));
-
-    if (result.success) {
-      setShowCartNotification(true);
-      setTimeout(() => setShowCartNotification(false), 3000);
-    }
-  };
+  const handleAddToCart = (service, tier) =>
+    addToCart(
+      buildPartnerCartItem(service, {
+        description: tier === 'setup' ? 'Monetization setup service' : 'Full monetization package',
+        category: 'monetization',
+        tier,
+        price: service.price,
+      })
+    );
 
   const scrollToSection = (sectionId) => {
     navigate('/');
@@ -153,12 +147,6 @@ function MonetizationServicesPage() {
           />
         </main>
       </div>
-
-      {showCartNotification && (
-        <div className="service-detail-cart-notification" role="status">
-          Item added to cart!
-        </div>
-      )}
 
       <ClientsSection />
       <Footer />

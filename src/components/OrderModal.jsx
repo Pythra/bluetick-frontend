@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import './OrderModal.css';
 
 function OrderModal({ isOpen, onClose, productName, productPrice }) {
   const { apiUrl } = useAuth();
+  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,13 +36,16 @@ function OrderModal({ isOpen, onClose, productName, productPrice }) {
         throw new Error(data.error || 'Failed to submit order');
       }
 
-      alert('Order submitted successfully! We will contact you soon.');
+      showToast({ message: 'Order submitted successfully! We will contact you soon.', type: 'success' });
       setEmail('');
       setMessage('');
       onClose();
     } catch (error) {
       console.error('Error submitting order:', error);
-      alert(`Failed to submit order: ${error.message}. Please try again.`);
+      showToast({
+        message: error.message || 'Failed to submit order. Please try again.',
+        type: 'error',
+      });
     } finally {
       setIsSubmitting(false);
     }

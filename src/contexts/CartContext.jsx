@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { useToast } from './ToastContext';
 
 const CartContext = createContext();
 
@@ -13,6 +14,7 @@ export const useCart = () => {
 
 export const CartProvider = ({ children }) => {
   const { apiUrl, isAuthenticated, authFetch } = useAuth();
+  const { showToast } = useToast();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -44,7 +46,7 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (item) => {
     if (!isAuthenticated) {
-      alert('Please login to add items to cart');
+      showToast({ message: 'Please log in to add items to cart', type: 'info' });
       return { success: false, error: 'Not authenticated' };
     }
 
@@ -66,6 +68,7 @@ export const CartProvider = ({ children }) => {
 
       if (response.ok && data.success) {
         setCartItems(data.cart.items || []);
+        showToast({ message: 'Item added to cart!', type: 'success' });
         return { success: true };
       }
 
@@ -76,7 +79,10 @@ export const CartProvider = ({ children }) => {
       throw new Error(data.error || 'Failed to add item to cart');
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert(`Failed to add item to cart: ${error.message}`);
+      showToast({
+        message: error.message || 'Failed to add item to cart',
+        type: 'error',
+      });
       return { success: false, error: error.message };
     } finally {
       setLoading(false);

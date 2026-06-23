@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import SectionHeader from './SectionHeader';
+import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './CustomRequestsSection.css';
 
 function CustomRequestsSection() {
   const { apiUrl } = useAuth();
+  const { showToast } = useToast();
   const { subdomain, isPartnerSite } = usePartnerBranding();
   const section = usePartnerSectionContent('customRequests');
   const [form, setForm] = useState({
@@ -48,9 +51,14 @@ function CustomRequestsSection() {
       }
 
       setFeedback({ type: 'success', text: data.message || section.successMessage });
+      showToast({
+        message: data.message || section.successMessage || 'Request sent successfully!',
+        type: 'success',
+      });
       setForm({ name: '', email: '', phone: '', serviceType: '', message: '' });
     } catch (error) {
       setFeedback({ type: 'error', text: error.message });
+      showToast({ message: error.message, type: 'error' });
     } finally {
       setSubmitting(false);
     }
@@ -60,12 +68,7 @@ function CustomRequestsSection() {
     <section id="custom-requests" className="custom-requests-section">
       <div className="custom-requests-container">
         <SectionHeader
-          title={(
-            <>
-              <span className="services-summary-title-black">{section.titleBlack}</span>{' '}
-              <span className="services-summary-title-blue">{section.titleBlue}</span>
-            </>
-          )}
+          title={<ServiceSectionTitle section={section} />}
           subtitle={section.intro}
         />
 
@@ -75,6 +78,7 @@ function CustomRequestsSection() {
               <label htmlFor="custom-request-name">Full name</label>
               <input
                 id="custom-request-name"
+                className="partner-form-control"
                 value={form.name}
                 onChange={(e) => updateField('name', e.target.value)}
                 required
@@ -85,6 +89,7 @@ function CustomRequestsSection() {
               <label htmlFor="custom-request-email">Email</label>
               <input
                 id="custom-request-email"
+                className="partner-form-control"
                 type="email"
                 value={form.email}
                 onChange={(e) => updateField('email', e.target.value)}
@@ -96,6 +101,7 @@ function CustomRequestsSection() {
               <label htmlFor="custom-request-phone">Phone (optional)</label>
               <input
                 id="custom-request-phone"
+                className="partner-form-control"
                 value={form.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
                 placeholder="+234 ..."
@@ -105,6 +111,7 @@ function CustomRequestsSection() {
               <label htmlFor="custom-request-service">Service / topic</label>
               <input
                 id="custom-request-service"
+                className="partner-form-control"
                 value={form.serviceType}
                 onChange={(e) => updateField('serviceType', e.target.value)}
                 placeholder="e.g. Custom app, PR campaign, special package"
@@ -116,6 +123,7 @@ function CustomRequestsSection() {
             <label htmlFor="custom-request-message">Tell us what you need</label>
             <textarea
               id="custom-request-message"
+              className="partner-form-control"
               rows={5}
               value={form.message}
               onChange={(e) => updateField('message', e.target.value)}

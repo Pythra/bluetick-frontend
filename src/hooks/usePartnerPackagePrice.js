@@ -14,11 +14,17 @@ export function resolvePartnerPackagePrice(packageId, defaultPrice, packagePrici
 }
 
 export function usePartnerPackagePrice(packageId, defaultPrice) {
-  const { isPartnerSite, packagePricing } = usePartnerBranding();
+  const { packagePricing } = usePartnerBranding();
   return useMemo(() => {
-    if (!isPartnerSite) return defaultPrice;
-    return resolvePartnerPackagePrice(packageId, defaultPrice, packagePricing);
-  }, [isPartnerSite, packageId, defaultPrice, packagePricing]);
+    const stored = packagePricing?.[packageId];
+    if (stored) {
+      const current = Number(stored.priceNgn ?? stored.currentPriceNgn ?? stored.sellingPriceNgn);
+      if (Number.isFinite(current) && current > 0) {
+        return current;
+      }
+    }
+    return defaultPrice;
+  }, [packageId, defaultPrice, packagePricing]);
 }
 
 export function useResolvedServiceItem(item) {

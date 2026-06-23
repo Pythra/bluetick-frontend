@@ -503,7 +503,6 @@ function PublicationServicesPage() {
   const { addToCart } = useCart();
   const { shortBrandName } = usePartnerText();
   const { isPartnerSite, packagePricing } = usePartnerBranding();
-  const [showCartNotification, setShowCartNotification] = useState(false);
   const [statsVisible, setStatsVisible] = useState(false);
   const statsRef = useRef(null);
   const { format } = useCurrency();
@@ -521,11 +520,11 @@ function PublicationServicesPage() {
     }).priceValue;
   };
 
-  const handleAddToCart = async (item) => {
+  const handleAddToCart = (item) => {
     const priceValue = resolvePublicationPrice(item);
     const formattedPrice = format(priceValue);
-    
-    const result = await addToCart({
+
+    return addToCart({
       itemId: item.packageId || item.id || `${item.title}-${Date.now()}`,
       title: item.title || item.name,
       price: formattedPrice,
@@ -534,11 +533,6 @@ function PublicationServicesPage() {
       category: 'publication',
       quantity: 1,
     });
-    
-    if (result.success) {
-      setShowCartNotification(true);
-      setTimeout(() => setShowCartNotification(false), 3000);
-    }
   };
 
 
@@ -592,11 +586,6 @@ function PublicationServicesPage() {
 
   return (
     <div className="publication-page">
-      {showCartNotification && (
-        <div className="publication-toast" role="status">
-          Item added to cart!
-        </div>
-      )}
       <Navbar onScrollToSection={scrollToSection} />
 
       <section className="publication-masthead">

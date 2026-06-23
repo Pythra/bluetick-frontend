@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { IoDocumentTextOutline, IoCloudUploadOutline } from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { useCart } from '../contexts/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -15,6 +16,7 @@ function ArticleSubmissionPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { isAuthenticated, apiUrl, authFetch } = useAuth();
+  const { showToast } = useToast();
   const { cartItems } = useCart();
 
   const [formData, setFormData] = useState({
@@ -263,13 +265,16 @@ function ArticleSubmissionPage() {
       if (data.publicationSubmissionComplete) {
         setSubmitStatus('success');
         setPartialSuccessMessage('');
+        showToast({ message: 'Article submitted successfully!', type: 'success' });
         setTimeout(() => {
           navigate('/account');
         }, 3000);
         return;
       }
 
-      setPartialSuccessMessage(data.message || 'Article saved. Submit the next platform when ready.');
+      const savedMessage = data.message || 'Article saved. Submit the next platform when ready.';
+      setPartialSuccessMessage(savedMessage);
+      showToast({ message: savedMessage, type: 'success' });
       resetSubmissionForm();
       if (data.publicationItems?.length) {
         setOrderFromLink((prev) =>
@@ -289,7 +294,9 @@ function ArticleSubmissionPage() {
       }
     } catch (submitError) {
       console.error('Article submission error:', submitError);
-      setError(submitError.message || 'Failed to submit article. Please try again.');
+      const message = submitError.message || 'Failed to submit article. Please try again.';
+      setError(message);
+      showToast({ message, type: 'error' });
     } finally {
       setIsSubmitting(false);
     }

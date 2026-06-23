@@ -125,7 +125,53 @@ export function PartnerBrandingProvider({ children }) {
 
   useEffect(() => {
     if (isMainHost) {
-      setBranding({ ...DEFAULT_BRANDING, loading: false });
+      let cancelled = false;
+
+      const loadGlobalPricing = async ({ force = false } = {}) => {
+        try {
+          const response = await fetch(`${apiUrl}/api/site/global-pricing`);
+          const data = await response.json();
+
+          if (cancelled || !response.ok || !data.success) {
+            if (!cancelled) {
+              setBranding({ ...DEFAULT_BRANDING, loading: false });
+            }
+            return;
+          }
+
+          setBranding(
+            buildBrandingState(
+              {
+                packagePricing: data.packagePricing || {},
+                pricingUpdatedAt: data.pricingUpdatedAt || null,
+              },
+              { loading: false }
+            )
+          );
+        } catch (error) {
+          console.error('Global pricing load failed:', error);
+          if (!cancelled) {
+            setBranding({ ...DEFAULT_BRANDING, loading: false });
+          }
+        }
+      };
+
+      loadGlobalPricing();
+
+      const handlePricingUpdated = () => loadGlobalPricing({ force: true });
+      window.addEventListener('partner-pricing-updated', handlePricingUpdated);
+
+      return () => {
+        cancelled = true;
+        window.removeEventListener('partner-pricing-updated', handlePricingUpdated);
+      };
+    }
+
+    return undefined;
+  }, [isMainHost, apiUrl]);
+
+  useEffect(() => {
+    if (isMainHost) {
       return undefined;
     }
 

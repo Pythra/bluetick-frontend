@@ -491,7 +491,7 @@
   margin-bottom: 0;
 }
 
-.section-title {
+.admin-page .section-title {
   font-size: 1.2rem;
   font-weight: 600;
   color: #333;
@@ -618,7 +618,7 @@
     margin: 0 1rem;
   }
 
-  .section-title {
+  .admin-page .section-title {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;

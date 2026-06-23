@@ -261,17 +261,52 @@ export function buildDefaultPackagePricing() {
   );
 }
 
-export function resolvePackageCurrentPrice(packageId, storedPricing = {}) {
+export function resolveGlobalPackagePrice(packageId, globalStoredPricing = {}) {
   const entry = getPackageCatalogEntry(packageId);
   if (!entry) return 0;
 
-  const extracted = extractPackagePricingFromServicePricing(storedPricing);
-  const stored = extracted[packageId] || storedPricing[packageId];
-  const saved = Number(stored?.sellingPriceNgn ?? stored?.currentPriceNgn);
+  const extracted = extractPackagePricingFromServicePricing(globalStoredPricing);
+  const stored = extracted[packageId] || globalStoredPricing[packageId];
+  const saved = Number(stored?.sellingPriceNgn ?? stored?.currentPriceNgn ?? stored?.priceNgn);
   if (Number.isFinite(saved) && saved > 0) {
     return saved;
   }
   return entry.basePriceNgn;
+}
+
+export function resolvePartnerMarkupNgn(packageId, partnerStoredPricing = {}) {
+  const partnerEntry = partnerStoredPricing[packageId];
+  if (!partnerEntry || typeof partnerEntry !== 'object') {
+    return 0;
+  }
+
+  const explicitMarkup = Number(partnerEntry.markupNgn);
+  if (Number.isFinite(explicitMarkup)) {
+    return Math.max(0, explicitMarkup);
+  }
+
+  const legacySelling = Number(partnerEntry.sellingPriceNgn ?? partnerEntry.currentPriceNgn);
+  if (!Number.isFinite(legacySelling) || legacySelling <= 0) {
+    return 0;
+  }
+
+  const catalogBase = getPackageCatalogEntry(packageId)?.basePriceNgn ?? 0;
+  return Math.max(0, legacySelling - catalogBase);
+}
+
+export function resolvePartnerPackageEffectivePrice(
+  packageId,
+  globalStoredPricing = {},
+  partnerStoredPricing = {}
+) {
+  const globalPrice = resolveGlobalPackagePrice(packageId, globalStoredPricing);
+  const markup = resolvePartnerMarkupNgn(packageId, partnerStoredPricing);
+  return globalPrice + markup;
+}
+
+/** @deprecated Use resolveGlobalPackagePrice for main-site stored pricing. */
+export function resolvePackageCurrentPrice(packageId, storedPricing = {}) {
+  return resolveGlobalPackagePrice(packageId, storedPricing);
 }
 
 export function mergePackagePricing(stored = {}) {
@@ -292,23 +327,44 @@ export function mergePackagePricing(stored = {}) {
   return merged;
 }
 
-export function buildPartnerPackagePricingRows(storedPricing = {}) {
-  const pricing = mergePackagePricing(storedPricing);
+export function buildMainPackagePricingRows(globalStoredPricing = {}) {
   return PARTNER_PACKAGE_CATALOG.map((entry) => {
-    const value = pricing[entry.id] || {};
-    const current = resolvePackageCurrentPrice(entry.id, storedPricing);
+    const current = resolveGlobalPackagePrice(entry.id, globalStoredPricing);
     return {
       ...entry,
+      basePriceNgn: entry.basePriceNgn,
       currentPriceNgn: current,
+      markupNgn: 0,
+    };
+  });
+}
+
+export function buildPartnerPackagePricingRows(globalStoredPricing = {}, partnerStoredPricing = {}) {
+  const extractedPartner = extractPackagePricingFromServicePricing(partnerStoredPricing);
+  return PARTNER_PACKAGE_CATALOG.map((entry) => {
+    const globalPrice = resolveGlobalPackagePrice(entry.id, globalStoredPricing);
+    const markupNgn = resolvePartnerMarkupNgn(entry.id, extractedPartner);
+    const current = globalPrice + markupNgn;
+    const value = extractedPartner[entry.id] || {};
+    return {
+      ...entry,
+      basePriceNgn: globalPrice,
+      currentPriceNgn: current,
+      markupNgn,
       enabled: value.enabled !== false,
     };
   });
 }
 
-export function buildPublicPackagePricing(storedPricing = {}) {
+export function buildPublicPackagePricing(globalStoredPricing = {}, partnerStoredPricing = {}) {
+  const extractedPartner = extractPackagePricingFromServicePricing(partnerStoredPricing);
   return Object.fromEntries(
     PARTNER_PACKAGE_CATALOG.map((entry) => {
-      const current = resolvePackageCurrentPrice(entry.id, storedPricing);
+      const current = resolvePartnerPackageEffectivePrice(
+        entry.id,
+        globalStoredPricing,
+        extractedPartner
+      );
       return [
         entry.id,
         {
@@ -321,8 +377,14 @@ export function buildPublicPackagePricing(storedPricing = {}) {
   );
 }
 
-export function resolvePackageSellingPrice(packageId, storedPricing = {}) {
-  return resolvePackageCurrentPrice(packageId, storedPricing) || null;
+export function resolvePackageSellingPrice(
+  packageId,
+  globalStoredPricing = {},
+  partnerStoredPricing = {}
+) {
+  return (
+    resolvePartnerPackageEffectivePrice(packageId, globalStoredPricing, partnerStoredPricing) || null
+  );
 }
 
 export function extractPackagePricingFromServicePricing(servicePricing = {}) {
@@ -336,7 +398,7 @@ export function isPackagePricingKey(key) {
   return packageMap.has(key);
 }
 
-export function findPackagePricingBelowMinimum(pricingEntries = []) {
+export function findMainPackagePricingBelowMinimum(pricingEntries = []) {
   const entries = Array.isArray(pricingEntries)
     ? pricingEntries
     : Object.entries(pricingEntries).map(([id, value]) => ({ id, ...value }));
@@ -357,6 +419,38 @@ export function findPackagePricingBelowMinimum(pricingEntries = []) {
       };
     })
     .filter(Boolean);
+}
+
+export function findPartnerPackagePricingBelowMinimum(pricingEntries = [], globalStoredPricing = {}) {
+  const entries = Array.isArray(pricingEntries)
+    ? pricingEntries
+    : Object.entries(pricingEntries).map(([id, value]) => ({ id, ...value }));
+
+  return entries
+    .map(({ id, sellingPriceNgn, currentPriceNgn, basePriceNgn: attemptedBase }) => {
+      const entry = getPackageCatalogEntry(id);
+      if (!entry) return null;
+      const minimumPriceNgn = resolveGlobalPackagePrice(id, globalStoredPricing);
+      const attempted = Number(sellingPriceNgn ?? currentPriceNgn ?? attemptedBase);
+      if (!Number.isFinite(attempted) || attempted <= 0 || attempted >= minimumPriceNgn) {
+        return null;
+      }
+      return {
+        id,
+        label: entry.label,
+        minimumPriceNgn,
+        attemptedPriceNgn: attempted,
+      };
+    })
+    .filter(Boolean);
+}
+
+/** @deprecated Use findPartnerPackagePricingBelowMinimum or findMainPackagePricingBelowMinimum. */
+export function findPackagePricingBelowMinimum(pricingEntries = [], globalStoredPricing = {}) {
+  if (globalStoredPricing && Object.keys(globalStoredPricing).length > 0) {
+    return findPartnerPackagePricingBelowMinimum(pricingEntries, globalStoredPricing);
+  }
+  return findMainPackagePricingBelowMinimum(pricingEntries);
 }
 
 export function buildPackagePricingMinimumError(violations = []) {

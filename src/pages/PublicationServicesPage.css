@@ -146,7 +146,7 @@
   margin: 0 auto;
 }
 
-.section-title {
+.publication-page .section-title {
   font-family: 'Space Grotesk', 'Inter', sans-serif;
   font-size: 2.5rem;
   font-weight: 600;
@@ -159,7 +159,7 @@
   letter-spacing: 0.8px;
 }
 
-.section-subtitle {
+.publication-page .section-subtitle {
   font-size: 1.02rem;
   text-align: center;
   color: #64748b;
@@ -1159,13 +1159,13 @@
     font-size: 1rem;
   }
 
-  .section-title {
+  .publication-page .section-title {
     font-size: 2rem;
     text-align: left;
     padding: 0 10px;
   }
 
-  .section-subtitle {
+  .publication-page .section-subtitle {
     font-size: 0.88rem;
     text-align: left;
     padding: 0 10px;

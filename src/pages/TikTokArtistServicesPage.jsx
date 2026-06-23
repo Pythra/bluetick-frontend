@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoLogoTiktok, IoMusicalNoteOutline, IoPeopleOutline } from 'react-icons/io5';
 import { useCart } from '../contexts/CartContext';
@@ -30,20 +29,15 @@ function TikTokArtistServicesPage() {
   const { addToCart } = useCart();
   const { format } = useCurrency();
   const { t, brandName, shortBrandName } = usePartnerText();
-  const [showCartNotification, setShowCartNotification] = useState(false);
 
-  const handleAddToCart = async (service) => {
-    const result = await addToCart(buildPartnerCartItem(service, {
-      description: service.meta || 'TikTok for Artist service',
-      category: 'tiktok-artist',
-      price: service.price,
-    }));
-
-    if (result.success) {
-      setShowCartNotification(true);
-      setTimeout(() => setShowCartNotification(false), 3000);
-    }
-  };
+  const handleAddToCart = (service) =>
+    addToCart(
+      buildPartnerCartItem(service, {
+        description: service.meta || 'TikTok for Artist service',
+        category: 'tiktok-artist',
+        price: service.price,
+      })
+    );
 
   const scrollToSection = (sectionId) => {
     navigate('/');
@@ -149,12 +143,6 @@ function TikTokArtistServicesPage() {
           </section>
         </main>
       </div>
-
-      {showCartNotification && (
-        <div className="service-detail-cart-notification" role="status">
-          Item added to cart!
-        </div>
-      )}
 
       <ClientsSection />
       <Footer />
