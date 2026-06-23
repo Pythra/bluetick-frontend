@@ -188,18 +188,28 @@ export default function PartnerServicesTab({ api, onMessage, pricingMode = 'part
   };
 
   const handleSave = async () => {
-    const violations = packages
-      .filter((pkg) => Number(pkg.currentPriceNgn) < Number(pkg.basePriceNgn))
-      .map((pkg) => ({
-        id: pkg.id,
-        label: pkg.label,
-        minimumPriceNgn: pkg.basePriceNgn,
-        attemptedPriceNgn: pkg.currentPriceNgn,
-      }));
+    if (!isMainPricing) {
+      const violations = packages
+        .filter((pkg) => Number(pkg.currentPriceNgn) < Number(pkg.basePriceNgn))
+        .map((pkg) => ({
+          id: pkg.id,
+          label: pkg.label,
+          minimumPriceNgn: pkg.basePriceNgn,
+          attemptedPriceNgn: pkg.currentPriceNgn,
+        }));
 
-    if (violations.length) {
-      onMessage?.({ type: 'error', text: buildPackagePricingMinimumError(violations) });
-      return;
+      if (violations.length) {
+        onMessage?.({ type: 'error', text: buildPackagePricingMinimumError(violations) });
+        return;
+      }
+    } else {
+      const invalid = packages.filter(
+        (pkg) => !Number.isFinite(Number(pkg.currentPriceNgn)) || Number(pkg.currentPriceNgn) <= 0
+      );
+      if (invalid.length) {
+        onMessage?.({ type: 'error', text: 'Each package price must be greater than zero.' });
+        return;
+      }
     }
 
     try {
@@ -353,7 +363,7 @@ export default function PartnerServicesTab({ api, onMessage, pricingMode = 'part
       <h2>{isMainPricing ? 'Main site service pricing' : 'Service package pricing'}</h2>
       <p className="pdash-panel-lead">
         {isMainPricing
-          ? 'Set the base prices shown on the main Bluetick site. Partner websites inherit these prices automatically and can add their own markup on top.'
+          ? 'Set the base prices shown on the main Bluetick site. You can enter any amount — partner websites inherit these prices and can add markup on top.'
           : 'Select a service, then choose a category or package group to set the prices shown on your public site. Your minimum is the current main site price for each package.'}
       </p>
 
