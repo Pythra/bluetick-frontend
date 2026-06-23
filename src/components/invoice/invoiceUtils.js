@@ -152,7 +152,7 @@ export function buildPartnerInvoiceFromOrder(order, branding) {
 export const INVOICE_PRINT_STYLES = `
   @page {
     size: A4 portrait;
-    margin: 12mm 14mm;
+    margin: 0;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -165,7 +165,7 @@ export const INVOICE_PRINT_STYLES = `
     font-family: 'Segoe UI', Arial, sans-serif;
     color: #0f172a;
     background: #fff;
-    padding: 0;
+    padding: 20mm 22mm;
     margin: 0;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -175,6 +175,7 @@ export const INVOICE_PRINT_STYLES = `
     width: 100%;
     max-width: none;
     margin: 0;
+    padding: 0;
   }
 
   .invoice-doc__header {

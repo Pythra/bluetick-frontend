@@ -20,45 +20,36 @@ export default function MainServicesPricingTab({ apiUrl, adminToken, onMessage }
 
   return (
     <div className="pdash-panel pdash-main-services">
-      <div className="adm-panel-head-row">
-        <div>
-          <h2 className="adm-panel-title">Services</h2>
-          <p className="pdash-panel-lead">
-            Manage main-site package pricing, homepage service backgrounds, publication logos, and
-            publication category logos.
-          </p>
-        </div>
-        <div className="adm-btn-group adm-btn-group-wrap">
-          <button
-            type="button"
-            className={`adm-btn ${view === VIEWS.pricing ? 'adm-btn-primary' : 'adm-btn-ghost'}`}
-            onClick={() => setView(VIEWS.pricing)}
-          >
-            Pricing
-          </button>
-          <button
-            type="button"
-            className={`adm-btn ${view === VIEWS.backgrounds ? 'adm-btn-primary' : 'adm-btn-ghost'}`}
-            onClick={() => setView(VIEWS.backgrounds)}
-          >
-            Service backgrounds
-          </button>
-          <button
-            type="button"
-            className={`adm-btn ${view === VIEWS.carousel ? 'adm-btn-primary' : 'adm-btn-ghost'}`}
-            onClick={() => setView(VIEWS.carousel)}
-          >
-            Publication logos
-          </button>
-          <button
-            type="button"
-            className={`adm-btn ${view === VIEWS.categoryLogos ? 'adm-btn-primary' : 'adm-btn-ghost'}`}
-            onClick={() => setView(VIEWS.categoryLogos)}
-          >
-            Publication category logos
-          </button>
-        </div>
-      </div>
+      <nav className="adm-services-tabs" aria-label="Services sections">
+        <button
+          type="button"
+          className={`adm-services-tab${view === VIEWS.pricing ? ' is-active' : ''}`}
+          onClick={() => setView(VIEWS.pricing)}
+        >
+          Pricing
+        </button>
+        <button
+          type="button"
+          className={`adm-services-tab${view === VIEWS.backgrounds ? ' is-active' : ''}`}
+          onClick={() => setView(VIEWS.backgrounds)}
+        >
+          Service backgrounds
+        </button>
+        <button
+          type="button"
+          className={`adm-services-tab${view === VIEWS.carousel ? ' is-active' : ''}`}
+          onClick={() => setView(VIEWS.carousel)}
+        >
+          Publication logos
+        </button>
+        <button
+          type="button"
+          className={`adm-services-tab${view === VIEWS.categoryLogos ? ' is-active' : ''}`}
+          onClick={() => setView(VIEWS.categoryLogos)}
+        >
+          Publication category logos
+        </button>
+      </nav>
 
       {view === VIEWS.pricing ? (
         <PartnerServicesTab api={api} onMessage={onMessage} pricingMode="main" embedded />

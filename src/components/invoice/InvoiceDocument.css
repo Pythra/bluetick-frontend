@@ -307,7 +307,7 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 12mm 14mm;
+    margin: 0;
   }
 
   body {
@@ -320,14 +320,18 @@
     display: none !important;
   }
 
-  .invoice-modal,
-  .invoice-modal__body {
+  .invoice-modal {
     box-shadow: none;
     border-radius: 0;
     max-height: none;
     overflow: visible;
-    padding: 0;
     width: 100%;
+  }
+
+  .invoice-modal__body {
+    padding: 20mm 22mm !important;
+    max-height: none;
+    overflow: visible;
   }
 }
 
