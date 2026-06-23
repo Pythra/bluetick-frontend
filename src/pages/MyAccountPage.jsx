@@ -12,6 +12,7 @@ import {
 } from 'react-icons/io5';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
+import { useToast } from '../contexts/ToastContext';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import { getPartnerSubdomainFromHost } from '../utils/partnerSubdomain';
 import Navbar from '../components/Navbar';
@@ -125,6 +126,7 @@ function MyAccountPage() {
   const isMainSiteAccount = !messageSubdomain;
   const messagesSiteMode = isMainSiteAccount ? 'main' : 'partner';
   const { user, isAuthenticated, loading, logout, apiUrl, authFetch, token } = useAuth();
+  const { showToast, confirm } = useToast();
   const { cartItemCount, fetchCart } = useCart();
   const [activeSection, setActiveSection] = useState(SECTIONS.dashboard);
   const [orders, setOrders] = useState([]);
@@ -248,12 +250,16 @@ function MyAccountPage() {
     }, 100);
   };
 
-  const handleLogout = () => {
-    const shouldLogout = window.confirm('Are you sure you want to log out?');
+  const handleLogout = async () => {
+    const shouldLogout = await confirm({
+      title: 'Log out',
+      message: 'Are you sure you want to log out?',
+    });
     if (!shouldLogout) {
       return;
     }
     logout();
+    showToast({ message: 'Logged out successfully', type: 'success' });
     navigate('/');
   };
 
@@ -270,9 +276,13 @@ function MyAccountPage() {
     event.preventDefault();
     setDeleteError('');
 
-    const confirmed = window.confirm(
-      'This will permanently delete your account and sign you out. Your order history will be kept for our records, but you will lose access to it. This cannot be undone.'
-    );
+    const confirmed = await confirm({
+      title: 'Delete account',
+      message:
+        'This will permanently delete your account and sign you out. Your order history will be kept for our records, but you will lose access to it. This cannot be undone.',
+      confirmLabel: 'Yes, delete',
+      tone: 'danger',
+    });
     if (!confirmed) {
       return;
     }
@@ -293,9 +303,12 @@ function MyAccountPage() {
       }
 
       logout();
+      showToast({ message: 'Your account has been deleted', type: 'success' });
       navigate('/', { replace: true });
     } catch (err) {
-      setDeleteError(err.message || 'Unable to delete your account');
+      const message = err.message || 'Unable to delete your account';
+      setDeleteError(message);
+      showToast({ message, type: 'error' });
     } finally {
       setDeleteLoading(false);
     }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { MdDelete, MdExpandMore, MdLanguage, MdEmail, MdPhone } from 'react-icons/md'
+import { useToast } from '../../contexts/ToastContext'
 import PartnershipCommunications from '../components/PartnershipCommunications'
 import '../styles/admin.css'
 
@@ -39,6 +40,7 @@ function formatDate(dateString) {
 }
 
 export const PartnershipManagement = ({ apiUrl, adminToken }) => {
+  const { showToast, confirm } = useToast()
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -121,9 +123,12 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
         ? `\n\nThis will release:\n${domainLines.join('\n')}\n\nThose names can be used again for a new partnership application.`
         : '\n\nAny assigned subdomain or custom domain will be released for reuse.'
 
-      const confirmed = window.confirm(
-        `Reject and permanently remove the partnership application for ${target.company || target.fullName}?${domainNote}\n\nThis cannot be undone.`
-      )
+      const confirmed = await confirm({
+        title: 'Reject application',
+        message: `Reject and permanently remove the partnership application for ${target.company || target.fullName}?${domainNote}\n\nThis cannot be undone.`,
+        confirmLabel: 'Yes, reject',
+        tone: 'danger',
+      })
 
       if (!confirmed) {
         return
@@ -152,6 +157,7 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
         if (expandedId === id) {
           setExpandedId(null)
         }
+        showToast({ message: 'Partnership application removed', type: 'success' })
         return
       }
 
@@ -160,8 +166,11 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
           item.id === id ? { ...item, status: newStatus, updatedAt: data.application.updatedAt } : item
         )
       )
+      showToast({ message: 'Application status updated', type: 'success' })
     } catch (updateError) {
-      setError(updateError.message || 'Failed to update application')
+      const message = updateError.message || 'Failed to update application'
+      setError(message)
+      showToast({ message, type: 'error' })
     } finally {
       setUpdatingId(null)
     }
@@ -179,9 +188,12 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
       ? `\n\nThis will release:\n${domainLines.join('\n')}\n\nThose names can be used again for a new partnership application.`
       : '\n\nAny assigned subdomain or custom domain will be released for reuse.'
 
-    const confirmed = window.confirm(
-      `Permanently delete the partnership application for ${app.company || app.fullName}?${domainNote}\n\nThis cannot be undone.`
-    )
+    const confirmed = await confirm({
+      title: 'Delete application',
+      message: `Permanently delete the partnership application for ${app.company || app.fullName}?${domainNote}\n\nThis cannot be undone.`,
+      confirmLabel: 'Yes, delete',
+      tone: 'danger',
+    })
 
     if (!confirmed) {
       return
@@ -205,8 +217,11 @@ export const PartnershipManagement = ({ apiUrl, adminToken }) => {
       if (expandedId === app.id) {
         setExpandedId(null)
       }
+      showToast({ message: 'Partnership application deleted', type: 'success' })
     } catch (deleteError) {
-      setError(deleteError.message || 'Failed to delete application')
+      const message = deleteError.message || 'Failed to delete application'
+      setError(message)
+      showToast({ message, type: 'error' })
     } finally {
       setDeletingId(null)
     }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import RichTextEditor from '../../components/RichTextEditor'
 import ContentPreviewModal from '../../components/ContentPreviewModal'
+import { useToast } from '../../contexts/ToastContext'
 import { parseJsonResponse } from '../../utils/apiResponse'
 import {
   applyBroadcastMergeTags,
@@ -27,6 +28,7 @@ export const EmailBroadcast = ({
   recipientNoun = 'user',
   excludeField = 'excludeUserIds',
 }) => {
+  const { showToast, confirm } = useToast()
   const buildBroadcastUrl = () => {
     const path = `${apiUrl}${broadcastEndpoint}`;
     if (!authQuery) return path;
@@ -149,9 +151,11 @@ export const EmailBroadcast = ({
       ? `\n\nThis message will be scheduled for: ${scheduleAt}.`
       : ''
 
-    const shouldSend = window.confirm(
-      `Send this email to ${recipientCount} ${recipientNoun}${recipientCount === 1 ? '' : 's'}?${exclusionNote}${scheduleNote}\n\nThis cannot be undone.`
-    )
+    const shouldSend = await confirm({
+      title: scheduleAt ? 'Schedule broadcast' : 'Send broadcast',
+      message: `Send this email to ${recipientCount} ${recipientNoun}${recipientCount === 1 ? '' : 's'}?${exclusionNote}${scheduleNote}\n\nThis cannot be undone.`,
+      confirmLabel: scheduleAt ? 'Yes, schedule' : 'Yes, send',
+    })
     if (!shouldSend) return
 
     setSubmitLoading(true)
@@ -179,17 +183,17 @@ export const EmailBroadcast = ({
       if (data.scheduled) {
         const excludedNote =
           data.excludedCount > 0 ? ` ${data.excludedCount} user(s) will be excluded.` : ''
-        setSuccess(
-          `Broadcast scheduled for ${new Date(data.scheduledFor).toLocaleString()}.${excludedNote}`
-        )
+        const message = `Broadcast scheduled for ${new Date(data.scheduledFor).toLocaleString()}.${excludedNote}`
+        setSuccess(message)
+        showToast({ message, type: 'success' })
       } else {
         const failedNote =
           data.failed > 0 ? ` ${data.failed} recipient(s) failed.` : ''
         const excludedNote =
           data.excludedCount > 0 ? ` ${data.excludedCount} user(s) were excluded.` : ''
-        setSuccess(
-          `Broadcast sent to ${data.sent} of ${data.totalRecipients} user(s).${excludedNote}${failedNote}`
-        )
+        const message = `Broadcast sent to ${data.sent} of ${data.totalRecipients} user(s).${excludedNote}${failedNote}`
+        setSuccess(message)
+        showToast({ message, type: 'success' })
       }
       setSubject('')
       setContent('')
@@ -197,7 +201,9 @@ export const EmailBroadcast = ({
       setExcludeSearch('')
       setScheduleAt('')
     } catch (submitError) {
-      setError(submitError.message || 'Unable to send broadcast email')
+      const message = submitError.message || 'Unable to send broadcast email'
+      setError(message)
+      showToast({ message, type: 'error' })
     } finally {
       setSubmitLoading(false)
     }

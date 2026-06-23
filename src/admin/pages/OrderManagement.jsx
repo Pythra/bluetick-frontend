@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { MdCheckCircle, MdAccessTime, MdCancel } from 'react-icons/md'
+import { useToast } from '../../contexts/ToastContext'
 import { getOrderServiceLabel, orderMatchesServiceSearch } from '../utils/orderServices'
 import OrderTrackingControl from '../../components/OrderTrackingControl'
 import InvoiceModal from '../../components/invoice/InvoiceModal'
@@ -14,6 +15,7 @@ const STATUS_CONFIG = {
 }
 
 export const OrderManagement = ({ users, onUpdateOrder, onUpdateTracking }) => {
+  const { showToast } = useToast()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [expandedOrders, setExpandedOrders] = useState({})
@@ -66,9 +68,13 @@ export const OrderManagement = ({ users, onUpdateOrder, onUpdateTracking }) => {
     setUpdatingOrderId(orderId)
     try {
       await onUpdateOrder?.(orderId, newStatus)
+      showToast({ message: 'Order status updated', type: 'success' })
     } catch (err) {
       console.error('Failed to update order status:', err)
-      window.alert(err.message || 'Failed to update order status')
+      showToast({
+        message: err.message || 'Failed to update order status',
+        type: 'error',
+      })
     } finally {
       setUpdatingOrderId(null)
     }

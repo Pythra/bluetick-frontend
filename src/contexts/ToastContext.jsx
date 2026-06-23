@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
 import AppToast from '../components/AppToast';
+import ConfirmModal from '../components/ConfirmModal';
 
 const ToastContext = createContext(null);
 
@@ -11,9 +12,16 @@ export const useToast = () => {
   return context;
 };
 
+export const useConfirm = () => {
+  const { confirm } = useToast();
+  return confirm;
+};
+
 export const ToastProvider = ({ children }) => {
   const [toast, setToast] = useState(null);
+  const [confirmState, setConfirmState] = useState(null);
   const timerRef = useRef(null);
+  const confirmResolverRef = useRef(null);
 
   const hideToast = useCallback(() => {
     if (timerRef.current) {
@@ -43,9 +51,49 @@ export const ToastProvider = ({ children }) => {
     []
   );
 
+  const closeConfirm = useCallback((result) => {
+    confirmResolverRef.current?.(result);
+    confirmResolverRef.current = null;
+    setConfirmState(null);
+  }, []);
+
+  const confirm = useCallback(
+    ({
+      title = 'Please confirm',
+      message = '',
+      confirmLabel = 'Yes',
+      cancelLabel = 'Cancel',
+      tone = 'default',
+    }) =>
+      new Promise((resolve) => {
+        confirmResolverRef.current = resolve;
+        setConfirmState({
+          title,
+          message,
+          confirmLabel,
+          cancelLabel,
+          tone,
+          id: Date.now(),
+        });
+      }),
+    []
+  );
+
   return (
-    <ToastContext.Provider value={{ showToast, hideToast }}>
+    <ToastContext.Provider value={{ showToast, hideToast, confirm }}>
       {children}
+      {confirmState ? (
+        <ConfirmModal
+          key={confirmState.id}
+          title={confirmState.title}
+          message={confirmState.message}
+          confirmLabel={confirmState.confirmLabel}
+          cancelLabel={confirmState.cancelLabel}
+          tone={confirmState.tone}
+          onConfirm={() => closeConfirm(true)}
+          onCancel={() => closeConfirm(false)}
+        />
+      ) : null}
       {toast ? (
         <AppToast
           key={toast.id}

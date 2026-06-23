@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { Sidebar } from './components/layout/Sidebar'
 import { Header } from './components/layout/Header'
+import { useToast } from '../contexts/ToastContext'
 import { Dashboard } from './pages/Dashboard'
 import { UserManagement } from './pages/UserManagement'
 import { CartManagement } from './pages/CartManagement'
@@ -22,6 +23,7 @@ import './styles/partnerDashboard.css'
 
 function AdminApp() {
   const { apiUrl } = useAuth()
+  const { showToast, confirm } = useToast()
   const partnerSubdomain = useMemo(() => getPartnerSubdomainFromHost(), [])
 
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -38,9 +40,12 @@ function AdminApp() {
   const [saveMessage, setSaveMessage] = useState(null)
   const [adminToken, setAdminToken] = useState(localStorage.getItem('adminToken'))
 
-  const handleLogout = useCallback((requireConfirmation = true) => {
+  const handleLogout = useCallback(async (requireConfirmation = true) => {
     if (requireConfirmation) {
-      const shouldLogout = window.confirm('Are you sure you want to log out?')
+      const shouldLogout = await confirm({
+        title: 'Log out',
+        message: 'Are you sure you want to log out?',
+      })
       if (!shouldLogout) {
         return
       }
@@ -52,7 +57,8 @@ function AdminApp() {
     setUsers([])
     setActiveTab('dashboard')
     setLoginData({ username: '', password: '' })
-  }, [])
+    showToast({ message: 'Logged out successfully', type: 'success' })
+  }, [confirm, showToast])
 
   const fetchUsers = useCallback(async () => {
     if (!adminToken) return

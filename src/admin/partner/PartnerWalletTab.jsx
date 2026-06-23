@@ -12,8 +12,10 @@ import {
   getPayoutMethodFields,
 } from '../../data/partnerPayoutMethods';
 import { formatAmount } from '../../data/partnerServiceCatalog';
+import { useToast } from '../../contexts/ToastContext';
 
 export default function PartnerWalletTab({ api, onMessage }) {
+  const { showToast, confirm } = useToast();
   const [earningsData, setEarningsData] = useState(null);
   const [withdrawals, setWithdrawals] = useState([]);
   const [payoutData, setPayoutData] = useState(null);
@@ -99,7 +101,13 @@ export default function PartnerWalletTab({ api, onMessage }) {
 
   const handleDeleteMethod = async (methodId) => {
     if (!methodId) return;
-    if (!window.confirm('Remove this payout method?')) return;
+    const confirmed = await confirm({
+      title: 'Remove payout method',
+      message: 'Remove this payout method?',
+      confirmLabel: 'Yes, remove',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
 
     try {
       setDeletingMethodId(methodId);
@@ -109,9 +117,12 @@ export default function PartnerWalletTab({ api, onMessage }) {
         setSelectedMethodId('');
       }
       showFeedback({ type: 'success', text: 'Payout method removed.' });
+      showToast({ message: 'Payout method removed', type: 'success' });
       await load();
     } catch (err) {
-      showFeedback({ type: 'error', text: err.message || 'Failed to remove payout method.' });
+      const message = err.message || 'Failed to remove payout method.';
+      showFeedback({ type: 'error', text: message });
+      showToast({ message, type: 'error' });
     } finally {
       setDeletingMethodId('');
     }

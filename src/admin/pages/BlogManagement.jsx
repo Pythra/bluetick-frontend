@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import RichTextEditor from '../../components/RichTextEditor'
 import ContentPreviewModal from '../../components/ContentPreviewModal'
+import { useToast } from '../../contexts/ToastContext'
 import { formatBlogDate } from '../../data/blogPosts'
 import '../../pages/BlogPage.css'
 import '../components/AdminBlogPostsGrid.css'
@@ -28,6 +29,7 @@ export const BlogManagement = ({
   authQuery = '',
   defaultAuthor = 'Bluetick Editorial',
 }) => {
+  const { showToast, confirm } = useToast()
   const buildBlogUrl = (suffix = '') => {
     const path = `${apiUrl}${apiBasePath}${suffix}`;
     if (!authQuery) return path;
@@ -211,7 +213,12 @@ export const BlogManagement = ({
   }
 
   const handleDeletePost = async (post) => {
-    const shouldDelete = window.confirm(`Delete "${post.title}"? This action cannot be undone.`)
+    const shouldDelete = await confirm({
+      title: 'Delete blog post',
+      message: `Delete "${post.title}"? This action cannot be undone.`,
+      confirmLabel: 'Yes, delete',
+      tone: 'danger',
+    })
     if (!shouldDelete) return
 
     setError('')
@@ -233,9 +240,12 @@ export const BlogManagement = ({
         handleCancelEdit()
       }
       setSuccess('Blog post deleted successfully.')
+      showToast({ message: 'Blog post deleted successfully', type: 'success' })
       await loadPosts()
     } catch (deleteError) {
-      setError(deleteError.message || 'Unable to delete blog post')
+      const message = deleteError.message || 'Unable to delete blog post'
+      setError(message)
+      showToast({ message, type: 'error' })
     }
   }
 

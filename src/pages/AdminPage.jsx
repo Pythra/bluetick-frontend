@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import Button from '../components/Button';
 import './AdminPage.css';
 
 function AdminPage() {
   const { apiUrl } = useAuth();
+  const { showToast, confirm } = useToast();
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginData, setLoginData] = useState({ username: '', password: '' });
@@ -65,9 +67,12 @@ function AdminPage() {
     }
   };
 
-  const handleLogout = (requireConfirmation = true) => {
+  const handleLogout = async (requireConfirmation = true) => {
     if (requireConfirmation) {
-      const shouldLogout = window.confirm('Are you sure you want to log out?');
+      const shouldLogout = await confirm({
+        title: 'Log out',
+        message: 'Are you sure you want to log out?',
+      });
       if (!shouldLogout) {
         return;
       }
@@ -77,6 +82,7 @@ function AdminPage() {
     setAdminToken(null);
     setIsLoggedIn(false);
     setUsers([]);
+    showToast({ message: 'Logged out successfully', type: 'success' });
   };
 
   const fetchUsers = useCallback(async () => {

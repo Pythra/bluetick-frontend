@@ -27,6 +27,7 @@ import {
 } from 'react-icons/md';
 import SectionContentEditor from './components/SectionContentEditor';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { createPartnerAdminApi } from './partner/partnerAdminApi';
 import PartnerDashboardTab from './partner/PartnerDashboardTab';
 import PartnerServicesTab from './partner/PartnerServicesTab';
@@ -118,6 +119,7 @@ function buildEmptyDraft(siteConfig = {}) {
 
 function PartnerAdminApp({ subdomain }) {
   const { apiUrl } = useAuth();
+  const { showToast, confirm } = useToast();
   const tokenKey = `partnerAdminToken:${subdomain}`;
 
   const [token, setToken] = useState(() => localStorage.getItem(tokenKey));
@@ -177,9 +179,17 @@ function PartnerAdminApp({ subdomain }) {
     setError(null);
   }, [tokenKey]);
 
-  const handleLogout = useCallback(() => {
+  const handleLogout = useCallback(async () => {
+    const shouldLogout = await confirm({
+      title: 'Log out',
+      message: 'Are you sure you want to log out?',
+    });
+    if (!shouldLogout) {
+      return;
+    }
     clearPartnerSession();
-  }, [clearPartnerSession]);
+    showToast({ message: 'Logged out successfully', type: 'success' });
+  }, [clearPartnerSession, confirm, showToast]);
 
   const handlePartnerSiteMissing = useCallback((message) => {
     clearPartnerSession();
