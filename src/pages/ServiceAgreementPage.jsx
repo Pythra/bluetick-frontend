@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import AgreementSignaturePad from '../components/agreements/AgreementSignaturePad';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { printAgreementHtml } from '../utils/printAgreement';
+import AgreementPrintModal from '../components/agreements/AgreementPrintModal';
 import './ServiceAgreementPage.css';
 
 const CONFIRMATIONS = [
@@ -30,6 +30,15 @@ function getSignValidationError({ allConfirmed, method, signatureData, typedName
   return '';
 }
 
+function formatAgreementError(message = '') {
+  const text = String(message || '').trim();
+  if (!text) return 'Something went wrong. Please try again.';
+  if (/unsupported number:\s*NaN/i.test(text)) {
+    return 'Agreement signing failed while generating the PDF. Please try again — your signature has not been saved yet.';
+  }
+  return text;
+}
+
 export default function ServiceAgreementPage() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
@@ -38,24 +47,23 @@ export default function ServiceAgreementPage() {
   const { showToast } = useToast();
   const [agreement, setAgreement] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [method, setMethod] = useState('draw');
   const [signatureData, setSignatureData] = useState('');
   const [typedName, setTypedName] = useState('');
   const [confirmations, setConfirmations] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [signAttempted, setSignAttempted] = useState(false);
+  const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
   const signCardRef = useRef(null);
   const iframeRef = useRef(null);
 
   const loadAgreement = useCallback(async () => {
     if (!orderId) {
-      setError('Order ID is required.');
+      showToast({ message: 'Order ID is required.', type: 'error' });
       setLoading(false);
       return;
     }
     setLoading(true);
-    setError('');
     try {
       const response = await authFetch(`${apiUrl}/api/orders/${orderId}/agreement`);
       const data = await response.json();
@@ -67,11 +75,14 @@ export default function ServiceAgreementPage() {
         navigate(data.onboardingUrl || `/project-onboarding?orderId=${orderId}`, { replace: true });
       }
     } catch (loadError) {
-      setError(loadError.message || 'Unable to load agreement');
+      showToast({
+        message: formatAgreementError(loadError.message || 'Unable to load agreement'),
+        type: 'error',
+      });
     } finally {
       setLoading(false);
     }
-  }, [apiUrl, authFetch, navigate, orderId]);
+  }, [apiUrl, authFetch, navigate, orderId, showToast]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -98,7 +109,7 @@ export default function ServiceAgreementPage() {
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       const height = doc?.documentElement?.scrollHeight || doc?.body?.scrollHeight;
       if (height && Number.isFinite(height)) {
-        iframe.style.height = `${Math.max(height + 24, 900)}px`;
+        iframe.style.height = `${Math.max(height + 24, 520)}px`;
       }
     } catch {
       iframe.style.height = '900px';
@@ -108,6 +119,16 @@ export default function ServiceAgreementPage() {
   useEffect(() => {
     resizeAgreementFrame();
   }, [agreement?.renderedHtml, resizeAgreementFrame]);
+
+  useEffect(() => {
+    const onMessage = (event) => {
+      if (event?.data?.type === 'agreement-resize') {
+        resizeAgreementFrame();
+      }
+    };
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [resizeAgreementFrame]);
 
   const scrollToSignSection = () => {
     signCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -126,25 +147,18 @@ export default function ServiceAgreementPage() {
       showToast({ message: 'Agreement content is not available to print yet.', type: 'error' });
       return;
     }
-    const opened = printAgreementHtml(
-      agreement.renderedHtml,
-      agreement.agreementNumber || 'Service Agreement'
-    );
-    if (!opened) {
-      showToast({ message: 'Please allow pop-ups to print the agreement.', type: 'error' });
-    }
+    setPrintPreviewOpen(true);
   };
 
   const handleSign = async () => {
     setSignAttempted(true);
     if (signValidationError) {
-      setError(signValidationError);
+      showToast({ message: signValidationError, type: 'error' });
       scrollToSignSection();
       return;
     }
 
     setSubmitting(true);
-    setError('');
     try {
       const response = await authFetch(`${apiUrl}/api/orders/${orderId}/agreement/sign`, {
         method: 'POST',
@@ -165,11 +179,16 @@ export default function ServiceAgreementPage() {
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to sign agreement');
       }
-      showToast({ message: 'Agreement signed successfully.', type: 'success' });
+      showToast({
+        message: data.pdfWarning || 'Agreement signed successfully.',
+        type: data.pdfWarning ? 'info' : 'success',
+      });
       navigate(data.redirectUrl || `/project-onboarding?orderId=${orderId}`, { replace: true });
     } catch (signError) {
-      const message = signError.message || 'Unable to sign agreement';
-      setError(message);
+      showToast({
+        message: formatAgreementError(signError.message || 'Unable to sign agreement'),
+        type: 'error',
+      });
       scrollToSignSection();
     } finally {
       setSubmitting(false);
@@ -179,7 +198,6 @@ export default function ServiceAgreementPage() {
   const handleDecline = async () => {
     const reason = window.prompt('Optional reason for declining this agreement:') || '';
     setSubmitting(true);
-    setError('');
     try {
       const response = await authFetch(`${apiUrl}/api/orders/${orderId}/agreement/decline`, {
         method: 'POST',
@@ -191,8 +209,12 @@ export default function ServiceAgreementPage() {
         throw new Error(data.error || 'Failed to decline agreement');
       }
       setAgreement(data.agreement);
+      showToast({ message: 'Agreement declined.', type: 'info' });
     } catch (declineError) {
-      setError(declineError.message || 'Unable to decline agreement');
+      showToast({
+        message: formatAgreementError(declineError.message || 'Unable to decline agreement'),
+        type: 'error',
+      });
     } finally {
       setSubmitting(false);
     }
@@ -211,47 +233,15 @@ export default function ServiceAgreementPage() {
         </div>
 
         {loading ? <p>Loading agreement…</p> : null}
-        {error ? <div className="agreement-locked-banner" role="alert">{error}</div> : null}
 
         {agreement ? (
           <>
-            <div className="agreement-meta-grid">
-              <div className="agreement-meta-block">
-                <h3>Client</h3>
-                <p><strong>{agreement.clientDetails?.name}</strong></p>
-                <p>{agreement.clientDetails?.email}</p>
-                <p>{agreement.clientDetails?.phone || '—'}</p>
-                <p>{agreement.clientDetails?.country || '—'}</p>
-              </div>
-              <div className="agreement-meta-block">
-                <h3>Order</h3>
-                <p>Agreement: <strong>{agreement.agreementNumber}</strong></p>
-                <p>Order: <strong>{agreement.orderDetails?.orderNumber}</strong></p>
-                <p>Invoice: <strong>{agreement.orderDetails?.invoiceNumber}</strong></p>
-                <p>Service: {agreement.orderDetails?.services}</p>
-                <p>Amount: <strong>{agreement.orderDetails?.amountPaid}</strong></p>
-                {agreement.orderDetails?.deliveryItems?.length ? (
-                  <div className="agreement-delivery-summary">
-                    <h4>Estimated delivery</h4>
-                    <ul>
-                      {agreement.orderDetails.deliveryItems.map((item) => (
-                        <li key={`${item.packageId || item.displayTitle}-${item.delivery}`}>
-                          <span>{item.displayTitle || item.title}</span>
-                          <strong>{item.delivery}</strong>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-
             <div className="agreement-document-card">
               <div className="agreement-document-toolbar">
                 <h2>Agreement document</h2>
                 {agreement.renderedHtml ? (
                   <button type="button" className="agreement-secondary-btn" onClick={handlePrint}>
-                    Print agreement
+                    Print / Save PDF
                   </button>
                 ) : null}
               </div>
@@ -319,7 +309,9 @@ export default function ServiceAgreementPage() {
                 </div>
 
                 {signAttempted && signValidationError && !submitting ? (
-                  <p className="agreement-sign-hint" role="status">{signValidationError}</p>
+                  <p className="agreement-sign-hint" role="status">
+                    {signValidationError}
+                  </p>
                 ) : null}
 
                 <div className="agreement-actions">
@@ -344,11 +336,15 @@ export default function ServiceAgreementPage() {
                   Download Signed PDF
                 </a>
                 <button type="button" className="agreement-secondary-btn" onClick={handlePrint}>
-                  Print Agreement
+                  Print / Save PDF
                 </button>
               </div>
             ) : null}
           </>
+        ) : null}
+
+        {printPreviewOpen && agreement ? (
+          <AgreementPrintModal agreement={agreement} onClose={() => setPrintPreviewOpen(false)} />
         ) : null}
       </main>
       <Footer />

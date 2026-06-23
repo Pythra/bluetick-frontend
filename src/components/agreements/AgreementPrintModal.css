@@ -1,0 +1,31 @@
+.agreement-print-modal {
+  max-width: 920px;
+}
+
+.agreement-print-modal__body {
+  background: #cbd5e1;
+  padding: 16px;
+}
+
+.agreement-print-modal__body .agreement-a4-sheet {
+  margin: 0 auto;
+}
+
+@media print {
+  .agreement-print-backdrop,
+  .agreement-print-modal .invoice-modal__toolbar {
+    display: none !important;
+  }
+
+  .agreement-print-modal {
+    box-shadow: none;
+    border: none;
+    max-width: none;
+    width: 100%;
+  }
+
+  .agreement-print-modal__body {
+    background: #fff;
+    padding: 0;
+  }
+}

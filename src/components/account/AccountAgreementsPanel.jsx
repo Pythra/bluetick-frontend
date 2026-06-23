@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { IoDocumentTextOutline, IoDownloadOutline, IoPrintOutline } from 'react-icons/io5';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { printAgreementHtml } from '../../utils/printAgreement';
+import AgreementPrintModal from '../agreements/AgreementPrintModal';
 import Button from '../Button';
 
 const STATUS_LABELS = {
@@ -39,6 +39,7 @@ export default function AccountAgreementsPanel() {
   const [agreements, setAgreements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [printAgreement, setPrintAgreement] = useState(null);
 
   const loadAgreements = useCallback(async () => {
     setLoading(true);
@@ -62,13 +63,11 @@ export default function AccountAgreementsPanel() {
   }, [loadAgreements]);
 
   const handlePrint = (agreement) => {
-    const opened = printAgreementHtml(
-      agreement.renderedHtml,
-      agreement.agreementNumber || 'Service Agreement'
-    );
-    if (!opened) {
-      showToast({ message: 'Please allow pop-ups to print agreements', type: 'error' });
+    if (!agreement?.renderedHtml) {
+      showToast({ message: 'Agreement content is not available to print yet.', type: 'error' });
+      return;
     }
+    setPrintAgreement(agreement);
   };
 
   const handleDecline = async (agreement) => {
@@ -210,6 +209,10 @@ export default function AccountAgreementsPanel() {
           })}
         </ul>
       )}
+
+      {printAgreement ? (
+        <AgreementPrintModal agreement={printAgreement} onClose={() => setPrintAgreement(null)} />
+      ) : null}
     </section>
   );
 }
