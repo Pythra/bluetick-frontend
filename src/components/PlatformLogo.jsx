@@ -1,18 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useMainSiteMedia } from '../contexts/MainSiteMediaContext';
 import {
   getPublicationPlatformLogo,
   getPublicationPlatformLogoFallback,
 } from '../utils/publicationPlatformLogos';
 
-function PlatformLogo({ platform, className = 'package-platform-logo' }) {
-  const primary = getPublicationPlatformLogo(platform);
+function PlatformLogo({ platform, categoryId = null, className = 'package-platform-logo' }) {
+  const { getPublicationCategoryPlatformLogo } = useMainSiteMedia();
+
+  const primary = useMemo(() => {
+    const adminLogo = categoryId ? getPublicationCategoryPlatformLogo(categoryId, platform?.name) : null;
+    if (adminLogo) return adminLogo;
+    if (platform?.logo) return platform.logo;
+    return getPublicationPlatformLogo(platform);
+  }, [categoryId, getPublicationCategoryPlatformLogo, platform]);
+
   const [src, setSrc] = useState(primary);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    setSrc(getPublicationPlatformLogo(platform));
+    setSrc(primary);
     setFailed(false);
-  }, [platform]);
+  }, [primary]);
 
   if (!src || failed) {
     return null;

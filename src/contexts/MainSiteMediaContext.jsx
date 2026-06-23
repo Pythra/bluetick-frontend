@@ -12,6 +12,7 @@ const MainSiteMediaContext = createContext({
   getServiceImage: (_slot, fallback) => fallback,
   getPublicationCarouselLogos: () => DEFAULT_PUBLICATION_CAROUSEL_LOGOS,
   getPublicationCategoryLogos: (_categoryId, fallback = []) => fallback,
+  getPublicationCategoryPlatformLogo: (_categoryId, _platformName) => null,
 });
 
 export function MainSiteMediaProvider({ children }) {
@@ -84,6 +85,21 @@ export function MainSiteMediaProvider({ children }) {
     }));
   }, [isPartnerSite, media]);
 
+  const getPublicationCategoryPlatformLogo = useCallback(
+    (categoryId, platformName) => {
+      if (isPartnerSite || !categoryId || !platformName) return null;
+      const configured = media?.publicationCategoryLogos?.[categoryId];
+      if (!Array.isArray(configured)) return null;
+
+      const key = String(platformName).trim().toLowerCase();
+      const match = configured.find(
+        (logo) => String(logo?.name || '').trim().toLowerCase() === key && logo?.imageUrl
+      );
+      return match?.imageUrl || null;
+    },
+    [isPartnerSite, media]
+  );
+
   const getPublicationCategoryLogos = useCallback(
     (categoryId, fallback = []) => {
       if (isPartnerSite) return fallback;
@@ -124,8 +140,16 @@ export function MainSiteMediaProvider({ children }) {
       getServiceImage,
       getPublicationCarouselLogos,
       getPublicationCategoryLogos,
+      getPublicationCategoryPlatformLogo,
     }),
-    [loaded, media, getServiceImage, getPublicationCarouselLogos, getPublicationCategoryLogos]
+    [
+      loaded,
+      media,
+      getServiceImage,
+      getPublicationCarouselLogos,
+      getPublicationCategoryLogos,
+      getPublicationCategoryPlatformLogo,
+    ]
   );
 
   return <MainSiteMediaContext.Provider value={value}>{children}</MainSiteMediaContext.Provider>;

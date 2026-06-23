@@ -8,18 +8,20 @@ import PublicationArticleAddons from '../components/PublicationArticleAddons';
 import Button from '../components/Button';
 import PlatformLogo from '../components/PlatformLogo';
 import { IoCheckmarkCircle, IoTime } from 'react-icons/io5';
-import { getPublicationPlatformLogo } from '../utils/publicationPlatformLogos';
 import {
   getPublicationCategoryPlatforms,
   PUBLICATION_PACKAGE_DETAILS,
   resolvePublicationPlatformPrice,
 } from '../utils/publicationPricing';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteMedia } from '../contexts/MainSiteMediaContext';
+import { getPublicationPlatformLogo } from '../utils/publicationPlatformLogos';
 import './PublicationServicesPage.editorial.css';
 import './PackageDetailPage.css';
 
 function PublicationPlatformCard({ categoryId, platform, onAddToCart }) {
   const { isPartnerSite, packagePricing } = usePartnerBranding();
+  const { getPublicationCategoryPlatformLogo } = useMainSiteMedia();
   const { format } = useCurrency();
   const { packageId, priceValue } = resolvePublicationPlatformPrice({
     categoryId,
@@ -28,13 +30,13 @@ function PublicationPlatformCard({ categoryId, platform, onAddToCart }) {
     packagePricing,
     isPartnerSite,
   });
-  const platformForLogo = { name: platform.name, logo: getPublicationPlatformLogo({ name: platform.name }) };
-  const hasLogo = Boolean(platformForLogo.logo);
+  const adminLogo = !isPartnerSite ? getPublicationCategoryPlatformLogo(categoryId, platform.name) : null;
+  const hasLogo = Boolean(adminLogo || getPublicationPlatformLogo({ name: platform.name }));
 
   return (
     <article className="package-platform-card">
       <div className="package-platform-media">
-        {hasLogo ? <PlatformLogo platform={platformForLogo} /> : null}
+        {hasLogo ? <PlatformLogo platform={{ name: platform.name }} categoryId={categoryId} /> : null}
         <h3 className="package-platform-name">{platform.name}</h3>
       </div>
       <footer className="package-platform-footer">
