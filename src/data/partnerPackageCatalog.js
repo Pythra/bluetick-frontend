@@ -200,6 +200,9 @@ const websitePackages = [
 
 const PUB = 'PR & Media Publications';
 const publicationAddons = [
+  pkg('publication.content-formats', 'publication', 'publication-addons', 'Publication add-ons', PUB, 'Article content formats', 100000),
+  pkg('publication.full-enhancement', 'publication', 'publication-addons', 'Publication add-ons', PUB, 'Full article enhancement', 250000),
+  pkg('publication.copywriting', 'publication', 'publication-addons', 'Publication add-ons', PUB, 'Professional copywriting', 40000),
   pkg('publication.backdate', 'publication', 'publication-addons', 'Publication add-ons', PUB, 'Backdating an article', 50000),
   pkg('publication.links', 'publication', 'publication-addons', 'Publication add-ons', PUB, 'Including links in an article', 100000),
   pkg('publication.reputation', 'publication', 'publication-addons', 'Publication add-ons', PUB, 'Deleting an existing article', 500000),

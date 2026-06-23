@@ -4,6 +4,8 @@ import SectionHeader from './SectionHeader';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import appHeroImage from '../assets/app.png';
 import { usePartnerAsset } from '../utils/partnerMedia';
+import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import PartnerMediaFrame from './PartnerMediaFrame';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
@@ -12,7 +14,10 @@ import './AppServicesSection.css';
 function AppServicesSummary() {
   const navigate = useNavigate();
   const section = usePartnerSectionContent('appDevelopment');
-  const { src: appImageSrc } = usePartnerAsset('appDevelopmentImage', appHeroImage);
+  const { isPartnerSite } = usePartnerBranding();
+  const { src: partnerImageSrc } = usePartnerAsset('appDevelopmentImage', appHeroImage);
+  const mainSiteImageSrc = useMainSiteServiceImage('appDevelopmentImage', appHeroImage);
+  const appImageSrc = isPartnerSite ? partnerImageSrc : mainSiteImageSrc;
 
   return (
     <section id="app-services" className="app-services-section app-services-summary services-summary-layout">

@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { createBrowserHistory } from 'history';
 import { AuthProvider } from './contexts/AuthContext';
 import { PartnerBrandingProvider, usePartnerBranding } from './contexts/PartnerBrandingContext';
+import { MainSiteMediaProvider } from './contexts/MainSiteMediaContext';
 import { CartProvider } from './contexts/CartContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { CurrencyProvider } from './contexts/CurrencyContext';
@@ -40,6 +41,8 @@ import MyAccountPage from './pages/MyAccountPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ArticleSubmissionPage from './pages/ArticleSubmissionPage';
 import ProjectOnboardingPage from './pages/ProjectOnboardingPage';
+import ServiceAgreementPage from './pages/ServiceAgreementPage';
+import VerifyAgreementPage from './pages/VerifyAgreementPage';
 import AdminPage from './pages/AdminPage';
 import AdminApp from './admin/AdminApp';
 import Footer from './components/Footer';
@@ -279,6 +282,7 @@ function App() {
   return (
     <AuthProvider>
       <PartnerBrandingProvider>
+      <MainSiteMediaProvider>
       <PartnerBrandingGate>
       <CurrencyProvider>
         <ToastProvider>
@@ -308,6 +312,8 @@ function App() {
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/article-submission" element={<ArticleSubmissionPage />} />
               <Route path="/project-onboarding" element={<ProjectOnboardingPage />} />
+              <Route path="/service-agreement" element={<ServiceAgreementPage />} />
+              <Route path="/verify-agreement/:token" element={<VerifyAgreementPage />} />
               <Route path="/admin" element={<AdminApp />} />
               <Route path="/admin-dashboard" element={<AdminApp />} />
               <Route path="/terms" element={<TermsAndConditions />} />
@@ -330,6 +336,7 @@ function App() {
         </ToastProvider>
       </CurrencyProvider>
       </PartnerBrandingGate>
+      </MainSiteMediaProvider>
       </PartnerBrandingProvider>
     </AuthProvider>
   );

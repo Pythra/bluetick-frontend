@@ -3,17 +3,10 @@ import {
   IoLogoFacebook,
   IoLogoTwitter,
 } from 'react-icons/io5';
-import punchLogo from '../assets/punch.png';
 import playStoreBadge from '../assets/play.png';
 import appStoreBadge from '../assets/appstore.png';
-import guardianLogo from '../assets/guardian.png';
-import businessDayLogo from '../assets/platforms/buisnessday.png';
-import cableLogo from '../assets/platforms/cable.jpg';
-import dailyPostLogo from '../assets/platforms/dailypost.jpg';
-import nairametricsLogo from '../assets/platforms/nairametrics.png';
-import techCabalLogo from '../assets/platforms/techcabal.png';
-import vanguardLogo from '../assets/platforms/Vanguard.png';
 import { amazonMusicLogo, boomplayLogo } from '../assets/streamingBrandLogos';
+import { useMainSiteMedia } from '../contexts/MainSiteMediaContext';
 import './PublicationLogosCarousel.css';
 
 const platformCarouselItems = [
@@ -91,16 +84,12 @@ function PublicationLogosCarousel({
   className = '',
   includePlatformBadges = false,
 }) {
-  const publicationLogos = [
-    { type: 'image', name: 'Punch', image: punchLogo },
-    { type: 'image', name: 'Guardian', image: guardianLogo },
-    { type: 'image', name: 'BusinessDay', image: businessDayLogo },
-    { type: 'image', name: 'The Cable', image: cableLogo },
-    { type: 'image', name: 'Daily Post', image: dailyPostLogo },
-    { type: 'image', name: 'Nairametrics', image: nairametricsLogo },
-    { type: 'image', name: 'TechCabal', image: techCabalLogo },
-    { type: 'image', name: 'Vanguard', image: vanguardLogo },
-  ];
+  const { getPublicationCarouselLogos } = useMainSiteMedia();
+  const publicationLogos = getPublicationCarouselLogos().map((logo) => ({
+    type: 'image',
+    name: logo.name,
+    image: logo.image,
+  }));
 
   const carouselItems = includePlatformBadges
     ? mergeCarouselItems(publicationLogos, platformCarouselItems)

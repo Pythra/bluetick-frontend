@@ -454,14 +454,22 @@ export default function PartnerMessagesTab({
             <button
               key={t.threadId}
               type="button"
-              className={`pdash-thread-item${activeThread?.threadId === t.threadId ? ' active' : ''}`}
+              className={`pdash-thread-item${activeThread?.threadId === t.threadId ? ' active' : ''}${t.unreadCount ? ' unread' : ''}`}
               onClick={() => openThread(t.threadId)}
             >
-              <strong>
-                {t.channel === 'partner-admin'
-                  ? 'Bluetickgeng Support'
-                  : t.participantName || t.participantEmail || 'Conversation'}
-              </strong>
+              <div className="pdash-thread-item-top">
+                <strong>
+                  {t.channel === 'partner-admin'
+                    ? 'Bluetickgeng Support'
+                    : t.participantName || t.participantEmail || 'Conversation'}
+                </strong>
+                {t.unreadCount ? (
+                  <span className="admin-messages-drawer-unread">{t.unreadCount}</span>
+                ) : null}
+              </div>
+              {t.orderNumber ? (
+                <span className="pdash-thread-badge">{t.orderNumber}</span>
+              ) : null}
               {t.channel === 'partner-admin' ? (
                 <span className="pdash-thread-badge">Platform</span>
               ) : null}

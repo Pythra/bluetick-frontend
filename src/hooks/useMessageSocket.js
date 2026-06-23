@@ -12,6 +12,7 @@ function buildSocketUrl(apiUrl, token, subdomain) {
 
 export default function useMessageSocket({ apiUrl, token, subdomain, enabled = true, onEvent }) {
   const handlerRef = useRef(onEvent);
+  const socketRef = useRef(null);
   handlerRef.current = onEvent;
 
   useEffect(() => {
@@ -22,15 +23,22 @@ export default function useMessageSocket({ apiUrl, token, subdomain, enabled = t
     let active = true;
     let socket;
     let retryTimer;
+    let pingTimer;
 
     const connect = () => {
       if (!active) return;
       socket = new WebSocket(buildSocketUrl(apiUrl, token, subdomain));
+      socketRef.current = socket;
 
       socket.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
-          if (payload.type === 'message:new') {
+          if (
+            payload.type === 'message:new' ||
+            payload.type === 'typing:start' ||
+            payload.type === 'typing:stop' ||
+            payload.type === 'message:read'
+          ) {
             handlerRef.current?.(payload);
           }
         } catch {
@@ -38,7 +46,17 @@ export default function useMessageSocket({ apiUrl, token, subdomain, enabled = t
         }
       };
 
+      socket.onopen = () => {
+        pingTimer = window.setInterval(() => {
+          if (socket.readyState === 1) {
+            socket.send(JSON.stringify({ type: 'presence:ping' }));
+          }
+        }, 30000);
+      };
+
       socket.onclose = () => {
+        window.clearInterval(pingTimer);
+        socketRef.current = null;
         if (!active) return;
         retryTimer = window.setTimeout(connect, 4000);
       };
@@ -49,7 +67,18 @@ export default function useMessageSocket({ apiUrl, token, subdomain, enabled = t
     return () => {
       active = false;
       window.clearTimeout(retryTimer);
+      window.clearInterval(pingTimer);
+      socketRef.current = null;
       socket?.close();
     };
   }, [apiUrl, token, subdomain, enabled]);
+
+  const sendEvent = (payload) => {
+    const socket = socketRef.current;
+    if (socket?.readyState === 1) {
+      socket.send(JSON.stringify(payload));
+    }
+  };
+
+  return { sendEvent };
 }

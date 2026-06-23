@@ -101,6 +101,10 @@ function ArticleSubmissionPage() {
         if (data.order.paymentStatus !== 'paid') {
           throw new Error('This order is still awaiting payment confirmation.');
         }
+        if (data.order.onboardingLocked || (data.order.agreement && !data.order.agreementSigned)) {
+          navigate(`/service-agreement?orderId=${orderIdFromQuery}`, { replace: true });
+          return;
+        }
         if (!cancelled) {
           setOrderFromLink(data.order);
           const pubs = data.order.publicationItems || [];
@@ -130,7 +134,7 @@ function ArticleSubmissionPage() {
     return () => {
       cancelled = true;
     };
-  }, [orderIdFromQuery, isAuthenticated, apiUrl, authFetch]);
+  }, [orderIdFromQuery, isAuthenticated, apiUrl, authFetch, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

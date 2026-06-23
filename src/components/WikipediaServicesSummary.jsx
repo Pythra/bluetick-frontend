@@ -3,6 +3,8 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import wikipediaHeroImage from '../assets/global.jpg';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './WikipediaServicesSummary.css';
@@ -11,6 +13,9 @@ import './ServicesSummaryHero.css';
 function WikipediaServicesSummary() {
   const navigate = useNavigate();
   const section = usePartnerSectionContent('wikipedia');
+  const { isPartnerSite } = usePartnerBranding();
+  const wikipediaImageSrc = useMainSiteServiceImage('wikipediaImage', wikipediaHeroImage);
+  const heroImageSrc = isPartnerSite ? wikipediaHeroImage : wikipediaImageSrc;
 
   return (
     <section id="wikipedia-services" className="wikipedia-services-section wikipedia-services-summary services-summary-layout">
@@ -27,7 +32,7 @@ function WikipediaServicesSummary() {
         media={(
           <div className="services-summary-hero-shell">
             <img
-              src={wikipediaHeroImage}
+              src={heroImageSrc}
               alt="Wikipedia page services"
               className="services-summary-hero-image"
             />

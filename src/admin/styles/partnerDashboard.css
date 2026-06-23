@@ -1451,6 +1451,17 @@
   background: rgba(var(--brand-primary-rgb, 37, 99, 235), 0.08);
 }
 
+.pdash-thread-item.unread {
+  background: #fffbeb;
+}
+
+.pdash-thread-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .pdash-thread-item span {
   display: block;
   font-size: 0.8rem;

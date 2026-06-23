@@ -118,7 +118,7 @@ function CheckoutPage() {
 
   const redirectAfterPaymentSuccess = useCallback(
     (orderId) => {
-      navigate(`/project-onboarding?orderId=${orderId}`, {
+      navigate(`/service-agreement?orderId=${orderId}`, {
         state: { orderId, paymentSuccess: true },
       });
     },

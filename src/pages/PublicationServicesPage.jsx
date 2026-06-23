@@ -19,20 +19,19 @@ import {
   IoLayersOutline,
   IoChevronUp,
   IoChatbubbleEllipses,
-  IoCalendarOutline,
-  IoLinkOutline,
-  IoTrashOutline,
 } from 'react-icons/io5';
 import Navbar from '../components/Navbar';
 import { usePartnerText } from '../utils/partnerText';
 import { useCurrency } from '../contexts/CurrencyContext.jsx';
 import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteMedia } from '../contexts/MainSiteMediaContext';
 import { resolvePublicationPlatformPrice } from '../utils/publicationPricing';
 import Button from '../components/Button';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
 import EditorialGuidelinesSection from '../components/EditorialGuidelinesSection';
 import PublicationFeaturedSplit from '../components/PublicationFeaturedSplit';
+import PublicationArticleAddons from '../components/PublicationArticleAddons';
 import newsImage from '../assets/news.jpg';
 import techImage from '../assets/tech.jpg';
 import globalImage from '../assets/global.jpg';
@@ -364,45 +363,6 @@ const packages = [
   },
 ];
 
-const additionalPublicationServices = [
-  {
-    id: 'backdate',
-    packageId: 'publication.backdate',
-    title: 'Backdating an article',
-    price: '₦50,000',
-    priceValue: 50000,
-    unit: 'per article',
-    description:
-      'Request a past publication date on supported outlets when your announcement needs to align with an earlier milestone.',
-    icon: IoCalendarOutline,
-    accent: 'calendar',
-  },
-  {
-    id: 'links',
-    packageId: 'publication.links',
-    title: 'Including links in an article',
-    price: '₦100,000',
-    priceValue: 100000,
-    unit: 'per article',
-    description:
-      'Add branded or campaign URLs in the body of the piece where the outlet allows in-article hyperlinks.',
-    icon: IoLinkOutline,
-    accent: 'links',
-  },
-  {
-    id: 'reputation',
-    packageId: 'publication.reputation',
-    title: 'Deleting an existing article',
-    subtitle: 'Reputation management',
-    price: '₦500,000',
-    priceValue: 500000,
-    unit: 'per article',
-    description:
-      'Request removal or suppression of a live article that is affecting your brand or public narrative.',
-    icon: IoTrashOutline,
-    accent: 'reputation',
-  },
-];
 
 // FAQ Data
 // FAQ data has been moved to the FAQ component
@@ -497,6 +457,36 @@ const howItWorks = [
     icon: IoNewspaper
   },
 ];
+
+function PublicationPackageCard({ pkg, category, onNavigate }) {
+  const { getPublicationCategoryLogos } = useMainSiteMedia();
+  const defaultLogos = category?.logos || [];
+  const logos = getPublicationCategoryLogos(category?.id, defaultLogos);
+
+  return (
+    <article
+      className={`publication-package-card publication-package-card--${pkg.categoryId} ${pkg.popular ? 'is-featured' : ''}`}
+    >
+      {pkg.popular && <span className="publication-package-ribbon">Most popular</span>}
+      <div className="publication-package-media">
+        <img src={pkg.image} alt="" />
+        {category && <span className="publication-package-region">{category.title}</span>}
+      </div>
+      <div className="publication-package-body">
+        <p className="publication-package-delivery">
+          <IoTime aria-hidden="true" />
+          {pkg.delivery}
+        </p>
+        <h3 className="publication-package-name">{pkg.title}</h3>
+        <p className="publication-package-desc">{pkg.description}</p>
+        {logos.length > 0 && <PublicationPackageLogosMarquee logos={logos} />}
+        <Button onClick={() => onNavigate(pkg.id)} className="publication-package-cta">
+          Place order
+        </Button>
+      </div>
+    </article>
+  );
+}
 
 function PublicationServicesPage() {
   const navigate = useNavigate();
@@ -664,35 +654,12 @@ function PublicationServicesPage() {
             {packages.map((pkg) => {
               const category = publicationCategories.find((cat) => cat.id === pkg.categoryId);
               return (
-                <article
+                <PublicationPackageCard
                   key={pkg.id}
-                  className={`publication-package-card publication-package-card--${pkg.categoryId} ${pkg.popular ? 'is-featured' : ''}`}
-                >
-                  {pkg.popular && <span className="publication-package-ribbon">Most popular</span>}
-                  <div className="publication-package-media">
-                    <img src={pkg.image} alt="" />
-                    {category && (
-                      <span className="publication-package-region">{category.title}</span>
-                    )}
-                  </div>
-                  <div className="publication-package-body">
-                    <p className="publication-package-delivery">
-                      <IoTime aria-hidden="true" />
-                      {pkg.delivery}
-                    </p>
-                    <h3 className="publication-package-name">{pkg.title}</h3>
-                    <p className="publication-package-desc">{pkg.description}</p>
-                    {category?.logos?.length > 0 && (
-                      <PublicationPackageLogosMarquee logos={category.logos} />
-                    )}
-                    <Button
-                      onClick={() => navigate(`/services/publications/package/${pkg.id}`)}
-                      className="publication-package-cta"
-                    >
-                      Place order
-                    </Button>
-                  </div>
-                </article>
+                  pkg={pkg}
+                  category={category}
+                  onNavigate={(id) => navigate(`/services/publications/package/${id}`)}
+                />
               );
             })}
           </div>
@@ -742,64 +709,9 @@ function PublicationServicesPage() {
 
       <PublicationFeaturedSplit />
 
-      <section className="publication-additional-services">
-        <div className="container">
-          <header className="publication-section-head">
-            <p className="publication-section-kicker">Extras</p>
-            <h2 className="publication-section-title">Additional services &amp; fees</h2>
-            <p className="publication-section-lead">
-              Optional add-ons beyond standard package placement — request these when you submit your
-              press release or during checkout.
-            </p>
-          </header>
-          <div className="publication-addon-grid">
-            {additionalPublicationServices.map((service) => {
-              const IconComponent = service.icon;
-              return (
-                <article
-                  key={service.id}
-                  className={`publication-addon-card publication-addon-card--${service.accent}`}
-                >
-                  <div className="publication-addon-card-icon" aria-hidden="true">
-                    <IconComponent />
-                  </div>
-                  <div className="publication-addon-card-body">
-                    <h3 className="publication-addon-card-title">{service.title}</h3>
-                    {service.subtitle ? (
-                      <p className="publication-addon-card-sub">{service.subtitle}</p>
-                    ) : null}
-                    <p className="publication-addon-card-desc">{service.description}</p>
-                  </div>
-                  <footer className="publication-addon-card-footer">
-                    <div className="publication-addon-card-pricing">
-                      <span className="publication-addon-price">
-                        {format(resolvePublicationPrice(service))}
-                      </span>
-                      <span className="publication-addon-unit">{service.unit}</span>
-                    </div>
-                    <Button
-                      type="button"
-                      className="publication-addon-order-btn"
-                      onClick={() =>
-                        handleAddToCart({
-                          id: `publication-addon-${service.id}`,
-                          packageId: service.packageId,
-                          title: service.title,
-                          priceValue: resolvePublicationPrice(service),
-                          price: resolvePublicationPrice(service),
-                          description: service.description,
-                        })
-                      }
-                    >
-                      Place order
-                    </Button>
-                  </footer>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <div className="container">
+        <PublicationArticleAddons />
+      </div>
 
       <section className="publication-goals">
         <div className="container">

@@ -1,4 +1,4 @@
-import { MdHandshake, MdPeople, MdSearch } from 'react-icons/md';
+import { MdSearch } from 'react-icons/md';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ChatComposeBar from './chat/ChatComposeBar';
 import ChatMessageRow from './chat/ChatMessageRow';
@@ -6,14 +6,20 @@ import ChatMessagesPane from './chat/ChatMessagesPane';
 import useMessageSocket from '../hooks/useMessageSocket';
 import { getDisplayName, isOwnMessage } from '../utils/chatDisplay';
 import { messagePreviewText } from '../utils/chatMedia';
-import {
-  appendThreadMessage,
-  clearAdminClientThreadUnread,
-  patchAdminClientPartners,
-  patchAdminPartnerInbox,
-  upsertAdminThreadSummary,
-} from '../utils/messagingRealtime';
+import { appendThreadMessage, patchAdminPartnerInbox, upsertAdminThreadSummary } from '../utils/messagingRealtime';
+import ConversationHeader from './messaging/ConversationHeader';
+import MessagingStatsBar from './messaging/MessagingStatsBar';
+import TypingIndicator from './messaging/TypingIndicator';
 import './AdminMessagesFab.css';
+import './messaging/messagingCrm.css';
+
+const FILTERS = [
+  { id: 'all', label: 'All Messages' },
+  { id: 'unread', label: 'Unread' },
+  { id: 'partners', label: 'Partners' },
+  { id: 'clients', label: 'Clients' },
+  { id: 'archived', label: 'Archived' },
+];
 
 function formatWhen(dateString) {
   if (!dateString) return '';
@@ -25,53 +31,56 @@ function formatWhen(dateString) {
   });
 }
 
-const CATEGORIES = [
-  { id: 'partners', label: 'Partners', icon: MdHandshake },
-  { id: 'clients', label: 'Clients', icon: MdPeople },
-];
-
-function findClientThread(partner, clientEmail) {
-  const email = String(clientEmail || '').trim().toLowerCase();
-  return (partner?.threads || []).find(
-    (thread) => String(thread.participantEmail || '').trim().toLowerCase() === email
-  );
-}
-
 export default function AdminMessagesPanel({
   apiUrl,
   token,
   onUnreadChange,
   variant = 'drawer',
-  initialCategory = 'partners',
+  initialFilter = 'all',
 }) {
   const [threads, setThreads] = useState([]);
-  const [clientPartners, setClientPartners] = useState([]);
+  const [stats, setStats] = useState(null);
   const [activeThread, setActiveThread] = useState(null);
-  const [composeTarget, setComposeTarget] = useState(null);
+  const [participant, setParticipant] = useState(null);
   const [message, setMessage] = useState('');
+  const [internalNote, setInternalNote] = useState('');
+  const [internalMode, setInternalMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
-  const [category, setCategory] = useState(initialCategory);
-  const [clientSearch, setClientSearch] = useState('');
+  const [filter, setFilter] = useState(initialFilter);
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const [typingName, setTypingName] = useState('');
   const activeThreadRef = useRef(null);
-  const categoryRef = useRef(category);
+  const typingTimerRef = useRef(null);
   activeThreadRef.current = activeThread;
-  categoryRef.current = category;
 
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   };
 
-  const loadInboxRef = useRef(null);
-  const loadClientDirectoryRef = useRef(null);
+  const loadStats = useCallback(async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/admin/messages/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setStats(data.stats);
+      }
+    } catch {
+      /* silent */
+    }
+  }, [apiUrl, token]);
 
   const loadInbox = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch(`${apiUrl}/api/admin/messages/inbox`, {
+      const params = new URLSearchParams({ filter, q: search.trim() });
+      const response = await fetch(`${apiUrl}/api/admin/messages/unified-inbox?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -85,30 +94,7 @@ export default function AdminMessagesPanel({
     } finally {
       setLoading(false);
     }
-  }, [apiUrl, token, onUnreadChange]);
-
-  loadInboxRef.current = loadInbox;
-
-  const loadClientDirectory = useCallback(async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const response = await fetch(`${apiUrl}/api/admin/messages/clients-directory`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        throw new Error(data.error || 'Failed to load clients');
-      }
-      setClientPartners(data.partners || []);
-    } catch (loadError) {
-      setError(loadError.message || 'Unable to load clients');
-    } finally {
-      setLoading(false);
-    }
-  }, [apiUrl, token]);
-
-  loadClientDirectoryRef.current = loadClientDirectory;
+  }, [apiUrl, token, filter, search, onUnreadChange]);
 
   const refreshUnreadTotal = useCallback(async () => {
     try {
@@ -125,44 +111,81 @@ export default function AdminMessagesPanel({
   }, [apiUrl, token, onUnreadChange]);
 
   useEffect(() => {
-    if (category === 'clients') {
-      loadClientDirectory();
-    } else {
-      loadInbox();
+    const timer = window.setTimeout(() => setSearch(searchInput.trim()), 300);
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
+    loadInbox();
+    if (variant === 'page') {
+      loadStats();
     }
-  }, [category, loadInbox, loadClientDirectory]);
+  }, [loadInbox, loadStats, variant]);
+
+  const loadParticipantContext = useCallback(async (thread) => {
+    if (!thread?.partnerId || !thread?.threadId) {
+      setParticipant(null);
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${apiUrl}/api/admin/partnerships/${thread.partnerId}/messages/${thread.threadId}/context`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setParticipant(data.participant);
+      }
+    } catch {
+      setParticipant(null);
+    }
+  }, [apiUrl, token]);
 
   const handleRealtimeMessage = useCallback((payload) => {
-    refreshUnreadTotal();
-
-    if (categoryRef.current === 'clients') {
-      setClientPartners((previous) => patchAdminClientPartners(previous, payload));
-    } else {
-      setThreads((previous) => patchAdminPartnerInbox(previous, payload));
+    if (payload.type === 'typing:start') {
+      if (payload.threadId === activeThreadRef.current?.threadId) {
+        setTypingName(payload.name || 'Someone');
+      }
+      return;
+    }
+    if (payload.type === 'typing:stop') {
+      if (payload.threadId === activeThreadRef.current?.threadId) {
+        setTypingName('');
+      }
+      return;
+    }
+    if (payload.type === 'message:read') {
+      if (activeThreadRef.current?.threadId === payload.threadId) {
+        setActiveThread((previous) => {
+          if (!previous) return previous;
+          const nextMessages = (previous.messages || []).map((entry) =>
+            payload.messageIds?.includes(entry.id)
+              ? { ...entry, deliveryStatus: 'read', readAt: payload.readAt }
+              : entry
+          );
+          return { ...previous, messages: nextMessages };
+        });
+      }
+      return;
     }
 
+    refreshUnreadTotal();
+    setThreads((previous) => patchAdminPartnerInbox(previous, payload));
     if (activeThreadRef.current?.threadId === payload.threadId) {
       setActiveThread((previous) => appendThreadMessage(previous, payload));
     }
   }, [refreshUnreadTotal]);
 
-  useMessageSocket({
+  const { sendEvent } = useMessageSocket({
     apiUrl,
     token,
     enabled: Boolean(apiUrl && token),
     onEvent: handleRealtimeMessage,
   });
 
-  useEffect(() => {
-    setActiveThread(null);
-    setComposeTarget(null);
-    setMessage('');
-    setClientSearch('');
-  }, [category]);
-
   const openThread = async (thread) => {
     setError('');
-    setComposeTarget(null);
+    setTypingName('');
     try {
       const response = await fetch(
         `${apiUrl}/api/admin/partnerships/${thread.partnerId}/messages/${thread.threadId}`,
@@ -173,73 +196,64 @@ export default function AdminMessagesPanel({
         throw new Error(data.error || 'Failed to load conversation');
       }
       setActiveThread(data.thread);
-      if (category === 'partners') {
-        setThreads((previous) =>
-          previous.map((entry) =>
-            entry.threadId === thread.threadId ? { ...entry, unreadCount: 0 } : entry
-          )
-        );
-      } else {
-        setClientPartners((previous) => clearAdminClientThreadUnread(previous, data.thread));
-      }
+      setThreads((previous) =>
+        previous.map((entry) =>
+          entry.threadId === thread.threadId ? { ...entry, unreadCount: 0 } : entry
+        )
+      );
+      await loadParticipantContext(data.thread);
       await refreshUnreadTotal();
+      sendEvent({ type: 'join', room: `thread:${thread.threadId}` });
     } catch (loadError) {
       setError(loadError.message || 'Unable to open conversation');
     }
   };
 
-  const selectClient = async (partner, client) => {
-    setError('');
-    const existingThread = findClientThread(partner, client.email);
-    if (existingThread) {
-      await openThread({
-        ...existingThread,
-        partnerId: partner.partnerId,
-        partnerName: partner.partnerName,
-        partnerSubdomain: partner.partnerSubdomain,
-      });
-      return;
-    }
-
-    setActiveThread(null);
-    setComposeTarget({
-      partnerId: partner.partnerId,
-      partnerName: partner.partnerName,
-      partnerSubdomain: partner.partnerSubdomain,
-      client,
+  const publishTyping = (typing) => {
+    if (!activeThread?.threadId) return;
+    sendEvent({
+      type: typing ? 'typing:start' : 'typing:stop',
+      threadId: activeThread.threadId,
+      name: 'Admin',
     });
+    fetch(`${apiUrl}/api/admin/messages/typing`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        threadId: activeThread.threadId,
+        typing,
+        name: 'Admin',
+      }),
+    }).catch(() => {});
+  };
+
+  const handleMessageChange = (value) => {
+    setMessage(value);
+    window.clearTimeout(typingTimerRef.current);
+    publishTyping(true);
+    typingTimerRef.current = window.setTimeout(() => publishTyping(false), 1200);
   };
 
   const handleSend = async ({ body, attachment, attachmentType, attachmentName }) => {
-    const partnerId = activeThread?.partnerId || composeTarget?.partnerId;
-    if (!partnerId || (!body?.trim() && !attachment)) return;
+    if (!activeThread?.partnerId || (!body?.trim() && !attachment)) return;
 
     setSending(true);
     setError('');
+    publishTyping(false);
     try {
       const payload = {
+        threadId: activeThread.threadId,
+        channel: activeThread.channel,
+        participantEmail: activeThread.participantEmail,
+        participantName: activeThread.participantName,
         body,
         attachment,
         attachmentType,
         attachmentName,
       };
 
-      if (activeThread) {
-        payload.threadId = activeThread.threadId;
-        payload.channel = activeThread.channel;
-        payload.participantEmail = activeThread.participantEmail;
-        payload.participantName = activeThread.participantName;
-      } else if (composeTarget) {
-        payload.channel = 'partner-client';
-        payload.participantEmail = composeTarget.client.email;
-        payload.participantName = composeTarget.client.name;
-        payload.subject = `Message to ${composeTarget.client.name || composeTarget.client.email}`;
-      } else {
-        return;
-      }
-
       const response = await fetch(
-        `${apiUrl}/api/admin/partnerships/${partnerId}/messages`,
+        `${apiUrl}/api/admin/partnerships/${activeThread.partnerId}/messages`,
         {
           method: 'POST',
           headers,
@@ -252,14 +266,8 @@ export default function AdminMessagesPanel({
       }
 
       setActiveThread(data.thread);
-      setComposeTarget(null);
       setMessage('');
-
-      if (category === 'clients') {
-        setClientPartners((previous) => clearAdminClientThreadUnread(previous, data.thread));
-      } else {
-        setThreads((previous) => upsertAdminThreadSummary(previous, data.thread));
-      }
+      setThreads((previous) => upsertAdminThreadSummary(previous, data.thread));
       await refreshUnreadTotal();
     } catch (sendError) {
       setError(sendError.message || 'Failed to send message');
@@ -268,56 +276,92 @@ export default function AdminMessagesPanel({
     }
   };
 
-  const filteredPartners = useMemo(() => {
-    const query = clientSearch.trim().toLowerCase();
-    if (!query) return clientPartners;
+  const handleInternalNoteSend = async () => {
+    if (!activeThread?.partnerId || !internalNote.trim()) return;
+    setSending(true);
+    setError('');
+    try {
+      const response = await fetch(
+        `${apiUrl}/api/admin/partnerships/${activeThread.partnerId}/messages/${activeThread.threadId}/internal-note`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ body: internalNote.trim() }),
+        }
+      );
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to save internal note');
+      }
+      setActiveThread(data.thread);
+      setInternalNote('');
+      setInternalMode(false);
+    } catch (sendError) {
+      setError(sendError.message || 'Failed to save internal note');
+    } finally {
+      setSending(false);
+    }
+  };
 
-    return clientPartners
-      .map((partner) => {
-        const partnerMatches =
-          partner.partnerName?.toLowerCase().includes(query) ||
-          partner.partnerSubdomain?.toLowerCase().includes(query);
+  const handleMessageAction = async (action, entry) => {
+    if (!activeThread?.partnerId) return;
 
-        const clients = (partner.clients || []).filter((client) => {
-          const fullName = `${client.firstName || ''} ${client.lastName || ''}`.trim().toLowerCase();
-          return (
-            partnerMatches ||
-            client.email?.toLowerCase().includes(query) ||
-            client.name?.toLowerCase().includes(query) ||
-            fullName.includes(query)
-          );
-        });
+    if (action === 'menu') {
+      const choice = window.prompt(
+        'Message action: edit, delete, pin, unpin, mark-unread',
+        'edit'
+      );
+      if (!choice) return;
+      const normalized = choice.trim().toLowerCase();
 
-        if (!clients.length && !partnerMatches) return null;
-        return { ...partner, clients: partnerMatches ? partner.clients : clients };
-      })
-      .filter(Boolean);
-  }, [clientPartners, clientSearch]);
+      let body;
+      if (normalized === 'edit') {
+        body = window.prompt('Updated message', entry.body || '');
+        if (!body?.trim()) return;
+      }
 
-  const partnerThreads = threads.filter((thread) => thread.channel === 'partner-admin');
-  const partnerUnread = partnerThreads.reduce((sum, thread) => sum + (thread.unreadCount || 0), 0);
-  const clientUnread = clientPartners.reduce((sum, partner) => sum + (partner.unreadCount || 0), 0);
+      const response = await fetch(
+        `${apiUrl}/api/admin/partnerships/${activeThread.partnerId}/messages/${activeThread.threadId}/messages/${entry.id}`,
+        {
+          method: 'PATCH',
+          headers,
+          body: JSON.stringify({
+            action: normalized === 'unpin' ? 'pin' : normalized,
+            body: body?.trim(),
+            pinned: normalized === 'pin' ? true : normalized === 'unpin' ? false : undefined,
+          }),
+        }
+      );
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setActiveThread(data.thread);
+      }
+    }
+  };
 
-  const canCompose = Boolean(activeThread || composeTarget);
-  const chatTitle = activeThread
-    ? activeThread.channel === 'partner-admin'
-      ? activeThread.partnerName || activeThread.subject
-      : activeThread.participantName || activeThread.participantEmail || activeThread.subject
-    : composeTarget
-      ? `Message ${composeTarget.client.name || composeTarget.client.email}`
-      : null;
+  const handleArchiveToggle = async () => {
+    if (!activeThread?.partnerId) return;
+    const response = await fetch(
+      `${apiUrl}/api/admin/partnerships/${activeThread.partnerId}/messages/${activeThread.threadId}/archive`,
+      {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ archived: !activeThread.archived }),
+      }
+    );
+    const data = await response.json();
+    if (response.ok && data.success) {
+      setActiveThread(null);
+      setParticipant(null);
+      await loadInbox();
+    }
+  };
 
-  const chatMeta = activeThread
-    ? activeThread.channel === 'partner-admin'
-      ? `Partner thread · ${activeThread.partnerEmail || ''}`
-      : `Client on ${activeThread.partnerName || 'partner site'} · ${activeThread.participantEmail || ''}`
-    : composeTarget
-      ? `Client on ${composeTarget.partnerName} · ${composeTarget.partnerSubdomain}`
-      : null;
+  const filterCounts = useMemo(() => ({
+    unread: threads.filter((thread) => thread.unreadCount > 0).length,
+  }), [threads]);
 
-  const shellClass = variant === 'page'
-    ? 'admin-messages-page'
-    : 'admin-messages-drawer';
+  const shellClass = variant === 'page' ? 'admin-messages-page' : 'admin-messages-drawer';
 
   return (
     <div className={shellClass}>
@@ -325,170 +369,180 @@ export default function AdminMessagesPanel({
         <div className="admin-messages-page-head">
           <div>
             <h2>Messages</h2>
-            <p>
-              {category === 'clients'
-                ? 'Chat with clients across all partner sites, grouped by partner.'
-                : 'Partner support threads from all partner dashboards.'}
-            </p>
+            <p>Professional inbox for partner support, client communication, and order threads.</p>
           </div>
         </div>
       ) : null}
 
-      <div className="admin-messages-drawer-cats">
-        {CATEGORIES.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            type="button"
-            className={`admin-messages-cat-tab${category === id ? ' active' : ''}`}
-            onClick={() => setCategory(id)}
-          >
-            <Icon size={14} />
-            {label}
-            {(id === 'partners' ? partnerUnread : clientUnread) > 0 ? (
-              <span className="admin-messages-cat-count">
-                {id === 'partners' ? partnerUnread : clientUnread}
-              </span>
-            ) : null}
-          </button>
-        ))}
-      </div>
-
+      {variant === 'page' ? <MessagingStatsBar stats={stats} /> : null}
       {error ? <p className="admin-messages-drawer-error">{error}</p> : null}
 
-      <div className={`admin-messages-drawer-body${variant === 'page' ? ' admin-messages-page-body' : ''}`}>
-        <div className="admin-messages-drawer-list">
-          {category === 'partners' ? (
-            loading ? (
+      <div className={`messaging-crm-shell${variant === 'page' ? ' admin-messages-page-body' : ''}`}>
+        <aside className="messaging-crm-sidebar">
+          <p className="messaging-crm-sidebar-title">Inbox</p>
+          {FILTERS.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              className={`messaging-crm-filter-btn${filter === id ? ' active' : ''}`}
+              onClick={() => {
+                setFilter(id);
+                setActiveThread(null);
+                setParticipant(null);
+              }}
+            >
+              <span>{label}</span>
+              {id === 'unread' && filterCounts.unread > 0 ? (
+                <span className="messaging-crm-filter-count">{filterCounts.unread}</span>
+              ) : null}
+            </button>
+          ))}
+        </aside>
+
+        <div className="messaging-crm-list-panel">
+          <div className="messaging-crm-search">
+            <MdSearch size={16} />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              placeholder="Search partners, clients, emails, orders…"
+            />
+          </div>
+          <div className="messaging-crm-thread-list">
+            {loading ? (
               <div className="adm-spinner" style={{ margin: '24px auto' }} />
-            ) : !partnerThreads.length ? (
-              <p className="admin-messages-drawer-empty">No partner support threads yet.</p>
+            ) : !threads.length ? (
+              <p className="admin-messages-drawer-empty">No conversations found.</p>
             ) : (
-              partnerThreads.map((thread) => (
+              threads.map((thread) => (
                 <button
                   key={thread.threadId}
                   type="button"
-                  className={`admin-messages-drawer-item${activeThread?.threadId === thread.threadId ? ' active' : ''}`}
+                  className={`messaging-crm-thread-item${activeThread?.threadId === thread.threadId ? ' active' : ''}${thread.unreadCount ? ' unread' : ''}`}
                   onClick={() => openThread(thread)}
                 >
-                  <div className="admin-messages-drawer-item-top">
-                    <strong>{thread.partnerName || 'Partner'}</strong>
+                  <div className="messaging-crm-thread-top">
+                    <strong>
+                      {thread.channel === 'partner-admin'
+                        ? thread.partnerName || 'Partner'
+                        : getDisplayName(thread.participantName, thread.participantEmail)}
+                    </strong>
                     {thread.unreadCount ? (
                       <span className="admin-messages-drawer-unread">{thread.unreadCount}</span>
                     ) : null}
                   </div>
-                  <span className="admin-messages-drawer-meta">
-                    <span className="admin-messages-channel-tag partner-tag">Partner</span>
-                    {' '}· {formatWhen(thread.lastMessageAt)}
-                  </span>
-                  <span className="admin-messages-drawer-preview">
+                  <div className="messaging-crm-thread-meta">
+                    <span className={`messaging-crm-tag ${thread.participantType === 'partner' ? 'partner' : 'client'}`}>
+                      {thread.participantType === 'partner' ? 'Partner' : 'Client'}
+                    </span>
+                    {thread.orderNumber ? (
+                      <span className="messaging-crm-tag order">{thread.orderNumber}</span>
+                    ) : null}
+                    <span>{formatWhen(thread.lastMessageAt)}</span>
+                  </div>
+                  <div className="messaging-crm-thread-preview">
+                    {thread.orderTitle ? `${thread.orderTitle} · ` : ''}
                     {messagePreviewText(thread.lastMessage) || thread.subject}
-                  </span>
+                  </div>
                 </button>
               ))
-            )
-          ) : (
-            <>
-              <div className="admin-messages-client-search">
-                <MdSearch size={15} />
-                <input
-                  type="text"
-                  value={clientSearch}
-                  onChange={(event) => setClientSearch(event.target.value)}
-                  placeholder="Search partner site or client…"
-                />
-              </div>
-              {loading ? (
-                <div className="adm-spinner" style={{ margin: '24px auto' }} />
-              ) : !filteredPartners.length ? (
-                <p className="admin-messages-drawer-empty">No partner clients found yet.</p>
-              ) : (
-                filteredPartners.map((partner) => (
-                  <div key={partner.partnerId} className="admin-messages-partner-group">
-                    <div className="admin-messages-partner-group-head">
-                      <strong>{partner.partnerName}</strong>
-                      <span>{partner.partnerSubdomain}</span>
-                      {partner.unreadCount ? (
-                        <span className="admin-messages-drawer-unread">{partner.unreadCount}</span>
-                      ) : null}
-                    </div>
-                    {(partner.clients || []).map((client) => {
-                      const thread = findClientThread(partner, client.email);
-                      const isActive =
-                        (activeThread?.participantEmail &&
-                          activeThread.participantEmail.toLowerCase() === client.email.toLowerCase() &&
-                          String(activeThread.partnerId) === String(partner.partnerId)) ||
-                        (composeTarget?.client?.email?.toLowerCase() === client.email.toLowerCase() &&
-                          String(composeTarget.partnerId) === String(partner.partnerId));
-
-                      return (
-                        <button
-                          key={`${partner.partnerId}-${client.email}`}
-                          type="button"
-                          className={`admin-messages-drawer-item admin-messages-client-item${isActive ? ' active' : ''}`}
-                          onClick={() => selectClient(partner, client)}
-                        >
-                          <div className="admin-messages-drawer-item-top">
-                            <strong>{getDisplayName(client.name, client.email)}</strong>
-                            {thread?.unreadCount ? (
-                              <span className="admin-messages-drawer-unread">{thread.unreadCount}</span>
-                            ) : null}
-                          </div>
-                          <span className="admin-messages-drawer-meta">{client.email}</span>
-                          {thread ? (
-                            <span className="admin-messages-drawer-preview">
-                              {messagePreviewText(thread.lastMessage) || thread.subject}
-                            </span>
-                          ) : (
-                            <span className="admin-messages-drawer-preview">Start conversation</span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ))
-              )}
-            </>
-          )}
+            )}
+          </div>
         </div>
 
-        <div className="admin-messages-drawer-chat">
-          {canCompose ? (
+        <div className="messaging-crm-chat-panel">
+          {activeThread ? (
             <>
-              <h3>{chatTitle}</h3>
-              {chatMeta ? <p className="admin-messages-chat-meta">{chatMeta}</p> : null}
-              {activeThread ? (
-                <ChatMessagesPane
-                  className="admin-messages-drawer-messages"
-                  threadKey={activeThread.threadId}
-                  messageCount={activeThread.messages?.length || 0}
-                >
-                  {(activeThread.messages || []).map((entry) => (
-                    <ChatMessageRow
-                      key={entry.id}
-                      message={entry}
-                      isMine={isOwnMessage(entry.senderType, 'admin')}
+              <ConversationHeader
+                participant={participant || {
+                  name: activeThread.channel === 'partner-admin'
+                    ? activeThread.partnerName
+                    : activeThread.participantName,
+                  email: activeThread.channel === 'partner-admin'
+                    ? activeThread.partnerEmail
+                    : activeThread.participantEmail,
+                  type: activeThread.participantType,
+                  accountId: activeThread.participantUserId || activeThread.participantEmail,
+                  orderNumber: activeThread.orderNumber,
+                  orderTitle: activeThread.orderTitle,
+                  onlineStatus: 'offline',
+                }}
+                archived={activeThread.archived}
+                onViewPartnership={
+                  activeThread.participantType === 'partner'
+                    ? () => window.open(`/admin?tab=partnerships&partnerId=${activeThread.partnerId}`, '_blank')
+                    : undefined
+                }
+                onViewOrders={
+                  activeThread.participantType === 'client'
+                    ? () => window.open(`/admin?tab=orders&email=${encodeURIComponent(activeThread.participantEmail || '')}`, '_blank')
+                    : undefined
+                }
+                onViewInvoices={
+                  activeThread.participantType === 'client'
+                    ? () => window.open(`/admin?tab=orders&email=${encodeURIComponent(activeThread.participantEmail || '')}`, '_blank')
+                    : undefined
+                }
+                onArchive={handleArchiveToggle}
+                onSuspend={
+                  activeThread.participantType === 'partner'
+                    ? () => window.open(`/admin?tab=partnerships&partnerId=${activeThread.partnerId}`, '_blank')
+                    : undefined
+                }
+              />
+              <TypingIndicator name={typingName} />
+              <ChatMessagesPane
+                className="admin-messages-drawer-messages"
+                threadKey={activeThread.threadId}
+                messageCount={activeThread.messages?.length || 0}
+              >
+                {(activeThread.messages || []).map((entry) => (
+                  <ChatMessageRow
+                    key={entry.id}
+                    message={entry}
+                    isMine={isOwnMessage(entry.senderType, 'admin') && !entry.isInternal}
+                    showStatus={isOwnMessage(entry.senderType, 'admin') && !entry.isInternal}
+                    onAction={handleMessageAction}
+                  />
+                ))}
+              </ChatMessagesPane>
+              <div className="messaging-crm-internal-bar">
+                <label className="messaging-crm-internal-toggle">
+                  <input
+                    type="checkbox"
+                    checked={internalMode}
+                    onChange={(event) => setInternalMode(event.target.checked)}
+                  />
+                  Add internal admin note (hidden from partners & clients)
+                </label>
+                {internalMode ? (
+                  <>
+                    <textarea
+                      value={internalNote}
+                      onChange={(event) => setInternalNote(event.target.value)}
+                      rows={3}
+                      placeholder="Withdrawal request received, verification in progress, etc."
+                      style={{ width: '100%', marginBottom: 8, borderRadius: 8, padding: 10 }}
                     />
-                  ))}
-                </ChatMessagesPane>
-              ) : (
-                <p className="admin-messages-drawer-empty">
-                  Send the first message to this client. They will receive an email notification.
-                </p>
-              )}
+                    <button type="button" className="messaging-crm-action-btn" onClick={handleInternalNoteSend} disabled={sending}>
+                      Save internal note
+                    </button>
+                  </>
+                ) : null}
+              </div>
               <ChatComposeBar
                 message={message}
-                onMessageChange={setMessage}
+                onMessageChange={handleMessageChange}
                 onSend={handleSend}
                 sending={sending}
-                placeholder={activeThread ? 'Reply…' : 'Write your message…'}
+                placeholder="Reply to this conversation…"
                 variant="drawer"
               />
             </>
           ) : (
-            <p className="admin-messages-drawer-empty">
-              {category === 'clients'
-                ? 'Select a client from a partner site to read or start a conversation.'
-                : 'Select a partner conversation to read and reply.'}
+            <p className="admin-messages-drawer-empty" style={{ margin: 'auto', padding: 24 }}>
+              Select a conversation to view messages, order context, and internal notes.
             </p>
           )}
         </div>

@@ -3,6 +3,8 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import musicHeroImage from '../assets/mayorkun.jpg';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './ServicesSummaryHero.css';
@@ -10,6 +12,9 @@ import './ServicesSummaryHero.css';
 function MusicStreamingVerificationSummary() {
   const navigate = useNavigate();
   const section = usePartnerSectionContent('musicStreaming');
+  const { isPartnerSite } = usePartnerBranding();
+  const musicImageSrc = useMainSiteServiceImage('musicStreamingImage', musicHeroImage);
+  const heroImageSrc = isPartnerSite ? musicHeroImage : musicImageSrc;
 
   return (
     <section
@@ -30,7 +35,7 @@ function MusicStreamingVerificationSummary() {
         media={(
           <div className="services-summary-hero-shell">
             <img
-              src={musicHeroImage}
+              src={heroImageSrc}
               alt="Music artist streaming platform verification"
               className="services-summary-hero-image"
             />

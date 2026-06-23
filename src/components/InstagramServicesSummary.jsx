@@ -3,6 +3,8 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import instagramHeroImage from '../assets/online.jpg';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './InstagramServicesSummary.css';
@@ -11,6 +13,9 @@ import './ServicesSummaryHero.css';
 function InstagramServicesSummary() {
   const navigate = useNavigate();
   const section = usePartnerSectionContent('instagram');
+  const { isPartnerSite } = usePartnerBranding();
+  const instagramImageSrc = useMainSiteServiceImage('instagramImage', instagramHeroImage);
+  const heroImageSrc = isPartnerSite ? instagramHeroImage : instagramImageSrc;
 
   return (
     <section id="instagram-services" className="instagram-services-section instagram-services-summary services-summary-layout">
@@ -28,7 +33,7 @@ function InstagramServicesSummary() {
         media={(
           <div className="services-summary-hero-shell">
             <img
-              src={instagramHeroImage}
+              src={heroImageSrc}
               alt="Instagram blog promotion"
               className="services-summary-hero-image"
             />

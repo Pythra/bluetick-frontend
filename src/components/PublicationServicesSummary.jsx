@@ -4,6 +4,8 @@ import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import PublicationLogosCarousel from './PublicationLogosCarousel';
 import publicationHeroImage from '../assets/news.jpg';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './PublicationSection.css';
@@ -12,6 +14,9 @@ import './ServicesSummaryHero.css';
 function PublicationServicesSummary() {
   const navigate = useNavigate();
   const section = usePartnerSectionContent('publication');
+  const { isPartnerSite } = usePartnerBranding();
+  const mainPublicationImage = useMainSiteServiceImage('publicationImage', publicationHeroImage);
+  const publicationImageSrc = isPartnerSite ? publicationHeroImage : mainPublicationImage;
 
   const publicationCategories = [
     {
@@ -71,7 +76,7 @@ function PublicationServicesSummary() {
         media={(
           <div className="services-summary-hero-shell">
             <img
-              src={publicationHeroImage}
+              src={publicationImageSrc}
               alt="Publication packages"
               className="services-summary-hero-image"
             />

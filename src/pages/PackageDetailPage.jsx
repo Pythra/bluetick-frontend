@@ -4,6 +4,7 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ClientsSection from '../components/ClientsSection';
+import PublicationArticleAddons from '../components/PublicationArticleAddons';
 import Button from '../components/Button';
 import PlatformLogo from '../components/PlatformLogo';
 import { IoCheckmarkCircle, IoTime } from 'react-icons/io5';
@@ -135,6 +136,11 @@ function PackageDetailPage() {
           </div>
         ) : null}
       </div>
+
+      <section className="package-detail-addons container">
+        <PublicationArticleAddons packageId={packageId} packageTitle={packageData.title} />
+      </section>
+
       <ClientsSection />
       <Footer onScrollToSection={scrollToSection} />
     </div>

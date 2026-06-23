@@ -846,6 +846,24 @@
   border-color: rgba(37, 99, 235, 0.45);
 }
 
+.my-account-agreement-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.my-account-agreement-decline {
+  color: #b91c1c;
+  border-color: rgba(185, 28, 28, 0.25);
+}
+
+.my-account-agreement-decline:hover {
+  background: #fee2e2;
+  border-color: rgba(185, 28, 28, 0.45);
+}
+
 .my-account-panel-messages {
   min-height: 420px;
   display: flex;

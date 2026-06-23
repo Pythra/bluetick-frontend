@@ -1052,3 +1052,61 @@
   background: #fecaca;
 }
 
+.adm-media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.adm-media-stack {
+  display: grid;
+  gap: 24px;
+}
+
+.adm-media-category {
+  padding-top: 8px;
+  border-top: 1px solid var(--adm-border);
+}
+
+.adm-media-card {
+  padding: 16px;
+  border: 1px solid var(--adm-border);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.adm-media-card h3 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+}
+
+.adm-media-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.adm-media-preview img {
+  width: 100%;
+  height: 100%;
+  min-height: 140px;
+  object-fit: cover;
+}
+
+.adm-media-preview--logo img {
+  object-fit: contain;
+  padding: 12px;
+  min-height: 90px;
+  max-height: 120px;
+}
+
+.adm-media-preview span {
+  color: var(--adm-text-soft);
+  font-size: 0.85rem;
+}
+

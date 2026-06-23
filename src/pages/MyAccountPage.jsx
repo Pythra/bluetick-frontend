@@ -4,6 +4,7 @@ import {
   IoBagOutline,
   IoCartOutline,
   IoChatbubbleOutline,
+  IoDocumentTextOutline,
   IoGridOutline,
   IoLogOutOutline,
   IoPersonOutline,
@@ -19,6 +20,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import AccountMessagesPanel from '../components/account/AccountMessagesPanel';
+import AccountAgreementsPanel from '../components/account/AccountAgreementsPanel';
 import UserInvoiceModal, { buildInvoiceFromOrder } from '../components/account/UserInvoiceModal';
 import OrderTrackingTimeline from '../components/OrderTrackingTimeline';
 import { AWAITING_PAYMENT_LABEL, PROJECT_STATUS_LABELS } from '../data/orderTracking';
@@ -28,6 +30,7 @@ import './MyAccountPage.css';
 const SECTIONS = {
   dashboard: 'dashboard',
   orders: 'orders',
+  agreements: 'agreements',
   invoices: 'invoices',
   account: 'account',
   messages: 'messages',
@@ -346,6 +349,7 @@ function MyAccountPage() {
   const navItems = [
     { id: SECTIONS.dashboard, label: 'Dashboard', icon: IoGridOutline },
     { id: SECTIONS.orders, label: 'Orders', icon: IoBagOutline },
+    { id: SECTIONS.agreements, label: 'Agreements', icon: IoDocumentTextOutline },
     { id: SECTIONS.invoices, label: 'Invoices', icon: IoReceiptOutline },
     { id: SECTIONS.messages, label: 'Messages', icon: IoChatbubbleOutline, badge: unreadMessages },
     { id: SECTIONS.account, label: 'Account info', icon: IoPersonOutline },
@@ -389,6 +393,13 @@ function MyAccountPage() {
       description: 'Check your order history, payment status, and progress tracking',
       icon: IoBagOutline,
       onClick: () => goToSection(SECTIONS.orders),
+    },
+    {
+      key: 'agreements',
+      title: 'Agreements',
+      description: 'Review, sign, and download service agreements for your orders',
+      icon: IoDocumentTextOutline,
+      onClick: () => goToSection(SECTIONS.agreements),
     },
     {
       key: 'invoices',
@@ -450,8 +461,11 @@ function MyAccountPage() {
             const paymentStatus = getPaymentStatusLabel(order);
             const orderId = order._id;
             const tracking = resolveOrderTracking(order);
+            const needsAgreement = order.paymentStatus === 'paid' && order.onboardingLocked;
             const showOnboardingLink =
-              order.paymentStatus === 'paid' && !order.onboardingComplete;
+              order.paymentStatus === 'paid' &&
+              !order.onboardingComplete &&
+              !needsAgreement;
             const stageLabel = resolveOrderStageLabel(order, tracking);
             const isHighlighted = highlightOrderId && String(orderId) === String(highlightOrderId);
 
@@ -488,6 +502,16 @@ function MyAccountPage() {
                       </li>
                     ))}
                   </ul>
+                )}
+
+                {needsAgreement && (
+                  <Button
+                    type="button"
+                    className="my-account-order-action"
+                    onClick={() => navigate(`/service-agreement?orderId=${orderId}`)}
+                  >
+                    Review & sign agreement
+                  </Button>
                 )}
 
                 {showOnboardingLink && (
@@ -882,6 +906,7 @@ function MyAccountPage() {
           <div className="my-account-content">
             {activeSection === SECTIONS.dashboard && renderDashboard()}
             {activeSection === SECTIONS.orders && renderOrdersPanel()}
+            {activeSection === SECTIONS.agreements && <AccountAgreementsPanel />}
             {activeSection === SECTIONS.invoices && renderInvoicesPanel()}
             {activeSection === SECTIONS.account && renderAccountPanel()}
             {activeSection === SECTIONS.messages && renderMessagesPanel()}

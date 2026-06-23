@@ -10,7 +10,8 @@ import ServicesSummaryLayout from './ServicesSummaryLayout';
 import socialVerificationImage from '../assets/social/verification.jpg';
 import { usePartnerAsset } from '../utils/partnerMedia';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
-import { usePartnerSectionContent } from '../utils/partnerSectionContent';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
 import './VerificationSection.css';
 
 const socialServiceCategories = [
@@ -52,6 +53,9 @@ const socialServiceCategories = [
 function VerificationServicesSummary() {
   const navigate = useNavigate();
   const section = usePartnerSectionContent('socialMedia');
+  const { isPartnerSite } = usePartnerBranding();
+  const socialImageSrc = useMainSiteServiceImage('socialMediaImage', socialVerificationImage);
+  const heroImageSrc = isPartnerSite ? socialVerificationImage : socialImageSrc;
 
   return (
     <section
@@ -76,7 +80,7 @@ function VerificationServicesSummary() {
             <div className="verification-carousel-shell verification-overview-shell">
               <div className="verification-carousel-slide verification-overview-slide">
                 <img
-                  src={socialVerificationImage}
+                  src={heroImageSrc}
                   alt="Social media services overview"
                   className="verification-carousel-image"
                 />

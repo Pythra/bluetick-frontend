@@ -41,13 +41,17 @@ function ProjectOnboardingPage() {
       if (data.order.paymentStatus !== 'paid') {
         throw new Error('Payment must be confirmed before you can submit project details.');
       }
+      if (data.order.onboardingLocked || (data.order.agreement && !data.order.agreementSigned)) {
+        navigate(`/service-agreement?orderId=${orderId}`, { replace: true });
+        return;
+      }
       setOrder(data.order);
     } catch (loadError) {
       setError(loadError.message || 'Unable to load order');
     } finally {
       setLoading(false);
     }
-  }, [orderId, apiUrl, authFetch]);
+  }, [orderId, apiUrl, authFetch, navigate]);
 
   useEffect(() => {
     if (!isAuthenticated) {

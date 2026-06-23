@@ -9,6 +9,12 @@
   padding: 1rem 1.25rem 3rem;
 }
 
+.package-detail-addons {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 1.25rem 1rem;
+}
+
 .package-detail-page .navbar {
   margin-bottom: 0.5rem;
 }

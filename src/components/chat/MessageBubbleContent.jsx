@@ -1,6 +1,15 @@
 import { useAuth } from '../../contexts/AuthContext';
 import { resolveChatMediaUrl } from '../../utils/chatMedia';
-import VoiceNotePlayer, { ChatMediaImage, ChatMediaVideo } from './VoiceNotePlayer';
+import VoiceNotePlayer from './VoiceNotePlayer';
+import { ChatMediaImage, ChatMediaVideo } from './VoiceNotePlayerMedia.jsx';
+
+function formatFileSize(size) {
+  const bytes = Number(size);
+  if (!Number.isFinite(bytes) || bytes <= 0) return null;
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 export default function MessageBubbleContent({ message }) {
   const { apiUrl } = useAuth();
@@ -13,6 +22,9 @@ export default function MessageBubbleContent({ message }) {
   return (
     <>
       {body ? <p className="chat-bubble-body">{message.body}</p> : null}
+      {message.editedAt ? (
+        <span className="chat-bubble-edited">Edited</span>
+      ) : null}
       <VoiceNotePlayer message={message} />
       {attachments.map((attachment, index) => {
         const key = `${attachment.url || attachment.name}-${index}`;
@@ -23,10 +35,22 @@ export default function MessageBubbleContent({ message }) {
           return <ChatMediaVideo key={key} attachment={attachment} apiUrl={apiUrl} />;
         }
         const fileUrl = resolveChatMediaUrl(attachment.url, apiUrl);
+        const sizeLabel = formatFileSize(attachment.size);
         return (
-          <a key={key} href={fileUrl || attachment.url} target="_blank" rel="noopener noreferrer" className="chat-bubble-file">
-            {attachment.name || 'Download file'}
-          </a>
+          <div key={key} className="chat-attachment-card">
+            <div className="chat-attachment-card-meta">
+              <strong>{attachment.name || 'Attachment'}</strong>
+              {sizeLabel ? <span>{sizeLabel}</span> : null}
+            </div>
+            <div className="chat-attachment-card-actions">
+              {fileUrl ? (
+                <>
+                  <a href={fileUrl} target="_blank" rel="noopener noreferrer">Open</a>
+                  <a href={fileUrl} download={attachment.name || 'download'}>Download</a>
+                </>
+              ) : null}
+            </div>
+          </div>
         );
       })}
       {!body && !message.voiceNoteUrl && !attachments.length && !(message.attachments || []).some((item) => item.type === 'voice') ? (

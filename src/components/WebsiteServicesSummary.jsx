@@ -4,6 +4,8 @@ import SectionHeader from './SectionHeader';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import websiteHeroImage from '../assets/tech.jpg';
 import { usePartnerAsset } from '../utils/partnerMedia';
+import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
 import PartnerMediaFrame from './PartnerMediaFrame';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
@@ -12,7 +14,10 @@ import './WebsiteServicesSection.css';
 function WebsiteServicesSummary() {
   const navigate = useNavigate();
   const section = usePartnerSectionContent('websiteDevelopment');
-  const { src: websiteImageSrc } = usePartnerAsset('websiteServicesImage', websiteHeroImage);
+  const { isPartnerSite } = usePartnerBranding();
+  const { src: partnerImageSrc } = usePartnerAsset('websiteServicesImage', websiteHeroImage);
+  const mainSiteImageSrc = useMainSiteServiceImage('websiteServicesImage', websiteHeroImage);
+  const websiteImageSrc = isPartnerSite ? partnerImageSrc : mainSiteImageSrc;
 
   return (
     <section id="website-services" className="website-services-section website-services-summary services-summary-layout">

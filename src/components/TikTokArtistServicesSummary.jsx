@@ -3,6 +3,8 @@ import SectionHeader from './SectionHeader';
 import Button from './Button';
 import ServicesSummaryLayout from './ServicesSummaryLayout';
 import tiktokArtistHeroImage from '../assets/social/tiktok-artist.jpg';
+import { usePartnerBranding } from '../contexts/PartnerBrandingContext';
+import { useMainSiteServiceImage } from '../contexts/MainSiteMediaContext';
 import { ServiceSectionTitle } from './ServiceSectionTitle';
 import { usePartnerSectionContent } from '../utils/partnerSectionContent';
 import './ServicesSummaryHero.css';
@@ -10,6 +12,9 @@ import './ServicesSummaryHero.css';
 function TikTokArtistServicesSummary() {
   const navigate = useNavigate();
   const section = usePartnerSectionContent('tiktokArtist');
+  const { isPartnerSite } = usePartnerBranding();
+  const tiktokImageSrc = useMainSiteServiceImage('tiktokArtistImage', tiktokArtistHeroImage);
+  const heroImageSrc = isPartnerSite ? tiktokArtistHeroImage : tiktokImageSrc;
 
   return (
     <section
@@ -29,7 +34,7 @@ function TikTokArtistServicesSummary() {
         media={(
           <div className="services-summary-hero-shell">
             <img
-              src={tiktokArtistHeroImage}
+              src={heroImageSrc}
               alt="Person scrolling TikTok on a phone — artist promotion and sound campaigns"
               className="services-summary-hero-image"
             />

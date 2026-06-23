@@ -116,7 +116,10 @@ export function patchAdminPartnerInbox(threads, payload) {
 
   const message = payload.message;
   const existing = threads[index];
-  const incomingUnread = message.senderType === 'partner' && !message.readAt ? 1 : 0;
+  const incomingUnread =
+    ['partner', 'client'].includes(message.senderType) && !message.readAt && !message.isInternal
+      ? 1
+      : 0;
   const alreadySeen = existing.lastMessage?.id === message.id;
 
   const next = [...threads];

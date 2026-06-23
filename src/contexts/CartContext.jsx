@@ -61,6 +61,9 @@ export const CartProvider = ({ children }) => {
           description: item.description || '',
           category: item.category,
           quantity: item.quantity || 1,
+          packageId: item.packageId || null,
+          priceValue: item.priceValue != null ? item.priceValue : null,
+          metadata: item.metadata || null,
         }),
       });
 

@@ -1,0 +1,175 @@
+.agreement-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.agreement-shell {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.agreement-header-card,
+.agreement-document-card,
+.agreement-sign-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.agreement-header-card h1 {
+  margin: 0 0 8px;
+  font-size: 1.75rem;
+  color: #0f172a;
+}
+
+.agreement-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.agreement-meta-block {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.agreement-meta-block h3 {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.agreement-document-card iframe,
+.agreement-document-html {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  min-height: 420px;
+  background: #fff;
+}
+
+.agreement-sign-methods {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.agreement-sign-method {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.agreement-sign-method.active {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #fff;
+}
+
+.agreement-checks {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.agreement-checks label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.92rem;
+  color: #334155;
+}
+
+.agreement-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.agreement-primary-btn,
+.agreement-secondary-btn,
+.agreement-danger-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.agreement-primary-btn {
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.agreement-secondary-btn {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.agreement-danger-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.agreement-signature-pad {
+  margin-top: 12px;
+}
+
+.agreement-signature-canvas {
+  width: 100%;
+  max-width: 640px;
+  border: 1px dashed #94a3b8;
+  border-radius: 10px;
+  background: #fff;
+  touch-action: none;
+}
+
+.agreement-typed-input,
+.agreement-upload-input {
+  width: 100%;
+  max-width: 420px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.agreement-locked-banner {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.agreement-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.agreement-status-pill.awaiting_signature { background: #fef3c7; color: #b45309; }
+.agreement-status-pill.fully_executed { background: #dcfce7; color: #15803d; }
+.agreement-status-pill.declined { background: #fee2e2; color: #b91c1c; }
+
+@media (max-width: 768px) {
+  .agreement-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}
