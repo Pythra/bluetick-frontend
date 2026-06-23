@@ -23,10 +23,20 @@ function ArticleSubmissionPage() {
     postTitle: '',
     postBody: '',
     articleContent: '',
+    preferredPublicationCategory: '',
+    preferredPublicationDate: '',
+    preferredMediaPlatforms: '',
+    contactInformation: '',
+    linksToInclude: '',
+    socialMediaLinks: '',
     file: null,
     fileName: '',
     images: [],
     imageFiles: [],
+    companyLogo: null,
+    companyLogoName: '',
+    videos: [],
+    videoFiles: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
@@ -130,6 +140,27 @@ function ArticleSubmissionPage() {
     }));
   };
 
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        companyLogo: file,
+        companyLogoName: file.name,
+      }));
+    }
+  };
+
+  const handleVideoChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setFormData((prev) => ({
+      ...prev,
+      videos: [...prev.videos, ...files.map((file) => file.name)],
+      videoFiles: [...prev.videoFiles, ...files],
+    }));
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -204,10 +235,20 @@ function ArticleSubmissionPage() {
       postTitle: '',
       postBody: '',
       articleContent: '',
+      preferredPublicationCategory: '',
+      preferredPublicationDate: '',
+      preferredMediaPlatforms: '',
+      contactInformation: '',
+      linksToInclude: '',
+      socialMediaLinks: '',
       file: null,
       fileName: '',
       images: [],
       imageFiles: [],
+      companyLogo: null,
+      companyLogoName: '',
+      videos: [],
+      videoFiles: [],
     });
   };
 
@@ -223,8 +264,27 @@ function ArticleSubmissionPage() {
     }
 
     if (!plainPostBody) {
-      setError('Please enter the article body');
+      setError('Please enter the article content');
       return;
+    }
+
+    if (isPublication) {
+      if (!formData.preferredPublicationCategory.trim()) {
+        setError('Preferred publication category is required');
+        return;
+      }
+      if (!formData.preferredPublicationDate.trim()) {
+        setError('Preferred publication date is required');
+        return;
+      }
+      if (!formData.preferredMediaPlatforms.trim()) {
+        setError('Preferred media platforms are required');
+        return;
+      }
+      if (!formData.contactInformation.trim()) {
+        setError('Contact information is required');
+        return;
+      }
     }
 
     if (!resolvedOrderId) {
@@ -248,8 +308,15 @@ function ArticleSubmissionPage() {
           postTitle: formData.postTitle.trim(),
           postBody: formData.postBody.trim(),
           articleContent: plainArticleContent,
+          preferredPublicationCategory: formData.preferredPublicationCategory.trim(),
+          preferredPublicationDate: formData.preferredPublicationDate.trim(),
+          preferredMediaPlatforms: formData.preferredMediaPlatforms.trim(),
+          contactInformation: formData.contactInformation.trim(),
+          linksToInclude: formData.linksToInclude.trim(),
+          socialMediaLinks: formData.socialMediaLinks.trim(),
           orderId: resolvedOrderId,
           fileName: formData.fileName,
+          companyLogoName: formData.companyLogoName,
           useSameArticleForAll: multiplePublications ? useSameArticleForAll : true,
           targetItemId:
             multiplePublications && !useSameArticleForAll ? activeTargetItemId : undefined,
@@ -459,6 +526,48 @@ function ArticleSubmissionPage() {
                     </div>
                   )}
 
+                  {isPublication && orderFromLink ? (
+                    <section className="article-form-section article-order-meta-section">
+                      <h2 className="article-form-section-title">Order information</h2>
+                      <div className="article-order-meta-grid">
+                        <div className="form-group">
+                          <label>Order ID</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            readOnly
+                            value={String(orderFromLink._id || resolvedOrderId || '')}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Payment reference</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            readOnly
+                            value={
+                              orderFromLink.paymentReference ||
+                              orderFromLink.paymentDetails?.reference ||
+                              '—'
+                            }
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Submission date</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            readOnly
+                            value={new Date().toLocaleString('en-NG', {
+                              dateStyle: 'medium',
+                              timeStyle: 'short',
+                            })}
+                          />
+                        </div>
+                      </div>
+                    </section>
+                  ) : null}
+
                   {multiplePublications && (
                     <section className="article-form-section article-multi-pub-section">
                       <h2 className="article-multi-pub-title">Multiple publications</h2>
@@ -536,7 +645,7 @@ function ArticleSubmissionPage() {
 
                     <div className="form-group">
                       <label htmlFor="postBody">
-                        {isPublication ? 'Article body *' : 'Post body *'}
+                        {isPublication ? 'Article content *' : 'Post body *'}
                       </label>
                       <RichTextEditor
                         value={formData.postBody}
@@ -555,34 +664,129 @@ function ArticleSubmissionPage() {
                       </small>
                     </div>
 
-                    <div className="form-group">
-                      <label htmlFor="articleContent">
-                        {isPublication ? 'Editorial notes' : 'Additional instructions'}
-                      </label>
-                      <textarea
-                        id="articleContent"
-                        name="articleContent"
-                        value={formData.articleContent}
-                        onChange={handleInputChange}
-                        placeholder="Preferred outlets, embargo dates, contact details, link preferences..."
-                        className="article-textarea article-textarea-compact"
-                        rows={5}
-                      />
-                      <small className="form-help">Plain text only — no formatting.</small>
-                    </div>
+                    {isPublication ? (
+                      <>
+                        <div className="form-group">
+                          <label htmlFor="preferredPublicationCategory">
+                            Preferred publication category *
+                          </label>
+                          <input
+                            type="text"
+                            id="preferredPublicationCategory"
+                            name="preferredPublicationCategory"
+                            value={formData.preferredPublicationCategory}
+                            onChange={handleInputChange}
+                            className="form-control"
+                            placeholder="e.g. Tech & Startups, African News"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="preferredPublicationDate">
+                            Preferred publication date *
+                          </label>
+                          <input
+                            type="date"
+                            id="preferredPublicationDate"
+                            name="preferredPublicationDate"
+                            value={formData.preferredPublicationDate}
+                            onChange={handleInputChange}
+                            className="form-control"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="preferredMediaPlatforms">
+                            Preferred media platforms *
+                          </label>
+                          <textarea
+                            id="preferredMediaPlatforms"
+                            name="preferredMediaPlatforms"
+                            value={formData.preferredMediaPlatforms}
+                            onChange={handleInputChange}
+                            className="article-textarea article-textarea-compact"
+                            rows={3}
+                            placeholder="List outlets or categories you want this published on"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="contactInformation">Contact information *</label>
+                          <textarea
+                            id="contactInformation"
+                            name="contactInformation"
+                            value={formData.contactInformation}
+                            onChange={handleInputChange}
+                            className="article-textarea article-textarea-compact"
+                            rows={3}
+                            placeholder="Name, email, phone for media enquiries"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="linksToInclude">Links to include</label>
+                          <textarea
+                            id="linksToInclude"
+                            name="linksToInclude"
+                            value={formData.linksToInclude}
+                            onChange={handleInputChange}
+                            className="article-textarea article-textarea-compact"
+                            rows={3}
+                            placeholder="Website, product pages, or other URLs"
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label htmlFor="socialMediaLinks">Social media links</label>
+                          <textarea
+                            id="socialMediaLinks"
+                            name="socialMediaLinks"
+                            value={formData.socialMediaLinks}
+                            onChange={handleInputChange}
+                            className="article-textarea article-textarea-compact"
+                            rows={3}
+                            placeholder="Instagram, LinkedIn, X, etc."
+                          />
+                        </div>
+                      </>
+                    ) : (
+                      <div className="form-group">
+                        <label htmlFor="articleContent">Additional instructions</label>
+                        <textarea
+                          id="articleContent"
+                          name="articleContent"
+                          value={formData.articleContent}
+                          onChange={handleInputChange}
+                          placeholder="Preferred outlets, embargo dates, contact details, link preferences..."
+                          className="article-textarea article-textarea-compact"
+                          rows={5}
+                        />
+                        <small className="form-help">Plain text only — no formatting.</small>
+                      </div>
+                    )}
                   </section>
 
                   <section className="article-form-section">
                     <div className="article-form-section-head">
                       <IoCloudUploadOutline aria-hidden="true" />
                       <div>
-                        <h2>Files &amp; images</h2>
-                        <p>Optional uploads to support your submission.</p>
+                        <h2>{isPublication ? 'File uploads' : 'Files & images'}</h2>
+                        <p>
+                          {isPublication
+                            ? 'Article document, images, videos, and company logo.'
+                            : 'Optional uploads to support your submission.'}
+                        </p>
                       </div>
                     </div>
 
                     <div className="form-group file-upload-container">
-                      <label htmlFor="file-upload">Document (optional)</label>
+                      <label htmlFor="file-upload">
+                        {isPublication ? 'Article document' : 'Document (optional)'}
+                      </label>
                       <div className="file-upload-wrapper">
                         <input
                           type="file"
@@ -643,6 +847,61 @@ function ArticleSubmissionPage() {
                         </div>
                       )}
                     </div>
+
+                    {isPublication ? (
+                      <>
+                        <div className="form-group file-upload-container">
+                          <label htmlFor="video-upload">Videos</label>
+                          <div className="file-upload-wrapper">
+                            <input
+                              type="file"
+                              id="video-upload"
+                              onChange={handleVideoChange}
+                              className="file-upload-input"
+                              accept="video/*"
+                              multiple
+                            />
+                            <label htmlFor="video-upload" className="file-upload-label">
+                              {formData.videos.length
+                                ? `${formData.videos.length} video(s) selected`
+                                : 'Choose video files'}
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="form-group file-upload-container">
+                          <label htmlFor="logo-upload">Company logo</label>
+                          <div className="file-upload-wrapper">
+                            <input
+                              type="file"
+                              id="logo-upload"
+                              onChange={handleLogoChange}
+                              className="file-upload-input"
+                              accept="image/*"
+                            />
+                            <label htmlFor="logo-upload" className="file-upload-label">
+                              {formData.companyLogoName || 'Choose logo image'}
+                            </label>
+                            {formData.companyLogoName ? (
+                              <button
+                                type="button"
+                                className="file-upload-clear"
+                                onClick={() =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    companyLogo: null,
+                                    companyLogoName: '',
+                                  }))
+                                }
+                                aria-label="Remove logo"
+                              >
+                                ×
+                              </button>
+                            ) : null}
+                          </div>
+                        </div>
+                      </>
+                    ) : null}
                   </section>
 
                   <div className="form-actions">

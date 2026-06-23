@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Button from './Button';
 import { useToast } from '../contexts/ToastContext';
-import { getFormSchema } from '../data/projectOnboardingForms';
+import { buildOrderContextValues, getFormSchema } from '../data/projectOnboardingForms';
 
 function emptyValues(fields) {
   const values = {};
@@ -22,6 +22,7 @@ function DynamicProjectForm({
   taskLabel,
   itemId,
   orderId,
+  order,
   apiUrl,
   authFetch,
   initialValues,
@@ -30,8 +31,14 @@ function DynamicProjectForm({
 }) {
   const schema = getFormSchema(formType);
   const { showToast } = useToast();
+  const orderContext = useMemo(
+    () => buildOrderContextValues(order || { _id: orderId }, taskLabel),
+    [order, orderId, taskLabel]
+  );
+
   const [values, setValues] = useState(() => ({
     ...emptyValues(schema.fields),
+    ...orderContext,
     ...(initialValues || {}),
   }));
   const [uploadingField, setUploadingField] = useState('');
@@ -95,7 +102,7 @@ function DynamicProjectForm({
     setError('');
 
     for (const field of schema.fields) {
-      if (!field.required) continue;
+      if (!field.required || field.type === 'readonly') continue;
       const value = values[field.id];
       if (field.type === 'checkbox') continue;
       if (field.type === 'file' || field.type === 'files') {
@@ -103,7 +110,7 @@ function DynamicProjectForm({
           field.type === 'files'
             ? Array.isArray(value) && value.length > 0
             : value && (value.url || value.fileName);
-        if (!hasFile && !String(value || '').trim()) {
+        if (!hasFile) {
           setError(`${field.label} is required`);
           return;
         }
@@ -117,10 +124,16 @@ function DynamicProjectForm({
 
     setIsSubmitting(true);
     try {
+      const submissionValues = {
+        ...values,
+        ...orderContext,
+        submissionDate: new Date().toISOString(),
+      };
+
       const payload =
         formType === 'client_profile'
-          ? { orderId, formType, clientProfile: values }
-          : { orderId, formType, itemId, formData: values };
+          ? { orderId, formType, clientProfile: submissionValues }
+          : { orderId, formType, itemId, formData: submissionValues };
 
       const response = await authFetch(`${apiUrl}/api/orders/project-submission`, {
         method: 'POST',
@@ -158,6 +171,16 @@ function DynamicProjectForm({
             {field.required ? <span className="project-onboarding-required"> *</span> : null}
           </label>
 
+          {field.type === 'readonly' ? (
+            <input
+              id={field.id}
+              type="text"
+              className="project-onboarding-readonly"
+              readOnly
+              value={values[field.id] || orderContext[field.id] || ''}
+            />
+          ) : null}
+
           {field.type === 'textarea' ? (
             <textarea
               id={field.id}
@@ -189,12 +212,36 @@ function DynamicProjectForm({
             />
           ) : null}
 
+          {field.type === 'date' ? (
+            <input
+              id={field.id}
+              type="date"
+              value={values[field.id] || ''}
+              onChange={(e) => handleChange(field, e.target.value)}
+            />
+          ) : null}
+
+          {field.type === 'select' ? (
+            <select
+              id={field.id}
+              value={values[field.id] || ''}
+              onChange={(e) => handleChange(field, e.target.value)}
+            >
+              <option value="">Select…</option>
+              {(field.options || []).map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          ) : null}
+
           {field.type === 'file' || field.type === 'files' ? (
             <div className="project-onboarding-file">
               <input
                 type="file"
                 multiple={field.type === 'files'}
-                accept="image/*,.pdf,.doc,.docx,.zip"
+                accept="image/*,.pdf,.doc,.docx,.zip,video/*,.mp3,.wav"
                 onChange={(e) => handleFileChange(field, e.target.files)}
               />
               {uploadingField === field.id ? (

@@ -112,12 +112,20 @@
 .project-onboarding-field input[type='text'],
 .project-onboarding-field input[type='email'],
 .project-onboarding-field input[type='tel'],
+.project-onboarding-field input[type='date'],
+.project-onboarding-field select,
 .project-onboarding-field textarea {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font: inherit;
+}
+
+.project-onboarding-readonly {
+  background: #f8fafc;
+  color: #475569;
+  cursor: not-allowed;
 }
 
 .project-onboarding-checkbox {

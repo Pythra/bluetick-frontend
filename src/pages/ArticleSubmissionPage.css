@@ -508,6 +508,17 @@
   }
 }
 
+.article-order-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.article-order-meta-grid .form-control[readonly] {
+  background: #f8fafc;
+  color: #475569;
+}
+
 @media (max-width: 640px) {
   .article-submission-main {
     padding: 0 1rem 2.5rem;

@@ -6,7 +6,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Button from '../components/Button';
 import DynamicProjectForm from '../components/DynamicProjectForm';
-import { FORM_TYPES } from '../data/projectOnboardingForms';
+import { FORM_TYPES, buildOrderContextValues } from '../data/projectOnboardingForms';
 import { usePartnerText } from '../utils/partnerText';
 import './ProjectOnboardingPage.css';
 
@@ -75,7 +75,10 @@ function ProjectOnboardingPage() {
 
   const activeTask = order?.onboardingTasks?.find((task) => task.id === activeTaskId);
   const clientProfileDefaults = {
+    ...buildOrderContextValues(order || {}, order?.productName),
     fullName: [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim(),
+    companyBrandName:
+      order?.clientProfile?.companyBrandName || order?.clientProfile?.businessName || '',
     email: user?.email || order?.email || '',
     phone: user?.phone || '',
     ...(order?.clientProfile || {}),
@@ -169,6 +172,7 @@ function ProjectOnboardingPage() {
               taskLabel={activeTask.label}
               itemId={activeTask.itemId}
               orderId={orderId}
+              order={order}
               apiUrl={apiUrl}
               authFetch={authFetch}
               initialValues={
