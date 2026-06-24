@@ -69,7 +69,7 @@ import { subscribeToPushNotifications } from './utils/pushNotifications';
 import ClientMessagesFab from './components/ClientMessagesFab';
 import RegisterPartnerSiteUser from './components/RegisterPartnerSiteUser';
 import MainSiteMaintenancePage from './pages/MainSiteMaintenancePage';
-import { shouldShowMainSiteMaintenance } from './utils/mainSiteMaintenance';
+import { shouldShowSiteMaintenance } from './utils/mainSiteMaintenance';
 import './App.css';
 import './styles/partnerTemplates.css';
 import './styles/brandTheme.css';
@@ -314,7 +314,7 @@ function AppRoutes() {
 }
 
 function App() {
-  if (shouldShowMainSiteMaintenance()) {
+  if (shouldShowSiteMaintenance()) {
     return <MainSiteMaintenancePage />;
   }
 
