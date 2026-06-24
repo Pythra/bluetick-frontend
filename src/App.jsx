@@ -68,6 +68,8 @@ import { isPartnerHomepageServiceEnabled, PARTNER_HOMEPAGE_SERVICES, getCustomSe
 import { subscribeToPushNotifications } from './utils/pushNotifications';
 import ClientMessagesFab from './components/ClientMessagesFab';
 import RegisterPartnerSiteUser from './components/RegisterPartnerSiteUser';
+import MainSiteMaintenancePage from './pages/MainSiteMaintenancePage';
+import { shouldShowMainSiteMaintenance } from './utils/mainSiteMaintenance';
 import './App.css';
 import './styles/partnerTemplates.css';
 import './styles/brandTheme.css';
@@ -270,14 +272,64 @@ function PushSubscriptionBootstrap() {
   return null;
 }
 
+function AppRoutes() {
+  if (shouldShowMainSiteMaintenance()) {
+    return (
+      <Routes>
+        <Route path="*" element={<MainSiteMaintenancePage />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/services/apps" element={<AppServicesPage />} />
+      <Route path="/services/websites" element={<WebsiteServicesPage />} />
+      <Route path="/services/verification" element={<VerificationServicesPage />} />
+      <Route path="/services/monetization" element={<MonetizationServicesPage />} />
+      <Route path="/services/twitter-trends" element={<TwitterTrendServicesPage />} />
+      <Route path="/services/music-streaming" element={<MusicStreamingVerificationPage />} />
+      <Route path="/services/tiktok-artist" element={<TikTokArtistServicesPage />} />
+      <Route path="/services/publications">
+        <Route index element={<PublicationServicesPage />} />
+        <Route path="package/:id" element={<PackageDetailPage />} />
+      </Route>
+      <Route path="/services/instagram" element={<InstagramServicesPage />} />
+      <Route path="/services/wikipedia" element={<WikipediaServicesPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/account" element={<MyAccountPage />} />
+      <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/article-submission" element={<ArticleSubmissionPage />} />
+      <Route path="/project-onboarding" element={<ProjectOnboardingPage />} />
+      <Route path="/service-agreement" element={<ServiceAgreementPage />} />
+      <Route path="/verify-agreement/:token" element={<VerifyAgreementPage />} />
+      <Route path="/admin" element={<AdminApp />} />
+      <Route path="/admin-dashboard" element={<AdminApp />} />
+      <Route path="/terms" element={<TermsAndConditions />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/refund-policy" element={<RefundPolicy />} />
+      <Route path="/legal/:slug" element={<LegalDocumentPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/partner" element={<PartnerPage />} />
+      <Route path="/partner/apply" element={<PartnerApplicationPage />} />
+      <Route path="/partner/verify-email" element={<PartnerVerifyEmailPage />} />
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/blog/:slug" element={<BlogPostPage />} />
+    </Routes>
+  );
+}
+
 function App() {
-  // Create a custom history object with the future flags
   const history = createBrowserHistory({
     future: {
       v7_startTransition: true,
       v7_relativeSplatPath: true
     }
   });
+
+  const mainSiteMaintenance = shouldShowMainSiteMaintenance();
 
   return (
     <AuthProvider>
@@ -288,48 +340,13 @@ function App() {
         <ToastProvider>
         <CartProvider>
           <Router history={history}>
-          <PushSubscriptionBootstrap />
-          <ScrollToTop />
+          {!mainSiteMaintenance ? <PushSubscriptionBootstrap /> : null}
+          {!mainSiteMaintenance ? <ScrollToTop /> : null}
           <div className="App">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/services/apps" element={<AppServicesPage />} />
-              <Route path="/services/websites" element={<WebsiteServicesPage />} />
-              <Route path="/services/verification" element={<VerificationServicesPage />} />
-              <Route path="/services/monetization" element={<MonetizationServicesPage />} />
-              <Route path="/services/twitter-trends" element={<TwitterTrendServicesPage />} />
-              <Route path="/services/music-streaming" element={<MusicStreamingVerificationPage />} />
-              <Route path="/services/tiktok-artist" element={<TikTokArtistServicesPage />} />
-              <Route path="/services/publications">
-                <Route index element={<PublicationServicesPage />} />
-                <Route path="package/:id" element={<PackageDetailPage />} />
-              </Route>
-              <Route path="/services/instagram" element={<InstagramServicesPage />} />
-              <Route path="/services/wikipedia" element={<WikipediaServicesPage />} />
-              <Route path="/signup" element={<SignUpPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/account" element={<MyAccountPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/article-submission" element={<ArticleSubmissionPage />} />
-              <Route path="/project-onboarding" element={<ProjectOnboardingPage />} />
-              <Route path="/service-agreement" element={<ServiceAgreementPage />} />
-              <Route path="/verify-agreement/:token" element={<VerifyAgreementPage />} />
-              <Route path="/admin" element={<AdminApp />} />
-              <Route path="/admin-dashboard" element={<AdminApp />} />
-              <Route path="/terms" element={<TermsAndConditions />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/refund-policy" element={<RefundPolicy />} />
-              <Route path="/legal/:slug" element={<LegalDocumentPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/partner" element={<PartnerPage />} />
-              <Route path="/partner/apply" element={<PartnerApplicationPage />} />
-              <Route path="/partner/verify-email" element={<PartnerVerifyEmailPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/blog/:slug" element={<BlogPostPage />} />
-            </Routes>
-            <CartIcon />
-            <RegisterPartnerSiteUser />
-            <ClientMessagesFab />
+            <AppRoutes />
+            {!mainSiteMaintenance ? <CartIcon /> : null}
+            {!mainSiteMaintenance ? <RegisterPartnerSiteUser /> : null}
+            {!mainSiteMaintenance ? <ClientMessagesFab /> : null}
           </div>
           </Router>
         </CartProvider>
