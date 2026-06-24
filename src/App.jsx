@@ -273,14 +273,6 @@ function PushSubscriptionBootstrap() {
 }
 
 function AppRoutes() {
-  if (shouldShowMainSiteMaintenance()) {
-    return (
-      <Routes>
-        <Route path="*" element={<MainSiteMaintenancePage />} />
-      </Routes>
-    );
-  }
-
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
@@ -322,14 +314,16 @@ function AppRoutes() {
 }
 
 function App() {
+  if (shouldShowMainSiteMaintenance()) {
+    return <MainSiteMaintenancePage />;
+  }
+
   const history = createBrowserHistory({
     future: {
       v7_startTransition: true,
       v7_relativeSplatPath: true
     }
   });
-
-  const mainSiteMaintenance = shouldShowMainSiteMaintenance();
 
   return (
     <AuthProvider>
@@ -340,13 +334,13 @@ function App() {
         <ToastProvider>
         <CartProvider>
           <Router history={history}>
-          {!mainSiteMaintenance ? <PushSubscriptionBootstrap /> : null}
-          {!mainSiteMaintenance ? <ScrollToTop /> : null}
+          <PushSubscriptionBootstrap />
+          <ScrollToTop />
           <div className="App">
             <AppRoutes />
-            {!mainSiteMaintenance ? <CartIcon /> : null}
-            {!mainSiteMaintenance ? <RegisterPartnerSiteUser /> : null}
-            {!mainSiteMaintenance ? <ClientMessagesFab /> : null}
+            <CartIcon />
+            <RegisterPartnerSiteUser />
+            <ClientMessagesFab />
           </div>
           </Router>
         </CartProvider>
